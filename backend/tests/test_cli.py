@@ -88,3 +88,15 @@ def test_existing_output_fails_before_network(tmp_path):
             == 1
         )
         acquire.assert_not_called()
+
+
+def test_malformed_manifest_cli_exits_cleanly(tmp_path, capsys):
+    (tmp_path / "metadata.json").write_text("null")
+    assert main(["inspect", str(tmp_path)]) == 1
+    assert "JSON object" in capsys.readouterr().err
+
+
+def test_cancelled_inspection_exits_cleanly(tmp_path, capsys):
+    with patch("uas_planner.cli.load_dataset", side_effect=KeyboardInterrupt):
+        assert main(["inspect", str(tmp_path)]) == 130
+    assert "Cancelled" in capsys.readouterr().err

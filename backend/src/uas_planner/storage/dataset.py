@@ -3,6 +3,7 @@
 import hashlib
 import json
 import math
+import re
 from dataclasses import asdict
 from datetime import datetime, timezone
 from importlib.metadata import version
@@ -14,6 +15,35 @@ import pandas as pd
 from uas_planner.core.area import BoundingBox
 
 IDENTITY = ["element_type", "osm_id"]
+RESERVED = {*IDENTITY, "geometry", "tags_json"}
+
+
+def _validate_metadata(metadata):
+    if not isinstance(metadata, dict):
+        raise ValueError("Dataset metadata must be a JSON object.")
+    if metadata.get("schema_version") != 1:
+        raise ValueError("Unsupported dataset schema version.")
+    if metadata.get("crs") != "EPSG:4326":
+        raise ValueError("Dataset metadata CRS must be EPSG:4326.")
+    count = metadata.get("feature_count")
+    if type(count) is not int or count < 0:
+        raise ValueError("Dataset feature count must be a non-negative integer.")
+    if not isinstance(metadata.get("sha256"), str) or not re.fullmatch(
+        r"[a-f0-9]{64}", metadata["sha256"]
+    ):
+        raise ValueError("Dataset metadata requires a SHA-256 checksum.")
+    columns = metadata.get("tag_columns")
+    if (
+        not isinstance(columns, list)
+        or not all(isinstance(name, str) for name in columns)
+        or len(set(columns)) != len(columns)
+        or RESERVED.intersection(columns)
+    ):
+        raise ValueError("Dataset tag columns must be unique names without reserved fields.")
+    try:
+        BoundingBox(**metadata["query_bounds"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError("Dataset metadata requires valid query bounds.") from exc
 
 
 def _json_value(value):
@@ -54,6 +84,8 @@ def save_dataset(frame: gpd.GeoDataFrame, directory: Path, area: BoundingBox, ta
         raise ValueError("Dataset contains missing or empty geometries.")
     frame = frame.to_crs(4326)
     tag_columns = [name for name in frame.columns if name not in [*IDENTITY, frame.geometry.name]]
+    if RESERVED.intersection(tag_columns):
+        raise ValueError("Dataset tag columns conflict with reserved fields.")
     rows = [
         json.dumps({name: _json_value(row[name]) for name in tag_columns}, allow_nan=False)
         for _, row in frame.iterrows()
@@ -91,12 +123,14 @@ def load_dataset(directory: Path) -> tuple[gpd.GeoDataFrame, dict]:
     """Load only local files, validating schema, checksum, count, identity, and CRS."""
     directory = Path(directory)
     metadata = json.loads((directory / "metadata.json").read_text(encoding="utf-8"))
-    if metadata.get("schema_version") != 1:
-        raise ValueError("Unsupported dataset schema version.")
     path = directory / "features.gpkg"
+    _validate_metadata(metadata)
     if checksum(path) != metadata.get("sha256"):
         raise ValueError("Dataset checksum mismatch.")
-    stored = gpd.read_file(path, layer="features", engine="pyogrio")
+    try:
+        stored = gpd.read_file(path, layer="features", engine="pyogrio")
+    except Exception as exc:
+        raise ValueError("Cannot read dataset GeoPackage features layer.") from exc
     if len(stored) != metadata.get("feature_count"):
         raise ValueError("Dataset feature count does not match metadata.")
     if stored.crs is None or stored.crs.to_string() != metadata.get("crs"):
@@ -105,10 +139,14 @@ def load_dataset(directory: Path) -> tuple[gpd.GeoDataFrame, dict]:
         raise ValueError("Dataset is missing required columns.")
     if stored[IDENTITY].isna().any().any() or stored.duplicated(IDENTITY).any():
         raise ValueError("Dataset has invalid OSM identities.")
-    tag_rows = [json.loads(value) for value in stored["tags_json"]]
-    reserved = {*IDENTITY, "geometry", "tags_json"}
-    if reserved.intersection(metadata["tag_columns"]):
-        raise ValueError("Dataset tag columns conflict with reserved fields.")
+    if stored.geometry.isna().any() or stored.geometry.is_empty.any():
+        raise ValueError("Dataset contains missing or empty geometries.")
+    try:
+        tag_rows = [json.loads(value) for value in stored["tags_json"]]
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Dataset contains malformed JSON tags.") from exc
+    if not all(isinstance(row, dict) for row in tag_rows):
+        raise ValueError("Dataset tags must be JSON objects.")
     result = stored.drop(columns="tags_json")
     for name in metadata["tag_columns"]:
         result[name] = [row.get(name) for row in tag_rows]
