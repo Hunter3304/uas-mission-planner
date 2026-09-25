@@ -67,7 +67,14 @@ def checksum(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def save_dataset(frame: gpd.GeoDataFrame, directory: Path, area: BoundingBox, tags: dict) -> dict:
+def save_dataset(
+    frame: gpd.GeoDataFrame,
+    directory: Path,
+    area: BoundingBox,
+    tags: dict,
+    *,
+    synthetic: bool = False,
+) -> dict:
     """Create a new dataset; manifest written last marks successful completion.
 
     On a write failure a partial directory may remain for diagnosis. It will not
@@ -115,6 +122,17 @@ def save_dataset(frame: gpd.GeoDataFrame, directory: Path, area: BoundingBox, ta
         "sha256": checksum(path),
         "versions": {name: version(name) for name in ["osmnx", "geopandas", "pyogrio", "shapely"]},
     }
+    metadata["synthetic"] = synthetic
+    if synthetic:
+        metadata.update(
+            {
+                "source": "Synthetic demonstration sample",
+                "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+                "license_url": None,
+                "cache_policy": "Generated locally; no network or cache used.",
+                "geometry_policy": "Fixed synthetic geometries; identifiers are illustrative only.",
+            }
+        )
     (directory / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     return metadata
 

@@ -13,6 +13,8 @@ export type MapData = FeatureCollection<Geometry, Record<string, unknown>>
 export interface Dataset {
   id: string
   verified: boolean
+  synthetic?: boolean
+  source?: string
   error?: string
   feature_count: number
   crs: string
