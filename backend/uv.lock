@@ -563,13 +563,14 @@ wheels = [
 [[package]]
 name = "uas-mission-planner"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "geopandas" },
     { name = "osmnx" },
     { name = "pyogrio" },
     { name = "pyproj" },
+    { name = "requests" },
     { name = "shapely" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -588,6 +589,7 @@ requires-dist = [
     { name = "osmnx", specifier = ">=2.1.1" },
     { name = "pyogrio", specifier = ">=0.13.0" },
     { name = "pyproj", specifier = ">=3.8.0" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "shapely", specifier = ">=2.1.2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
