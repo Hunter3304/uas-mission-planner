@@ -24,6 +24,8 @@ def parser():
         "inspect", help="Reload and verify a local dataset without network"
     )
     inspect.add_argument("directory", type=Path)
+    sample = commands.add_parser("sample", help="Create a synthetic offline demonstration dataset")
+    sample.add_argument("--output", type=Path, required=True, help="New dataset directory")
     return result
 
 
@@ -43,6 +45,11 @@ def main(argv=None):
             frame.attrs["acquisition_finished_at_utc"] = datetime.now(timezone.utc).isoformat()
             save_dataset(frame, args.output, area, TAGS)
             directory = args.output
+        elif args.command == "sample":
+            from uas_planner.sample import create_sample
+
+            create_sample(args.output)
+            directory = args.output
         else:
             directory = args.directory
         frame, metadata = load_dataset(directory)
@@ -55,6 +62,7 @@ def main(argv=None):
             "query_bounds": metadata["query_bounds"],
             "sha256": metadata["sha256"],
             "verified": True,
+            "synthetic": metadata.get("synthetic", False),
         }
         print(json.dumps(summary, indent=2, allow_nan=False))
         return 0

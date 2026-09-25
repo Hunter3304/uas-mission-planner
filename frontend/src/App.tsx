@@ -289,7 +289,9 @@ export default function App() {
                   <strong data-testid="total-count">
                     {dataset.feature_count.toLocaleString()}
                   </strong>
-                  <small>Unique OSM objects</small>
+                  <small>
+                    {dataset.synthetic ? 'Synthetic sample objects' : 'Unique OSM objects'}
+                  </small>
                 </article>
                 <article className="stat">
                   <span>Visible on map</span>
@@ -460,7 +462,12 @@ export default function App() {
                 </section>
               </div>
               <footer className="data-footer">
-                <span>Source: © OpenStreetMap contributors</span>
+                <span>
+                  Source:{' '}
+                  {dataset.synthetic
+                    ? 'Synthetic demonstration sample'
+                    : '© OpenStreetMap contributors'}
+                </span>
                 <span>Saved {dateText(dataset.saved_at_utc)}</span>
                 <span>{dataset.invalid_geometry_count} invalid geometries recorded</span>
               </footer>
