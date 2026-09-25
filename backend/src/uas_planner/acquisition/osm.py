@@ -43,7 +43,12 @@ def acquire(area: BoundingBox, cache_dir: Path) -> gpd.GeoDataFrame:
                 raise AcquisitionError(f"OSM acquisition failed: {exc}") from exc
         finally:
             ox.settings.cache_folder, ox.settings.use_cache, ox.settings.requests_timeout = original
-    frame = frame.reset_index().rename(columns={"osmid": "osm_id"})
+    if frame.index.nlevels != 2 or tuple(frame.index.names) not in {
+        ("element", "id"),
+        ("element_type", "osmid"),
+    }:
+        raise AcquisitionError("Unrecognized OSM feature identity index.")
+    frame = frame.rename_axis(index=["element_type", "osm_id"]).reset_index()
     if not {"element_type", "osm_id"}.issubset(frame.columns):
         raise AcquisitionError("OSM response lacks element identity.")
     return frame.to_crs("EPSG:4326")

@@ -3,11 +3,24 @@
 ## Current status
 
 - Local project directory: `D:\Aostfalia\develop\uas-mission-planner`.
-- Intended GitHub repository: `Hunter3304/uas-mission-planner`, public.
-- The local directory, this handoff file, and README.md have been created.
-- Git initialization and remote repository creation have not yet been performed.
-- No sprint, milestone, issue, branch, or application code has been created.
-- Next step: discuss and agree on Iteration 001 scope and acceptance criteria with the user, then record the agreed plan before creating the sprint.
+- GitHub repository: https://github.com/Hunter3304/uas-mission-planner (public).
+- Iteration 001: https://github.com/Hunter3304/uas-mission-planner/milestone/1.
+- Approved scope: specify an area -> acquire OSM data -> save -> reload.
+- Issues #1, #2, and #3 are closed; corresponding PRs #5, #6, and #7 merged into `iteration/001` and feature branches were deleted.
+- Issue #4 is being finalized on `feat/4-core-workflow`; its PR and the sprint PR still need CI validation and merge.
+- Python and frontend dependencies are installed and locked. The Python command-line core is implemented. React application screens and HTTP endpoints are deferred.
+- Local validation: 20 offline tests pass; Ruff passes; a real Braunschweig acquisition saved and reloaded 91 features.
+- Next step: publish the workflow PR, verify GitHub Actions, merge into `iteration/001`, close #4, then validate and merge the sprint into `main` and close the Milestone.
+
+## Local commands and demonstration
+
+- Install dependencies: `uv sync --project backend --locked` and `npm ci --prefix frontend`.
+- Run tests: `uv run --project backend --locked pytest backend/tests -q`.
+- Command help: `uv run --project backend --locked uas-planner --help`.
+- Reload live sample: `uv run --project backend --locked uas-planner inspect data/braunschweig-demo`.
+- Sample files: `data/braunschweig-demo/features.gpkg` and `metadata.json` (excluded from Git).
+- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0, authenticated as Hunter3304. It is invoked by absolute path; no global PATH change was made.
+- See README and `doc/iteration/iteration-001/feedback.md` for commands and limitations.
 
 ## Agreed architecture
 
@@ -43,15 +56,18 @@
 
 ## Open questions and pending decisions
 
-- Iteration 001 scope and acceptance criteria require discussion. Candidate scope: foundational environment and map-data acquisition prototype.
-- Dependency versions, exact module layout, and development commands will be determined during implementation.
-- README.md records the agreed stack and proposes Python 3.13.x, Node.js 24 LTS, npm 11, and uv. These version/tooling proposals await user confirmation and compatibility validation.
-- Local environment observed: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, Git 2.45.1.windows.1. uv was not found on PATH. These are observations, not validated project pins.
-- No application tests have run because application code does not exist yet.
+- No new sprint is approved. Discuss subsequent scope with the user before creating it.
+- Runtime baseline is approved and validated: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, uv 0.11.6. Git is 2.45.1.windows.1.
+- OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
+- Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.
+- Acquisition timestamps may describe a cache read, not the original source download/edit. Source snapshots require preserving the local dataset.
+- Frontend dependencies are ready, but there is no frontend app/build yet; CI only validates its dependency installation.
 
 ## Session outcome
 
-- Read the handoff and checked local runtime versions.
-- Consulted official Python, Node.js, Vite, and OSMnx documentation.
-- Added an English README documenting architecture, stack, proposed runtime baselines, version-locking policy, workflow, and pending setup.
-- No runtime changes or dependency installations were performed; application compatibility remains untested.
+- Installed and verified locked dependencies and checksum-verified GitHub CLI; user completed browser authorization.
+- Created the public repository, Milestone, and Issues before their feature branches.
+- Implemented acquisition, GeoPackage persistence, manifest validation, and command-line fetch/inspect.
+- Live testing exposed OSMnx index names `element/id`; normalized both these and the older `element_type/osmid` schema and added regression coverage.
+- A temporary-directory sandbox restriction affected the first environment smoke test; rerunning within the workspace passed. No application defect remained from that check.
+- Final local validation passed: 20 tests, Ruff, and 91-feature real-data round trip. Remote CI and final merges are pending at this checkpoint.

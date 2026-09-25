@@ -28,8 +28,9 @@ def test_invalid_bounds(bounds):
         BoundingBox(*bounds)
 
 
-def test_acquisition_preserves_identity_and_bbox_order(tmp_path):
-    index = pd.MultiIndex.from_tuples([("node", 123)], names=["element_type", "osmid"])
+@pytest.mark.parametrize("names", [["element", "id"], ["element_type", "osmid"]])
+def test_acquisition_preserves_identity_and_bbox_order(tmp_path, names):
+    index = pd.MultiIndex.from_tuples([("node", 123)], names=names)
     fixture = gpd.GeoDataFrame(
         {"natural": ["tree"]}, geometry=[Point(10.52, 52.27)], index=index, crs=4326
     )
