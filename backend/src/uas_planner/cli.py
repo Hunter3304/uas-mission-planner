@@ -6,12 +6,14 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from uas_planner import __version__
 from uas_planner.core.area import BoundingBox
 from uas_planner.storage.dataset import load_dataset, save_dataset
 
 
 def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
+    result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
     fetch = commands.add_parser("fetch", help="Acquire, save, and verify a new dataset")
     for name in ("west", "south", "east", "north"):
@@ -22,6 +24,8 @@ def parser():
         "inspect", help="Reload and verify a local dataset without network"
     )
     inspect.add_argument("directory", type=Path)
+    sample = commands.add_parser("sample", help="Create a synthetic offline demonstration dataset")
+    sample.add_argument("--output", type=Path, required=True, help="New dataset directory")
     return result
 
 
@@ -41,6 +45,11 @@ def main(argv=None):
             frame.attrs["acquisition_finished_at_utc"] = datetime.now(timezone.utc).isoformat()
             save_dataset(frame, args.output, area, TAGS)
             directory = args.output
+        elif args.command == "sample":
+            from uas_planner.sample import create_sample
+
+            create_sample(args.output)
+            directory = args.output
         else:
             directory = args.directory
         frame, metadata = load_dataset(directory)
@@ -53,9 +62,16 @@ def main(argv=None):
             "query_bounds": metadata["query_bounds"],
             "sha256": metadata["sha256"],
             "verified": True,
+            "synthetic": metadata.get("synthetic", False),
         }
         print(json.dumps(summary, indent=2, allow_nan=False))
         return 0
+    except KeyboardInterrupt:
+        print(
+            "Cancelled. No completed dataset is guaranteed; check the output directory.",
+            file=sys.stderr,
+        )
+        return 130
     except (OSError, ValueError, RuntimeError, KeyError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1

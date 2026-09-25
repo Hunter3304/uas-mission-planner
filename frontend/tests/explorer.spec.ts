@@ -69,6 +69,11 @@ async function mock(page: Page, mode = 'normal') {
         status: 422,
         json: { detail: 'Dataset integrity verification failed.' },
       })
+    if (path.endsWith('/download/gpkg'))
+      return route.fulfill({
+        contentType: 'application/geopackage+sqlite3',
+        body: JSON.stringify(features),
+      })
     if (path.endsWith('/features') || path.includes('/download/'))
       return route.fulfill({ json: mode === 'empty' ? { ...features, features: [] } : features })
     return route.fulfill({
@@ -158,3 +163,45 @@ for (const [mode, message] of [
     }
   })
 }
+
+for (const mode of ['network', 'html']) {
+  test(`actionable ${mode} response with retry`, async ({ page }) => {
+    await page.route('**/api/**', (route) =>
+      mode === 'network'
+        ? route.abort()
+        : route.fulfill({
+            contentType: 'text/html',
+            body: '<!doctype html><html>Wrong server</html>',
+          }),
+    )
+    await page.goto('/')
+    await expect(page.getByRole('alert')).toContainText(
+      mode === 'network' ? 'Start the backend on port 8000' : 'Restart the frontend and backend',
+    )
+    await page.unroute('**/api/**')
+    await mock(page)
+    await page.getByRole('button', { name: 'Try again' }).click()
+    await expect(page.getByTestId('total-count')).toHaveText('3')
+  })
+}
+
+test('failed or HTML download is reported and does not download a bogus file', async ({ page }) => {
+  await mock(page)
+  await page.goto('/')
+  await expect(page.getByTestId('total-count')).toHaveText('3')
+  let downloads = 0
+  page.on('download', () => downloads++)
+  await page.route('**/download/**', (route) =>
+    route.fulfill({ status: 422, json: { detail: 'Dataset cannot be verified.' } }),
+  )
+  await page.getByRole('button', { name: /Download GeoJSON/ }).click()
+  await expect(page.locator('.download-status')).toHaveText('Dataset cannot be verified.')
+  await page.unroute('**/download/**')
+  await page.route('**/download/**', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<html>Wrong server</html>' }),
+  )
+  await page.getByRole('button', { name: /Download GeoJSON/ }).click()
+  await expect(page.locator('.download-status')).toContainText('unexpected file type')
+  expect(downloads).toBe(0)
+  await expect(page.getByRole('button', { name: /Download GeoJSON/ })).toBeEnabled()
+})
