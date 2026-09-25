@@ -7,8 +7,10 @@
 - Iteration 001 completed the CLI acquisition -> save -> verified reload loop.
 - Iteration 002 implements the user-approved demonstration interface: layers, statistics, feature inspection, and downloads.
 - Milestone #2; issues #14 (API), #15 (React), #16 (verification/docs). PRs #17 and #18 merged into iteration/002; their feature branches were deleted locally and remotely and verified.
-- Final verification and sprint integration are in progress under #16. Update this status after the main merge.
-- Local real-data browser check passed with 91 features; six automated browser tests passed, as did frontend lint and production build.
+- Issues #14, #15, #16 are closed. PR #19 completed verification; sprint PR #20 merged into main at `f5a900c0efbe0cddeb66019240fc3b5bf42f126d` on 2026-09-25. Milestone #2 is closed.
+- All three implementation branches were deleted locally/remotely and verified with branch listings. This post-merge documentation update belongs to #21; delete its temporary branch after merging.
+- Local validation: 26 Python tests passed, one Windows symlink test skipped; six browser tests passed; Ruff, ESLint, and production build passed. Windows/Linux and frontend CI passed for sprint PR #20.
+- Real-data browser verification displays the saved 91-feature Braunschweig dataset.
 - No subsequent sprint is approved; discuss its plan before creating it.
 
 ## Local commands and demonstration
@@ -78,7 +80,9 @@
 - Built a read-only dataset API and React/Leaflet explorer with statistics, feature details, and complete-dataset exports.
 - Added browser regression checks and expanded CI to lint/build/test the frontend.
 - Documented local launch, data root configuration, offline basemap behavior, and current limits in README and Iteration 002 feedback.
-- Finish integration, close the milestone, and record branch cleanup before ending this session.
+- Completed main integration through PR #20, closed Milestone #2, and verified implementation branch cleanup.
+- Restarted local frontend/API after branch switching; Vite may need a restart if its configuration disappears while checking out an older branch.
+- Final post-merge documentation is tracked by #21. No application work or next sprint remains authorized.
 
 ## Start the interface
 
