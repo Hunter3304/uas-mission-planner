@@ -92,3 +92,14 @@ def test_external_symlink_is_not_exposed(dataset, tmp_path):
     client = TestClient(create_app(root))
     assert client.get("/api/datasets/external").status_code == 404
     assert "external" not in [item["id"] for item in client.get("/api/datasets").json()["datasets"]]
+
+
+def test_missing_query_bounds_is_reported(dataset):
+    root, _ = dataset
+    manifest = root / "demo/metadata.json"
+    metadata = json.loads(manifest.read_text())
+    del metadata["query_bounds"]
+    manifest.write_text(json.dumps(metadata))
+    client = TestClient(create_app(root))
+    assert client.get("/api/datasets/demo").status_code == 422
+    assert client.get("/api/datasets").json()["datasets"][0]["verified"] is False

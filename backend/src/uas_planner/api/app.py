@@ -10,6 +10,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, Response
 
+from uas_planner.core.area import BoundingBox
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
@@ -37,6 +38,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         path = dataset_path(dataset_id)
         try:
             frame, metadata = load_dataset(path)
+            BoundingBox(**metadata["query_bounds"])
             return path, frame, metadata
         except Exception as exc:
             logger.warning("Cannot verify dataset %s: %s", dataset_id, type(exc).__name__)
