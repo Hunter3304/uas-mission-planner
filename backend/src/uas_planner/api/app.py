@@ -10,6 +10,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, Response
 
+from uas_planner import __version__
 from uas_planner.core.area import BoundingBox
 from uas_planner.storage.dataset import load_dataset
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 def create_app(data_dir: Path | None = None) -> FastAPI:
     default = Path(__file__).resolve().parents[4] / "data"
     root = Path(data_dir or os.environ.get("UAS_DATA_DIR", default)).resolve()
-    api = FastAPI(title="UAS Mission Planner", version="0.2.0")
+    api = FastAPI(title="UAS Mission Planner", version=__version__)
 
     def dataset_path(dataset_id: str) -> Path:
         if not DATASET_ID.fullmatch(dataset_id):

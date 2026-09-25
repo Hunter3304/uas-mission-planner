@@ -2,16 +2,14 @@
 
 ## Current status
 
-- Repository: https://github.com/Hunter3304/uas-mission-planner (public).
+- Public repository: https://github.com/Hunter3304/uas-mission-planner.
 - Local directory: `D:/Aostfalia/develop/uas-mission-planner`.
-- Iteration 001 completed the CLI acquisition -> save -> verified reload loop.
-- Iteration 002 implements the user-approved demonstration interface: layers, statistics, feature inspection, and downloads.
-- Milestone #2; issues #14 (API), #15 (React), #16 (verification/docs). PRs #17 and #18 merged into iteration/002; their feature branches were deleted locally and remotely and verified.
-- Issues #14, #15, #16 are closed. PR #19 completed verification; sprint PR #20 merged into main at `f5a900c0efbe0cddeb66019240fc3b5bf42f126d` on 2026-09-25. Milestone #2 is closed.
-- All three implementation branches were deleted locally/remotely and verified with branch listings. This post-merge documentation update belongs to #21; delete its temporary branch after merging.
-- Local validation: 26 Python tests passed, one Windows symlink test skipped; six browser tests passed; Ruff, ESLint, and production build passed. Windows/Linux and frontend CI passed for sprint PR #20.
-- Real-data browser verification displays the saved 91-feature Braunschweig dataset.
-- No subsequent sprint is approved; discuss its plan before creating it.
+- Iterations 001/002 delivered acquisition, verified persistence, and the dataset explorer. PR #22 completed their post-merge documentation; #21 is closed and its branch was deleted.
+- User authorized Iteration 003: error handling, small-example tests, README, and stage version. Milestone #3, issues #23–#25; plan in doc/plan/iteration-003.md.
+- Error handling PR #26 merged; #23 closed and branch deleted locally/remotely. Offline sample PR #27 merged; #24 closed and its local/remote branch deleted. Stage delivery is tracked by #25.
+- Validation: 42 Python tests passed (one Windows symlink skip), nine mocked browser tests and one real-stack browser test passed; Ruff, ESLint and production build passed. Existing 91-feature data remains verified; data/offline-sample now contains three synthetic features.
+- Target release: v0.3.0. Finish integration and publish only from a tested main commit; record final release evidence after merge.
+- No subsequent sprint is approved.
 
 ## Local commands and demonstration
 
@@ -67,7 +65,7 @@
 
 ## Open questions and pending decisions
 
-- No new sprint is approved. Discuss subsequent scope with the user before creating it.
+- Iteration 003 is authorized. Discuss subsequent scope before creating another sprint.
 - Runtime baseline is approved and validated: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, uv 0.11.6. Git is 2.45.1.windows.1.
 - OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
 - Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.
@@ -77,12 +75,11 @@
 
 ## Session outcome
 
-- Built a read-only dataset API and React/Leaflet explorer with statistics, feature details, and complete-dataset exports.
-- Added browser regression checks and expanded CI to lint/build/test the frontend.
-- Documented local launch, data root configuration, offline basemap behavior, and current limits in README and Iteration 002 feedback.
-- Completed main integration through PR #20, closed Milestone #2, and verified implementation branch cleanup.
-- Restarted local frontend/API after branch switching; Vite may need a restart if its configuration disappears while checking out an older branch.
-- Final post-merge documentation is tracked by #21. No application work or next sprint remains authorized.
+- Hardened shared dataset validation, CLI cancellation and frontend error/download handling.
+- Added an offline synthetic point/line/polygon sample and a real API/browser round-trip test.
+- Unified stage versions, prepared changelog, rewrote README quick start and startup troubleshooting.
+- Do not leave agent-owned demonstration servers running. Test servers use 8011/5175 and terminate after testing; do not stop user-owned 8000/5173 services.
+- Final CI, main integration, release publication and branch cleanup must be recorded before closing this delivery.
 
 ## Start the interface
 
@@ -94,3 +91,5 @@ npm --prefix frontend run dev
 ```
 
 Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
+
+For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
