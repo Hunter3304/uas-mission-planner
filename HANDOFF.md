@@ -2,17 +2,14 @@
 
 ## Current status
 
-- Local project directory: `D:\Aostfalia\develop\uas-mission-planner`.
-- GitHub repository: https://github.com/Hunter3304/uas-mission-planner (public).
-- Iteration 001: https://github.com/Hunter3304/uas-mission-planner/milestone/1.
-- Approved scope: specify an area -> acquire OSM data -> save -> reload.
-- Implementation Issues #1-#4 are closed. Feature PRs #5-#8 merged into `iteration/001`; their feature branches were deleted.
-- Sprint PR #9 merged into `main` at commit `4c16cc9ce1f3e6ec10c10e5987f5d29b90b15774` on 2026-09-25. Iteration 001 Milestone is closed.
-- This post-merge documentation update records completed delivery; no application changes are included.
-- Python and frontend dependencies are installed and locked. The Python command-line core is implemented. React application screens and HTTP endpoints are deferred.
-- Local validation: 20 offline tests pass; Ruff passes; a real Braunschweig acquisition saved and reloaded 91 features.
-- Remote validation passed on Windows and Linux, plus frontend dependency installation. The sprint PR checks are successful.
-- Next step: demonstrate the saved dataset and discuss the next sprint with the user. No next sprint or implementation scope is approved.
+- Repository: https://github.com/Hunter3304/uas-mission-planner (public).
+- Local directory: `D:/Aostfalia/develop/uas-mission-planner`.
+- Iteration 001 completed the CLI acquisition -> save -> verified reload loop.
+- Iteration 002 implements the user-approved demonstration interface: layers, statistics, feature inspection, and downloads.
+- Milestone #2; issues #14 (API), #15 (React), #16 (verification/docs). PRs #17 and #18 merged into iteration/002; their feature branches were deleted locally and remotely and verified.
+- Final verification and sprint integration are in progress under #16. Update this status after the main merge.
+- Local real-data browser check passed with 91 features; six automated browser tests passed, as did frontend lint and production build.
+- No subsequent sprint is approved; discuss its plan before creating it.
 
 ## Local commands and demonstration
 
@@ -73,17 +70,23 @@
 - OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
 - Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.
 - Acquisition timestamps may describe a cache read, not the original source download/edit. Source snapshots require preserving the local dataset.
-- Frontend dependencies are ready, but there is no frontend app/build yet; CI only validates its dependency installation.
+- Frontend and read-only API are implemented. Acquisition remains a CLI operation; refresh the UI after saving new data.
+- The current API loads and verifies complete small datasets per request; large-data performance remains future scope.
 
 ## Session outcome
 
-- Rechecked branch cleanup at the user's request: actual local and remote branches were only `main` and `iteration/001`; no feature branches remained.
-- Clarified mandatory local/remote deletion and verification for all merged feature and temporary documentation/fix branches.
+- Built a read-only dataset API and React/Leaflet explorer with statistics, feature details, and complete-dataset exports.
+- Added browser regression checks and expanded CI to lint/build/test the frontend.
+- Documented local launch, data root configuration, offline basemap behavior, and current limits in README and Iteration 002 feedback.
+- Finish integration, close the milestone, and record branch cleanup before ending this session.
 
-- Installed and verified locked dependencies and checksum-verified GitHub CLI; user completed browser authorization.
-- Created the public repository, Milestone, and Issues before their feature branches.
-- Implemented acquisition, GeoPackage persistence, manifest validation, and command-line fetch/inspect.
-- Live testing exposed OSMnx index names `element/id`; normalized both these and the older `element_type/osmid` schema and added regression coverage.
-- A temporary-directory sandbox restriction affected the first environment smoke test; rerunning within the workspace passed. No application defect remained from that check.
-- Final validation passed: 20 local tests, Ruff, the 91-feature real-data round trip, Windows/Linux CI, and frontend dependency checks.
-- Merged the complete iteration through PR #9 and closed its Milestone. README and retrospective now describe delivered functionality and actual merge evidence.
+## Start the interface
+
+Run from the repository root in two terminals:
+
+```powershell
+uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+npm --prefix frontend run dev
+```
+
+Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
