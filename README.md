@@ -4,7 +4,7 @@ A Python-based geospatial data and UAS mission-planning research project, develo
 
 ## Project status
 
-Iteration 001 is complete and merged into `main`: specify an area, acquire OSM features, save, and reload. The public repository is [Hunter3304/uas-mission-planner](https://github.com/Hunter3304/uas-mission-planner). See the [iteration plan](doc/plan/iteration-001.md), [feedback and validation](doc/iteration/iteration-001/feedback.md), and [sprint PR #9](https://github.com/Hunter3304/uas-mission-planner/pull/9). All 20 offline tests and Windows/Linux CI passed. The live example saved and reloaded 91 OSM features. Frontend dependencies are prepared; UI and HTTP endpoints are deferred.
+Iteration 002 adds a local dataset explorer: view saved OSM layers, inspect statistics and feature tags, and download GeoJSON, GeoPackage, or metadata. Iteration 001 provides the acquisition/save/reload core. See the [Iteration 002 plan](doc/plan/iteration-002.md) and [feedback](doc/iteration/iteration-002/feedback.md).
 
 Read [HANDOFF.md](HANDOFF.md) before starting work and update it at the end of each work session.
 
@@ -18,14 +18,14 @@ Read [HANDOFF.md](HANDOFF.md) before starting work and update it at the end of e
 
 ## Technology stack
 
-The architecture and runtime baselines are agreed. Dependency versions are recorded in `backend/uv.lock` and `frontend/package-lock.json`; the frontend application is deferred beyond the initial core round trip.
+The architecture and runtime baselines are agreed. Dependency versions are recorded in `backend/uv.lock` and `frontend/package-lock.json`.
 
 | Area | Technology | Status |
 | --- | --- | --- |
 | Research core | Python 3.13.13 | Installed and verified |
-| HTTP API | FastAPI | Agreed |
-| Frontend | React 19.3.0, TypeScript 6.0.3, Vite 8.3.1 | Dependencies installed; application deferred |
-| Map interface | Leaflet | Agreed |
+| HTTP API | FastAPI | Read-only dataset API implemented |
+| Frontend | React 19.3.0, TypeScript 6.0.3, Vite 8.3.1 | Dataset explorer implemented |
+| Map interface | Leaflet | Interactive vector map implemented |
 | Frontend runtime/tooling | Node.js 24.14.1 LTS, npm 11.11.0 | Installed and verified |
 | Map data | OpenStreetMap through OSMnx/Overpass | Agreed |
 | Geospatial processing | GeoPandas, Shapely, pyproj | Agreed |
@@ -33,9 +33,9 @@ The architecture and runtime baselines are agreed. Dependency versions are recor
 | Python environment and dependency management | uv 0.11.6, project-local virtual environment, uv.lock | Installed and verified |
 | Frontend dependency management | npm, package-lock.json | Installed and locked |
 | Python quality checks | Ruff, pytest | Installed |
-| Frontend quality checks | ESLint, TypeScript | Dependencies installed; application checks deferred |
+| Frontend quality checks | ESLint, TypeScript, Playwright | Lint, build, and browser checks enabled |
 | Development | Local Windows environment, VS Code | Agreed |
-| Version control and automation | Git, GitHub, GitHub Actions | CI runs offline Python tests on Windows/Linux and installs frontend dependencies |
+| Version control and automation | Git, GitHub, GitHub Actions | CI runs offline Python tests on Windows/Linux and runs frontend lint, build, and browser tests |
 
 ### Runtime and dependency policy
 
@@ -61,7 +61,7 @@ Dependencies are installed. Python imports, frontend dependency resolution, GeoP
 
 ### Install locked dependencies
 
-From the repository root, install Python dependencies with `uv sync --project backend --locked` and frontend dependencies with `npm ci --prefix frontend`. Use the project environment rather than installing packages into system Python. The frontend has no application or development-server script in this iteration.
+From the repository root, install Python dependencies with `uv sync --project backend --locked` and frontend dependencies with `npm ci --prefix frontend`. Use the project environment rather than installing packages into system Python.
 
 ## Repository layout
 
@@ -93,7 +93,7 @@ HANDOFF.md         Current state, workflow, open questions, and next steps
 
 ## Initial delivery direction
 
-The agreed first iteration establishes the development foundation and a command-line map acquisition prototype: specify an area, retrieve OSM features, save and reload the dataset, and record acquisition metadata. Interactive display and API endpoints are deferred. Acceptance criteria are recorded in the iteration plan.
+The agreed first iteration establishes the development foundation and a command-line map acquisition prototype: specify an area, retrieve OSM features, save and reload the dataset, and record acquisition metadata. Iteration 002 adds interactive display and API endpoints. Acceptance criteria are recorded in the iteration plan.
 
 ## Run the core workflow
 
@@ -118,7 +118,13 @@ Acquisition uses OSMnx's cache and service backoff. HTTP requests have a 60-seco
 uv run --project backend --locked pytest backend/tests -q
 uv run --project backend --locked ruff check backend/src backend/tests
 uv run --project backend --locked ruff format --check backend/src backend/tests
-npm ls --prefix frontend --depth=0
+npm run lint --prefix frontend
+npm run build --prefix frontend
+# First install the test browser:
+cd frontend
+npx playwright install chromium
+npm run test:e2e
+cd ..
 ```
 
 Automated tests use synthetic data and mocked acquisition. They check input validation, request errors, mixed-geometry/tag persistence, empty datasets, checksum corruption, and offline CLI reload. Live acquisition is a separate manual demonstration, not a CI network dependency.
@@ -130,3 +136,30 @@ Automated tests use synthetic data and mocked acquisition. They check input vali
 - [Vite setup requirements](https://vite.dev/guide/)
 - [OSMnx installation](https://osmnx.readthedocs.io/en/stable/installation.html)
 - [uv project management](https://docs.astral.sh/uv/guides/projects/)
+
+## Run the demonstration interface
+
+From the repository root, open two terminals:
+
+```powershell
+# Terminal 1: Python API
+uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+```
+
+```powershell
+# Terminal 2: React interface
+npm --prefix frontend run dev
+```
+
+Open http://127.0.0.1:5173. The development server proxies `/api` to port 8000. API documentation is at http://127.0.0.1:8000/docs.
+
+1. Select a saved dataset. Use the CLI acquisition command above if none exists, then click **Refresh**.
+2. Toggle Buildings, Roads & paths, Land use, and Natural features. Overlapping layers count each object only once in the visible total.
+3. Select an object on the map or in the searchable table to inspect its tags. **Fit dataset** restores the complete extent; the dashed rectangle marks the query boundary.
+4. Download GeoJSON, GeoPackage, or metadata. Downloads contain the entire dataset, including hidden layers, and verify stored integrity before returning data.
+
+The API reads direct subdirectories of `data/`, each containing `features.gpkg` and `metadata.json`. Dataset folder names must start with an ASCII letter or digit, contain only letters, digits, underscores, or hyphens, and be at most 100 characters. Set `UAS_DATA_DIR` before starting the API to use another data root.
+
+Saved vectors and statistics work without internet; the optional OpenStreetMap basemap needs network access. Turn off **Basemap** for an offline demonstration. Source features retain their full geometry outside the query boundary. Integrity verification checks storage consistency, not geographic accuracy. This local prototype loads datasets into memory; browser acquisition, large-area streaming, route planning, and public deployment are future scope.
+
+Browser regression tests mock API responses and tile failures. Backend tests verify actual export bytes separately. On Windows, an existing Chrome installation can be used for tests with `$env:PLAYWRIGHT_CHANNEL='chrome'` instead of downloading Chromium.
