@@ -49,6 +49,8 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     def summary(dataset_id, frame, metadata):
         return {
             "id": dataset_id,
+            "synthetic": metadata.get("synthetic", False),
+            "source": metadata.get("source", "OpenStreetMap via OSMnx/Overpass"),
             "feature_count": len(frame),
             "crs": frame.crs.to_string(),
             "geometry_counts": {

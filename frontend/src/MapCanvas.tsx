@@ -46,9 +46,6 @@ export default function MapCanvas({ dataset, data, visibility, onSelect }: Props
     map.current = instance
     L.control.zoom({ position: 'bottomright' }).addTo(instance)
     L.control.scale({ position: 'bottomleft', imperial: false }).addTo(instance)
-    instance.attributionControl.addAttribution(
-      'Vector data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    )
     const observer = new ResizeObserver(() => instance.invalidateSize())
     observer.observe(container.current)
     return () => {
@@ -73,6 +70,10 @@ export default function MapCanvas({ dataset, data, visibility, onSelect }: Props
 
   useEffect(() => {
     if (!map.current) return
+    const attribution = dataset.synthetic
+      ? 'Synthetic demonstration vectors'
+      : 'Vector data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    map.current.attributionControl.addAttribution(attribution)
     const q = dataset.query_bounds
     const query = L.rectangle(
       [
@@ -102,6 +103,7 @@ export default function MapCanvas({ dataset, data, visibility, onSelect }: Props
     )
     return () => {
       query.remove()
+      map.current?.attributionControl.removeAttribution(attribution)
     }
   }, [dataset])
 
