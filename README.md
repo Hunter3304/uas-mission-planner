@@ -4,7 +4,7 @@ A Python-based geospatial data and UAS mission-planning research project, develo
 
 ## Project status
 
-Iteration 001 is in progress: specify an area, acquire OSM features, save, and reload. The public repository is [Hunter3304/uas-mission-planner](https://github.com/Hunter3304/uas-mission-planner). See the [iteration plan](doc/plan/iteration-001.md).
+Iteration 001 is complete and merged into `main`: specify an area, acquire OSM features, save, and reload. The public repository is [Hunter3304/uas-mission-planner](https://github.com/Hunter3304/uas-mission-planner). See the [iteration plan](doc/plan/iteration-001.md), [feedback and validation](doc/iteration/iteration-001/feedback.md), and [sprint PR #9](https://github.com/Hunter3304/uas-mission-planner/pull/9). All 20 offline tests and Windows/Linux CI passed. The live example saved and reloaded 91 OSM features. Frontend dependencies are prepared; UI and HTTP endpoints are deferred.
 
 Read [HANDOFF.md](HANDOFF.md) before starting work and update it at the end of each work session.
 
