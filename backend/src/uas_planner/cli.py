@@ -6,12 +6,14 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from uas_planner import __version__
 from uas_planner.core.area import BoundingBox
 from uas_planner.storage.dataset import load_dataset, save_dataset
 
 
 def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
+    result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
     fetch = commands.add_parser("fetch", help="Acquire, save, and verify a new dataset")
     for name in ("west", "south", "east", "north"):

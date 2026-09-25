@@ -1,165 +1,161 @@
 # UAS Mission Planner
 
-A Python-based geospatial data and UAS mission-planning research project, developed for an internship and a subsequent bachelor's thesis.
+A local Python geospatial research prototype for an internship and subsequent bachelor's thesis. Acquire a small area, save and verify its data, explore layers and statistics, and download results.
 
-## Project status
+**Stage version: v0.3.0.** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.
 
-Iteration 002 is complete and merged through [PR #20](https://github.com/Hunter3304/uas-mission-planner/pull/20). It adds a local dataset explorer: view saved OSM layers, inspect statistics and feature tags, and download GeoJSON, GeoPackage, or metadata. Iteration 001 provides the acquisition/save/reload core. See the [Iteration 002 plan](doc/plan/iteration-002.md) and [feedback](doc/iteration/iteration-002/feedback.md).
+## Quick start: offline demonstration
 
-Read [HANDOFF.md](HANDOFF.md) before starting work and update it at the end of each work session.
+Prerequisites: Git, Python 3.13, uv, and Node.js 24/npm 11. Validated baseline: Python 3.13.13, uv 0.11.6, Node 24.14.1, npm 11.11.0. Open the repository folder in VS Code. Run these PowerShell commands from its root:
 
-## Architecture
+```powershell
+# New checkout only; skip if the repository already exists locally.
+git clone https://github.com/Hunter3304/uas-mission-planner.git
+cd uas-mission-planner
 
-- One public GitHub repository, intended name: `Hunter3304/uas-mission-planner`.
-- Separate frontend and backend code, running as separate local processes.
-- The React frontend communicates with the Python backend through HTTP APIs.
-- The Python research core is independent of React and FastAPI. API handlers and experiment scripts call the same core.
-- Default project language: English.
+# First installation (requires internet).
+uv sync --project backend --locked
+npm ci --prefix frontend
 
-## Technology stack
-
-The architecture and runtime baselines are agreed. Dependency versions are recorded in `backend/uv.lock` and `frontend/package-lock.json`.
-
-| Area | Technology | Status |
-| --- | --- | --- |
-| Research core | Python 3.13.13 | Installed and verified |
-| HTTP API | FastAPI | Read-only dataset API implemented |
-| Frontend | React 19.3.0, TypeScript 6.0.3, Vite 8.3.1 | Dataset explorer implemented |
-| Map interface | Leaflet | Interactive vector map implemented |
-| Frontend runtime/tooling | Node.js 24.14.1 LTS, npm 11.11.0 | Installed and verified |
-| Map data | OpenStreetMap through OSMnx/Overpass | Agreed |
-| Geospatial processing | GeoPandas, Shapely, pyproj | Agreed |
-| Storage and export | GeoPackage, GeoJSON, JSON metadata | Agreed |
-| Python environment and dependency management | uv 0.11.6, project-local virtual environment, uv.lock | Installed and verified |
-| Frontend dependency management | npm, package-lock.json | Installed and locked |
-| Python quality checks | Ruff, pytest | Installed |
-| Frontend quality checks | ESLint, TypeScript, Playwright | Lint, build, and browser checks enabled |
-| Development | Local Windows environment, VS Code | Agreed |
-| Version control and automation | Git, GitHub, GitHub Actions | CI runs offline Python tests on Windows/Linux and runs frontend lint, build, and browser tests |
-
-### Runtime and dependency policy
-
-- Agreed runtime lines: Python 3.13 and Node.js 24 LTS.
-- Runtime pins are recorded in `.python-version` and `.node-version`; npm is pinned in `frontend/package.json`.
-- The geospatial stack has been installed and verified on Windows with Python 3.13.13.
-- Select mutually compatible stable package releases during scaffolding; do not select prereleases by default.
-- Backend and frontend dependency lockfiles are committed. Use the same locked dependencies in local development and CI.
-- Upgrade dependencies deliberately, verify affected functionality, and record changes through the project workflow.
-- Evaluate future planning-library compatibility when introducing those libraries; it has not been tested yet.
-
-### Local environment observed during planning
-
-| Tool | Observed version |
-| --- | --- |
-| Python | 3.13.13 |
-| Node.js | 24.14.1 |
-| npm | 11.11.0 |
-| Git | 2.45.1.windows.1 |
-| uv | 0.11.6 |
-
-Dependencies are installed. Python imports, frontend dependency resolution, GeoPackage mixed-geometry persistence, and coordinate projection have passed environment checks. See `doc/iteration/iteration-001/` for workflow validation and live acquisition evidence.
-
-### Install locked dependencies
-
-From the repository root, install Python dependencies with `uv sync --project backend --locked` and frontend dependencies with `npm ci --prefix frontend`. Use the project environment rather than installing packages into system Python.
-
-## Repository layout
-
-`frontend/`, `backend/`, `data/`, `doc/plan/`, and `.github/` are established. Experiment and research directories will be added when their work begins.
-
-```text
-frontend/          React application and frontend tests
-backend/           Python package, API, and backend tests
-experiments/       Reproducible experiment configurations and runners
-data/              Local datasets; large generated files excluded from Git
-doc/plan/          Agreed sprint plans
-doc/iteration/     Sprint outcomes and retrospectives
-doc/decisions/     Architecture and technical decision records
-doc/research/      Literature and research-methodology notes
-.github/           Issue templates and automated checks
-HANDOFF.md         Current state, workflow, open questions, and next steps
+# Generate a tiny sample; no map-service access is needed.
+uv run --project backend --locked uas-planner sample --output data/offline-sample
+uv run --project backend --locked uas-planner inspect data/offline-sample
 ```
 
-## Workflow
+The sample contains **3 synthetic objects: 1 point, 1 line, 1 polygon**. Each semantic layer has one object; the building also has a land-use tag, so layer counts total four but unique objects total three. It is illustrative data, not surveyed OSM data. Feature content is fixed; timestamps and GeoPackage checksums can differ between saves. If `data/offline-sample` already exists, inspect it or choose another output name. Never overwrite a dataset silently.
 
-1. Read the handoff and verify the actual state.
-2. Discuss each sprint with the user and write the agreed plan in `doc/plan/`.
-3. Create a GitHub Milestone for the sprint and an `iteration/NNN` branch.
-4. Create Issues assigned to that Milestone before creating corresponding feature branches.
-5. Branch from the iteration branch, implement, validate, and merge through a pull request into that iteration branch.
-6. Close the completed Issue and delete the merged feature branch. Keep Issue history.
-7. Prepare the sprint retrospective and README update, validate the whole sprint, and merge into `main` through a pull request.
-8. Record post-merge facts as needed and update the handoff at the end of the session.
+Open **two terminals** at the repository root and keep both running:
 
-## Initial delivery direction
+```powershell
+# Terminal 1: backend
+uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+```
 
-The agreed first iteration establishes the development foundation and a command-line map acquisition prototype: specify an area, retrieve OSM features, save and reload the dataset, and record acquisition metadata. Iteration 002 adds interactive display and API endpoints. Acceptance criteria are recorded in the iteration plan.
+```powershell
+# Terminal 2: frontend
+npm --prefix frontend run dev
+```
 
-## Run the core workflow
+Open **http://127.0.0.1:5173**. Select `offline-sample`; switch off **Basemap** for offline use. Toggle layers, select a feature in the map/table, and download GeoJSON, GeoPackage, or metadata. Downloads always contain the complete dataset, including hidden layers. Click **Refresh** after saving another dataset. Stop each service with **Ctrl+C** in its terminal.
 
-Run these commands from the repository root after installing locked dependencies:
+| Address | Purpose |
+| --- | --- |
+| http://127.0.0.1:5173 | User interface |
+| http://127.0.0.1:8000/docs | API documentation |
+| http://127.0.0.1:8000/api/health | Backend health; returns `{"status":"ok"}` |
+| http://127.0.0.1:8000/ | No page is registered; `Not Found` is expected |
+
+## Acquire real map data
+
+With dependencies installed, run from the repository root:
 
 ```powershell
 uv run --project backend --locked uas-planner fetch --west 10.519 --south 52.269 --east 10.521 --north 52.271 --output data/braunschweig-demo --cache .cache/osmnx
 uv run --project backend --locked uas-planner inspect data/braunschweig-demo
 ```
 
-`fetch` downloads OSM building, highway, landuse, and natural features, creates `features.gpkg` and `metadata.json`, and immediately reloads and verifies the output. `inspect` only reads local files and checks integrity. It needs no network connection when the locked environment is already installed. For direct offline use, run `backend/.venv/Scripts/uas-planner.exe inspect data/braunschweig-demo` on Windows.
+`fetch` needs internet and retrieves building, highway, landuse, and natural features through OSMnx/Overpass. It saves `features.gpkg` and `metadata.json`, then reloads and verifies them. `inspect` reads only local data. The output directory must be new. A previous live demonstration contained 91 features; current OSM results may change.
 
-The output directory must be new; an existing dataset is never silently overwritten. To repeat the demonstration, choose a different output directory or inspect the saved dataset. Coordinates are EPSG:4326 longitude/latitude with explicit west/south/east/north flags. Query area is limited to 25 km², each coordinate span to one degree, and polar/dateline-crossing queries are unsupported.
+Coordinates use EPSG:4326 longitude/latitude. Queries are limited to 25 km², a maximum one-degree span per axis, and no polar or dateline-crossing area. Features retain complete geometries and can extend beyond the query rectangle. Layers match by union. Empty results are valid; source-invalid geometries are retained and counted.
 
-Returned features retain their complete geometry, so their bounds may extend beyond the query. Tags match by union, not intersection. Empty matches are valid datasets with zero features; service failures return a nonzero exit code. Source-invalid geometries are retained and counted in metadata.
+OSMnx enables caching and service backoff. Individual HTTP requests time out after 60 seconds; retries/backoff are not bounded by an overall deadline. Use Ctrl+C to cancel. Acquisition times are operation times, not source edit times or proof of a fresh download. A failed save may leave an incomplete folder for diagnosis; it will not pass verification. Preserve it for investigation and retry with a new output name.
 
-Acquisition uses OSMnx's cache and service backoff. HTTP requests have a 60-second timeout, but repeated service backoff can make total execution longer; use Ctrl+C to cancel. Acquisition timestamps record the request operation, not the edit date of source data or a guaranteed fresh download. Data files remain local and are excluded from Git.
+## Troubleshooting
 
-## Verify
+| Symptom | Action |
+| --- | --- |
+| `WinError 10048` / address already in use | A service already owns backend port 8000. Check `/api/health`; reuse it if it is this project, or stop the original terminal with Ctrl+C before restarting. |
+| `Port 5173 is already in use` | Check the existing frontend URL. Stop the original frontend terminal before starting another instance. |
+| Backend root shows `Not Found` | Open port **5173** for the UI, or `/docs` on port 8000 for API docs. |
+| Cannot reach data service / error 500 or 502 | Start the backend and check its terminal. Restart Vite after changing branches or proxy configuration. |
+| Invalid response / unexpected download type | Check both addresses above. An HTML page may be served instead of the API; restart the services with the correct configuration. |
+| No saved datasets | Run the sample/fetch command, then Refresh. Check the data root and folder name. |
+| Dataset cannot be verified | Inspect it with the CLI for details. Check that both files are present; do not edit checksums to bypass corruption. |
+| Basemap unavailable | Disable Basemap. Saved vector layers, statistics, and downloads still work locally. |
+| uv hardlink warning | Installation falls back to copying; this is not failure. Optionally set `$env:UV_LINK_MODE='copy'` in that terminal. |
+| Sample output already exists | Use `inspect`, or choose a new directory such as `data/offline-sample-02`. |
+
+Identify the owner of a busy port in PowerShell:
 
 ```powershell
+Get-NetTCPConnection -LocalPort 8000,5173 -State Listen |
+    Select-Object LocalAddress, LocalPort, OwningProcess
+# Replace 12345 with an actual PID from the output:
+Get-Process -Id 12345
+```
+
+Stop a process only after confirming it belongs to your project. Prefer Ctrl+C in its original terminal. If that terminal is unavailable, `Stop-Process -Id 12345` stops the confirmed process. Do not copy an old PID from another session.
+
+## Configuration and data
+
+The API reads direct subdirectories of `data/`, containing `features.gpkg` and `metadata.json`. Names must start with an ASCII letter/digit, use only letters, digits, underscores or hyphens, and be at most 100 characters. To use another data root, set `$env:UAS_DATA_DIR='D:/path/to/datasets'` in the **backend terminal before startup**.
+
+Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend port, start uvicorn with that port and set `$env:UAS_API_URL='http://127.0.0.1:8001'` in the **frontend terminal before startup**. Servers bind to loopback for local development.
+
+Generated datasets and caches are excluded from Git. Metadata records the source, query, versions, geometry policy, count, and GeoPackage SHA-256. Verification checks storage consistency, not geographic accuracy. Synthetic samples are explicitly marked in metadata and UI. Dataset schema remains version 1, compatible with valid earlier datasets.
+
+## Verify the delivery
+
+From the repository root:
+
+```powershell
+uv run --project backend --locked uas-planner --version
 uv run --project backend --locked pytest backend/tests -q
 uv run --project backend --locked ruff check backend/src backend/tests
 uv run --project backend --locked ruff format --check backend/src backend/tests
-npm run lint --prefix frontend
-npm run build --prefix frontend
-# First install the test browser:
+npm --prefix frontend run lint
+npm --prefix frontend run build
+
+# One-time browser installation requires internet.
 cd frontend
 npx playwright install chromium
 npm run test:e2e
+npm run test:smoke
 cd ..
 ```
 
-Automated tests use synthetic data and mocked acquisition. They check input validation, request errors, mixed-geometry/tag persistence, empty datasets, checksum corruption, and offline CLI reload. Live acquisition is a separate manual demonstration, not a CI network dependency.
+Alternatively, with Chrome installed on Windows, set `$env:PLAYWRIGHT_CHANNEL='chrome'` before the browser tests and skip installing Chromium. The mocked UI suite uses port 5174. The **real-stack smoke test** creates a temporary sample, launches the actual API on 8011 and Vite on 5175, checks map/statistics/tags and all downloads, verifies the GeoPackage checksum, and stops its servers. Keep these test ports free. Basemap requests are blocked in tests; map-service access is unnecessary after dependencies and browser installation.
 
-## Technical references
+CI runs Python checks on Windows/Linux and frontend lint, build, mocked browser tests and real-stack smoke on Linux. Windows may skip the symlink-containment test when symlink permission is unavailable; Linux runs it. A dependency currently emits a Starlette/httpx deprecation warning; it does not fail the checks.
 
-- [Python version lifecycle](https://devguide.python.org/versions/)
-- [Node.js release lifecycle](https://nodejs.org/en/about/previous-releases)
-- [Vite setup requirements](https://vite.dev/guide/)
-- [OSMnx installation](https://osmnx.readthedocs.io/en/stable/installation.html)
-- [uv project management](https://docs.astral.sh/uv/guides/projects/)
+## Architecture and stack
 
-## Run the demonstration interface
+One public monorepo, separately running frontend/backend. React communicates through HTTP. **The Python core must never depend on React or FastAPI**; CLI, API and future experiments reuse the core. Code, UI and project documentation default to English.
 
-From the repository root, open two terminals:
+| Area | Stack |
+| --- | --- |
+| Core/API | Python 3.13, FastAPI, uvicorn |
+| Frontend | React 19.3.0, TypeScript 6.0.3, Vite 8.3.1, Leaflet |
+| Geospatial | OSMnx/Overpass, GeoPandas, Shapely, pyproj, pyogrio |
+| Storage/export | GeoPackage, GeoJSON, JSON metadata |
+| Environments | uv + backend/uv.lock; npm + frontend/package-lock.json |
+| Quality | pytest, Ruff, ESLint, TypeScript, Playwright, GitHub Actions |
+| Development | Local VS Code; Python 3.13 and Node.js 24 runtime lines |
 
-```powershell
-# Terminal 1: Python API
-uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+Use locked installs. Upgrade dependencies deliberately through a tested issue/PR, not as part of ordinary startup.
+
+```text
+backend/src/uas_planner/   Independent core, acquisition, storage, CLI and API adapters
+backend/tests/            Unit/API tests and isolated smoke-test server
+frontend/src/             React interface and map
+frontend/tests/           Mocked browser regression tests
+frontend/smoke/           Real API/browser sample test
+data/                     Local generated datasets (ignored)
+doc/plan/                 Agreed sprint plans
+doc/iteration/            Results and retrospectives
+doc/decisions/            Architecture decisions
+doc/research/             Literature and methodology
+.github/                  Issues and CI
+HANDOFF.md                Current state, workflow and pending work
+CHANGELOG.md              Stage release history
 ```
 
-```powershell
-# Terminal 2: React interface
-npm --prefix frontend run dev
-```
+## Workflow and stage versions
 
-Open http://127.0.0.1:5173. The development server proxies `/api` to port 8000. API documentation is at http://127.0.0.1:8000/docs.
+Read HANDOFF, discuss each sprint, and record its plan before creating the Milestone. Create Issues in that Milestone **before** feature branches. Branch from `iteration/NNN`, validate and merge PRs back into it, close Issues, and immediately delete merged branches **locally and remotely**, pruning and verifying both. Merge the tested iteration into main; retain iteration branches as history. Update README, feedback and HANDOFF, including post-merge facts.
 
-1. Select a saved dataset. Use the CLI acquisition command above if none exists, then click **Refresh**.
-2. Toggle Buildings, Roads & paths, Land use, and Natural features. Overlapping layers count each object only once in the visible total.
-3. Select an object on the map or in the searchable table to inspect its tags. **Fit dataset** restores the complete extent; the dashed rectangle marks the query boundary.
-4. Download GeoJSON, GeoPackage, or metadata. Downloads contain the entire dataset, including hidden layers, and verify stored integrity before returning data.
+The v0.3.0 stage release is a tagged prototype baseline. Backend, frontend, CLI and API versions agree; a regression test checks this. Only tag a main commit with successful CI. Release notes record capabilities, validation and limits. Do not move a published tag; fixes get a new version. GitHub source archives plus committed lockfiles and the sample command reproduce the release environment without publishing local map datasets.
 
-The API reads direct subdirectories of `data/`, each containing `features.gpkg` and `metadata.json`. Dataset folder names must start with an ASCII letter or digit, contain only letters, digits, underscores, or hyphens, and be at most 100 characters. Set `UAS_DATA_DIR` before starting the API to use another data root.
+## Current limits
 
-Saved vectors and statistics work without internet; the optional OpenStreetMap basemap needs network access. Turn off **Basemap** for an offline demonstration. Source features retain their full geometry outside the query boundary. Integrity verification checks storage consistency, not geographic accuracy. This local prototype loads datasets into memory; browser acquisition, large-area streaming, route planning, and public deployment are future scope.
-
-Browser regression tests mock API responses and tile failures. Backend tests verify actual export bytes separately. On Windows, an existing Chrome installation can be used for tests with `$env:PLAYWRIGHT_CHANNEL='chrome'` instead of downloading Chromium.
+This is a local small-area prototype that loads datasets into memory and revalidates API reads. Browser-triggered acquisition, background jobs, large-area performance, risk models, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.
