@@ -6,11 +6,13 @@
 - GitHub repository: https://github.com/Hunter3304/uas-mission-planner (public).
 - Iteration 001: https://github.com/Hunter3304/uas-mission-planner/milestone/1.
 - Approved scope: specify an area -> acquire OSM data -> save -> reload.
-- Issues #1, #2, and #3 are closed; corresponding PRs #5, #6, and #7 merged into `iteration/001` and feature branches were deleted.
-- Issue #4 is being finalized on `feat/4-core-workflow`; its PR and the sprint PR still need CI validation and merge.
+- Implementation Issues #1-#4 are closed. Feature PRs #5-#8 merged into `iteration/001`; their feature branches were deleted.
+- Sprint PR #9 merged into `main` at commit `4c16cc9ce1f3e6ec10c10e5987f5d29b90b15774` on 2026-09-25. Iteration 001 Milestone is closed.
+- This post-merge documentation update records completed delivery; no application changes are included.
 - Python and frontend dependencies are installed and locked. The Python command-line core is implemented. React application screens and HTTP endpoints are deferred.
 - Local validation: 20 offline tests pass; Ruff passes; a real Braunschweig acquisition saved and reloaded 91 features.
-- Next step: publish the workflow PR, verify GitHub Actions, merge into `iteration/001`, close #4, then validate and merge the sprint into `main` and close the Milestone.
+- Remote validation passed on Windows and Linux, plus frontend dependency installation. The sprint PR checks are successful.
+- Next step: demonstrate the saved dataset and discuss the next sprint with the user. No next sprint or implementation scope is approved.
 
 ## Local commands and demonstration
 
@@ -70,4 +72,5 @@
 - Implemented acquisition, GeoPackage persistence, manifest validation, and command-line fetch/inspect.
 - Live testing exposed OSMnx index names `element/id`; normalized both these and the older `element_type/osmid` schema and added regression coverage.
 - A temporary-directory sandbox restriction affected the first environment smoke test; rerunning within the workspace passed. No application defect remained from that check.
-- Final local validation passed: 20 tests, Ruff, and 91-feature real-data round trip. Remote CI and final merges are pending at this checkpoint.
+- Final validation passed: 20 local tests, Ruff, the 91-feature real-data round trip, Windows/Linux CI, and frontend dependency checks.
+- Merged the complete iteration through PR #9 and closed its Milestone. README and retrospective now describe delivered functionality and actual merge evidence.

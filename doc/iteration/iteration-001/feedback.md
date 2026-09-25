@@ -37,7 +37,9 @@ Specify a small geographic area, acquire OpenStreetMap features, save a GeoPacka
 
 ## Process
 
-Issues #1-#4 belong to Milestone 1. Feature PRs target `iteration/001`; the complete sprint is submitted separately to `main`. Remote CI and final merge outcomes will be recorded after verification.
+Issues #1-#4 belong to Milestone 1 and are closed. Feature PRs #5-#8 merged into `iteration/001`, and their branches were deleted. Sprint [PR #9](https://github.com/Hunter3304/uas-mission-planner/pull/9) merged into `main` at `4c16cc9ce1f3e6ec10c10e5987f5d29b90b15774` on 2026-09-25 at 12:45:18 UTC. Milestone 1 is closed.
+
+Windows and Linux Python checks and frontend dependency checks all passed on the sprint PR: [CI run](https://github.com/Hunter3304/uas-mission-planner/actions/runs/36136664590). The iteration branch is retained as a historical integration reference. This post-merge documentation update records completion facts through the workflow's documentation follow-up path.
 
 ## Next discussion
 
