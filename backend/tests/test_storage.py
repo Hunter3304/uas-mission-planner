@@ -78,3 +78,46 @@ def test_duplicate_identity_rejected_before_output(tmp_path, features):
     with pytest.raises(ValueError, match="unique"):
         save_dataset(features, tmp_path / "duplicate", AREA, {})
     assert not (tmp_path / "duplicate").exists()
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        None,
+        [],
+        {"tag_columns": None},
+        {"tag_columns": ["name", "name"]},
+        {"tag_columns": ["geometry"]},
+        {"query_bounds": None},
+        {"feature_count": True},
+        {"sha256": "bad"},
+        {"crs": "EPSG:3857"},
+    ],
+)
+def test_malformed_manifest_is_rejected(tmp_path, features, change):
+    destination = tmp_path / "invalid"
+    metadata = save_dataset(features, destination, AREA, {})
+    if isinstance(change, dict):
+        metadata.update(change)
+    else:
+        metadata = change
+    (destination / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_dataset(destination)
+
+
+@pytest.mark.parametrize("tags", ["[]", "null", "broken"])
+def test_malformed_stored_tags_are_rejected(tmp_path, features, tags):
+    from uas_planner.storage.dataset import checksum
+
+    destination = tmp_path / "invalid-tags"
+    metadata = save_dataset(features, destination, AREA, {})
+    stored = gpd.read_file(destination / "features.gpkg", layer="features")
+    stored["tags_json"] = tags
+    stored.to_file(
+        destination / "features.gpkg", layer="features", driver="GPKG", mode="w", index=False
+    )
+    metadata["sha256"] = checksum(destination / "features.gpkg")
+    (destination / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+    with pytest.raises(ValueError, match="tags"):
+        load_dataset(destination)
