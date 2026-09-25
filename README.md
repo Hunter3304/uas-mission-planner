@@ -4,7 +4,7 @@ A Python-based geospatial data and UAS mission-planning research project, develo
 
 ## Project status
 
-Iteration 002 adds a local dataset explorer: view saved OSM layers, inspect statistics and feature tags, and download GeoJSON, GeoPackage, or metadata. Iteration 001 provides the acquisition/save/reload core. See the [Iteration 002 plan](doc/plan/iteration-002.md) and [feedback](doc/iteration/iteration-002/feedback.md).
+Iteration 002 is complete and merged through [PR #20](https://github.com/Hunter3304/uas-mission-planner/pull/20). It adds a local dataset explorer: view saved OSM layers, inspect statistics and feature tags, and download GeoJSON, GeoPackage, or metadata. Iteration 001 provides the acquisition/save/reload core. See the [Iteration 002 plan](doc/plan/iteration-002.md) and [feedback](doc/iteration/iteration-002/feedback.md).
 
 Read [HANDOFF.md](HANDOFF.md) before starting work and update it at the end of each work session.
 

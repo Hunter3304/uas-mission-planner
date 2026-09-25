@@ -24,3 +24,5 @@ The prototype reads all data into memory and revalidates each API request; this 
 ## Delivery records
 
 Milestone: Iteration 002 (#2). Implementation issues: #14, #15, #16. API PR #17 and explorer PR #18 merged into iteration/002; their feature branches were removed locally and remotely. Final integration evidence is recorded in HANDOFF.md.
+
+Sprint PR #20 merged into main at `f5a900c0efbe0cddeb66019240fc3b5bf42f126d` on 2026-09-25. Issues #14–#16 and Milestone #2 are closed. PR #19 completed verification. All implementation feature branches were deleted locally and remotely and branch listings verified. Local Python result: 26 passed, one Windows symlink test skipped. All sprint PR CI checks passed. Post-merge documentation is tracked by #21.
