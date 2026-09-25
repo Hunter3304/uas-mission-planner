@@ -64,6 +64,12 @@ def main(argv=None):
         }
         print(json.dumps(summary, indent=2, allow_nan=False))
         return 0
+    except KeyboardInterrupt:
+        print(
+            "Cancelled. No completed dataset is guaranteed; check the output directory.",
+            file=sys.stderr,
+        )
+        return 130
     except (OSError, ValueError, RuntimeError, KeyError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
