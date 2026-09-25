@@ -33,17 +33,17 @@ The architecture and runtime baselines are agreed. Dependency versions are recor
 | Python environment and dependency management | uv 0.11.6, project-local virtual environment, uv.lock | Installed and verified |
 | Frontend dependency management | npm, package-lock.json | Installed and locked |
 | Python quality checks | Ruff, pytest | Installed |
-| Frontend quality checks | ESLint, TypeScript checks, relevant component tests | Proposed; test tooling selected when needed |
+| Frontend quality checks | ESLint, TypeScript | Dependencies installed; application checks deferred |
 | Development | Local Windows environment, VS Code | Agreed |
-| Version control and automation | Git, GitHub, GitHub Actions | GitHub agreed; CI configuration pending |
+| Version control and automation | Git, GitHub, GitHub Actions | CI runs offline Python tests on Windows/Linux and installs frontend dependencies |
 
 ### Runtime and dependency policy
 
 - Agreed runtime lines: Python 3.13 and Node.js 24 LTS.
-- Select and record exact runtime patch versions after compatibility validation. Locally observed versions are not automatically project requirements.
-- Validate installation and import of the geospatial stack on Windows before finalizing the Python baseline.
+- Runtime pins are recorded in `.python-version` and `.node-version`; npm is pinned in `frontend/package.json`.
+- The geospatial stack has been installed and verified on Windows with Python 3.13.13.
 - Select mutually compatible stable package releases during scaffolding; do not select prereleases by default.
-- Commit backend and frontend dependency lockfiles once generated. Use the same locked dependencies in local development and CI.
+- Backend and frontend dependency lockfiles are committed. Use the same locked dependencies in local development and CI.
 - Upgrade dependencies deliberately, verify affected functionality, and record changes through the project workflow.
 - Evaluate future planning-library compatibility when introducing those libraries; it has not been tested yet.
 
@@ -57,15 +57,15 @@ The architecture and runtime baselines are agreed. Dependency versions are recor
 | Git | 2.45.1.windows.1 |
 | uv | 0.11.6 |
 
-Dependencies are installed. Python imports, frontend dependency resolution, GeoPackage mixed-geometry persistence, and coordinate projection have passed environment checks. These checks do not yet demonstrate live OSM acquisition.
+Dependencies are installed. Python imports, frontend dependency resolution, GeoPackage mixed-geometry persistence, and coordinate projection have passed environment checks. See `doc/iteration/iteration-001/` for workflow validation and live acquisition evidence.
 
 ### Install locked dependencies
 
 From the repository root, install Python dependencies with `uv sync --project backend --locked` and frontend dependencies with `npm ci --prefix frontend`. Use the project environment rather than installing packages into system Python. The frontend has no application or development-server script in this iteration.
 
-## Planned repository layout
+## Repository layout
 
-These directories describe the intended layout; they have not yet been created.
+`frontend/`, `backend/`, `data/`, `doc/plan/`, and `.github/` are established. Experiment and research directories will be added when their work begins.
 
 ```text
 frontend/          React application and frontend tests
@@ -94,6 +94,34 @@ HANDOFF.md         Current state, workflow, open questions, and next steps
 ## Initial delivery direction
 
 The agreed first iteration establishes the development foundation and a command-line map acquisition prototype: specify an area, retrieve OSM features, save and reload the dataset, and record acquisition metadata. Interactive display and API endpoints are deferred. Acceptance criteria are recorded in the iteration plan.
+
+## Run the core workflow
+
+Run these commands from the repository root after installing locked dependencies:
+
+```powershell
+uv run --project backend --locked uas-planner fetch --west 10.519 --south 52.269 --east 10.521 --north 52.271 --output data/braunschweig-demo --cache .cache/osmnx
+uv run --project backend --locked uas-planner inspect data/braunschweig-demo
+```
+
+`fetch` downloads OSM building, highway, landuse, and natural features, creates `features.gpkg` and `metadata.json`, and immediately reloads and verifies the output. `inspect` only reads local files and checks integrity. It needs no network connection when the locked environment is already installed. For direct offline use, run `backend/.venv/Scripts/uas-planner.exe inspect data/braunschweig-demo` on Windows.
+
+The output directory must be new; an existing dataset is never silently overwritten. To repeat the demonstration, choose a different output directory or inspect the saved dataset. Coordinates are EPSG:4326 longitude/latitude with explicit west/south/east/north flags. Query area is limited to 25 km², each coordinate span to one degree, and polar/dateline-crossing queries are unsupported.
+
+Returned features retain their complete geometry, so their bounds may extend beyond the query. Tags match by union, not intersection. Empty matches are valid datasets with zero features; service failures return a nonzero exit code. Source-invalid geometries are retained and counted in metadata.
+
+Acquisition uses OSMnx's cache and service backoff. HTTP requests have a 60-second timeout, but repeated service backoff can make total execution longer; use Ctrl+C to cancel. Acquisition timestamps record the request operation, not the edit date of source data or a guaranteed fresh download. Data files remain local and are excluded from Git.
+
+## Verify
+
+```powershell
+uv run --project backend --locked pytest backend/tests -q
+uv run --project backend --locked ruff check backend/src backend/tests
+uv run --project backend --locked ruff format --check backend/src backend/tests
+npm ls --prefix frontend --depth=0
+```
+
+Automated tests use synthetic data and mocked acquisition. They check input validation, request errors, mixed-geometry/tag persistence, empty datasets, checksum corruption, and offline CLI reload. Live acquisition is a separate manual demonstration, not a CI network dependency.
 
 ## Technical references
 

@@ -1,0 +1,25 @@
+# Local environments and tools
+.venv/
+node_modules/
+.cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*
+!.env.example
+
+# Generated output
+dist/
+build/
+coverage/
+.coverage
+*.log
+data/*
+!data/README.md
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
