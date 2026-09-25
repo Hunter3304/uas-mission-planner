@@ -6,7 +6,8 @@
 - Local directory: `D:/Aostfalia/develop/uas-mission-planner`.
 - Iterations 001/002 delivered acquisition, verified persistence, and the dataset explorer. PR #22 completed their post-merge documentation; #21 is closed and its branch was deleted.
 - User authorized Iteration 003: error handling, small-example tests, README, and stage version. Milestone #3, issues #23–#25; plan in doc/plan/iteration-003.md.
-- Error handling PR #26 merged; #23 closed and branch deleted locally/remotely. Offline sample PR #27 and stage-delivery work complete the sprint.
+- Error handling PR #26 merged; #23 closed and branch deleted locally/remotely. Offline sample PR #27 merged; #24 closed and its local/remote branch deleted. Stage delivery is tracked by #25.
+- Validation: 42 Python tests passed (one Windows symlink skip), nine mocked browser tests and one real-stack browser test passed; Ruff, ESLint and production build passed. Existing 91-feature data remains verified; data/offline-sample now contains three synthetic features.
 - Target release: v0.3.0. Finish integration and publish only from a tested main commit; record final release evidence after merge.
 - No subsequent sprint is approved.
 

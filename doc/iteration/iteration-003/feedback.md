@@ -14,7 +14,7 @@ Completes the user-requested stable delivery block: predictable failures, a smal
 
 ## Validation and lessons
 
-Error regressions and the real-stack sample complement the earlier mocked UI tests. Local pre-release checks pass; final counts and remote integration evidence are recorded after sprint verification. Existing Braunschweig data is retained locally and remains excluded from Git.
+Error regressions and the real-stack sample complement the earlier mocked UI tests. Local pre-release validation: 42 Python tests passed and one Windows symlink test skipped; nine mocked browser tests and one real-stack browser test passed. Ruff, ESLint and the production build passed. The existing 91-feature Braunschweig dataset reloads with its original checksum; a three-feature offline sample was generated successfully. Remote integration evidence is recorded after sprint verification. Existing Braunschweig data is retained locally and remains excluded from Git.
 
 GeoPackage edits should use geospatial tooling: a test fixture initially attempted plain SQLite updates but GeoPackage spatial triggers require spatial functions. Rewriting its test layer through GeoPandas provided the intended corrupt-tag fixture.
 
