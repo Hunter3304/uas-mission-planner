@@ -44,10 +44,20 @@
 4. Represent each sprint with a GitHub Milestone and an `iteration/NNN` integration branch.
 5. Create each Issue and assign it to its Milestone before creating its feature branch.
 6. Create feature branches from the corresponding iteration branch.
-7. Validate changes and merge feature pull requests into the iteration branch. Close the corresponding Issue explicitly if necessary; retain its history. Delete the merged feature branch.
+7. Validate changes and merge feature pull requests into the iteration branch. Close the corresponding Issue explicitly if necessary; retain its history. Immediately delete the merged feature branch both locally and on GitHub, following the mandatory cleanup procedure below.
 8. Validate the complete sprint and merge the iteration branch into `main` through a pull request.
 9. Prepare sprint feedback in `doc/iteration/iteration-NNN/` and update README before the sprint merge. Record post-merge facts or further feedback through a documentation update as needed.
 10. Update this file at the end of every work session, including incomplete or blocked sessions.
+
+### Mandatory post-merge branch cleanup
+
+- Applies to every merged feature branch and temporary documentation/fix branch, including the branch used to change this document.
+- Verify that the intended PR is merged before deleting its source branch. Never delete a branch with unmerged work merely to make the branch list shorter.
+- Switch to the target branch and synchronize it, delete the source branch on GitHub, and delete the corresponding local branch.
+- Run `git fetch --prune origin` to remove stale remote-tracking references.
+- Verify both `git branch -a` and `git ls-remote --heads origin`. Do not report cleanup as complete based only on a PR merge or the local branch list.
+- Keep `main`. Iteration integration branches such as `iteration/001` are separate from feature branches and remain historical references under the current convention; changing their retention requires an explicit user decision.
+- For squash merges, Git ancestry alone may not mark the local feature branch merged. Confirm the merged PR and synchronized changes before deleting that local branch.
 
 ## Documentation locations
 
@@ -66,6 +76,9 @@
 - Frontend dependencies are ready, but there is no frontend app/build yet; CI only validates its dependency installation.
 
 ## Session outcome
+
+- Rechecked branch cleanup at the user's request: actual local and remote branches were only `main` and `iteration/001`; no feature branches remained.
+- Clarified mandatory local/remote deletion and verification for all merged feature and temporary documentation/fix branches.
 
 - Installed and verified locked dependencies and checksum-verified GitHub CLI; user completed browser authorization.
 - Created the public repository, Milestone, and Issues before their feature branches.
