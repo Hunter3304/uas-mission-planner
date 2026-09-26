@@ -4,12 +4,14 @@
 
 - Public repository: https://github.com/Hunter3304/uas-mission-planner.
 - Local directory: `D:/Aostfalia/develop/uas-mission-planner`.
-- Iterations 001/002 delivered acquisition, verified persistence, and the dataset explorer. PR #22 completed their post-merge documentation; #21 is closed and its branch was deleted.
-- User authorized Iteration 003: error handling, small-example tests, README, and stage version. Milestone #3, issues #23–#25; plan in doc/plan/iteration-003.md.
-- Error handling PR #26 merged; #23 closed and branch deleted locally/remotely. Offline sample PR #27 merged; #24 closed and its local/remote branch deleted. Stage delivery is tracked by #25.
-- Validation: 42 Python tests passed (one Windows symlink skip), nine mocked browser tests and one real-stack browser test passed; Ruff, ESLint and production build passed. Existing 91-feature data remains verified; data/offline-sample now contains three synthetic features.
-- Target release: v0.3.0. Finish integration and publish only from a tested main commit; record final release evidence after merge.
-- No subsequent sprint is approved.
+- Iterations 001–003 are delivered. Iteration 003 completes the user-requested error handling, small-example tests, README and stage version.
+- Sprint PR #29 merged into main at `6d33ceae8d227eba48ee2c08d716fc37448edd5e`. Main CI run 36174938461 passed Windows/Linux Python and frontend checks, including the real-stack smoke test.
+- Published release: https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0. Annotated tag v0.3.0 points to that tested sprint commit; publication date 2026-09-25.
+- Milestone #3 is closed. Implementation issues #23–#25 are closed; PRs #26–#28 merged and their branches were deleted locally/remotely, pruned and verified.
+- This final post-merge documentation is tracked by #30. Its temporary branch follows the mandatory cleanup policy below. Subsequent main documentation commits do not move the published tag.
+- Validation: 42 local Python tests passed (one Windows symlink-permission skip), nine mocked browser tests and one real-stack browser test passed; Ruff, ESLint and production build passed.
+- Existing data/braunschweig-demo remains verified with 91 features. data/offline-sample contains three synthetic features. Both are local and excluded from Git.
+- No further implementation or next sprint is approved. Discuss the next plan with the user.
 
 ## Local commands and demonstration
 
@@ -65,7 +67,7 @@
 
 ## Open questions and pending decisions
 
-- Iteration 003 is authorized. Discuss subsequent scope before creating another sprint.
+- Iteration 003 is complete. Discuss subsequent scope before creating another sprint.
 - Runtime baseline is approved and validated: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, uv 0.11.6. Git is 2.45.1.windows.1.
 - OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
 - Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.
@@ -79,7 +81,10 @@
 - Added an offline synthetic point/line/polygon sample and a real API/browser round-trip test.
 - Unified stage versions, prepared changelog, rewrote README quick start and startup troubleshooting.
 - Do not leave agent-owned demonstration servers running. Test servers use 8011/5175 and terminate after testing; do not stop user-owned 8000/5173 services.
-- Final CI, main integration, release publication and branch cleanup must be recorded before closing this delivery.
+- Completed main integration and published v0.3.0 after successful main CI. Implementation branches were removed and verified.
+- Test ports 8011/5174/5175 were confirmed free after tests. No demonstration server was left running by this session. User-owned development services were not stopped.
+- Restart both development terminals after updating to load the latest Python code and Vite configuration.
+- Known non-blocking dependency warning: Starlette deprecates its current httpx test-client integration. CI also reports older action runtime deprecation notices; schedule deliberate tooling updates in future work.
 
 ## Start the interface
 
@@ -93,3 +98,9 @@ npm --prefix frontend run dev
 Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
 
 For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
+
+## Delivery continuation — 2026-09-26
+
+- Verified PR #31 checks completed successfully (run 36175197131); only documentation integration and temporary-branch cleanup remained from the previous session.
+- GitHub CLI authentication was unavailable in this session; the connected GitHub tools remain available for reviewing and merging the existing PR.
+- No application changes or new sprint were introduced. The published v0.3.0 tag remains fixed. Merge this documentation through PR #31, close #30, and apply the mandatory local/remote branch cleanup procedure.

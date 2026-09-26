@@ -14,7 +14,7 @@ Completes the user-requested stable delivery block: predictable failures, a smal
 
 ## Validation and lessons
 
-Error regressions and the real-stack sample complement the earlier mocked UI tests. Local pre-release validation: 42 Python tests passed and one Windows symlink test skipped; nine mocked browser tests and one real-stack browser test passed. Ruff, ESLint and the production build passed. The existing 91-feature Braunschweig dataset reloads with its original checksum; a three-feature offline sample was generated successfully. Remote integration evidence is recorded after sprint verification. Existing Braunschweig data is retained locally and remains excluded from Git.
+Error regressions and the real-stack sample complement the earlier mocked UI tests. Local pre-release validation: 42 Python tests passed and one Windows symlink test skipped; nine mocked browser tests and one real-stack browser test passed. Ruff, ESLint and the production build passed. The existing 91-feature Braunschweig dataset reloads with its original checksum; a three-feature offline sample was generated successfully. Main CI run 36174938461 passed all Windows/Linux Python and frontend checks, including the real-stack smoke test. Existing Braunschweig data is retained locally and remains excluded from Git.
 
 GeoPackage edits should use geospatial tooling: a test fixture initially attempted plain SQLite updates but GeoPackage spatial triggers require spatial functions. Rewriting its test layer through GeoPandas provided the intended corrupt-tag fixture.
 
@@ -26,4 +26,8 @@ Small-area, in-memory processing and CLI-only acquisition remain deliberate limi
 
 ## Delivery
 
-Milestone Iteration 003 (#3), issues #23–#25. Final PR, tag, release, and cleanup evidence will be recorded in the post-merge handoff.
+Milestone Iteration 003 (#3) is closed; implementation issues #23–#25 are closed. Feature PRs #26–#28 merged into iteration/003, and all three source branches were deleted locally/remotely and verified.
+
+Sprint PR #29 merged into main at `6d33ceae8d227eba48ee2c08d716fc37448edd5e`. After main CI passed, annotated tag **v0.3.0** was pushed at that commit and the [GitHub Release](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0) was published on 2026-09-25. The tag remains fixed; post-merge documentation is tracked separately by #30.
+
+Test servers terminated and ports 8011/5174/5175 were free after verification. No agent-owned demonstration services were left running. User-owned development terminals should be restarted after updating to load the release code.
