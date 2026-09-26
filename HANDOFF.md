@@ -98,3 +98,9 @@ npm --prefix frontend run dev
 Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
 
 For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
+
+## Delivery continuation — 2026-09-26
+
+- Verified PR #31 checks completed successfully (run 36175197131); only documentation integration and temporary-branch cleanup remained from the previous session.
+- GitHub CLI authentication was unavailable in this session; the connected GitHub tools remain available for reviewing and merging the existing PR.
+- No application changes or new sprint were introduced. The published v0.3.0 tag remains fixed. Merge this documentation through PR #31, close #30, and apply the mandatory local/remote branch cleanup procedure.
