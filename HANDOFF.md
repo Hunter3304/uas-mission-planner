@@ -2,16 +2,19 @@
 
 ## Current status
 
-- Public repository: https://github.com/Hunter3304/uas-mission-planner.
-- Local directory: `D:/Aostfalia/develop/uas-mission-planner`.
-- Iterations 001–003 are delivered. Iteration 003 completes the user-requested error handling, small-example tests, README and stage version.
-- Sprint PR #29 merged into main at `6d33ceae8d227eba48ee2c08d716fc37448edd5e`. Main CI run 36174938461 passed Windows/Linux Python and frontend checks, including the real-stack smoke test.
-- Published release: https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0. Annotated tag v0.3.0 points to that tested sprint commit; publication date 2026-09-25.
-- Milestone #3 is closed. Implementation issues #23–#25 are closed; PRs #26–#28 merged and their branches were deleted locally/remotely, pruned and verified.
-- This final post-merge documentation is tracked by #30. Its temporary branch follows the mandatory cleanup policy below. Subsequent main documentation commits do not move the published tag.
-- Validation: 42 local Python tests passed (one Windows symlink-permission skip), nine mocked browser tests and one real-stack browser test passed; Ruff, ESLint and production build passed.
-- Existing data/braunschweig-demo remains verified with 91 features. data/offline-sample contains three synthetic features. Both are local and excluded from Git.
-- No further implementation or next sprint is approved. Discuss the next plan with the user.
+- Iteration 004 implements independent explainable costs for building, highway,
+  landuse and natural tags. User approved implementation and GitHub integration.
+- Tracking: Milestone #4; implementation Issue #32; integration branch
+  `iteration/004`; feature branch `feature/32-independent-tag-costs`.
+- Local implementation is complete. Feature and sprint PR integration/CI are
+  pending; do not report delivery until verified.
+- Local validation: 66 Python tests passed, one Windows symlink-permission skip;
+  9 mocked and 3 real-stack browser tests passed; Ruff, ESLint and build passed.
+- Published release remains v0.3.0; Iteration 004 does not move its tag or create
+  a new release. CHANGELOG records these capabilities under Unreleased.
+- Existing saved datasets are unchanged. Analysis requires no new acquisition.
+- See `doc/plan/iteration-004.md`, `doc/iteration/iteration-004/feedback.md`,
+  and `doc/rules/independent-costs.md` for scope, verification and rules.
 
 ## Local commands and demonstration
 
@@ -20,7 +23,7 @@
 - Command help: `uv run --project backend --locked uas-planner --help`.
 - Reload live sample: `uv run --project backend --locked uas-planner inspect data/braunschweig-demo`.
 - Sample files: `data/braunschweig-demo/features.gpkg` and `metadata.json` (excluded from Git).
-- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0, authenticated as Hunter3304. It is invoked by absolute path; no global PATH change was made.
+- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0, not logged in directly. Git's credential provider supplies authenticated access when required; never print or persist credential values. No global PATH change was made.
 - See README and `doc/iteration/iteration-001/feedback.md` for commands and limitations.
 
 ## Agreed architecture
@@ -67,7 +70,7 @@
 
 ## Open questions and pending decisions
 
-- Iteration 003 is complete. Discuss subsequent scope before creating another sprint.
+- Iteration 004 scope is approved. Further feature work requires a subsequent agreed plan.
 - Runtime baseline is approved and validated: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, uv 0.11.6. Git is 2.45.1.windows.1.
 - OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
 - Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.
@@ -77,14 +80,20 @@
 
 ## Session outcome
 
-- Hardened shared dataset validation, CLI cancellation and frontend error/download handling.
-- Added an offline synthetic point/line/polygon sample and a real API/browser round-trip test.
-- Unified stage versions, prepared changelog, rewrote README quick start and startup troubleshooting.
-- Do not leave agent-owned demonstration servers running. Test servers use 8011/5175 and terminate after testing; do not stop user-owned 8000/5173 services.
-- Completed main integration and published v0.3.0 after successful main CI. Implementation branches were removed and verified.
-- Test ports 8011/5174/5175 were confirmed free after tests. No demonstration server was left running by this session. User-owned development services were not stopped.
-- Restart both development terminals after updating to load the latest Python code and Vite configuration.
-- Known non-blocking dependency warning: Starlette deprecates its current httpx test-client integration. CI also reports older action runtime deprecation notices; schedule deliberate tooling updates in future work.
+- Added independent tag-cost core/API and category switching in the explorer.
+- Original features/downloads and dataset schema remain compatible. Historical
+  paper obstruction flags are distinct from numeric costs and current regulation.
+- Unknown values use explicitly marked provisional cost 2. No undocumented rule
+  was added to classify natural=tree as natural=wood.
+- Expanded-area acquisition was canceled at the user's request and not resumed.
+  Basemap imagery is context; moving the map does not acquire analysis features.
+- All current changes were prepared locally before remote tracking was established;
+  Issue #32 was created before the feature branch. The plan records this sequence.
+- Do not stop user-owned development services. Browser tests use 8011/5174/5175.
+- Restart the backend after updating, then refresh the browser. In Cost category,
+  select Buildings, Roads & paths, Land use or Natural features and enable its map.
+- Known dependency warning: Starlette deprecates the current httpx TestClient
+  integration. It does not fail the verified tests.
 
 ## Start the interface
 
@@ -98,9 +107,3 @@ npm --prefix frontend run dev
 Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
 
 For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
-
-## Delivery continuation — 2026-09-26
-
-- Verified PR #31 checks completed successfully (run 36175197131); only documentation integration and temporary-branch cleanup remained from the previous session.
-- GitHub CLI authentication was unavailable in this session; the connected GitHub tools remain available for reviewing and merging the existing PR.
-- No application changes or new sprint were introduced. The published v0.3.0 tag remains fixed. Merge this documentation through PR #31, close #30, and apply the mandatory local/remote branch cleanup procedure.

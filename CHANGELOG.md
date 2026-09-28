@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - Iteration 004
+
+- Independent costs for buildings, roads, land use and natural features.
+- Versioned paper-based classification, explicit unknown defaults and separate obstruction flags.
+- Category-specific map colors, statistics, per-tag explanations and tag search.
+- Read-only analysis API; original datasets and downloads remain unchanged.
+- Rule tables, methodology, offline walkthrough and regression coverage.
+
 ## 0.3.0 — 2026-09-25
 
 First tagged research prototype, completing Iterations 001–003.

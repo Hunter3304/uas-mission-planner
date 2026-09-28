@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { downloadDataset, getJson } from './api'
 import MapCanvas from './MapCanvas'
+import { CostDetails, CostOverview, costText } from './BuildingCosts'
 import {
   featureKey,
   featureLayers,
@@ -10,6 +11,7 @@ import {
   type MapData,
   type MapFeature,
   type Visibility,
+  type LayerKey,
 } from './types'
 
 const allVisible: Visibility = { building: true, highway: true, landuse: true, natural: true }
@@ -29,12 +31,32 @@ export default function App() {
   const [catalogLoading, setCatalogLoading] = useState(true)
   const [catalogError, setCatalogError] = useState('')
   const [dataset, setDataset] = useState<Dataset | null>(null)
-  const [data, setData] = useState<MapData | null>(null)
+  const [sourceData, setData] = useState<MapData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [visibility, setVisibility] = useState<Visibility>(allVisible)
   const [selected, setSelected] = useState<MapFeature | null>(null)
   const [search, setSearch] = useState('')
+  const [costMode, setCostMode] = useState(false)
+  const [costLayer, setCostLayer] = useState<LayerKey>('building')
+  const costName = {
+    building: 'Building',
+    highway: 'Road',
+    landuse: 'Land use',
+    natural: 'Natural feature',
+  }[costLayer]
+  const data = useMemo(() => {
+    if (!sourceData?.layer_summaries) return sourceData
+    const summary = sourceData.layer_summaries[costLayer]
+    return {
+      ...sourceData,
+      features: sourceData.features.map((feature) => ({
+        ...feature,
+        cost_analysis: feature.layer_analyses?.[costLayer] ?? null,
+      })),
+      cost_summary: summary ? { ...summary, buildings: summary.features } : undefined,
+    }
+  }, [sourceData, costLayer])
   const [page, setPage] = useState(0)
   const [downloading, setDownloading] = useState('')
   const [downloadStatus, setDownloadStatus] = useState('')
@@ -73,6 +95,7 @@ export default function App() {
     setSelected(null)
     setError('')
     setSearch('')
+    setCostMode(false)
     setPage(0)
     setDownloadStatus('')
     if (!id) {
@@ -82,7 +105,10 @@ export default function App() {
     setLoading(true)
     Promise.all([
       getJson<Dataset>(`/api/datasets/${encodeURIComponent(id)}`, controller.signal),
-      getJson<MapData>(`/api/datasets/${encodeURIComponent(id)}/features`, controller.signal),
+      getJson<MapData>(
+        `/api/datasets/${encodeURIComponent(id)}/features?analysis=tag-costs`,
+        controller.signal,
+      ),
     ])
       .then(([info, features]) => {
         setDataset(info)
@@ -99,13 +125,13 @@ export default function App() {
   }, [id, revision])
 
   const visible = useMemo(
-    () => data?.features.filter((feature) => isVisible(feature, visibility)) ?? [],
-    [data, visibility],
+    () => data?.features.filter((feature) => isVisible(feature, visibility, costMode)) ?? [],
+    [data, visibility, costMode],
   )
   const filtered = useMemo(
     () =>
       visible.filter((feature) =>
-        `${featureKey(feature)} ${String(feature.properties.name ?? '')}`
+        `${featureKey(feature)} ${JSON.stringify(feature.properties)}`
           .toLowerCase()
           .includes(search.toLowerCase()),
       ),
@@ -299,7 +325,9 @@ export default function App() {
                     {visible.length.toLocaleString()}
                     <em> / {dataset.feature_count}</em>
                   </strong>
-                  <small>Across active layers</small>
+                  <small>
+                    {costMode ? `${costName} objects across active layers` : 'Across active layers'}
+                  </small>
                 </article>
                 <article className="stat">
                   <span>Geometry mix</span>
@@ -324,6 +352,21 @@ export default function App() {
                   <small>{dataset.crs}</small>
                 </article>
               </div>
+              <CostOverview
+                data={data}
+                enabled={costMode}
+                layer={costLayer}
+                onLayerChange={(layer) => {
+                  setCostLayer(layer)
+                  setSelected(null)
+                  setPage(0)
+                }}
+                onChange={(enabled) => {
+                  setCostMode(enabled)
+                  setPage(0)
+                  setSelected(null)
+                }}
+              />
               <div className="map-title">
                 <h3>Geographic overview</h3>
                 <span>
@@ -335,6 +378,7 @@ export default function App() {
                 data={data}
                 visibility={visibility}
                 onSelect={onSelect}
+                costMode={costMode}
               />
               {!data.features.length && (
                 <p className="empty-note" role="status">
@@ -343,7 +387,9 @@ export default function App() {
               )}
               {data.features.length > 0 && !visible.length && (
                 <p className="empty-note" role="status">
-                  All layers are hidden. Enable a layer to show features.
+                  {costMode
+                    ? `No analyzed ${costName.toLowerCase()} objects in the active layers.`
+                    : 'All layers are hidden. Enable a layer to show features.'}
                 </p>
               )}
               <div className="detail-grid">
@@ -355,7 +401,7 @@ export default function App() {
                     <input
                       aria-label="Search features"
                       className="search"
-                      placeholder="Search name or OSM ID…"
+                      placeholder="Search tags, name or OSM ID…"
                       value={search}
                       onChange={(event) => {
                         setSearch(event.target.value)
@@ -371,6 +417,7 @@ export default function App() {
                           <th>Layer</th>
                           <th>Name</th>
                           <th>Geometry</th>
+                          <th>{costName} cost</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -399,6 +446,10 @@ export default function App() {
                             </td>
                             <td>{String(feature.properties.name ?? 'Unnamed')}</td>
                             <td>{feature.geometry.type}</td>
+                            <td>
+                              {costText(feature.cost_analysis)}
+                              {feature.cost_analysis?.obstruction ? ' · Paper flag' : ''}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -436,6 +487,9 @@ export default function App() {
                   {selected ? (
                     <>
                       <p className="selected-id">{featureKey(selected)}</p>
+                      {selected.cost_analysis && (
+                        <CostDetails analysis={selected.cost_analysis} layer={costLayer} />
+                      )}
                       <dl className="properties">
                         {Object.entries(selected.properties)
                           .filter(([, value]) => value != null)

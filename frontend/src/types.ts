@@ -8,8 +8,67 @@ export const layers = [
 ] as const
 export type LayerKey = (typeof layers)[number]['key']
 export type Visibility = Record<LayerKey, boolean>
-export type MapFeature = Feature<Geometry, Record<string, unknown>>
-export type MapData = FeatureCollection<Geometry, Record<string, unknown>>
+export interface CostMatch {
+  input: string | null
+  normalized: string | null
+  cost: number | null
+  status: string
+  obstruction: boolean
+  source: string
+  reason: string
+}
+export interface TagCost {
+  key: string
+  value: unknown
+  cost: number | null
+  status: string
+  obstruction: boolean
+  has_default: boolean
+  matches: CostMatch[]
+  reason: string
+  source: string
+}
+export interface BuildingCost {
+  rule_version: string
+  cost: number | null
+  label: string
+  status: string
+  has_default: boolean
+  obstruction: boolean
+  tags: TagCost[]
+}
+export type MapFeature = Feature<Geometry, Record<string, unknown>> & {
+  cost_analysis?: BuildingCost | null
+  layer_analyses?: Partial<Record<LayerKey, BuildingCost | null>>
+}
+export interface LayerSummary {
+  features: number
+  levels: Record<string, number>
+  defaulted: number
+  obstruction_flagged: number
+  without_numeric_cost: number
+  unmatched_tags: { key: string; value: unknown; count: number }[]
+}
+export type MapData = Omit<FeatureCollection<Geometry, Record<string, unknown>>, 'features'> & {
+  features: MapFeature[]
+  layer_summaries?: Partial<Record<LayerKey, LayerSummary>>
+  cost_summary?: {
+    buildings: number
+    levels: Record<string, number>
+    defaulted: number
+    obstruction_flagged: number
+    without_numeric_cost: number
+    unmatched_tags: { key: string; value: unknown; count: number }[]
+  }
+  cost_policy?: {
+    version: string
+    source: string
+    scope: string
+    aggregation: string
+    unknown: string
+    limits: string
+  }
+}
 export interface Dataset {
   id: string
   verified: boolean
@@ -35,6 +94,9 @@ export function featureKey(feature: MapFeature) {
 export function featureLayers(feature: MapFeature) {
   return layers.filter(({ key }) => feature.properties[key] != null)
 }
-export function isVisible(feature: MapFeature, visibility: Visibility) {
-  return featureLayers(feature).some(({ key }) => visibility[key])
+export function isVisible(feature: MapFeature, visibility: Visibility, costMode = false) {
+  return (
+    (!costMode || feature.cost_analysis != null) &&
+    featureLayers(feature).some(({ key }) => visibility[key])
+  )
 }

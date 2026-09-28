@@ -4,6 +4,8 @@ A local Python geospatial research prototype for an internship and subsequent ba
 
 **Stage version: [v0.3.0](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0).** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.
 
+The current main development adds [Iteration 004](doc/plan/iteration-004.md) independent tag costs; these additions are not part of the fixed v0.3.0 release. See [iteration feedback](doc/iteration/iteration-004/feedback.md).
+
 ## Quick start: offline demonstration
 
 Prerequisites: Git, Python 3.13, uv, and Node.js 24/npm 11. Validated baseline: Python 3.13.13, uv 0.11.6, Node 24.14.1, npm 11.11.0. Open the repository folder in VS Code. Run these PowerShell commands from its root:
@@ -120,6 +122,30 @@ CI runs Python checks on Windows/Linux and frontend lint, build, mocked browser 
 
 ## Architecture and stack
 
+### Independent tag cost analysis
+
+Saved datasets are analyzed using versioned rules from Ramke (2020). Choose
+**Cost category**: Buildings, Roads & paths, Land use, or Natural features.
+Enable the corresponding **cost map** checkbox to color that category by its
+tag cost (0-4). Roads, land use and natural features are analyzed independently,
+including objects with no building tag. Select a feature to inspect each tag, its cost or unscored status,
+the matched rule, source and any historical paper obstruction flag. Search
+supports tag keys/values as well as names and OSM identities.
+Read [Cost rules](doc/rules/README.md) and the
+[independent-layer guide](doc/rules/independent-costs.md). The executable rules
+live in [cost_rules.json](backend/src/uas_planner/core/cost_rules.json).
+Unknown classifications use provisional cost 2 with a distinct gray
+style; blank areas are unassessed. Other tag costs are shown independently,
+not added to the selected category's cost. Statistics cover all saved objects in
+that category, including hidden ones. Switching categories updates the map,
+table and statistics and clears the prior selection. Active layer switches still
+use union visibility for objects carrying multiple tags.
+Paper obstruction flags do not establish current flight restrictions.
+
+Restart the backend after updating rules/code, then Refresh the dataset.
+Original datasets and downloads are unchanged; analysis is calculated on read.
+This feature does not yet create a fused cost grid or plan a flight route.
+
 One public monorepo, separately running frontend/backend. React communicates through HTTP. **The Python core must never depend on React or FastAPI**; CLI, API and future experiments reuse the core. Code, UI and project documentation default to English.
 
 | Area | Stack |
@@ -158,4 +184,4 @@ The v0.3.0 stage release is a tagged prototype baseline. Backend, frontend, CLI 
 
 ## Current limits
 
-This is a local small-area prototype that loads datasets into memory and revalidates API reads. Browser-triggered acquisition, background jobs, large-area performance, risk models, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.
+This is a local small-area prototype that loads datasets into memory and revalidates API reads. Building tag costs are ordinal research classifications. Browser-triggered acquisition, background jobs, large-area performance, population/cost fusion, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.
