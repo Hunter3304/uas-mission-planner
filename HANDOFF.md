@@ -4,10 +4,15 @@
 
 - Iteration 004 implements independent explainable costs for building, highway,
   landuse and natural tags. User approved implementation and GitHub integration.
-- Tracking: Milestone #4; implementation Issue #32; integration branch
-  `iteration/004`; feature branch `feature/32-independent-tag-costs`.
-- Local implementation is complete. Feature and sprint PR integration/CI are
-  pending; do not report delivery until verified.
+- Delivered to main through sprint PR #34 at
+  `7d516065a05e807e26092db1c1c7e969e0211c90` on 2026-09-28.
+- Feature PR #33 merged into iteration/004; implementation Issue #32 is closed.
+  Feature branch was deleted locally/remotely, pruned and verified. Retain
+  iteration/001 through iteration/004 as history.
+- Feature PR CI run 36446412570, iteration push run 36446647516 and sprint PR
+  run 36446678245 passed all Windows/Linux Python and frontend checks.
+- Main push CI run 36446895517 also passed for the sprint merge commit.
+- Final delivery documentation is tracked by Issue #35 in Milestone #4.
 - Local validation: 66 Python tests passed, one Windows symlink-permission skip;
   9 mocked and 3 real-stack browser tests passed; Ruff, ESLint and build passed.
 - Published release remains v0.3.0; Iteration 004 does not move its tag or create
@@ -70,7 +75,7 @@
 
 ## Open questions and pending decisions
 
-- Iteration 004 scope is approved. Further feature work requires a subsequent agreed plan.
+- Iteration 004 implementation is delivered. Further feature work requires a subsequent agreed plan.
 - Runtime baseline is approved and validated: Python 3.13.13, Node.js 24.14.1, npm 11.11.0, uv 0.11.6. Git is 2.45.1.windows.1.
 - OSMnx may retry after service backoff without an overall deadline; Ctrl+C cancels acquisition. HTTP timeout is not a total execution limit.
 - Geometries are complete source features, not clipped. Invalid geometries are retained and counted. Unknown tags are preserved as JSON-compatible values.

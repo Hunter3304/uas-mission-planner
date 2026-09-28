@@ -16,7 +16,11 @@ Rules are documented in `doc/rules/`; no source dataset or download is rewritten
 - Desktop/mobile screenshots inspected; no viewport overflow.
 - Coverage includes standalone features, overlapping tags, zero and unknown
   costs, obstruction-only/excluded tags, category switches and raw-data fidelity.
-- GitHub PR/iteration/main CI results will be recorded after integration.
+- GitHub feature PR CI: [36446412570](https://github.com/Hunter3304/uas-mission-planner/actions/runs/36446412570), passed.
+- Iteration push CI: [36446647516](https://github.com/Hunter3304/uas-mission-planner/actions/runs/36446647516), passed.
+- Sprint PR CI: [36446678245](https://github.com/Hunter3304/uas-mission-planner/actions/runs/36446678245), passed.
+
+- Main push CI: [36446895517](https://github.com/Hunter3304/uas-mission-planner/actions/runs/36446895517), passed for the sprint merge commit.
 
 ## Findings and limitations
 
@@ -34,6 +38,11 @@ Rules are documented in `doc/rules/`; no source dataset or download is rewritten
 The scope was approved before implementation. Remote tracking was established
 on September 28 after local preparation: Milestone #4 and Issue #32 were created
 before creating the feature branch. Preserve this distinction in the history.
-Feature -> iteration -> main PR integration is pending at this document revision.
-Temporary merged branches must be deleted; iteration branches remain as history.
+[Feature PR #33](https://github.com/Hunter3304/uas-mission-planner/pull/33) merged
+into iteration/004 at 970760eb1c7b9bc00a9facb980188879b4f9db41.
+[Sprint PR #34](https://github.com/Hunter3304/uas-mission-planner/pull/34) merged
+into main at 7d516065a05e807e26092db1c1c7e969e0211c90.
+Issue #32 is closed. The feature branch was deleted locally and remotely;
+`git fetch --prune`, local branches and remote heads were checked.
+Iteration branches remain as history. Issue #35 tracks this final delivery record.
 The release tag v0.3.0 stays fixed; no new release is included in this delivery.

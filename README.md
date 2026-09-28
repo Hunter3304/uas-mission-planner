@@ -4,7 +4,7 @@ A local Python geospatial research prototype for an internship and subsequent ba
 
 **Stage version: [v0.3.0](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0).** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.
 
-The current main development adds [Iteration 004](doc/plan/iteration-004.md) independent tag costs; these additions are not part of the fixed v0.3.0 release. See [iteration feedback](doc/iteration/iteration-004/feedback.md).
+Main includes the completed [Iteration 004](doc/plan/iteration-004.md) independent tag costs; these additions are not part of the fixed v0.3.0 release. See [iteration feedback](doc/iteration/iteration-004/feedback.md).
 
 ## Quick start: offline demonstration
 
