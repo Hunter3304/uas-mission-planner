@@ -1,0 +1,54 @@
+{
+  "version": "ramke-building-tags-v1",
+  "source": "Ramke (2020), Appendix I.II, Tables 7-1 to 7-4, printed pp. 69-70",
+  "default_cost": 2,
+  "layers": {
+    "building": {
+      "table": "Table 7-3, p. 70",
+      "levels": {
+        "0": ["hut", "shed", "bunker", "ruins"],
+        "1": ["carport", "garage", "garages", "greenhouse", "farm_auxiliary", "shrine"],
+        "2": ["parking", "service", "yes", "stable"],
+        "3": ["commercial", "industrial", "kiosk", "office", "retail", "supermarket", "warehouse", "train_station", "toilets"],
+        "4": ["apartments", "bungalow", "cabin", "detached", "dormitory", "farm", "ger", "hotel", "house", "houseboat", "residential", "semidetached_house", "static_caravan", "terrace", "stadium", "school", "hospital", "fire_station", "religious", "church", "mosque", "synagogue", "cathedral"]
+      },
+      "obstructions": ["civic", "fire_station", "government", "hospital", "kindergarten", "public", "school", "train_station", "transportation", "university", "grandstand", "pavilion", "sports_hall", "stadium"],
+      "aliases": {"apartements": "apartments", "farm_auxilary": "farm_auxiliary", "train_staion": "train_station", "semidetached-house": "semidetached_house"},
+      "corrections": {"apartments": "Corrected appendix spelling apartements.", "farm_auxiliary": "Corrected appendix spelling farm_auxilary.", "train_station": "Corrected obstruction-row spelling train_staion.", "semidetached_house": "Normalized appendix semidetached-house to underscore spelling."},
+      "supplements": {"barn": {"cost": 1, "source": "Ramke (2020), Table 3-3, p. 32", "reason": "Low category: mostly storage, people are rarely present (paper example)."}},
+      "excluded": ["no"]
+    },
+    "landuse": {
+      "table": "Table 7-1, p. 69",
+      "levels": {
+        "0": ["reservoir", "farmland", "farmyard", "vineyard", "meadow", "orchard", "salt_pond"],
+        "1": ["basin", "landfill", "quarry"],
+        "2": ["brownfield", "grass", "greenfield", "greenhouse_horticulture", "plant_nursery", "village_green"],
+        "3": ["allotments", "retail", "commercial", "industrial", "construction", "cemetery", "garage"],
+        "4": ["residential", "railway", "recreation_ground", "religious"]
+      },
+      "obstructions": ["military"]
+    },
+    "natural": {
+      "table": "Table 7-2, p. 69",
+      "levels": {
+        "0": ["wood", "water", "glacier"],
+        "1": ["scrub", "heath", "grassland", "fell", "bare_rock", "scree", "shingle", "sand", "mud", "wetland", "bay", "cape", "strait"],
+        "2": ["beach"], "3": [], "4": []
+      },
+      "obstructions": []
+    },
+    "highway": {
+      "table": "Table 7-4, p. 70",
+      "levels": {
+        "0": ["escape", "track"],
+        "1": ["service", "raceway", "bridleway"],
+        "2": ["unclassified", "residential", "living_street", "road", "path"],
+        "3": ["secondary", "secondary_link", "tertiary", "tertiary_link", "pedestrian", "bus_guideway", "footway", "steps", "cycleway"],
+        "4": ["motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link"]
+      },
+      "obstructions": [],
+      "excluded": ["corridor"]
+    }
+  }
+}

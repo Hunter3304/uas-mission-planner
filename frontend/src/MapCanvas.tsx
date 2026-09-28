@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { buildingColor, costText } from './BuildingCosts'
 import {
   featureKey,
   featureLayers,
@@ -16,9 +17,10 @@ interface Props {
   data: MapData
   visibility: Visibility
   onSelect: (feature: MapFeature) => void
+  costMode: boolean
 }
 
-export default function MapCanvas({ dataset, data, visibility, onSelect }: Props) {
+export default function MapCanvas({ dataset, data, visibility, onSelect, costMode }: Props) {
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const [basemap, setBasemap] = useState(true)
@@ -110,22 +112,33 @@ export default function MapCanvas({ dataset, data, visibility, onSelect }: Props
   useEffect(() => {
     if (!map.current) return
     const color = (feature: MapFeature) =>
-      featureLayers(feature).find(({ key }) => visibility[key])?.color ?? '#7c8b91'
+      costMode
+        ? buildingColor(feature)
+        : (featureLayers(feature).find(({ key }) => visibility[key])?.color ?? '#7c8b91')
+    const style = (feature: MapFeature) => ({
+      color: costMode && feature.cost_analysis?.obstruction ? '#202c3b' : color(feature),
+      fillColor: color(feature),
+      weight: costMode && feature.cost_analysis?.obstruction ? 4 : 3,
+      fillOpacity: costMode ? 0.65 : 0.25,
+      dashArray:
+        costMode && (feature.cost_analysis?.has_default || feature.cost_analysis?.cost == null)
+          ? '5 4'
+          : undefined,
+    })
     const overlay = L.geoJSON(data, {
-      filter: (feature) => isVisible(feature as MapFeature, visibility),
-      style: (feature) => ({ color: color(feature as MapFeature), weight: 3, fillOpacity: 0.25 }),
+      filter: (feature) => isVisible(feature as MapFeature, visibility, costMode),
+      style: (feature) => style(feature as MapFeature),
       pointToLayer: (feature, latlng) =>
         L.circleMarker(latlng, {
           radius: 5,
-          color: '#fff',
-          weight: 1.5,
-          fillColor: color(feature as MapFeature),
-          fillOpacity: 0.95,
+          ...style(feature as MapFeature),
         }),
       onEachFeature: (raw, layer) => {
         const feature = raw as MapFeature
         const label = document.createElement('span')
-        label.textContent = String(feature.properties.name ?? featureKey(feature))
+        label.textContent =
+          String(feature.properties.name ?? featureKey(feature)) +
+          (costMode ? ` · ${costText(feature.cost_analysis)}` : '')
         layer.bindTooltip(label)
         layer.on('click', () => onSelect(feature))
       },
@@ -133,7 +146,7 @@ export default function MapCanvas({ dataset, data, visibility, onSelect }: Props
     return () => {
       overlay.remove()
     }
-  }, [data, visibility, onSelect])
+  }, [data, visibility, onSelect, costMode])
 
   return (
     <div className="map-shell">
