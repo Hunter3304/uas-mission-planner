@@ -48,6 +48,23 @@ def test_list_details_features_and_downloads(dataset):
     assert client.get("/api/datasets/demo/download/exe").status_code == 422
 
 
+def test_all_tag_costs_analyze_standalone_features(dataset):
+    root, _ = dataset
+    client = TestClient(create_app(root))
+    response = client.get("/api/datasets/demo/features?analysis=tag-costs")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["layer_summaries"]["building"]["features"] == 0
+    assert data["layer_summaries"]["highway"]["features"] == 1
+    assert data["layer_summaries"]["landuse"]["features"] == 1
+    assert data["layer_summaries"]["natural"]["features"] == 1
+    assert data["features"][1]["layer_analyses"]["highway"]["cost"] == 3
+    assert data["features"][1]["layer_analyses"]["landuse"]["cost"] == 4
+    raw = client.get("/api/datasets/demo/features").json()
+    assert raw == client.get("/api/datasets/demo/download/geojson").json()
+    assert "layer_analyses" not in raw["features"][0]
+
+
 def test_missing_and_invalid_dataset_ids(dataset):
     root, _ = dataset
     client = TestClient(create_app(root))
@@ -71,6 +88,28 @@ def test_empty_dataset_and_missing_root(dataset):
     assert client.get("/api/datasets/empty/features").json()["features"] == []
     assert client.get("/api/datasets/empty").json()["feature_bounds"] is None
     assert TestClient(create_app(root / "absent")).get("/api/datasets").json() == {"datasets": []}
+
+
+def test_building_analysis_is_opt_in_and_preserves_downloads(tmp_path):
+    from uas_planner.sample import create_sample
+
+    create_sample(tmp_path / "sample")
+    client = TestClient(create_app(tmp_path))
+    before = (tmp_path / "sample/features.gpkg").read_bytes()
+    source = client.get("/api/datasets/sample/features").json()
+    response = client.get("/api/datasets/sample/features?analysis=building-costs")
+    assert response.status_code == 200
+    result = response.json()
+    assert result["cost_summary"]["buildings"] == 1
+    for raw, derived in zip(source["features"], result["features"], strict=True):
+        assert raw["properties"] == derived["properties"]
+        assert raw["geometry"] == derived["geometry"]
+    building = next(feature for feature in result["features"] if feature["cost_analysis"])
+    assert building["cost_analysis"]["cost"] == 2
+    assert building["cost_analysis"]["rule_version"] == "ramke-building-tags-v1"
+    assert client.get("/api/datasets/sample/download/geojson").json() == source
+    assert (tmp_path / "sample/features.gpkg").read_bytes() == before
+    assert client.get("/api/datasets/sample/features?analysis=bad").status_code == 422
 
 
 def test_manifest_malformed_is_reported(dataset):

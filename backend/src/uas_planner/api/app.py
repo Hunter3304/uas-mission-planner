@@ -12,6 +12,7 @@ from fastapi.responses import FileResponse, Response
 
 from uas_planner import __version__
 from uas_planner.core.area import BoundingBox
+from uas_planner.core.costs import analyze_all_layers, analyze_collection
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
@@ -95,9 +96,12 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         return summary(dataset_id, frame, metadata)
 
     @api.get("/api/datasets/{dataset_id}/features")
-    def features(dataset_id: str):
+    def features(dataset_id: str, analysis: Literal["building-costs", "tag-costs"] | None = None):
         _, frame, _ = verified(dataset_id)
-        return json.loads(frame.to_json(drop_id=True, na="null"))
+        collection = json.loads(frame.to_json(drop_id=True, na="null"))
+        if analysis == "tag-costs":
+            return analyze_all_layers(collection)
+        return analyze_collection(collection) if analysis else collection
 
     @api.get("/api/datasets/{dataset_id}/download/{format_name}")
     def download(dataset_id: str, format_name: Literal["geojson", "gpkg", "metadata"]):
