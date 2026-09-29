@@ -6,6 +6,13 @@ A local Python geospatial research prototype for an internship and subsequent ba
 
 Main includes the completed [Iteration 004](doc/plan/iteration-004.md) independent tag costs; these additions are not part of the fixed v0.3.0 release. See [iteration feedback](doc/iteration/iteration-004/feedback.md).
 
+Iteration 005 Part 1 adds independent **GHSL population, DIPUL zones and terrain
+height inspection**. Use the [experiment guide](doc/experiments/part1.md) to acquire
+or reload a checksummed snapshot and inspect 60 m AGL plus ground/aircraft height.
+The saved local demonstration is `braunschweig-part1-v2` (9.23 km²). Select it in
+the explorer after restarting the backend and refreshing the page. Parts 2/3
+(grid, constraints and routing) remain deferred.
+
 ## Quick start: offline demonstration
 
 Prerequisites: Git, Python 3.13, uv, and Node.js 24/npm 11. Validated baseline: Python 3.13.13, uv 0.11.6, Node 24.14.1, npm 11.11.0. Open the repository folder in VS Code. Run these PowerShell commands from its root:
@@ -183,5 +190,11 @@ Read HANDOFF, discuss each sprint, and record its plan before creating the Miles
 The v0.3.0 stage release is a tagged prototype baseline. Backend, frontend, CLI and API versions agree; a regression test checks this. Only tag a main commit with successful CI. Release notes record capabilities, validation and limits. Do not move a published tag; fixes get a new version. GitHub source archives plus committed lockfiles and the sample command reproduce the release environment without publishing local map datasets.
 
 ## Current limits
+
+The [external data and methodology assessment](doc/data-sources/README.md)
+reviews Droniq/TraX, OpenFlightMaps, GHSL, DIPUL, SORA 2.5 and EGRED 2 as of
+2026-09-29, with access evidence, limitations and proposed routing uses.
+GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for local independent
+inspection in Part 1. The other assessed sources remain documentation-only.
 
 This is a local small-area prototype that loads datasets into memory and revalidates API reads. Building tag costs are ordinal research classifications. Browser-triggered acquisition, background jobs, large-area performance, population/cost fusion, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.

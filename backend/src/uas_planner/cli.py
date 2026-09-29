@@ -26,12 +26,62 @@ def parser():
     inspect.add_argument("directory", type=Path)
     sample = commands.add_parser("sample", help="Create a synthetic offline demonstration dataset")
     sample.add_argument("--output", type=Path, required=True, help="New dataset directory")
+    experiment = commands.add_parser(
+        "experiment-fetch", help="Acquire a new bounded external-layer experiment"
+    )
+    experiment.add_argument(
+        "--resume",
+        action="store_true",
+        help="Explicitly continue a verified incomplete acquisition",
+    )
+    experiment.add_argument("--config", type=Path, required=True)
+    experiment.add_argument("--output", type=Path, required=True)
+    external = commands.add_parser("experiment-inspect", help="Verify external payloads offline")
+    external.add_argument("directory", type=Path)
+    external.add_argument("--longitude", type=float)
+    external.add_argument("--latitude", type=float)
+    attach = commands.add_parser(
+        "experiment-add-osm", help="Copy a verified matching OSM snapshot into an experiment"
+    )
+    attach.add_argument("directory", type=Path)
+    attach.add_argument("--dataset", type=Path, required=True)
     return result
 
 
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command.startswith("experiment-"):
+            from uas_planner.core.experiment import inspect_location, load_experiment, read_json
+
+            if args.command == "experiment-add-osm":
+                import shutil
+
+                manifest = load_experiment(args.directory)
+                _, osm_metadata = load_dataset(args.dataset)
+                if osm_metadata["query_bounds"] != manifest["config"]["bounds"]:
+                    raise ValueError("OSM and experiment bounds must match exactly.")
+                target = args.directory / "osm"
+                target.mkdir(exist_ok=False)
+                for name in ("features.gpkg", "metadata.json"):
+                    shutil.copy2(args.dataset / name, target / name)
+                load_dataset(target)
+            elif args.command == "experiment-fetch":
+                from uas_planner.acquisition.external import acquire_experiment
+
+                manifest = acquire_experiment(
+                    read_json(args.config), args.output, resume=args.resume
+                )
+            else:
+                manifest = load_experiment(args.directory)
+                if (args.longitude is None) != (args.latitude is None):
+                    raise ValueError("Supply both longitude and latitude.")
+                if args.longitude is not None:
+                    manifest = inspect_location(
+                        args.directory, manifest, args.longitude, args.latitude
+                    )
+            print(json.dumps(manifest, indent=2, allow_nan=False))
+            return 0
         if args.command == "fetch":
             # Import the network adapter only for acquisition, never for inspect.
             from uas_planner.acquisition.osm import TAGS, acquire

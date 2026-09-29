@@ -13,6 +13,15 @@ from fastapi.responses import FileResponse, Response
 from uas_planner import __version__
 from uas_planner.core.area import BoundingBox
 from uas_planner.core.costs import analyze_all_layers, analyze_collection
+from uas_planner.core.experiment import (
+    checksum,
+    inspect_location,
+    load_experiment,
+    population_layer,
+    read_json,
+    safe_file,
+    zone_layer,
+)
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
@@ -36,10 +45,20 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 raise HTTPException(404, "Dataset not found.")
         return path
 
-    def verified(dataset_id: str):
+    def verified(dataset_id: str, *, compact: bool = False):
         path = dataset_path(dataset_id)
+        if (path / "osm").is_dir():
+            osm = (path / "osm").resolve()
+            if not osm.is_relative_to(path):
+                raise HTTPException(404, "Dataset not found.")
+            path = osm
+            if any(
+                not (path / name).resolve().is_relative_to(path)
+                for name in ("features.gpkg", "metadata.json")
+            ):
+                raise HTTPException(404, "Dataset not found.")
         try:
-            frame, metadata = load_dataset(path)
+            frame, metadata = load_dataset(path, compact=compact)
             BoundingBox(**metadata["query_bounds"])
             return path, frame, metadata
         except Exception as exc:
@@ -69,7 +88,55 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "invalid_geometry_count": metadata.get("invalid_geometry_count", 0),
             "sha256": metadata["sha256"],
             "verified": True,
+            "has_experiment": (dataset_path(dataset_id) / "experiment.json").is_file(),
         }
+
+    def external(dataset_id):
+        path = dataset_path(dataset_id)
+        if not (path / "experiment.json").is_file():
+            raise HTTPException(404, "No external experiment saved for this dataset.")
+        try:
+            manifest = load_experiment(path)
+            osm_path = path / "osm" if (path / "osm").is_dir() else path
+            osm_metadata = read_json(
+                safe_file(path, str((osm_path / "metadata.json").relative_to(path)))
+            )
+            osm_file = safe_file(path, str((osm_path / "features.gpkg").relative_to(path)))
+            if checksum(osm_file) != osm_metadata["sha256"]:
+                raise ValueError("OSM snapshot checksum mismatch.")
+            if manifest["config"]["bounds"] != osm_metadata["query_bounds"]:
+                raise ValueError("OSM and external experiment bounds do not match.")
+            return path, manifest
+        except Exception as exc:
+            logger.warning("Cannot verify experiment %s: %s", dataset_id, type(exc).__name__)
+            raise HTTPException(
+                422, "External experiment cannot be verified. Check payloads and bounds."
+            ) from exc
+
+    @api.get("/api/datasets/{dataset_id}/experiment")
+    def experiment(dataset_id: str):
+        _, manifest = external(dataset_id)
+        return manifest
+
+    @api.get("/api/datasets/{dataset_id}/experiment/layers/{layer}")
+    def experiment_layer(dataset_id: str, layer: Literal["population", "zones"]):
+        path, manifest = external(dataset_id)
+        try:
+            return (
+                population_layer(path, manifest)
+                if layer == "population"
+                else zone_layer(path, manifest)
+            )
+        except (ValueError, KeyError, OSError) as exc:
+            raise HTTPException(422, "Cannot inspect external layer.") from exc
+
+    @api.get("/api/datasets/{dataset_id}/experiment/inspect")
+    def experiment_point(dataset_id: str, longitude: float, latitude: float):
+        path, manifest = external(dataset_id)
+        try:
+            return inspect_location(path, manifest, longitude, latitude)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     @api.get("/api/health")
     def health():
@@ -83,7 +150,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 if not entry.is_dir() or not DATASET_ID.fullmatch(entry.name):
                     continue
                 try:
-                    _, frame, metadata = verified(entry.name)
+                    _, frame, metadata = verified(entry.name, compact=True)
                     items.append(summary(entry.name, frame, metadata))
                 except HTTPException as exc:
                     if exc.status_code == 422:
@@ -92,13 +159,23 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
 
     @api.get("/api/datasets/{dataset_id}")
     def details(dataset_id: str):
-        _, frame, metadata = verified(dataset_id)
+        _, frame, metadata = verified(dataset_id, compact=True)
         return summary(dataset_id, frame, metadata)
 
     @api.get("/api/datasets/{dataset_id}/features")
     def features(dataset_id: str, analysis: Literal["building-costs", "tag-costs"] | None = None):
-        _, frame, _ = verified(dataset_id)
-        collection = json.loads(frame.to_json(drop_id=True, na="null"))
+        _, frame, metadata = verified(dataset_id, compact=True)
+        # Large experiment snapshots contain many sparse OSM tag columns. Omit
+        # absent tags only in their display response; source downloads stay intact.
+        na = "drop" if (dataset_path(dataset_id) / "experiment.json").is_file() else "null"
+        collection = json.loads(frame.to_json(drop_id=True, na=na))
+        for feature, tags in zip(collection["features"], frame.attrs["source_tags"], strict=True):
+            if na == "null":
+                feature["properties"].update(
+                    {key: tags.get(key) for key in metadata["tag_columns"]}
+                )
+            else:
+                feature["properties"].update(tags)
         if analysis == "tag-costs":
             return analyze_all_layers(collection)
         return analyze_collection(collection) if analysis else collection

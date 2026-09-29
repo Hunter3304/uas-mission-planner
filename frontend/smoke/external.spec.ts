@@ -1,0 +1,28 @@
+import { expect, test } from '@playwright/test'
+
+test('external native layers preserve zero, unknown, source IDs and OSM behavior', async ({
+  page,
+}) => {
+  await page.route('https://tile.openstreetmap.org/**', (route) => route.abort())
+  await page.goto('/')
+  await page.getByLabel('Saved dataset').selectOption('z-external-experiment')
+  await expect(page.getByRole('region', { name: 'External layers', exact: true })).toBeVisible()
+  await expect(page.getByText('Synthetic test fixture', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: 'Inspect start', exact: true }).click()
+  const location = page.getByTestId('external-location')
+  await expect(location).toContainText('Terrain elevation: 0.000 m')
+  await expect(location).toContainText('Aircraft altitude: 60.000 m')
+  await expect(location).toContainText('Population: 0.000 people')
+  await location.getByRole('button', { name: 'test:zone / test-zone.42' }).click()
+  await expect(page.getByText('Source feature: test:zone / test-zone.42')).toBeVisible()
+  await expect(page.getByText('<img src=x onerror=alert(1)>', { exact: true })).toBeVisible()
+  await expect(page.locator('.external-panel img')).toHaveCount(0)
+  await page.getByLabel('DIPUL zones', { exact: true }).check()
+  await page.getByLabel('GHSL population', { exact: false }).uncheck()
+  await page.getByRole('button', { name: 'Inspect end', exact: true }).click()
+  await expect(location).toContainText('Terrain elevation: Unknown / NoData')
+  await expect(location).toContainText('Aircraft altitude: Unknown / NoData')
+  await page.getByLabel('Saved dataset').selectOption('offline-sample')
+  await expect(page.getByRole('region', { name: 'External layers', exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('total-count')).toHaveText('3')
+})

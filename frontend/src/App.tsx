@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { downloadDataset, getJson } from './api'
-import MapCanvas from './MapCanvas'
+import ExperimentMap from './ExperimentMap'
 import { CostDetails, CostOverview, costText } from './BuildingCosts'
 import {
   featureKey,
@@ -373,7 +373,7 @@ export default function App() {
                   <i /> Saved source data
                 </span>
               </div>
-              <MapCanvas
+              <ExperimentMap
                 dataset={dataset}
                 data={data}
                 visibility={visibility}

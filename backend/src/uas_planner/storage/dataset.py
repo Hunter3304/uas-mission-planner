@@ -137,7 +137,7 @@ def save_dataset(
     return metadata
 
 
-def load_dataset(directory: Path) -> tuple[gpd.GeoDataFrame, dict]:
+def load_dataset(directory: Path, *, compact: bool = False) -> tuple[gpd.GeoDataFrame, dict]:
     """Load only local files, validating schema, checksum, count, identity, and CRS."""
     directory = Path(directory)
     metadata = json.loads((directory / "metadata.json").read_text(encoding="utf-8"))
@@ -159,13 +159,31 @@ def load_dataset(directory: Path) -> tuple[gpd.GeoDataFrame, dict]:
         raise ValueError("Dataset has invalid OSM identities.")
     if stored.geometry.isna().any() or stored.geometry.is_empty.any():
         raise ValueError("Dataset contains missing or empty geometries.")
+    tag_names = set(metadata["tag_columns"])
+
+    def read_tags(value):
+        row = json.loads(value)
+        if not isinstance(row, dict):
+            raise ValueError("Dataset tags must be JSON objects.")
+        if compact:
+            return {
+                key: value for key, value in row.items() if value is not None and key in tag_names
+            }
+        return row
+
     try:
-        tag_rows = [json.loads(value) for value in stored["tags_json"]]
+        tag_rows = [read_tags(value) for value in stored["tags_json"]]
     except (TypeError, ValueError) as exc:
         raise ValueError("Dataset contains malformed JSON tags.") from exc
     if not all(isinstance(row, dict) for row in tag_rows):
         raise ValueError("Dataset tags must be JSON objects.")
     result = stored.drop(columns="tags_json")
-    for name in metadata["tag_columns"]:
+    columns = metadata["tag_columns"]
+    if compact:
+        # API summaries need only semantic presence. Preserve all other source
+        # tags as sparse dictionaries instead of a wide, mostly empty dataframe.
+        columns = [key for key in ("building", "highway", "landuse", "natural") if key in columns]
+        result.attrs["source_tags"] = tag_rows
+    for name in columns:
         result[name] = [row.get(name) for row in tag_rows]
     return result, metadata

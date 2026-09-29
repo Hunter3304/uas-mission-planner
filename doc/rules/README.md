@@ -1,6 +1,12 @@
-# Cost rules
+# Research and routing rules
 
-This directory documents the research rules used by the four independent cost layers.
+This directory documents implemented cost classification and planned routing rules.
+
+[Constrained shortest-path routing](routing-algorithms.md) specifies the confirmed
+A* planner and Dijkstra verification roles. These routing rules are not implemented
+yet; they do not change the current cost layers.
+
+## Implemented cost rules
 Start with [Independent cost layers](independent-costs.md) for current UI and API behavior.
 Start with [Building and tag costs](building-costs.md) for the classification table,
 source citations, interpretation and project-specific decisions. The
@@ -13,7 +19,7 @@ with the independent Python core. The frontend receives results from the core;
 it contains no duplicate classification table. No database migration or new
 OSM download is needed to analyze a saved dataset.
 
-## Updating a rule
+## Updating a cost classification rule
 
 1. Identify its source and explain the research assumption.
 2. Edit the JSON and increment its `version` when behavior changes.

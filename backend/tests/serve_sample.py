@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 
 import geopandas as gpd
 import uvicorn
+from experiment_fixture import create_experiment_fixture
 from shapely.geometry import box
 
 from uas_planner.api.app import create_app
@@ -57,4 +58,5 @@ if __name__ == "__main__":
             {},
             synthetic=True,
         )
+        create_experiment_fixture(root / "z-external-experiment")
         uvicorn.run(create_app(root), host="127.0.0.1", port=8011)
