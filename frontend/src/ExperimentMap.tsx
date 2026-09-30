@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { FeatureCollection } from 'geojson'
 import { getJson } from './api'
-import { populationColor, type ExternalFeature, type Experiment } from './external'
+import { populationColor, type ExternalFeature, type Experiment, type GridData, type GridCell } from './external'
 import MapCanvas, { type Props as MapProps } from './MapCanvas'
 
 interface Location {
@@ -31,6 +31,11 @@ export default function ExperimentMap(props: MapProps) {
   const [point, setPoint] = useState<[number, number] | null>(null)
   const [inspecting, setInspecting] = useState(false)
   const [pointError, setPointError] = useState('')
+  const [cellSize, setCellSize] = useState(50)
+  const [grid, setGrid] = useState<GridData | null>(null)
+  const [gridError, setGridError] = useState('')
+  const [showGrid, setShowGrid] = useState(false)
+  const [selectedCell, setSelectedCell] = useState<GridCell | null>(null)
   const base = `/api/datasets/${encodeURIComponent(props.dataset.id)}/experiment`
   useEffect(() => {
     const controller = new AbortController()
@@ -41,6 +46,8 @@ export default function ExperimentMap(props: MapProps) {
     setPoint(null)
     setInspecting(false)
     setPointError('')
+    setGrid(null)
+    setSelectedCell(null)
     if (props.dataset.has_experiment) {
       Promise.all([
         getJson<Experiment>(base, controller.signal),
@@ -54,6 +61,21 @@ export default function ExperimentMap(props: MapProps) {
     }
     return () => controller.abort()
   }, [base, props.dataset])
+  useEffect(() => {
+    if (!snapshot) return
+    const controller = new AbortController()
+    setGrid(null)
+    setSelectedCell(null)
+    setGridError('')
+    if (!Number.isFinite(cellSize) || cellSize <= 0) {
+      setGridError('Grid cell size must be positive.')
+      return
+    }
+    getJson<GridData>(`${base}/grid?cell_m=${cellSize}`, controller.signal)
+      .then((result) => { if (!controller.signal.aborted) setGrid(result) })
+      .catch((err) => { if (!controller.signal.aborted) setGridError(err.message) })
+    return () => controller.abort()
+  }, [base, snapshot, cellSize])
   useEffect(() => {
     if (!point || !snapshot) return
     const controller = new AbortController()
@@ -76,7 +98,7 @@ export default function ExperimentMap(props: MapProps) {
   const onLocation = useCallback((lon: number, lat: number) => setPoint([lon, lat]), [])
   const onFeature = useCallback((feature: ExternalFeature) => setSelected(feature), [])
   const overlays = snapshot
-    ? { ...snapshot, showPopulation, showZones, onFeature, onLocation }
+    ? { ...snapshot, showPopulation, showZones, onFeature, onLocation, grid: grid ?? undefined, showGrid, onCell: setSelectedCell }
     : undefined
   return (
     <>
@@ -98,6 +120,15 @@ export default function ExperimentMap(props: MapProps) {
                 {snapshot.experiment.config.mission_end} ({snapshot.experiment.config.timezone})
               </p>
               <div className="external-controls">
+                <label>
+                  Grid cell (m)
+                  <input type="number" min="1" step="1" value={cellSize}
+                    onChange={(e) => setCellSize(Number(e.target.value))} />
+                </label>
+                <label>
+                  <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} />{' '}
+                  Constraint grid
+                </label>
                 <label>
                   <input
                     type="checkbox"
@@ -122,6 +153,8 @@ export default function ExperimentMap(props: MapProps) {
                   Inspect end
                 </button>
               </div>
+              {gridError && <p role="alert">Grid unavailable: {gridError}</p>}
+              {grid && <p className="subtle">{grid.cell_count} cells · {grid.edge_count} candidate edges · unresolved inputs blocked by policy. Click a grid cell for reasons.</p>}
               <div className="external-legend" aria-label="Population legend">
                 {[
                   [0, '0'],
@@ -217,6 +250,24 @@ export default function ExperimentMap(props: MapProps) {
               </dl>
             </details>
           )}
+          {selectedCell && (
+            <details open>
+              <summary>Grid cell {selectedCell.id}: {selectedCell.state}</summary>
+              <p>Terrain: {number(selectedCell.terrain_m)} m; aircraft altitude: {number(selectedCell.aircraft_altitude_m)} m</p>
+              <p>Estimated people in cell: {number(selectedCell.population.estimated_people)}; density: {number(selectedCell.population.people_per_km2)} people/km²; unknown support: {selectedCell.population.unknown_area_m2.toFixed(1)} m². Native GHSL support: {selectedCell.population.native_support_m} m.</p>
+              {selectedCell.reasons.map((item, index) => <p key={index}>{item.source}: {item.reason}</p>)}
+              <details>
+                <summary>Adjacent candidate connections</summary>
+                {grid?.edges.filter((edge) => edge.from === selectedCell.id || edge.to === selectedCell.id).map((edge) => (
+                  <p key={`${edge.from}:${edge.to}`}>{edge.from} → {edge.to}: {edge.length_m.toFixed(1)} m · {edge.state}; {edge.reasons.map((reason) => `${reason.source}: ${reason.reason}`).join(' ')}</p>
+                ))}
+              </details>
+            </details>
+          )}
+          {grid && <details>
+            <summary>Endpoint connectors</summary>
+            {grid.connectors.map((item) => <p key={item.endpoint}>{item.endpoint} → cell {item.cell}: {item.length_m.toFixed(1)} m · {item.state}; {item.reasons.map((reason) => reason.reason).join(' ')}</p>)}
+          </details>}
           <details>
             <summary>Source versions, coverage and provenance</summary>
             <p>Snapshot saved: {snapshot.experiment.saved_at_utc}. Checksums verified on read.</p>

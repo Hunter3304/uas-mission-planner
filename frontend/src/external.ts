@@ -36,6 +36,27 @@ export interface ExternalOverlays {
   experiment: Experiment
   onFeature: (feature: ExternalFeature) => void
   onLocation: (lon: number, lat: number) => void
+  grid?: GridData
+  showGrid?: boolean
+  onCell?: (cell: GridCell) => void
+}
+export interface GridCell {
+  id: string
+  geometry: Geometry
+  state: string
+  terrain_m: number | null
+  aircraft_altitude_m: number | null
+  population: { estimated_people: number | null; people_per_km2: number | null; unknown_area_m2: number; native_support_m: number }
+  reasons: { source: string; reason: string }[]
+}
+export interface GridData {
+  cell_size_m: number
+  cell_count: number
+  edge_count: number
+  policy: string
+  cells: GridCell[]
+  edges: { from: string; to: string; length_m: number; state: string; reasons: { source: string; reason: string }[] }[]
+  connectors: { endpoint: string; cell: string; length_m: number; state: string; reasons: { source: string; reason: string }[] }[]
 }
 export const populationColor = (value: unknown) =>
   value == null

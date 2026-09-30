@@ -1,0 +1,33 @@
+import { expect, test } from '@playwright/test'
+
+test('constraint grid rebuilds and exposes cell and connector uncertainty', async ({ page, request }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.route('https://tile.openstreetmap.org/**', route => route.abort())
+  await page.goto('/')
+  await page.getByLabel('Saved dataset').selectOption('z-external-experiment')
+  const panel = page.getByRole('region', { name: 'External layers', exact: true })
+  const inspector = page.getByRole('region', { name: 'External inspection', exact: true })
+  await expect(panel).toContainText('candidate edges')
+  const url = '/api/datasets/z-external-experiment/experiment/grid'
+  const fine = await (await request.get(url)).json()
+  await page.getByLabel('Constraint grid', { exact: true }).check()
+  const shapes = page.locator('.leaflet-grid-pane path.leaflet-interactive')
+  await expect(shapes).toHaveCount(fine.cell_count)
+  await shapes.nth(Math.floor(fine.cell_count / 2)).click()
+  await expect(inspector).toContainText('Estimated people in cell')
+  await expect(inspector).toContainText('Temporary restriction coverage unverified')
+  await page.getByText('Adjacent candidate connections', { exact: true }).click()
+  await expect(inspector).toContainText('unresolved')
+  await page.getByText('Endpoint connectors', { exact: true }).click()
+  await expect(inspector).toContainText('start → cell')
+  await expect(inspector).toContainText('end → cell')
+  await page.getByLabel('Grid cell (m)', { exact: true }).fill('100')
+  const coarse = await (await request.get(`${url}?cell_m=100`)).json()
+  await expect(shapes).toHaveCount(coarse.cell_count)
+  expect(coarse.cell_count).toBeLessThan(fine.cell_count)
+  await page.getByLabel('Grid cell (m)', { exact: true }).fill('0')
+  await expect(panel.getByRole('alert')).toContainText('must be positive')
+  await expect(shapes).toHaveCount(0)
+  expect(errors).toEqual([])
+})
