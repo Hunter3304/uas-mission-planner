@@ -1,7 +1,9 @@
-# Iteration 005 — Part 1 delivery feedback
+# Iteration 005 — Delivery feedback
+
+## Part 1 delivery
 
 Part 1 implements repeatable local external snapshots, independent source layers
-and location height inspection. Parts 2/3 remain deferred. User approved the new
+and location height inspection. Parts 2/3 were deferred at that delivery. User approved the new
 9.23 km² area, experiment parameters, GitHub work and subsequent merges.
 
 - Source-native core for raster/zone validation, NoData and height inspection.
@@ -42,7 +44,8 @@ complete; the grid, constraint graph and routing in Parts 2/3 require separate
 implementation.
 
 Validation results and merge facts are recorded in HANDOFF after final checks.
-# Part 2 closeout
+
+## Part 2 closeout
 
 Part 2 was authorized and completed on 2026-09-30. See [Part 2 outcome](part2.md)
 for its grid/constraint scope, numerical and browser validation, real-snapshot
@@ -52,4 +55,3 @@ Feature PR #47 merged into iteration/005 at
 is closed and local/remote feature branch cleanup was independently verified.
 Part 3 route search remains deferred. The main integration PR follows this
 validated checkpoint; final delivery evidence will be added after merge.
-
