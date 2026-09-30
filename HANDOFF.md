@@ -14,7 +14,11 @@
   browser checks and 6 real-stack checks passed; Ruff check/format, ESLint, build
   and diff whitespace checks passed. Real 100 m CLI returns unresolved_input;
   synthetic 50 m detour is 276.222 m and 200 m gives no_path_on_grid.
-  Feature/integration PR delivery is pending; do not claim remote delivery yet.
+  Feature PR #52 passed all three CI jobs in run `36747282565` and merged into
+  iteration/005 at `dc04c01cdd6a60b87c9203eccc664398dad14693`. Issue #51 is closed.
+  Feature ancestry was confirmed in synchronized iteration/005 before deleting
+  the local/remote feature branch; fetch/prune, branch -a and ls-remote verified
+  cleanup. The main integration PR is pending.
 
 - Iteration 005 Part 2 is delivered to `main` through PR #48 at
   `8815f8c10f787b38fc8644691855851b7a5d344d` on 2026-09-30.

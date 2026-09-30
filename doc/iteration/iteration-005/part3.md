@@ -2,6 +2,8 @@
 
 User authorized completion on 2026-09-30. Issue #51 belongs to Milestone #5;
 its feature branch follows the existing iteration/005 integration workflow.
+Feature PR #52 merged into iteration/005 after successful Windows/Linux Python
+and frontend CI; Issue #51 is closed and its merged feature branch is removed.
 
 ## Result
 

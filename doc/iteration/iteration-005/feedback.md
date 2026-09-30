@@ -77,3 +77,9 @@ Braunschweig CLI result was `unresolved_input`, while the synthetic 50 m detour
 measured 276.222 m and the conservative 200 m graph had no path. Source payloads
 and existing small samples were retained. A coordinate-call regression in added
 connector diagnostics was caught by the final gates, fixed, and revalidated.
+
+Feature PR #52 passed Windows/Linux Python and frontend CI in run `36747282565`,
+then merged into iteration/005 at `dc04c01cdd6a60b87c9203eccc664398dad14693`.
+Issue #51 is closed. After synchronizing the target and confirming feature
+ancestry, local/remote feature branches were deleted and fetch/prune,
+`git branch -a` and `git ls-remote --heads origin` verified cleanup.
