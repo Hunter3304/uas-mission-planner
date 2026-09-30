@@ -1,8 +1,38 @@
 # Constrained shortest-path routing rules
 
-Status: algorithm roles confirmed by the user on 2026-09-29; implementation
-pending. This document specifies the first routing baseline, not existing
-application behavior. See the [three-part iteration draft](../plan/iteration-005-draft.md).
+Status: algorithm roles confirmed on 2026-09-29; Part 3 implementation authorized
+on 2026-09-30. Implemented baseline version: `distance-grid-v1`.
+See the [approved scope](../plan/iteration-005.md) and
+[Part 3 outcome](../iteration/iteration-005/part3.md).
+
+## Implemented model details
+
+Each exact endpoint connects only to its containing grid cell center; choose the
+lexicographically smallest cell ID when multiple polygons contain a boundary
+point. There is no additional radius, snapping or direct start-goal edge. A valid
+start equal to goal yields a zero-length GeoJSON LineString with two equal
+coordinates. The grid conservatively excludes entire cells intersecting synthetic
+obstacles. Every allowed edge and connector, then every final segment, receives
+continuous vector intersection checking in EPSG:25832. Obstacle boundary contact
+is blocked; no clearance buffer or geometry tolerance is added.
+
+Queue ties sort by `(f, g, node ID)` and neighbors by ID. A* and Dijkstra share the
+same filtered graph and weights; verification compares lengths within 1e-6 m and
+path existence, not vertex sequences. Metric round-trip differences of up to
+1e-6 m are tolerated in the weight/displacement consistency check.
+The search expansion limit is 10,002 (10,000 cells plus exact endpoints).
+Runtime measures graph filtering, search and final checks, excluding snapshot
+verification and cached grid preparation. Resolution/source/mission changes
+invalidate prepared graphs; endpoint changes replace connectors without
+modifying the cached graph. No route cache is maintained.
+
+Real snapshots remain globally unresolved due to temporary coverage and legal
+applicability. Only explicitly marked, exclusively synthetic source experiments
+use `synthetic-obstacles-v1`; their supplied zone polygons are modeled obstacles,
+with no legal interpretation. Missing synthetic terrain remains unresolved.
+An unresolved input yields no validated route; exported failures contain empty
+features plus the explicit outcome metadata. NoData population is inspectable
+and does not affect these distance-only weights.
 
 ## Scope and algorithm roles
 

@@ -12,15 +12,56 @@ or reload a checksummed snapshot and inspect 60 m AGL plus ground/aircraft heigh
 The saved local demonstration is `braunschweig-part1-v2` (9.23 km²). Select it in
 the explorer after restarting the backend and refreshing the page.
 
-Iteration 005 [Part 2](doc/iteration/iteration-005/part2.md) adds a configurable
+Iteration 005 [Part 2](doc/iteration/iteration-005/part2.md) was delivered to main
+on 2026-09-30 through [PR #48](https://github.com/Hunter3304/uas-mission-planner/pull/48).
+It adds a configurable
 EPSG:25832 preparation grid (default 50 m, maximum 10,000 cells). Enable
 **Constraint grid**, change **Grid cell (m)**, and click a cell to inspect
 population estimates, unknown support, altitude diagnostics and adjacent
 candidate connections. Endpoint connectors preserve the exact mission points.
 The read-only endpoint is `/api/datasets/{id}/experiment/grid?cell_m=50`.
 Temporary restriction coverage and legal applicability remain unresolved;
-`block_unresolved` excludes every candidate from traversal. Part 3 route search
-remains deferred. This preparation graph does not establish flight permission.
+`block_unresolved` excludes every candidate from traversal. Part 3 preserves
+this policy and reports `unresolved_input` for the real snapshot. This
+preparation graph does not establish flight permission.
+Validated locally with 96 Python passes (one Windows permission skip), 9 mocked
+and 5 real-stack browser passes, lint/format/build, and real Braunschweig grid
+inspection. Windows/Linux Python and frontend CI passed before and after merge.
+The real 50 m grid has 3,809 cells and 14,867 candidate edges; initial preparation
+took about 35 seconds locally, so allow it to finish before inspecting cells.
+
+## Part 3: constrained shortest route
+
+Part 3 adds deterministic distance-only A*, verified against Dijkstra, exact
+endpoint selection, full segment checks, explicit failures and route GeoJSON
+with mission/source/rule metadata. See [Part 3 outcome](doc/iteration/iteration-005/part3.md).
+Local verification: 110 Python passes (one Windows permission skip), 9 mocked
+and 6 real-stack browser passes, Ruff, ESLint and production build.
+Real Braunschweig inputs remain unresolved; use this synthetic obstacle model
+for a successful offline demonstration:
+
+```powershell
+uv run --project backend --locked uas-planner route-demo --output data/synthetic-route-demo
+uv run --project backend --locked uas-planner experiment-route data/synthetic-route-demo --output .cache/demo-route.geojson
+```
+
+Output paths must be new. Restart the backend, refresh the explorer and select
+`synthetic-route-demo`. Choose **Select start/end on map** or edit longitude and
+latitude, then **Generate shortest route**. The green route displays horizontal
+length and runtime. **Export route GeoJSON** includes provenance and assumptions;
+failures export empty features with their explicit outcome. The optional dashed
+**Straight-line reference** has no constraint validation. Changing endpoints,
+dataset or cell size clears the old route. Grid colors: green permitted, red
+blocked, amber unresolved. Population and OSM scores are independent of routing.
+
+The API is `/api/datasets/{id}/experiment/route?cell_m=50` with optional
+`start_lon`, `start_lat`, `end_lon`, `end_lat`; add `export=true` for GeoJSON.
+Results distinguish `success`, `invalid_endpoint`, `unresolved_input`,
+`no_path_on_grid`, `resource_limit` and `computational_failure`. Malformed
+coordinates or unsupported preparation sizes return HTTP 422. CLI exit codes
+are 0 success, 2 explicit route failure, 1 invalid input/storage failure.
+The shortest-distance guarantee applies to the constructed graph only; no
+flight permission, continuous-space optimality, 3D clearance or SORA claim.
 
 ## Quick start: offline demonstration
 

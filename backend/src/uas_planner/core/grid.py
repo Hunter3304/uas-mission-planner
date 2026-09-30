@@ -7,7 +7,7 @@ from math import ceil, floor, hypot, isfinite
 
 import rasterio
 from pyproj import Transformer
-from shapely.geometry import LineString, Point, box, mapping, shape
+from shapely.geometry import LineString, box, mapping, shape
 from shapely.ops import transform
 from shapely.prepared import prep
 
@@ -174,6 +174,7 @@ def build_grid(directory, manifest, cell_m=DEFAULT_CELL_M, endpoints=None):
                         "col": col,
                         "geometry": mapping(transform(reverse, polygon)),
                         "center": [lon, lat],
+                        "center_metric": [center.x, center.y],
                         "terrain_m": ground,
                         "aircraft_altitude_m": None if ground is None else ground + config["agl_m"],
                         "population": _population(
@@ -221,12 +222,12 @@ def build_grid(directory, manifest, cell_m=DEFAULT_CELL_M, endpoints=None):
                     "reasons": reasons,
                 }
             )
-    connectors = []
     selected = endpoints or {name: config[name] for name in ("start", "end")}
     for name in ("start", "end"):
         coordinate = selected[name]
         if (
-            len(coordinate) != 2
+            not isinstance(coordinate, (list, tuple))
+            or len(coordinate) != 2
             or any(
                 isinstance(v, bool) or not isinstance(v, (int, float)) or not isfinite(v)
                 for v in coordinate
@@ -239,29 +240,7 @@ def build_grid(directory, manifest, cell_m=DEFAULT_CELL_M, endpoints=None):
             raise ValueError(
                 f"Invalid {name} endpoint: expected a finite point inside the experiment bounds."
             )
-        x, y = forward(*coordinate)
-        point = Point(x, y)
-        candidates = [(i, point.distance(polygon)) for i, (_, _, polygon) in enumerate(metric)]
-        i = min(candidates, key=lambda item: item[1])[0]
-        cell = cells[i]
-        line = LineString([(x, y), metric[i][:2]])
-        reasons = list(cell["reasons"])
-        for zone_id, layer, _, prepared, properties in zones:
-            if prepared.intersects(line):
-                state, reason = _zone_state(properties, config["agl_m"], None)
-                if state == "unresolved":
-                    reasons.append({"source": f"{layer}/{zone_id}", "reason": reason})
-        connectors.append(
-            {
-                "endpoint": name,
-                "coordinate": list(coordinate),
-                "cell": cell["id"],
-                "length_m": line.length,
-                "state": "unresolved",
-                "reasons": reasons,
-            }
-        )
-    return {
+    result = {
         "cell_size_m": cell_m,
         "analysis_crs": "EPSG:25832",
         "policy": "block_unresolved",
@@ -269,7 +248,6 @@ def build_grid(directory, manifest, cell_m=DEFAULT_CELL_M, endpoints=None):
         "edge_count": len(edges),
         "cells": cells,
         "edges": edges,
-        "connectors": connectors,
         "assumptions": {
             "scenario": config["scenario"],
             "agl_m": config["agl_m"],
@@ -278,3 +256,73 @@ def build_grid(directory, manifest, cell_m=DEFAULT_CELL_M, endpoints=None):
             "temporary_restrictions": config["temporary_restrictions"],
         },
     }
+    result["validation"] = {
+        "boundary": mapping(box(*area.as_tuple())),
+        "blocked": [],
+        "unresolved": True,
+        "zone_diagnostics": [
+            {
+                "geometry": mapping(transform(reverse, geometry)),
+                "source": f"{layer}/{zone_id}",
+                "reason": reason,
+            }
+            for zone_id, layer, geometry, _, properties in zones
+            for state, reason in [_zone_state(properties, config["agl_m"], None)]
+            if state == "unresolved"
+        ],
+    }
+    # Explicit, local synthetic model only. Real source applicability is unchanged.
+    if manifest.get("routing_fixture") == "synthetic-obstacles-v1":
+        if manifest.get("synthetic") is not True or any(
+            not source["source_id"].startswith("SYNTHETIC-")
+            for source in manifest["sources"].values()
+        ):
+            raise ValueError("Synthetic routing model requires exclusively synthetic sources.")
+        from uas_planner.core.routing import constraint_checker
+
+        result["validation"] = {
+            "boundary": mapping(box(*area.as_tuple())),
+            "blocked": [mapping(transform(reverse, zone[2])) for zone in zones],
+            "unresolved": False,
+            "unresolved_regions": [cell["geometry"] for cell in cells if cell["terrain_m"] is None],
+        }
+        result["assumptions"]["constraint_model"] = (
+            "Synthetic obstacles only; no legal or real-source applicability."
+        )
+        check = constraint_checker(result)
+        for cell in cells:
+            blocked = any(
+                zone[3].intersects(metric[by_position[(cell["row"], cell["col"])]][2])
+                for zone in zones
+            )
+            cell["state"] = (
+                "blocked" if blocked else "unresolved" if cell["terrain_m"] is None else "permitted"
+            )
+            cell["reasons"] = (
+                [{"source": "synthetic", "reason": "Cell intersects synthetic obstacle."}]
+                if blocked
+                else []
+            )
+            if cell["state"] == "unresolved":
+                cell["reasons"] = [{"source": "terrain", "reason": "Ground elevation unknown."}]
+        by_id = {cell["id"]: cell for cell in cells}
+        for edge in edges:
+            a, b = by_id[edge["from"]], by_id[edge["to"]]
+            permitted = (
+                a["state"] == b["state"] == "permitted"
+                and check([a["center"], b["center"]]) == "permitted"
+            )
+            if a["row"] != b["row"] and a["col"] != b["col"]:
+                permitted = permitted and all(
+                    p in by_position and cells[by_position[p]]["state"] == "permitted"
+                    for p in ((a["row"], b["col"]), (b["row"], a["col"]))
+                )
+            edge["state"] = "permitted" if permitted else "blocked"
+            edge["reasons"] = (
+                []
+                if permitted
+                else [{"source": "synthetic", "reason": "Obstacle or diagonal corner exclusion."}]
+            )
+    from uas_planner.core.routing import connect_endpoints
+
+    return connect_endpoints(result, selected)

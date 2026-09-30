@@ -1,10 +1,10 @@
 # Research and routing rules
 
-This directory documents implemented cost classification and planned routing rules.
+This directory documents implemented cost classification and routing rules.
 
 [Constrained shortest-path routing](routing-algorithms.md) specifies the confirmed
-A* planner and Dijkstra verification roles. These routing rules are not implemented
-yet; they do not change the current cost layers.
+A* planner and Dijkstra verification roles implemented in Part 3. Routing does
+not change the independent cost layers.
 
 ## Implemented cost rules
 Start with [Independent cost layers](independent-costs.md) for current UI and API behavior.

@@ -195,15 +195,28 @@ export default function MapCanvas({
         type: 'Feature' as const, geometry: cell.geometry, properties: { id: cell.id },
       })) } as FeatureCollection, {
         pane: 'grid',
-        style: { color: '#c87928', weight: 0.7, fillColor: '#dba754', fillOpacity: 0.12 },
+        style: (feature) => {
+          const state = external.grid?.cells.find((cell) => cell.id === feature?.properties.id)?.state
+          const color = state === 'permitted' ? '#12664f' : state === 'blocked' ? '#b33e39' : '#c87928'
+          return { color, weight: 0.7, fillColor: color, fillOpacity: 0.15 }
+        },
         onEachFeature: (_feature, layer) => {
           const cell = external.grid?.cells.find((item) => item.id === (_feature.properties as { id: string }).id)
           if (cell) layer.on('click', () => external.onCell?.(cell))
         },
       }).addTo(group)
+    if (external.route?.geometry)
+      L.geoJSON({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: external.route.geometry, properties: {} }] } as FeatureCollection, {
+        style: { color: '#12664f', weight: 5, opacity: 1 }, interactive: false,
+      }).addTo(group)
+    const endpoints = external.endpoints ?? external.experiment.config
+    if (external.showReference)
+      L.polyline([[endpoints.start[1], endpoints.start[0]], [endpoints.end[1], endpoints.end[0]]], {
+        color: '#56637c', weight: 2, dashArray: '8 6', interactive: false,
+      }).addTo(group)
     for (const [label, point] of [
-      ['Start', external.experiment.config.start],
-      ['End', external.experiment.config.end],
+      ['Start', endpoints.start],
+      ['End', endpoints.end],
     ] as const) {
       L.circleMarker([point[1], point[0]], {
         radius: 7,

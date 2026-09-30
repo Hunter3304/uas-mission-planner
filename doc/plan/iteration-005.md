@@ -1,7 +1,29 @@
-# Iteration 005 — Parts 1 and 2: external layers and preparation grid
+# Iteration 005 — External layers, preparation grid and constrained routing
 
-Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 is tracked
-by Issue #46 in Milestone #5; Part 3 remains deferred.
+## Part 3 approved scope (2026-09-30)
+
+The user authorized completion of Part 3 after reviewing its objectives.
+Issue #51 was assigned to existing Milestone #5 before creating
+`feature/51-constrained-routing` from `iteration/005`, synchronized to main.
+Implement distance-only deterministic A* on the Part 2 graph, Dijkstra as a
+small-case oracle, exact endpoints, full segment validation, explicit invalid /
+unresolved / no-path / resource outcomes, map integration and reproducible
+GeoJSON exports. Update README, feedback, HANDOFF and run integration checks.
+
+Real Braunschweig inputs retain `block_unresolved`; unverified temporary coverage
+still prevents a validated route. Add a separately labeled synthetic offline
+experiment with known obstacles to demonstrate successful search without
+inventing permission for real DIPUL data. Synthetic applicability requires an
+explicit synthetic-model marker and exclusively synthetic source identities.
+Population and OSM scores do not affect distance weights. Smoothing, 3D clearance,
+altitude/time optimization, population weighting, SORA and flight execution remain
+outside this part. Endpoint policy: one connector to the containing cell center,
+stable cell-ID tie break on boundaries, no extra radius or direct start-goal edge.
+No endpoint relocation; zero-length case still validates input constraints.
+
+Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 followed
+through PR #48 at `8815f8c10f787b38fc8644691855851b7a5d344d` on the same day.
+Issue #46 in Milestone #5 is closed; Part 3 is now authorized as described above.
 
 Part 2 was subsequently authorized by the user on 2026-09-30. Its implementation
 adds a configurable metric preparation grid, native-support GHSL transfer,

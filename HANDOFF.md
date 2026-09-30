@@ -2,7 +2,27 @@
 
 ## Current status
 
-- Iteration 005 Part 2 closeout is tracked by Issue #46 in Milestone #5.
+- Part 3 was authorized on 2026-09-30. Issue #51 in existing Milestone #5 was
+  created before `feature/51-constrained-routing`, based on iteration/005
+  synchronized to main. Implementation adds deterministic distance-only A*,
+  Dijkstra verification, exact endpoint selection, final vector segment checks,
+  explicit route outcomes and GeoJSON provenance export through core/CLI/API/UI.
+  `route-demo` creates a separate synthetic experiment for successful search.
+  Real Braunschweig inputs retain conservative `unresolved_input` behavior.
+  See `doc/iteration/iteration-005/part3.md` for reproducible operations and limits.
+  Local gate: 110 Python passes, one Windows symlink-permission skip; 9 mocked
+  browser checks and 6 real-stack checks passed; Ruff check/format, ESLint, build
+  and diff whitespace checks passed. Real 100 m CLI returns unresolved_input;
+  synthetic 50 m detour is 276.222 m and 200 m gives no_path_on_grid.
+  Feature/integration PR delivery is pending; do not claim remote delivery yet.
+
+- Iteration 005 Part 2 is delivered to `main` through PR #48 at
+  `8815f8c10f787b38fc8644691855851b7a5d344d` on 2026-09-30.
+  PR CI run `36737388087` and iteration push run `36737380659` passed all
+  Windows/Linux Python and frontend checks. Issue #46 is closed in Milestone #5;
+  documentation follow-up is tracked by Issue #49.
+  Main merge CI run `36737709390` also passed all three jobs. README records
+  the delivered Part 2 scope, operation, validation and cold preparation time.
   Feature branch `feature/46-grid-constraints` was created from `iteration/005`
   after issue assignment and synchronization to main's Part 1 maintenance.
   Implementation had already been prepared locally. The user authorized the
@@ -29,7 +49,7 @@
   the synchronized target; fetch/prune, branch -a and ls-remote confirmed cleanup.
   Local validation: 96 Python tests passed, one symlink-permission skip; 9 mocked
   and 5 real-stack browser tests, Ruff lint/format, ESLint and build passed.
-  Main integration is the next step; retain iteration branches and v0.3.0.
+  Retain iteration branches and v0.3.0. Part 3 route search remains deferred.
 
 - Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
   `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into
