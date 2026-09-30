@@ -2,9 +2,10 @@
 
 ## Current status
 
-- Iteration 005 Part 1 feature PR #38 merged into `iteration/005` at
-  `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`. Issue #37 is closed in
-  Milestone #5. User authorized pushes, PRs and merges. Parts 2/3 remain deferred.
+- Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
+  `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into
+  `iteration/005` at `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`.
+  Issue #37 is closed in Milestone #5. Parts 2/3 remain deferred.
 - Post-merge feature branch cleanup is complete: the user explicitly authorized
   deletion, the exact commit was confirmed in `iteration/005`, and local/remote
   references were pruned and checked after removal.
@@ -26,9 +27,10 @@
   while legacy responses and all original downloads retain their prior contract.
 - Local validation: 85 Python tests passed, one Windows symlink-permission skip;
   9 mocked browser tests and 12 repeated real-stack smoke runs passed; Ruff,
-  ESLint and production build passed. PR #38 passed Windows/Linux Python and
-  frontend CI. Real-data Chrome inspection succeeded with no page errors, and
-  original GHSL ZIP values equal saved-window values at both endpoints.
+  ESLint and production build passed. PRs #38 and #39 passed Windows/Linux
+  Python and frontend CI; the main merge commit also passed all three jobs.
+  Real-data Chrome inspection succeeded with no page errors, and original GHSL
+  ZIP values equal saved-window values at both endpoints.
 - Known non-failing dependency warnings: Starlette/httpx and Rasterio/Affine.
 - Restart the backend and refresh the frontend; select `braunschweig-part1-v2`.
   Use GHSL/DIPUL switches and Inspect start/end. External originals are local-only;

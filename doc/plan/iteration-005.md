@@ -1,5 +1,8 @@
 # Iteration 005 — Part 1: reproducible external layers
 
+Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Parts 2 and 3
+in the discussion draft are not part of this delivery.
+
 Approved scope: user requested Part 1 on 2026-09-29 and confirmed the new
 Braunschweig area and mission parameters. Parts 2 and 3 remain deferred.
 User subsequently authorized GitHub objects, pushes and merges. Milestone #5 and
