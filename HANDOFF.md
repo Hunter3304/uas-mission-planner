@@ -18,7 +18,13 @@
   iteration/005 at `dc04c01cdd6a60b87c9203eccc664398dad14693`. Issue #51 is closed.
   Feature ancestry was confirmed in synchronized iteration/005 before deleting
   the local/remote feature branch; fetch/prune, branch -a and ls-remote verified
-  cleanup. The main integration PR is pending.
+  cleanup. Main integration PR #53 delivered Part 3 at
+  `a097e4b7c1233a38399ffefe0e819b4cfe05df4c` on 2026-09-30. PR run
+  `36747782585` and iteration push run `36747776576` passed all three jobs.
+  Main merge run `36748035762` also passed all three jobs.
+  Final delivery documentation is tracked by Issue #54. Retain iteration branches
+  and v0.3.0. Restart backend, refresh frontend and select `synthetic-route-demo`
+  for successful routing, or `braunschweig-part1-v2` for explicit unresolved data.
 
 - Iteration 005 Part 2 is delivered to `main` through PR #48 at
   `8815f8c10f787b38fc8644691855851b7a5d344d` on 2026-09-30.
@@ -30,7 +36,7 @@
   Feature branch `feature/46-grid-constraints` was created from `iteration/005`
   after issue assignment and synchronization to main's Part 1 maintenance.
   Implementation had already been prepared locally. The user authorized the
-  Part 2 handoff workflow on 2026-09-30; Part 3 remains deferred.
+  Part 2 handoff workflow on 2026-09-30; Part 3 was deferred at that delivery.
 - Part 2 adds configurable EPSG:25832 cells (50 m default, 10,000 maximum),
   area-weighted native GHSL estimates, conservative DIPUL diagnostics, candidate
   connections and exact endpoint connectors. No routing or flight permission.
@@ -53,7 +59,7 @@
   the synchronized target; fetch/prune, branch -a and ls-remote confirmed cleanup.
   Local validation: 96 Python tests passed, one symlink-permission skip; 9 mocked
   and 5 real-stack browser tests, Ruff lint/format, ESLint and build passed.
-  Retain iteration branches and v0.3.0. Part 3 route search remains deferred.
+  Retain iteration branches and v0.3.0. Part 3 route search was deferred at that delivery.
 
 - Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
   `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into
