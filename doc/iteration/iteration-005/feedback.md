@@ -59,3 +59,21 @@ and iteration push run `36737380659` passed all Windows/Linux Python and
 frontend checks. Issue #49 tracks the final documentation follow-up.
 Main merge CI run `36737709390` also passed all three jobs. README now includes
 the Part 2 delivery status, controls/API, validation and measured preparation time.
+
+## Part 3
+
+Part 3 was authorized on 2026-09-30 and is tracked by Issue #51 in Milestone #5.
+See [Part 3 outcome](part3.md) for scope, reproduction and limitations.
+The route feature connects the existing graph to deterministic A*, exact
+endpoints, vector validation, explicit failure results, map interaction and
+GeoJSON export. Dijkstra verifies small reference cases. A separate synthetic
+experiment demonstrates successful routing; real restriction coverage remains
+unresolved and is never relaxed to produce a route.
+
+Local validation: 110 Python tests passed with one Windows symlink-permission
+skip; 9 mocked browser tests and 6 real-stack tests passed. Ruff lint/format,
+ESLint, production build and diff whitespace checks passed. The real 100 m
+Braunschweig CLI result was `unresolved_input`, while the synthetic 50 m detour
+measured 276.222 m and the conservative 200 m graph had no path. Source payloads
+and existing small samples were retained. A coordinate-call regression in added
+connector diagnostics was caught by the final gates, fixed, and revalidated.

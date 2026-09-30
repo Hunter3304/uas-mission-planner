@@ -2,6 +2,20 @@
 
 ## Current status
 
+- Part 3 was authorized on 2026-09-30. Issue #51 in existing Milestone #5 was
+  created before `feature/51-constrained-routing`, based on iteration/005
+  synchronized to main. Implementation adds deterministic distance-only A*,
+  Dijkstra verification, exact endpoint selection, final vector segment checks,
+  explicit route outcomes and GeoJSON provenance export through core/CLI/API/UI.
+  `route-demo` creates a separate synthetic experiment for successful search.
+  Real Braunschweig inputs retain conservative `unresolved_input` behavior.
+  See `doc/iteration/iteration-005/part3.md` for reproducible operations and limits.
+  Local gate: 110 Python passes, one Windows symlink-permission skip; 9 mocked
+  browser checks and 6 real-stack checks passed; Ruff check/format, ESLint, build
+  and diff whitespace checks passed. Real 100 m CLI returns unresolved_input;
+  synthetic 50 m detour is 276.222 m and 200 m gives no_path_on_grid.
+  Feature/integration PR delivery is pending; do not claim remote delivery yet.
+
 - Iteration 005 Part 2 is delivered to `main` through PR #48 at
   `8815f8c10f787b38fc8644691855851b7a5d344d` on 2026-09-30.
   PR CI run `36737388087` and iteration push run `36737380659` passed all

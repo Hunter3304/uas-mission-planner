@@ -24,6 +24,7 @@ from uas_planner.core.experiment import (
     zone_layer,
 )
 from uas_planner.core.grid import build_grid
+from uas_planner.core.routing import connect_endpoints, plan_route, route_context, route_geojson
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
@@ -152,6 +153,38 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         try:
             signature = json.dumps(manifest, sort_keys=True)
             return prepared_grid(str(path), signature, cell_m)
+        except (ValueError, KeyError, OSError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @api.get("/api/datasets/{dataset_id}/experiment/route")
+    def experiment_route(
+        dataset_id: str,
+        cell_m: float = 50,
+        start_lon: float | None = None,
+        start_lat: float | None = None,
+        end_lon: float | None = None,
+        end_lat: float | None = None,
+        export: bool = False,
+    ):
+        path, manifest = external(dataset_id)
+        try:
+            selected = {}
+            for name, lon, lat in (("start", start_lon, start_lat), ("end", end_lon, end_lat)):
+                if (lon is None) != (lat is None):
+                    raise ValueError("Supply both longitude and latitude for each endpoint.")
+                selected[name] = manifest["config"][name] if lon is None else [lon, lat]
+            grid = prepared_grid(str(path), json.dumps(manifest, sort_keys=True), cell_m)
+            result = plan_route(connect_endpoints(grid, selected))
+            result["experiment"] = route_context(manifest, selected)
+            if export:
+                return Response(
+                    json.dumps(route_geojson(result), allow_nan=False),
+                    media_type="application/geo+json",
+                    headers={
+                        "Content-Disposition": f'attachment; filename="{dataset_id}-route.geojson"'
+                    },
+                )
+            return result
         except (ValueError, KeyError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
 

@@ -45,12 +45,54 @@ def parser():
     )
     attach.add_argument("directory", type=Path)
     attach.add_argument("--dataset", type=Path, required=True)
+    demo = commands.add_parser(
+        "route-demo", help="Create an explicitly synthetic offline routing experiment"
+    )
+    demo.add_argument("--output", type=Path, required=True)
+    route = commands.add_parser(
+        "experiment-route", help="Plan distance-only route from verified offline data"
+    )
+    route.add_argument("directory", type=Path)
+    route.add_argument("--cell-m", type=float, default=50)
+    route.add_argument("--start", nargs=2, type=float, metavar=("LON", "LAT"))
+    route.add_argument("--end", nargs=2, type=float, metavar=("LON", "LAT"))
+    route.add_argument("--output", type=Path, help="New route GeoJSON file; never overwrite")
     return result
 
 
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command == "route-demo":
+            from uas_planner.route_demo import create_route_demo
+
+            print(json.dumps(create_route_demo(args.output), indent=2, allow_nan=False))
+            return 0
+        if args.command == "experiment-route":
+            from uas_planner.core.experiment import load_experiment
+            from uas_planner.core.grid import build_grid
+            from uas_planner.core.routing import (
+                connect_endpoints,
+                plan_route,
+                route_context,
+                route_geojson,
+            )
+
+            manifest = load_experiment(args.directory)
+            endpoints = {
+                name: getattr(args, name) or manifest["config"][name] for name in ("start", "end")
+            }
+            # Build default graph first so invalid selected endpoints become explicit results.
+            result = plan_route(
+                connect_endpoints(build_grid(args.directory, manifest, args.cell_m), endpoints)
+            )
+            result["experiment"] = route_context(manifest, endpoints)
+            if args.output:
+                with args.output.open("x", encoding="utf-8") as stream:
+                    json.dump(route_geojson(result), stream, indent=2, allow_nan=False)
+                    stream.write("\n")
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0 if result["status"] == "success" else 2
         if args.command.startswith("experiment-"):
             from uas_planner.core.experiment import inspect_location, load_experiment, read_json
 

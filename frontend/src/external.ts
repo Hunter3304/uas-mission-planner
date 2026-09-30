@@ -39,6 +39,19 @@ export interface ExternalOverlays {
   grid?: GridData
   showGrid?: boolean
   onCell?: (cell: GridCell) => void
+  route?: RouteResult | null
+  endpoints?: { start: [number, number]; end: [number, number] }
+  showReference?: boolean
+}
+export interface RouteResult {
+  status: string
+  message?: string
+  geometry: Geometry | null
+  length_m: number | null
+  runtime_ms: number
+  rules_version: string
+  experiment: { synthetic: boolean }
+  connectors?: GridData['connectors']
 }
 export interface GridCell {
   id: string
