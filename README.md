@@ -32,7 +32,10 @@ took about 35 seconds locally, so allow it to finish before inspecting cells.
 
 ## Part 3: constrained shortest route
 
-Part 3 adds deterministic distance-only A*, verified against Dijkstra, exact
+Part 3 was delivered to main on 2026-09-30 through
+[PR #53](https://github.com/Hunter3304/uas-mission-planner/pull/53), after
+Windows/Linux Python and frontend CI passed. It adds deterministic distance-only
+A*, verified against Dijkstra, exact
 endpoint selection, full segment checks, explicit failures and route GeoJSON
 with mission/source/rule metadata. See [Part 3 outcome](doc/iteration/iteration-005/part3.md).
 Local verification: 110 Python passes (one Windows permission skip), 9 mocked

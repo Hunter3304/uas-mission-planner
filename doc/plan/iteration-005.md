@@ -21,6 +21,14 @@ outside this part. Endpoint policy: one connector to the containing cell center,
 stable cell-ID tie break on boundaries, no extra radius or direct start-goal edge.
 No endpoint relocation; zero-length case still validates input constraints.
 
+Part 3 was delivered to main through PR #53 at
+`a097e4b7c1233a38399ffefe0e819b4cfe05df4c` on 2026-09-30, following feature PR
+#52 into iteration/005. Windows/Linux Python and frontend CI passed for both
+PRs and the iteration push. Issue #51 is closed; Issue #54 tracks delivery
+documentation. See Part 3 feedback for local validation and remaining data limits.
+
+## Parts 1 and 2 approval and delivery history
+
 Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 followed
 through PR #48 at `8815f8c10f787b38fc8644691855851b7a5d344d` on the same day.
 Issue #46 in Milestone #5 is closed; Part 3 is now authorized as described above.
@@ -35,7 +43,7 @@ predated Issue #46; the feature branch was created after milestone assignment
 from `iteration/005`, synchronized to the current `main` maintenance baseline.
 
 Approved scope: user requested Part 1 on 2026-09-29 and confirmed the new
-Braunschweig area and mission parameters. Part 3 remains deferred.
+Braunschweig area and mission parameters. Part 3 was deferred at the Part 1 delivery.
 User subsequently authorized GitHub objects, pushes and merges. Milestone #5 and
 Issue #37 track Part 1; the issue preceded the feature branch. The earlier draft
 and source assessments are retained as planning history.
