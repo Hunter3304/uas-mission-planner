@@ -13,6 +13,13 @@ and location height inspection. Parts 2/3 remain deferred. User approved the new
   and absent NoData tag are documented against the official product specification.
 - Four selected DIPUL static layers only; temporary restrictions, validity and
   applicability remain unresolved. No additional source buffers are invented.
+- Real-area inspection required compact OSM tag dictionaries to avoid expanding
+  thousands of absent tags into the browser payload. Complete source downloads
+  remain unchanged. Experiment maps fit the query area, retaining full source
+  geometries without allowing distant geometry to determine the initial view.
+- Initial Linux browser CI caught a Leaflet zoom callback after map teardown.
+  Dataset fitting is now immediate, CSS zoom animation is disabled, map movement
+  is stopped on teardown, and repeated dataset-switch coverage checks page errors.
 
 Reproduction, source observations and checked values: [experiment guide](../../experiments/part1.md).
 Implementation tracking: Issue #37, Milestone #5. Feature work was prepared locally

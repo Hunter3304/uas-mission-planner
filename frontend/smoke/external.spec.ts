@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test'
 test('external native layers preserve zero, unknown, source IDs and OSM behavior', async ({
   page,
 }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.stack ?? error.message))
   await page.route('https://tile.openstreetmap.org/**', (route) => route.abort())
   await page.goto('/')
   await page.getByLabel('Saved dataset').selectOption('z-external-experiment')
@@ -25,4 +27,9 @@ test('external native layers preserve zero, unknown, source IDs and OSM behavior
   await page.getByLabel('Saved dataset').selectOption('offline-sample')
   await expect(page.getByRole('region', { name: 'External layers', exact: true })).toHaveCount(0)
   await expect(page.getByTestId('total-count')).toHaveText('3')
+  await page.getByLabel('Saved dataset').selectOption('z-external-experiment')
+  await expect(page.getByRole('button', { name: 'Inspect start', exact: true })).toBeVisible()
+  await page.getByLabel('Saved dataset').selectOption('offline-sample')
+  await expect(page.getByTestId('total-count')).toHaveText('3')
+  expect(errors).toEqual([])
 })

@@ -35,7 +35,7 @@ export default function MapCanvas({
   const [basemap, setBasemap] = useState(true)
   const [tileError, setTileError] = useState(false)
   const fit = () => {
-    const b = dataset.feature_bounds
+    const b = dataset.has_experiment ? null : dataset.feature_bounds
     const q = dataset.query_bounds
     map.current?.fitBounds(
       b
@@ -47,13 +47,18 @@ export default function MapCanvas({
             [q.south, q.west],
             [q.north, q.east],
           ],
-      { padding: [35, 35], maxZoom: 18 },
+      { padding: [35, 35], maxZoom: 18, animate: false },
     )
   }
 
   useEffect(() => {
     if (!container.current) return
-    const instance = L.map(container.current, { zoomControl: false }).setView([52.27, 10.52], 15)
+    // Dataset changes unmount the map. Avoid CSS zoom callbacks running after
+    // Leaflet has removed its panes during a rapid dataset switch.
+    const instance = L.map(container.current, { zoomControl: false, zoomAnimation: false }).setView(
+      [52.27, 10.52],
+      15,
+    )
     map.current = instance
     instance.createPane('population').style.zIndex = '350'
     instance.createPane('zones').style.zIndex = '450'
@@ -63,6 +68,7 @@ export default function MapCanvas({
     observer.observe(container.current)
     return () => {
       observer.disconnect()
+      instance.stop()
       instance.remove()
       map.current = null
     }
@@ -101,7 +107,7 @@ export default function MapCanvas({
         interactive: false,
       },
     ).addTo(map.current)
-    const b = dataset.feature_bounds
+    const b = dataset.has_experiment ? null : dataset.feature_bounds
     map.current.fitBounds(
       b
         ? [
@@ -112,7 +118,7 @@ export default function MapCanvas({
             [q.south, q.west],
             [q.north, q.east],
           ],
-      { padding: [35, 35], maxZoom: 18 },
+      { padding: [35, 35], maxZoom: 18, animate: false },
     )
     return () => {
       query.remove()
