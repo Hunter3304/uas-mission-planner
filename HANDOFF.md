@@ -188,10 +188,12 @@ Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See R
 
 For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
 
-- Follow-up Issue #42 addresses the Part 1 UI timeout on the 31,496-feature
+- Follow-up Issue #42 addressed the Part 1 UI timeout on the 31,496-feature
   local snapshot: the tag-analysis response is ~85.5 MB and measured 26.2 seconds.
-  Frontend request timeout raised from 30 to 120 seconds; no backend or data
-  contract change. Maintenance branch/PR and merge evidence will be recorded here.
-  Local checks: ESLint and production build passed. The response duration and
-  size were measured against the saved experiment API. Automated CI will run on
-  the pull request; its result and merge commit will be appended after delivery.
+  Frontend request timeout was raised from 30 to 120 seconds with no backend or
+  data contract change. ESLint and the production build passed locally; the
+  response duration and size were measured against the saved experiment API.
+- PR #43 merged to `main` at `063905eed8254ea9816686696b3ec5453be34301`.
+  GitHub Actions run `36693434334` passed. Issue #42 closed with the merge.
+  Branch `fix/42-large-dataset-timeout` was deleted locally and remotely, then
+  pruned; `git branch -a` and `git ls-remote --heads origin` confirmed cleanup.
