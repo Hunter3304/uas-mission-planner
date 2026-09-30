@@ -187,3 +187,11 @@ npm --prefix frontend run dev
 Open http://127.0.0.1:5173. Dataset files are local and excluded from Git. See README for acquisition and verification commands.
 
 For a network-free example after installing dependencies: `uv run --project backend --locked uas-planner sample --output data/offline-sample`. Existing directories are not overwritten. Test with `npm --prefix frontend run test:smoke`.
+
+- Follow-up Issue #42 addresses the Part 1 UI timeout on the 31,496-feature
+  local snapshot: the tag-analysis response is ~85.5 MB and measured 26.2 seconds.
+  Frontend request timeout raised from 30 to 120 seconds; no backend or data
+  contract change. Maintenance branch/PR and merge evidence will be recorded here.
+  Local checks: ESLint and production build passed. The response duration and
+  size were measured against the saved experiment API. Automated CI will run on
+  the pull request; its result and merge commit will be appended after delivery.
