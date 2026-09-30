@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased - Iteration 004
+## Unreleased — Iteration 005 Part 1
+
+- Bounded GHSL/DIPUL/LGLN experiment acquisition, source-native storage, SHA-256
+  verification, explicit interrupted-acquisition resume and offline inspection.
+- Independent population and zone map layers, source attributes/provenance,
+  fixed AGL plus terrain and aircraft height display, explicit unknown values.
+- Matching OSM snapshot attachment and compact API reads for sparse large samples.
+- Reproducible Braunschweig experiment configuration and documented real-payload
+  validation, including terrain metadata exceptions and partial zone coverage.
+- No grid, routing, applicability engine or SORA implementation.
+
+## Unreleased — Iteration 004
 
 - Independent costs for buildings, roads, land use and natural features.
 - Versioned paper-based classification, explicit unknown defaults and separate obstruction flags.

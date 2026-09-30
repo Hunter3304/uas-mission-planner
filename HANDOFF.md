@@ -2,6 +2,78 @@
 
 ## Current status
 
+- Iteration 005 Part 1 feature PR #38 merged into `iteration/005` at
+  `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`. Issue #37 is closed in
+  Milestone #5. User authorized pushes, PRs and merges. Parts 2/3 remain deferred.
+- Post-merge feature branch cleanup is complete: the user explicitly authorized
+  deletion, the exact commit was confirmed in `iteration/005`, and local/remote
+  references were pruned and checked after removal.
+- Approved experiment: civil, bounds (10.50, 52.25, 10.545, 52.277), 60 m AGL,
+  2026-10-01 10:00–10:15 Europe/Berlin, GHSL 2020 estimate. Full details and
+  reproduction commands: `doc/experiments/part1.md`.
+- Real snapshot: `data/braunschweig-part1-v2`, with a matching OSM snapshot under
+  `osm/`. Original tiny samples remain unchanged. First failed terrain snapshot
+  remains in `data/braunschweig-part1` for diagnosis; do not use it for the demo.
+- GHSL original ZIP/native window, bounded DIPUL WFS responses/schemas and LGLN
+  DGM1 terrain are preserved with checksums. Independent UI layers and location
+  height inspection are implemented; no routing or constraint evaluation.
+- Terrain response omits NoData and its WCS metadata gives an incorrect unit.
+  Explicitly use the official product's -9999 NoData and metres NHN/DHHN2016;
+  preserve and document the original metadata. DIPUL coverage is partial and
+  temporary restrictions, validity, buffers/applicability remain unresolved.
+- Large-area UI verification exposed excessive empty OSM tag expansion. API
+  reads now use compact tag dictionaries; experiment display omits absent tags,
+  while legacy responses and all original downloads retain their prior contract.
+- Local validation: 85 Python tests passed, one Windows symlink-permission skip;
+  9 mocked browser tests and 12 repeated real-stack smoke runs passed; Ruff,
+  ESLint and production build passed. PR #38 passed Windows/Linux Python and
+  frontend CI. Real-data Chrome inspection succeeded with no page errors, and
+  original GHSL ZIP values equal saved-window values at both endpoints.
+- Known non-failing dependency warnings: Starlette/httpx and Rasterio/Affine.
+- Restart the backend and refresh the frontend; select `braunschweig-part1-v2`.
+  Use GHSL/DIPUL switches and Inspect start/end. External originals are local-only;
+  existing download buttons continue to export OSM only.
+
+### Historical planning and previous iteration notes
+
+- Latest scope update (2026-09-29): user excluded SORA from this iteration and
+  requested algorithm options plus three delivery parts. Draft now separates
+  (1) data/independent layers, (2) grid/constraints, (3) shortest-route demo.
+  A* for planning and Dijkstra for verification are now user-confirmed.
+  Their planned contract is recorded in `doc/rules/routing-algorithms.md`;
+  implementation remains deferred.
+  Planning-only changes; no adapters, routing code or remote objects created.
+
+- Latest planning decisions (2026-09-29): AGL height, with ground elevation and
+  corresponding aircraft altitude displayed; user-configurable 2D grid default
+  50 m; first planner optimizes distance under constraints. Draft updated.
+- Height display requires an additional terrain-elevation source and verified
+  vertical datum. Source choice and numeric AGL/time remain unresolved. Population
+  optimization is a later extension; implementation is still deferred.
+
+- Follow-up on 2026-09-29: user confirmed GHSL + DIPUL as first sources, with
+  altitude/time fixed initially and potentially optimized later. Implementation
+  remains explicitly deferred pending discussion.
+- Read relevant Ramke thesis sections and recorded proposed sequencing, spatial
+  model and unresolved decisions in `doc/plan/iteration-005-draft.md`. This is not
+  an approved iteration plan; no milestone/issues/branches were created.
+- Created the Chinese six-source PDF report at
+  `D:/Aostfalia/praxis/datasource/六项数据源评估报告_2026-09-29.pdf`.
+- PDF validation: 9 pages, embedded Chinese fonts, 17 external reference links;
+  rendered pages inspected, text bounds checked. Documentation diff whitespace
+  checks passed. No application tests run because application code is unchanged.
+
+- 2026-09-29: user requested assessment of six external sources and a dedicated
+  documentation folder. Added `doc/data-sources/` with overview, six source notes
+  and an integration recommendation based on current official web material.
+- This session is documentation-only: no new sprint, GitHub objects, acquisition,
+  source adapter or routing implementation. Changes remain local and uncommitted.
+- Key finding: current DIPUL documentation includes vector downloads, WFS and
+  registered ED-318 API access. GHSL and DIPUL are first validation candidates;
+  Droniq access remains conditional; SORA/EGRED are methodological inputs.
+- Live payload validation remains pending. See assessment verification limits,
+  including failed capabilities fetches and unverified latest EGRED revision.
+
 - Iteration 004 implements independent explainable costs for building, highway,
   landuse and natural tags. User approved implementation and GitHub integration.
 - Delivered to main through sprint PR #34 at
@@ -68,6 +140,7 @@
 
 ## Documentation locations
 
+- `doc/data-sources/`: external data/methodology assessments and integration options.
 - `doc/plan/`: agreed sprint plans.
 - `doc/iteration/`: sprint outcomes and retrospectives.
 - `doc/decisions/`: architecture and technical decisions.

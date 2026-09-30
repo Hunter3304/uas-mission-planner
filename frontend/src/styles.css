@@ -894,3 +894,60 @@ td {
     flex-direction: column;
   }
 }
+/* Source-native external inspection, independent of OSM tag-cost controls. */
+.external-panel {
+  background: #fff;
+  border: 1px solid #dce4e1;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.external-panel h3 {
+  margin-top: 0;
+}
+.external-controls,
+.external-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 12px 0;
+}
+.external-controls label {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.external-controls button,
+.external-values button {
+  padding: 6px 10px;
+  border: 1px solid #dce4e1;
+  border-radius: 6px;
+  background: #f5f8f6;
+  cursor: pointer;
+}
+.external-legend {
+  font-size: 12px;
+}
+.external-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.external-legend i {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #9caea4;
+}
+.external-panel details {
+  margin-top: 14px;
+  overflow-wrap: anywhere;
+}
+.external-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.external-values p {
+  margin: 7px 0;
+}

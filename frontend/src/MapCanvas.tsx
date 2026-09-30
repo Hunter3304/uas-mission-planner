@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { buildingColor, costText } from './BuildingCosts'
+import { populationColor, type ExternalOverlays, type ExternalFeature } from './external'
 import {
   featureKey,
   featureLayers,
@@ -12,21 +13,29 @@ import {
   type Visibility,
 } from './types'
 
-interface Props {
+export interface Props {
   dataset: Dataset
   data: MapData
   visibility: Visibility
   onSelect: (feature: MapFeature) => void
   costMode: boolean
+  external?: ExternalOverlays
 }
 
-export default function MapCanvas({ dataset, data, visibility, onSelect, costMode }: Props) {
+export default function MapCanvas({
+  dataset,
+  data,
+  visibility,
+  onSelect,
+  costMode,
+  external,
+}: Props) {
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const [basemap, setBasemap] = useState(true)
   const [tileError, setTileError] = useState(false)
   const fit = () => {
-    const b = dataset.feature_bounds
+    const b = dataset.has_experiment ? null : dataset.feature_bounds
     const q = dataset.query_bounds
     map.current?.fitBounds(
       b
@@ -38,20 +47,28 @@ export default function MapCanvas({ dataset, data, visibility, onSelect, costMod
             [q.south, q.west],
             [q.north, q.east],
           ],
-      { padding: [35, 35], maxZoom: 18 },
+      { padding: [35, 35], maxZoom: 18, animate: false },
     )
   }
 
   useEffect(() => {
     if (!container.current) return
-    const instance = L.map(container.current, { zoomControl: false }).setView([52.27, 10.52], 15)
+    // Dataset changes unmount the map. Avoid CSS zoom callbacks running after
+    // Leaflet has removed its panes during a rapid dataset switch.
+    const instance = L.map(container.current, { zoomControl: false, zoomAnimation: false }).setView(
+      [52.27, 10.52],
+      15,
+    )
     map.current = instance
+    instance.createPane('population').style.zIndex = '350'
+    instance.createPane('zones').style.zIndex = '450'
     L.control.zoom({ position: 'bottomright' }).addTo(instance)
     L.control.scale({ position: 'bottomleft', imperial: false }).addTo(instance)
     const observer = new ResizeObserver(() => instance.invalidateSize())
     observer.observe(container.current)
     return () => {
       observer.disconnect()
+      instance.stop()
       instance.remove()
       map.current = null
     }
@@ -90,7 +107,7 @@ export default function MapCanvas({ dataset, data, visibility, onSelect, costMod
         interactive: false,
       },
     ).addTo(map.current)
-    const b = dataset.feature_bounds
+    const b = dataset.has_experiment ? null : dataset.feature_bounds
     map.current.fitBounds(
       b
         ? [
@@ -101,7 +118,7 @@ export default function MapCanvas({ dataset, data, visibility, onSelect, costMod
             [q.south, q.west],
             [q.north, q.east],
           ],
-      { padding: [35, 35], maxZoom: 18 },
+      { padding: [35, 35], maxZoom: 18, animate: false },
     )
     return () => {
       query.remove()
@@ -147,6 +164,59 @@ export default function MapCanvas({ dataset, data, visibility, onSelect, costMod
       overlay.remove()
     }
   }, [data, visibility, onSelect, costMode])
+
+  useEffect(() => {
+    const instance = map.current
+    if (!instance || !external) return
+    const group = L.layerGroup().addTo(instance)
+    if (external.showPopulation)
+      L.geoJSON(external.population, {
+        pane: 'population',
+        style: (f) => ({
+          color: '#527b66',
+          weight: 0.6,
+          fillColor: populationColor(f?.properties.people_per_cell),
+          fillOpacity: 0.55,
+        }),
+        onEachFeature: (feature, layer) =>
+          layer.on('click', () => external.onFeature(feature as ExternalFeature)),
+      }).addTo(group)
+    if (external.showZones)
+      L.geoJSON(external.zones, {
+        pane: 'zones',
+        style: { color: '#8b5bb5', weight: 2, fillOpacity: 0.12, dashArray: '5 3' },
+        onEachFeature: (feature, layer) =>
+          layer.on('click', () => external.onFeature(feature as ExternalFeature)),
+      }).addTo(group)
+    for (const [label, point] of [
+      ['Start', external.experiment.config.start],
+      ['End', external.experiment.config.end],
+    ] as const) {
+      L.circleMarker([point[1], point[0]], {
+        radius: 7,
+        color: label === 'Start' ? '#12664f' : '#c15733',
+        fillOpacity: 1,
+      })
+        .bindTooltip(label)
+        .on('click', () => external.onLocation(point[0], point[1]))
+        .addTo(group)
+    }
+    const click = (event: L.LeafletMouseEvent) =>
+      external.onLocation(event.latlng.lng, event.latlng.lat)
+    instance.on('click', click)
+    const attribution = Object.values(external.experiment.sources)
+      .map((s) => s.attribution)
+      .join(' · ')
+    // Source metadata is untrusted text; Leaflet treats attribution as HTML.
+    const span = document.createElement('span')
+    span.textContent = attribution
+    instance.attributionControl.addAttribution(span.innerHTML)
+    return () => {
+      instance.off('click', click)
+      group.remove()
+      instance.attributionControl.removeAttribution(span.innerHTML)
+    }
+  }, [external])
 
   return (
     <div className="map-shell">
