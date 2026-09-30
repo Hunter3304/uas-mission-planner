@@ -42,3 +42,14 @@ complete; the grid, constraint graph and routing in Parts 2/3 require separate
 implementation.
 
 Validation results and merge facts are recorded in HANDOFF after final checks.
+# Part 2 closeout
+
+Part 2 was authorized and completed on 2026-09-30. See [Part 2 outcome](part2.md)
+for its grid/constraint scope, numerical and browser validation, real-snapshot
+counts, conservative MSL treatment and remaining source limitations.
+Feature PR #47 merged into iteration/005 at
+`b5be7732ee6df183fb58646b9c0e76555c233dfa`; its three CI jobs passed, Issue #46
+is closed and local/remote feature branch cleanup was independently verified.
+Part 3 route search remains deferred. The main integration PR follows this
+validated checkpoint; final delivery evidence will be added after merge.
+

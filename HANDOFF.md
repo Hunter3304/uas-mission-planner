@@ -22,7 +22,14 @@
   14,867 candidate edges, all unresolved; cold preparation about 35 seconds
   locally. At 100 m: 978 cells, 3,726 edges, about 10 seconds. Endpoint coordinates
   remain [10.505, 52.254] and [10.54, 52.273]. Source snapshots are unchanged.
-- Part 2 integration and verified branch cleanup are pending at this checkpoint.
+- Feature PR #47 merged into `iteration/005` at
+  `b5be7732ee6df183fb58646b9c0e76555c233dfa`. CI run `36736745505` passed
+  Windows/Linux Python and frontend checks. Issue #46 was explicitly closed.
+  Its feature branch was deleted locally/remotely after confirming ancestry in
+  the synchronized target; fetch/prune, branch -a and ls-remote confirmed cleanup.
+  Local validation: 96 Python tests passed, one symlink-permission skip; 9 mocked
+  and 5 real-stack browser tests, Ruff lint/format, ESLint and build passed.
+  Main integration is the next step; retain iteration branches and v0.3.0.
 
 - Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
   `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into

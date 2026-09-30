@@ -57,5 +57,10 @@ rebuild and mobile layout without page errors. Screenshots are local-only at
 `.cache/part2-real-grid.png` and `.cache/part2-real-mobile.png`.
 
 The user requested closeout of Part 2; route search remains separate. Part 2 is
-ready for integration after CI; final PR/merge/cleanup evidence will be recorded
-after delivery. The fixed v0.3.0 tag is retained.
+validated in feature PR #47, merged into `iteration/005` at
+`b5be7732ee6df183fb58646b9c0e76555c233dfa`. CI run `36736745505` passed
+Windows/Linux Python and frontend checks. Issue #46 is closed and the merged
+feature branch was removed locally/remotely, pruned and verified with both
+`git branch -a` and `git ls-remote --heads origin`. Main delivery follows through
+the integration PR; its final evidence will be recorded after merge.
+The fixed v0.3.0 tag is retained.
