@@ -5,9 +5,9 @@
 - Iteration 005 Part 1 feature PR #38 merged into `iteration/005` at
   `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`. Issue #37 is closed in
   Milestone #5. User authorized pushes, PRs and merges. Parts 2/3 remain deferred.
-- Post-merge feature branch cleanup awaits separate authorization because an
-  automatic approval review refused the remote deletion. The exact feature
-  commit is already an ancestor of `iteration/005` and is recoverable there.
+- Post-merge feature branch cleanup is complete: the user explicitly authorized
+  deletion, the exact commit was confirmed in `iteration/005`, and local/remote
+  references were pruned and checked after removal.
 - Approved experiment: civil, bounds (10.50, 52.25, 10.545, 52.277), 60 m AGL,
   2026-10-01 10:00–10:15 Europe/Berlin, GHSL 2020 estimate. Full details and
   reproduction commands: `doc/experiments/part1.md`.

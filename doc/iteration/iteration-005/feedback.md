@@ -30,5 +30,8 @@ Issue #37 was explicitly closed. The final local gate comprised 85 Python passes
 one Windows symlink skip, 9 mocked browser passes, 12 repeated real-stack browser
 passes, Ruff, ESLint and production build. The sprint PR and main merge are the
 remaining delivery steps at this point.
+The user separately authorized cleanup of merged branches. The feature branch
+was deleted locally and remotely, pruned and verified by branch listing and
+`git ls-remote --heads origin`.
 
 Validation results and merge facts are recorded in HANDOFF after final checks.
