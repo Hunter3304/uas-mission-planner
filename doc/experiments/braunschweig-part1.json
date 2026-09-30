@@ -1,0 +1,12 @@
+{
+  "scenario": "civil",
+  "bounds": {"west": 10.5, "south": 52.25, "east": 10.545, "north": 52.277},
+  "start": [10.505, 52.254],
+  "end": [10.54, 52.273],
+  "agl_m": 60,
+  "timezone": "Europe/Berlin",
+  "mission_start": "2026-10-01T10:00:00+02:00",
+  "mission_end": "2026-10-01T10:15:00+02:00",
+  "ghsl_epoch": 2020,
+  "temporary_restrictions": "unverified"
+}
