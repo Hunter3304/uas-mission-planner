@@ -1,10 +1,19 @@
-# Iteration 005 — Part 1: reproducible external layers
+# Iteration 005 — Parts 1 and 2: external layers and preparation grid
 
-Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Parts 2 and 3
-in the discussion draft are not part of this delivery.
+Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 is tracked
+by Issue #46 in Milestone #5; Part 3 remains deferred.
+
+Part 2 was subsequently authorized by the user on 2026-09-30. Its implementation
+adds a configurable metric preparation grid, native-support GHSL transfer,
+conditional DIPUL altitude interpretation, inspectable candidate connections and
+a conservative unresolved-data policy. Part 3 route search remains separate.
+The user requested Part 2 closeout according to HANDOFF on the same day,
+authorizing tracking, validation and integration. Existing local implementation
+predated Issue #46; the feature branch was created after milestone assignment
+from `iteration/005`, synchronized to the current `main` maintenance baseline.
 
 Approved scope: user requested Part 1 on 2026-09-29 and confirmed the new
-Braunschweig area and mission parameters. Parts 2 and 3 remain deferred.
+Braunschweig area and mission parameters. Part 3 remains deferred.
 User subsequently authorized GitHub objects, pushes and merges. Milestone #5 and
 Issue #37 track Part 1; the issue preceded the feature branch. The earlier draft
 and source assessments are retained as planning history.
