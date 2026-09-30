@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — Iteration 005 Part 3
+
+- Deterministic distance-only A* on the preparation graph, Dijkstra verification,
+  exact endpoint connectors and continuous final segment validation.
+- Map/coordinate endpoint selection, route length/runtime, optional unvalidated
+  straight-line reference, explicit outcomes and route GeoJSON provenance export.
+- Network-free synthetic obstacle demo and CLI routing/export, with conservative
+  unresolved behavior retained for real restriction coverage and applicability.
+
 ## Unreleased — Iteration 005 Part 2
 
 - Configurable metric preparation grid, native GHSL area-weighted estimates,

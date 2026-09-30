@@ -11,6 +11,7 @@ from shapely.geometry import box
 from uas_planner.api.app import create_app
 from uas_planner.cli import main
 from uas_planner.core.area import BoundingBox
+from uas_planner.route_demo import create_route_demo
 from uas_planner.storage.dataset import save_dataset
 
 if __name__ == "__main__":
@@ -59,4 +60,5 @@ if __name__ == "__main__":
             synthetic=True,
         )
         create_experiment_fixture(root / "z-external-experiment")
+        create_route_demo(root / "z-routing-demo")
         uvicorn.run(create_app(root), host="127.0.0.1", port=8011)
