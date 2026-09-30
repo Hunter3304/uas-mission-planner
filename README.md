@@ -68,6 +68,14 @@ flight permission, continuous-space optimality, 3D clearance or SORA claim.
 
 ## Quick start: offline demonstration
 
+Iteration 006 Part 1 adds **building-risk weighted A*/Dijkstra in the Python
+core**, with metric centreline length times score, overlap maximum, explicit
+background assumptions and risk/length weights 0.9/0.1. See the
+[calculation rules and offline example](doc/rules/risk-weighted-routing.md) and
+[Part 1 feedback](doc/iteration/iteration-006/part1.md). Current route controls
+continue to optimize distance; OMPL and weighted route controls are later parts.
+Real unresolved constraints retain their existing behavior.
+
 Prerequisites: Git, Python 3.13, uv, and Node.js 24/npm 11. Validated baseline: Python 3.13.13, uv 0.11.6, Node 24.14.1, npm 11.11.0. Open the repository folder in VS Code. Run these PowerShell commands from its root:
 
 ```powershell
