@@ -1,7 +1,8 @@
 # Iteration 005 — Parts 1 and 2: external layers and preparation grid
 
-Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 is tracked
-by Issue #46 in Milestone #5; Part 3 remains deferred.
+Delivery: Part 1 merged into `main` through PR #39 on 2026-09-30. Part 2 followed
+through PR #48 at `8815f8c10f787b38fc8644691855851b7a5d344d` on the same day.
+Issue #46 in Milestone #5 is closed; Part 3 remains deferred.
 
 Part 2 was subsequently authorized by the user on 2026-09-30. Its implementation
 adds a configurable metric preparation grid, native-support GHSL transfer,

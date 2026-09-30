@@ -53,5 +53,9 @@ counts, conservative MSL treatment and remaining source limitations.
 Feature PR #47 merged into iteration/005 at
 `b5be7732ee6df183fb58646b9c0e76555c233dfa`; its three CI jobs passed, Issue #46
 is closed and local/remote feature branch cleanup was independently verified.
-Part 3 route search remains deferred. The main integration PR follows this
-validated checkpoint; final delivery evidence will be added after merge.
+Part 3 route search remains deferred. Integration PR #48 delivered Part 2 to
+main at `8815f8c10f787b38fc8644691855851b7a5d344d`; PR CI run `36737388087`
+and iteration push run `36737380659` passed all Windows/Linux Python and
+frontend checks. Issue #49 tracks the final documentation follow-up.
+Main merge CI run `36737709390` also passed all three jobs. README now includes
+the Part 2 delivery status, controls/API, validation and measured preparation time.

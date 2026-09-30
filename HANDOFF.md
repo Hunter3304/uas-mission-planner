@@ -2,7 +2,13 @@
 
 ## Current status
 
-- Iteration 005 Part 2 closeout is tracked by Issue #46 in Milestone #5.
+- Iteration 005 Part 2 is delivered to `main` through PR #48 at
+  `8815f8c10f787b38fc8644691855851b7a5d344d` on 2026-09-30.
+  PR CI run `36737388087` and iteration push run `36737380659` passed all
+  Windows/Linux Python and frontend checks. Issue #46 is closed in Milestone #5;
+  documentation follow-up is tracked by Issue #49.
+  Main merge CI run `36737709390` also passed all three jobs. README records
+  the delivered Part 2 scope, operation, validation and cold preparation time.
   Feature branch `feature/46-grid-constraints` was created from `iteration/005`
   after issue assignment and synchronization to main's Part 1 maintenance.
   Implementation had already been prepared locally. The user authorized the
@@ -29,7 +35,7 @@
   the synchronized target; fetch/prune, branch -a and ls-remote confirmed cleanup.
   Local validation: 96 Python tests passed, one symlink-permission skip; 9 mocked
   and 5 real-stack browser tests, Ruff lint/format, ESLint and build passed.
-  Main integration is the next step; retain iteration branches and v0.3.0.
+  Retain iteration branches and v0.3.0. Part 3 route search remains deferred.
 
 - Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
   `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into
