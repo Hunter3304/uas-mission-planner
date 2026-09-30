@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import type { FeatureCollection } from 'geojson'
 import 'leaflet/dist/leaflet.css'
 import { buildingColor, costText } from './BuildingCosts'
 import { populationColor, type ExternalOverlays, type ExternalFeature } from './external'
@@ -62,6 +63,7 @@ export default function MapCanvas({
     map.current = instance
     instance.createPane('population').style.zIndex = '350'
     instance.createPane('zones').style.zIndex = '450'
+    instance.createPane('grid').style.zIndex = '470'
     L.control.zoom({ position: 'bottomright' }).addTo(instance)
     L.control.scale({ position: 'bottomleft', imperial: false }).addTo(instance)
     const observer = new ResizeObserver(() => instance.invalidateSize())
@@ -187,6 +189,17 @@ export default function MapCanvas({
         style: { color: '#8b5bb5', weight: 2, fillOpacity: 0.12, dashArray: '5 3' },
         onEachFeature: (feature, layer) =>
           layer.on('click', () => external.onFeature(feature as ExternalFeature)),
+      }).addTo(group)
+    if (external.showGrid && external.grid)
+      L.geoJSON({ type: 'FeatureCollection', features: external.grid.cells.map((cell) => ({
+        type: 'Feature' as const, geometry: cell.geometry, properties: { id: cell.id },
+      })) } as FeatureCollection, {
+        pane: 'grid',
+        style: { color: '#c87928', weight: 0.7, fillColor: '#dba754', fillOpacity: 0.12 },
+        onEachFeature: (_feature, layer) => {
+          const cell = external.grid?.cells.find((item) => item.id === (_feature.properties as { id: string }).id)
+          if (cell) layer.on('click', () => external.onCell?.(cell))
+        },
       }).addTo(group)
     for (const [label, point] of [
       ['Start', external.experiment.config.start],

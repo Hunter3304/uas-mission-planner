@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — Iteration 005 Part 2
+
+- Configurable metric preparation grid, native GHSL area-weighted estimates,
+  explicit unknown support and zero preservation.
+- Conservative DIPUL altitude diagnostics, segment intersection checks,
+  horizontal candidate lengths and exact endpoint connectors.
+- Grid API with verified manifest/resolution cache and browser cell/edge inspection.
+- Unknown MSL terrain profiles and temporary/legal applicability remain unresolved;
+  the research policy blocks unresolved traversal. Route search remains deferred.
+
 ## Unreleased — Iteration 005 Part 1
 
 - Bounded GHSL/DIPUL/LGLN experiment acquisition, source-native storage, SHA-256

@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
@@ -22,11 +23,18 @@ from uas_planner.core.experiment import (
     safe_file,
     zone_layer,
 )
+from uas_planner.core.grid import build_grid
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
 DATASET_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}\Z")
 logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=8)
+def prepared_grid(directory: str, manifest_signature: str, cell_m: float):
+    """Source checksums/config and grid resolution form the cache key."""
+    return build_grid(directory, json.loads(manifest_signature), cell_m)
 
 
 def create_app(data_dir: Path | None = None) -> FastAPI:
@@ -136,6 +144,15 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         try:
             return inspect_location(path, manifest, longitude, latitude)
         except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @api.get("/api/datasets/{dataset_id}/experiment/grid")
+    def experiment_grid(dataset_id: str, cell_m: float = 50):
+        path, manifest = external(dataset_id)
+        try:
+            signature = json.dumps(manifest, sort_keys=True)
+            return prepared_grid(str(path), signature, cell_m)
+        except (ValueError, KeyError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
     @api.get("/api/health")

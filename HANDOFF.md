@@ -2,10 +2,40 @@
 
 ## Current status
 
+- Iteration 005 Part 2 closeout is tracked by Issue #46 in Milestone #5.
+  Feature branch `feature/46-grid-constraints` was created from `iteration/005`
+  after issue assignment and synchronization to main's Part 1 maintenance.
+  Implementation had already been prepared locally. The user authorized the
+  Part 2 handoff workflow on 2026-09-30; Part 3 remains deferred.
+- Part 2 adds configurable EPSG:25832 cells (50 m default, 10,000 maximum),
+  area-weighted native GHSL estimates, conservative DIPUL diagnostics, candidate
+  connections and exact endpoint connectors. No routing or flight permission.
+  MSL checks across cells/segments remain unresolved because center terrain
+  samples cannot bound the profile. Temporary coverage/legal applicability
+  remains unresolved and `block_unresolved` excludes every connection.
+- Part 2 validation covers population conservation, missing support, exact
+  endpoints, metric lengths, source/config cache invalidation, integrity rechecks
+  and a zone crossed between centers. Browser tests cover grid rebuilding,
+  cell/connection inspection, invalid input and real-snapshot mobile layout.
+- Restart the backend and refresh the frontend, select `braunschweig-part1-v2`,
+  enable Constraint grid and click a cell. Real 50 m preparation: 3,809 cells,
+  14,867 candidate edges, all unresolved; cold preparation about 35 seconds
+  locally. At 100 m: 978 cells, 3,726 edges, about 10 seconds. Endpoint coordinates
+  remain [10.505, 52.254] and [10.54, 52.273]. Source snapshots are unchanged.
+- Feature PR #47 merged into `iteration/005` at
+  `b5be7732ee6df183fb58646b9c0e76555c233dfa`. CI run `36736745505` passed
+  Windows/Linux Python and frontend checks. Issue #46 was explicitly closed.
+  Its feature branch was deleted locally/remotely after confirming ancestry in
+  the synchronized target; fetch/prune, branch -a and ls-remote confirmed cleanup.
+  Local validation: 96 Python tests passed, one symlink-permission skip; 9 mocked
+  and 5 real-stack browser tests, Ruff lint/format, ESLint and build passed.
+  Main integration is the next step; retain iteration branches and v0.3.0.
+
 - Iteration 005 Part 1 is delivered to `main` through sprint PR #39 at
   `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`. Feature PR #38 merged into
   `iteration/005` at `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`.
-  Issue #37 is closed in Milestone #5. Parts 2/3 remain deferred.
+  Issue #37 is closed in Milestone #5. Part 2 was subsequently authorized;
+  Part 3 remains deferred.
 - Post-merge feature branch cleanup is complete: the user explicitly authorized
   deletion, the exact commit was confirmed in `iteration/005`, and local/remote
   references were pruned and checked after removal.
