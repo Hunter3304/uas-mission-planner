@@ -61,6 +61,12 @@ validated in feature PR #47, merged into `iteration/005` at
 `b5be7732ee6df183fb58646b9c0e76555c233dfa`. CI run `36736745505` passed
 Windows/Linux Python and frontend checks. Issue #46 is closed and the merged
 feature branch was removed locally/remotely, pruned and verified with both
-`git branch -a` and `git ls-remote --heads origin`. Main delivery follows through
-the integration PR; its final evidence will be recorded after merge.
+`git branch -a` and `git ls-remote --heads origin`.
+
+Integration PR #48 delivered Part 2 to main at
+`8815f8c10f787b38fc8644691855851b7a5d344d`. Its PR CI run `36737388087`
+and iteration push run `36737380659` passed all three jobs.
+Main merge CI run `36737709390` also passed all three jobs. Issue #49 tracks
+this post-merge documentation update. Retain the iteration integration branch
+as history; remove merged temporary branches according to HANDOFF.
 The fixed v0.3.0 tag is retained.

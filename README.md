@@ -12,7 +12,9 @@ or reload a checksummed snapshot and inspect 60 m AGL plus ground/aircraft heigh
 The saved local demonstration is `braunschweig-part1-v2` (9.23 km²). Select it in
 the explorer after restarting the backend and refreshing the page.
 
-Iteration 005 [Part 2](doc/iteration/iteration-005/part2.md) adds a configurable
+Iteration 005 [Part 2](doc/iteration/iteration-005/part2.md) was delivered to main
+on 2026-09-30 through [PR #48](https://github.com/Hunter3304/uas-mission-planner/pull/48).
+It adds a configurable
 EPSG:25832 preparation grid (default 50 m, maximum 10,000 cells). Enable
 **Constraint grid**, change **Grid cell (m)**, and click a cell to inspect
 population estimates, unknown support, altitude diagnostics and adjacent
@@ -21,6 +23,11 @@ The read-only endpoint is `/api/datasets/{id}/experiment/grid?cell_m=50`.
 Temporary restriction coverage and legal applicability remain unresolved;
 `block_unresolved` excludes every candidate from traversal. Part 3 route search
 remains deferred. This preparation graph does not establish flight permission.
+Validated locally with 96 Python passes (one Windows permission skip), 9 mocked
+and 5 real-stack browser passes, lint/format/build, and real Braunschweig grid
+inspection. Windows/Linux Python and frontend CI passed before and after merge.
+The real 50 m grid has 3,809 cells and 14,867 candidate edges; initial preparation
+took about 35 seconds locally, so allow it to finish before inspecting cells.
 
 ## Quick start: offline demonstration
 
