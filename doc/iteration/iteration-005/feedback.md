@@ -28,10 +28,17 @@ Feature PR #38 passed Windows/Linux Python and frontend CI, then merged into
 `iteration/005` at `89796b130f6d31ed7efcdfa0200427fafa3b1a6d`.
 Issue #37 was explicitly closed. The final local gate comprised 85 Python passes,
 one Windows symlink skip, 9 mocked browser passes, 12 repeated real-stack browser
-passes, Ruff, ESLint and production build. The sprint PR and main merge are the
-remaining delivery steps at this point.
+passes, Ruff, ESLint and production build. The sprint PR and main merge
+subsequently completed.
 The user separately authorized cleanup of merged branches. The feature branch
 was deleted locally and remotely, pruned and verified by branch listing and
 `git ls-remote --heads origin`.
+
+Sprint PR #39 passed Windows/Linux Python and frontend CI, then merged into
+`main` at `1469af7ded55782cf1c67fded3b2c7b8c60e50e9`.
+The main merge commit passed the same three CI jobs.
+The `iteration/005` branch is retained as integration history. Part 1 is
+complete; the grid, constraint graph and routing in Parts 2/3 require separate
+implementation.
 
 Validation results and merge facts are recorded in HANDOFF after final checks.
