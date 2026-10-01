@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — Iteration 006 Part 1
+
+- Metric centreline building-risk integration using existing tag classifications,
+  maximum score in overlaps and explicit unassessed/background-assumption handling.
+- Weighted A*/Dijkstra with separate physical length, risk-length and objective
+  outputs; default risk/length weights 0.9/0.1 and offline Python entry point.
+- Configurable shared point/motion clearance, conservative obstacle boundary
+  contact checks, verified source/rule/config cache identity and export provenance.
+- Calculation rules documented under `doc/rules/risk-weighted-routing.md`.
+  Existing distance-only CLI/API/UI remain default; OMPL and new UI controls deferred.
+
 ## Unreleased — Iteration 005 Part 3
 
 - Deterministic distance-only A* on the preparation graph, Dijkstra verification,

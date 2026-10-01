@@ -2,6 +2,11 @@
 
 This directory documents implemented cost classification and routing rules.
 
+[Metric building-risk routing](risk-weighted-routing.md) records Iteration 006
+Part 1's length-times-score formula, 0.9/0.1 objective, maximum overlap policy,
+explicit background assumptions, metric point/motion collision checks and
+weighted A*/Dijkstra. This mode is currently exposed through the Python core.
+
 [Constrained shortest-path routing](routing-algorithms.md) specifies the confirmed
 A* planner and Dijkstra verification roles implemented in Part 3. Routing does
 not change the independent cost layers.

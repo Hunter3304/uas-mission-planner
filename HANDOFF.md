@@ -257,3 +257,19 @@ For a network-free example after installing dependencies: `uv run --project back
   GitHub Actions run `36693434334` passed. Issue #42 closed with the merge.
   Branch `fix/42-large-dataset-timeout` was deleted locally and remotely, then
   pruned; `git branch -a` and `git ls-remote --heads origin` confirmed cleanup.
+
+## Iteration 006 Part 1 (2026-09-30)
+
+- User approved `doc/plan/iteration-006.md`, authorized Part 1, and requested calculation rules under `doc/rules/`. Parts 2 and 3 remain deferred.
+- Milestone 6 / Issue #56 precede `iteration/006` and `feature/56-risk-weighted-routing`, based on main `42db227`.
+- Confirmed: metric units; centreline intersection length times risk; buffered point/motion intersection collision checks; initial risk/length weights 0.9/0.1.
+- Verified existing OSM acquisition, 0–4 building/tag classifications, EPSG:25832 grid and distance-only A*/Dijkstra. Reuse them rather than importing the archive wholesale.
+- Approved: building-only first objective, maximum score in overlaps, explicit background assessment policy, safety-distance default 0 m with configurable positive clearance. Population and cross-layer fusion deferred.
+- OMPL Python 3.13 Windows/Linux compatibility remains unverified and is an implementation dependency gate. Real-data constraint uncertainty remains unchanged.
+- Implemented core: `risk.py`, `risk_routing.py`, weighted A*/Dijkstra in `routing.py`; documented calculations in `doc/rules/risk-weighted-routing.md`. Existing CLI/API/UI remain distance-only defaults; Python entry point is `plan_risk_route`.
+- Prepared risk models verify saved OSM before cache access; signatures include source/rules/manifest/grid/CRS/weights/background/clearance. Final route costs and full geometry are rechecked.
+- Local validation: 139 Python tests passed, one Windows permission skip; Ruff, ESLint and frontend build passed. Six real-stack browser cases passed and Playwright exited successfully after stopping its test servers during Windows teardown.
+- Saved real `braunschweig-part1-v2` at 100 m remains `unresolved_input`; four in-boundary building objects have unsupported non-polygon geometry, explicitly recorded without invented footprints. Synthetic 100 m returns `no_path_on_grid`; use finer cells for successful demos.
+- Saved synthetic 50 m succeeds for weighted A* and Dijkstra: 276.22166570077525 m, risk-length 71.90458069004399, objective 92.33628919111712, explicit background 0 assumption.
+- Part 1 implementation and local validation are complete. On 2026-10-01 the user explicitly authorized publication and merges to `Hunter3304/uas-mission-planner`, resolving the previous automatic-review publication block. Implementation commit `9dac74d` is pushed; feature PR #57 targets `iteration/006`. CI and integration are in progress.
+- Existing 51-line real-route handoff addition predates this task and is preserved unstaged; it is excluded from this task's commit. No OMPL dependency, population objective, new acquisition or weighted UI controls implemented.

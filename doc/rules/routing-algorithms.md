@@ -1,7 +1,9 @@
 # Constrained shortest-path routing rules
 
 Status: algorithm roles confirmed on 2026-09-29; Part 3 implementation authorized
-on 2026-09-30. Implemented baseline version: `distance-grid-v1`.
+on 2026-09-30. Original baseline version: `distance-grid-v1`; Iteration 006
+Part 1 reports `distance-grid-v2` for configurable clearance and conservative
+numerical contact checks. See [risk-weighted routing](risk-weighted-routing.md).
 See the [approved scope](../plan/iteration-005.md) and
 [Part 3 outcome](../iteration/iteration-005/part3.md).
 
@@ -14,7 +16,8 @@ start equal to goal yields a zero-length GeoJSON LineString with two equal
 coordinates. The grid conservatively excludes entire cells intersecting synthetic
 obstacles. Every allowed edge and connector, then every final segment, receives
 continuous vector intersection checking in EPSG:25832. Obstacle boundary contact
-is blocked; no clearance buffer or geometry tolerance is added.
+is blocked. Default clearance remains 0 m. The core now supports positive metre
+buffers and conservatively treats obstacle separations up to 1e-7 m as contact.
 
 Queue ties sort by `(f, g, node ID)` and neighbors by ID. A* and Dijkstra share the
 same filtered graph and weights; verification compares lengths within 1e-6 m and
