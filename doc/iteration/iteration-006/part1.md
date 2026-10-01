@@ -55,12 +55,12 @@ objective 92.33628919111712. Both retain the explicit background assumption;
 the contributing building ID is `way/3`. This sample verifies consistent scoring;
 the separate analytical high-risk-crossing fixture verifies lower-risk detouring.
 
-Part 1 is implemented and locally validated. Automatic approval review rejected
-the compound commit/push/PR command before execution: external code publication
-to `Hunter3304/uas-mission-planner` was not considered explicitly authorized by
-this request. No remote iteration/feature branch or PR has been created. Keep
-the concrete local result and request explicit user authorization for publication;
-remote CI, reviewed integration and feature-branch cleanup remain pending.
+Part 1 is implemented and locally validated. On 2026-10-01 the user explicitly
+authorized pushing and merging to `Hunter3304/uas-mission-planner`, resolving
+the previous publication approval block. Implementation commit `9dac74d` is
+pushed and [feature PR #57](https://github.com/Hunter3304/uas-mission-planner/pull/57)
+targets `iteration/006`. CI, integration and verified feature-branch cleanup
+are in progress.
 
 The pre-existing 51-line real-route HANDOFF addition is retained locally and
 excluded from this task's commit. Local changes are confined to Part 1 core,
