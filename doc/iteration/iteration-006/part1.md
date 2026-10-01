@@ -56,11 +56,21 @@ the contributing building ID is `way/3`. This sample verifies consistent scoring
 the separate analytical high-risk-crossing fixture verifies lower-risk detouring.
 
 Part 1 is implemented and locally validated. On 2026-10-01 the user explicitly
-authorized pushing and merging to `Hunter3304/uas-mission-planner`, resolving
-the previous publication approval block. Implementation commit `9dac74d` is
-pushed and [feature PR #57](https://github.com/Hunter3304/uas-mission-planner/pull/57)
-targets `iteration/006`. CI, integration and verified feature-branch cleanup
-are in progress.
+authorized pushing and merging to `Hunter3304/uas-mission-planner`. Feature
+[PR #57](https://github.com/Hunter3304/uas-mission-planner/pull/57) merged into
+`iteration/006` at `02ef32a5c0035b83749e996b78f8d63273ac4093` after all three
+Windows/Linux Python and frontend jobs passed in run `36836063414`.
+Issue #56 is closed. The merged feature branch was deleted locally and remotely
+after confirming PR merge and ancestry; `fetch --prune`, `branch -a` and
+`ls-remote --heads` confirmed cleanup. Retain `iteration/006` and Milestone 6
+for the deferred parts.
+
+Main integration is tracked by
+[PR #58](https://github.com/Hunter3304/uas-mission-planner/pull/58). Its initial
+CI run `36836528007` and iteration push run `36836402950` passed all three jobs.
+The same integration PR includes this delivery record; its current checks and
+merge state are available on GitHub. No additional delivery issue/branch is
+required for this part.
 
 The pre-existing 51-line real-route HANDOFF addition is retained locally and
 excluded from this task's commit. Local changes are confined to Part 1 core,
