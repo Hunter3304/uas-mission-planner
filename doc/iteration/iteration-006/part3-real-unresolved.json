@@ -1,0 +1,1896 @@
+{
+  "status": "incomplete",
+  "synthetic": false,
+  "runs": [
+    {
+      "label": "distance A*",
+      "result": {
+        "algorithm": "astar",
+        "rules_version": "distance-grid-v2",
+        "cell_size_m": 100.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified"
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.505,
+              52.254
+            ],
+            "cell": "4:3",
+            "length_m": 44.29509002134216,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.54,
+              52.273
+            ],
+            "cell": "26:27",
+            "length_m": 36.6353756570656,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "dipul:kontrollzonen/kontrollzonen.99",
+                "reason": "Altitude limit or reference cannot be interpreted."
+              },
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          }
+        ],
+        "start": [
+          10.505,
+          52.254
+        ],
+        "end": [
+          10.54,
+          52.273
+        ],
+        "geometry": null,
+        "length_m": null,
+        "objective": "distance",
+        "objective_cost": null,
+        "risk_length_cost": null,
+        "safety_distance_m": 0.0,
+        "status": "unresolved_input",
+        "message": "Coverage or constraint applicability unresolved; conservative policy prevents a validated route.",
+        "runtime_ms": 77.94889999786392,
+        "exact": false,
+        "solution_kind": "none",
+        "controls": {
+          "algorithm": "astar",
+          "objective": "distance",
+          "cell_m": 100.0,
+          "background_cost": 0.0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 1.0,
+          "effective_weights": {
+            "risk": 0,
+            "distance": 1
+          }
+        },
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": false,
+          "config": {
+            "scenario": "civil",
+            "bounds": {
+              "west": 10.5,
+              "south": 52.25,
+              "east": 10.545,
+              "north": 52.277
+            },
+            "start": [
+              10.505,
+              52.254
+            ],
+            "end": [
+              10.54,
+              52.273
+            ],
+            "agl_m": 60,
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "saved_at_utc": "2026-09-29T20:19:07.136671+00:00",
+          "files": [
+            {
+              "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.zip",
+              "started_at_utc": "2026-09-29T20:15:30.576155+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:34.966405+00:00",
+              "last_modified": "Mon, 27 Jan 2025 19:35:30 GMT",
+              "etag": "\"271e9ae-62cb52ddc83e3\"",
+              "bytes": 41019822,
+              "content_type": "application/zip",
+              "path": "raw/ghsl.zip",
+              "sha256": "736d07c99453834235d62c2c9eab9f37450809d6621b9ea8d6255e4ae7f44dd1"
+            },
+            {
+              "path": "population.tif",
+              "sha256": "430fa21a2548652d7663e077764fb923386fc41accbd10571608bafdb15c288b",
+              "derived_from": "raw/ghsl.zip",
+              "member": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.tif",
+              "operation": "native pixel window, no resampling"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:15:35.268004+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:51.318759+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 9281,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-capabilities.xml",
+              "sha256": "3b8c44405d958a0c71945fbb5434f50f6d9e0beebbf5da9e258dbe121458e1f9"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=ni_dgm1",
+              "started_at_utc": "2026-09-29T20:15:51.339551+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:53.936293+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2471,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-description.xml",
+              "sha256": "cc2ddb5cc9152e22ff04081de28cf5967cc5ff1b1e4da6a2044f2d5ce1696c60"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ni_dgm1&format=image%2Ftiff&subset=x%28602336%2C605471%29&subset=y%285789904%2C5792972%29",
+              "started_at_utc": "2026-09-29T20:15:53.954463+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.123238+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 23236946,
+              "content_type": "image/tiff",
+              "path": "raw/terrain.tif",
+              "sha256": "2252028c62822db102f50dcddb731b74f6613fbc5a858f93edd681fc33e10275"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:16:06.177898+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.494572+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 105348,
+              "content_type": "application/xml",
+              "path": "raw/dipul-capabilities.xml",
+              "sha256": "fad02a4d1c0e95aaef5414961410a7b2e7ca0f7d1b6d0d8ea87b18fe059b7505"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Akontrollzonen",
+              "started_at_utc": "2026-09-29T20:16:06.535598+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.911034+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2220,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/kontrollzonen-schema.xml",
+              "sha256": "f9c1481c9d3f791cbd3cd49e953305a799923644e295ecec10b1e091f204f196"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Akontrollzonen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:06.919377+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.190196+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 4946,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/kontrollzonen.geojson",
+              "sha256": "88cbd0b89397dbddfb8a9e833b246979cf3fc436fbe8e4403944acf3847c3c6d"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abahnanlagen",
+              "started_at_utc": "2026-09-29T20:16:07.221592+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.479424+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1762,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bahnanlagen-schema.xml",
+              "sha256": "92b22af7dfc1cf25f17c88c987d71a728bec51085553c5fbb0ee71025b533b0a"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abahnanlagen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:07.488937+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.808937+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 94284,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bahnanlagen.geojson",
+              "sha256": "92eae3d96a1c816cc876fc4e44f08924c0b72a8bb2809c9e8ed52f409d357b81"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abundesstrassen",
+              "started_at_utc": "2026-09-29T20:16:07.822318+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.077446+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1771,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bundesstrassen-schema.xml",
+              "sha256": "46ebb38717225bb6b9eafbb5d5a8fc13c5479479781189994794f1815cb8d59e"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abundesstrassen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:08.108529+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.380178+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bundesstrassen.geojson",
+              "sha256": "90355ad47c28cb0c692db0572cd8efc5e6fd4756c4551060de6902f7ba4f4382"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Anaturschutzgebiete",
+              "started_at_utc": "2026-09-29T20:19:06.219732+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:06.841444+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1784,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/naturschutzgebiete-schema.xml",
+              "sha256": "b03deca3380c36eebac949e535d4f52baad35ad36856f5f46cd975f597bfa95c"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Anaturschutzgebiete&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:19:06.850983+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:07.129235+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/naturschutzgebiete.geojson",
+              "sha256": "63833ed7c36440c73771886b08f2b3bb75621204cdea54637947672311f86968"
+            }
+          ],
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "sources": {
+            "ghsl": {
+              "source_id": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19",
+              "path": "population.tif",
+              "product": "GHS-POP R2023A V1.0",
+              "epoch_kind": "estimate",
+              "units": "people per native 100 m cell",
+              "license": "EC reuse policy; acknowledge source",
+              "attribution": "European Commission, Joint Research Centre (JRC), GHS-POP R2023A",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -200.0,
+                "effective_nodata": -200.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  774100.0,
+                  6107000.0,
+                  777800.0,
+                  6109800.0
+                ],
+                "width": 37,
+                "height": 28,
+                "dtype": "float64",
+                "transform": [
+                  100.0,
+                  0.0,
+                  774100.0,
+                  0.0,
+                  -100.0,
+                  6109800.0
+                ]
+              }
+            },
+            "terrain": {
+              "source_id": "LGLN:ni_dgm1",
+              "path": "raw/terrain.tif",
+              "product": "DGM1",
+              "units": "metres",
+              "vertical_datum": "DHHN2016 / NHN (EPSG:7837)",
+              "surface": "bare-earth terrain",
+              "native_support_m": 1,
+              "license": "CC BY 4.0",
+              "attribution": "LGLN (2026), CC BY 4.0",
+              "survey_epoch": null,
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": null,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "LGLN DGM product specification (-9999)",
+                "bounds": [
+                  602336.0,
+                  5789904.0,
+                  605471.0,
+                  5792972.0
+                ],
+                "width": 3135,
+                "height": 3068,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  602336.0,
+                  0.0,
+                  -1.0,
+                  5792972.0
+                ]
+              },
+              "unit_evidence": "https://www.lgln.niedersachsen.de/download/207140/Kundeninformation_1_2024.pdf",
+              "metadata_discrepancy": "WCS DescribeCoverage reports W.m-2.Sr-1 and the returned TIFF omits NoData. Metres, DHHN2016 and -9999 NoData are taken from the official DGM product specification; no radiance conversion applied. Original response bytes are retained."
+            },
+            "dipul": {
+              "source_id": "DIPUL:WFS:2.0.0",
+              "product": "WFS 2.0.0 snapshot",
+              "license": "CC BY-ND 4.0",
+              "attribution": "dipul",
+              "responses": [
+                {
+                  "path": "raw/kontrollzonen.geojson",
+                  "type_name": "dipul:kontrollzonen",
+                  "feature_count": 2,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code",
+                    "type_code_detail",
+                    "upper_limit_alt_ref",
+                    "upper_limit_altitude",
+                    "upper_limit_unit"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.086Z"
+                },
+                {
+                  "path": "raw/bahnanlagen.geojson",
+                  "type_name": "dipul:bahnanlagen",
+                  "feature_count": 1,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.658Z"
+                },
+                {
+                  "path": "raw/bundesstrassen.geojson",
+                  "type_name": "dipul:bundesstrassen",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:16:08.276Z"
+                },
+                {
+                  "path": "raw/naturschutzgebiete.geojson",
+                  "type_name": "dipul:naturschutzgebiete",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:19:07.022Z"
+                }
+              ],
+              "coverage": "partial: selected static layers only",
+              "temporary_restrictions": "unverified",
+              "validity": "unresolved; download timestamp is not mission validity",
+              "vertical_reference": "source properties retained; applicability unresolved",
+              "buffers": "source geometries retained unchanged; no extra buffer applied",
+              "sharing": "local inspection only; derived export not enabled"
+            }
+          },
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Shortest horizontal distance on the constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "optimality": "Shortest horizontal distance on the constructed graph only."
+      },
+      "comparison_costs": {
+        "status": "no_exact_route"
+      }
+    },
+    {
+      "label": "weighted A*",
+      "result": {
+        "algorithm": "astar",
+        "rules_version": "building-length-risk-v1",
+        "cell_size_m": 100.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified"
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.505,
+              52.254
+            ],
+            "cell": "4:3",
+            "length_m": 44.29509002134216,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.54,
+              52.273
+            ],
+            "cell": "26:27",
+            "length_m": 36.6353756570656,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "dipul:kontrollzonen/kontrollzonen.99",
+                "reason": "Altitude limit or reference cannot be interpreted."
+              },
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          }
+        ],
+        "start": [
+          10.505,
+          52.254
+        ],
+        "end": [
+          10.54,
+          52.273
+        ],
+        "geometry": null,
+        "length_m": null,
+        "objective": "risk",
+        "objective_cost": null,
+        "risk_length_cost": null,
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "\u00a9 OpenStreetMap contributors",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "4221ff509a7576fd94b3141f1bf20952edaa0ba12a8ac6e8417d4fa07d4ad7ae",
+            "grid_signature": "df6272a881d69131aa2990c9e2c0df16ca8d9c55e91acecd6ecc581570a39769",
+            "license_url": "https://www.openstreetmap.org/copyright",
+            "name": "OpenStreetMap via OSMnx/Overpass",
+            "osm_sha256": "060bc0e7ea5f206e8e1099125bcf3b154c2a632dbb7fa1e5295a9042fa5ef4c9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-09-29T20:15:24.611383+00:00",
+            "synthetic": false
+          },
+          "collection_sha256": "8501cf69b4bb2c2f58a80def15074d93b1f91d1a684f13ac4bd96e8cbf2c6ff4",
+          "boundary_sha256": "5193a6321175aed3e94c9ff2cb02cc07a22af368eff01bd3d56bc8cbdb6c92a7",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [
+            {
+              "id": "node/703470310",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/1583810871",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/9078715414",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/12199215634",
+              "status": "unsupported_geometry"
+            }
+          ],
+          "model_signature": "9cbb3509477d3a04af514a73cfb36d55ef2c1c15ab7ccb626bd19eeb79ac1ab9"
+        },
+        "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+        "status": "unresolved_input",
+        "message": "Coverage or constraint applicability unresolved; conservative policy prevents a validated route.",
+        "runtime_ms": 6942.703900000197,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": false,
+          "config": {
+            "scenario": "civil",
+            "bounds": {
+              "west": 10.5,
+              "south": 52.25,
+              "east": 10.545,
+              "north": 52.277
+            },
+            "start": [
+              10.505,
+              52.254
+            ],
+            "end": [
+              10.54,
+              52.273
+            ],
+            "agl_m": 60,
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "saved_at_utc": "2026-09-29T20:19:07.136671+00:00",
+          "files": [
+            {
+              "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.zip",
+              "started_at_utc": "2026-09-29T20:15:30.576155+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:34.966405+00:00",
+              "last_modified": "Mon, 27 Jan 2025 19:35:30 GMT",
+              "etag": "\"271e9ae-62cb52ddc83e3\"",
+              "bytes": 41019822,
+              "content_type": "application/zip",
+              "path": "raw/ghsl.zip",
+              "sha256": "736d07c99453834235d62c2c9eab9f37450809d6621b9ea8d6255e4ae7f44dd1"
+            },
+            {
+              "path": "population.tif",
+              "sha256": "430fa21a2548652d7663e077764fb923386fc41accbd10571608bafdb15c288b",
+              "derived_from": "raw/ghsl.zip",
+              "member": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.tif",
+              "operation": "native pixel window, no resampling"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:15:35.268004+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:51.318759+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 9281,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-capabilities.xml",
+              "sha256": "3b8c44405d958a0c71945fbb5434f50f6d9e0beebbf5da9e258dbe121458e1f9"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=ni_dgm1",
+              "started_at_utc": "2026-09-29T20:15:51.339551+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:53.936293+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2471,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-description.xml",
+              "sha256": "cc2ddb5cc9152e22ff04081de28cf5967cc5ff1b1e4da6a2044f2d5ce1696c60"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ni_dgm1&format=image%2Ftiff&subset=x%28602336%2C605471%29&subset=y%285789904%2C5792972%29",
+              "started_at_utc": "2026-09-29T20:15:53.954463+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.123238+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 23236946,
+              "content_type": "image/tiff",
+              "path": "raw/terrain.tif",
+              "sha256": "2252028c62822db102f50dcddb731b74f6613fbc5a858f93edd681fc33e10275"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:16:06.177898+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.494572+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 105348,
+              "content_type": "application/xml",
+              "path": "raw/dipul-capabilities.xml",
+              "sha256": "fad02a4d1c0e95aaef5414961410a7b2e7ca0f7d1b6d0d8ea87b18fe059b7505"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Akontrollzonen",
+              "started_at_utc": "2026-09-29T20:16:06.535598+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.911034+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2220,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/kontrollzonen-schema.xml",
+              "sha256": "f9c1481c9d3f791cbd3cd49e953305a799923644e295ecec10b1e091f204f196"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Akontrollzonen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:06.919377+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.190196+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 4946,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/kontrollzonen.geojson",
+              "sha256": "88cbd0b89397dbddfb8a9e833b246979cf3fc436fbe8e4403944acf3847c3c6d"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abahnanlagen",
+              "started_at_utc": "2026-09-29T20:16:07.221592+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.479424+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1762,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bahnanlagen-schema.xml",
+              "sha256": "92b22af7dfc1cf25f17c88c987d71a728bec51085553c5fbb0ee71025b533b0a"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abahnanlagen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:07.488937+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.808937+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 94284,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bahnanlagen.geojson",
+              "sha256": "92eae3d96a1c816cc876fc4e44f08924c0b72a8bb2809c9e8ed52f409d357b81"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abundesstrassen",
+              "started_at_utc": "2026-09-29T20:16:07.822318+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.077446+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1771,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bundesstrassen-schema.xml",
+              "sha256": "46ebb38717225bb6b9eafbb5d5a8fc13c5479479781189994794f1815cb8d59e"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abundesstrassen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:08.108529+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.380178+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bundesstrassen.geojson",
+              "sha256": "90355ad47c28cb0c692db0572cd8efc5e6fd4756c4551060de6902f7ba4f4382"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Anaturschutzgebiete",
+              "started_at_utc": "2026-09-29T20:19:06.219732+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:06.841444+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1784,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/naturschutzgebiete-schema.xml",
+              "sha256": "b03deca3380c36eebac949e535d4f52baad35ad36856f5f46cd975f597bfa95c"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Anaturschutzgebiete&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:19:06.850983+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:07.129235+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/naturschutzgebiete.geojson",
+              "sha256": "63833ed7c36440c73771886b08f2b3bb75621204cdea54637947672311f86968"
+            }
+          ],
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "sources": {
+            "ghsl": {
+              "source_id": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19",
+              "path": "population.tif",
+              "product": "GHS-POP R2023A V1.0",
+              "epoch_kind": "estimate",
+              "units": "people per native 100 m cell",
+              "license": "EC reuse policy; acknowledge source",
+              "attribution": "European Commission, Joint Research Centre (JRC), GHS-POP R2023A",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -200.0,
+                "effective_nodata": -200.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  774100.0,
+                  6107000.0,
+                  777800.0,
+                  6109800.0
+                ],
+                "width": 37,
+                "height": 28,
+                "dtype": "float64",
+                "transform": [
+                  100.0,
+                  0.0,
+                  774100.0,
+                  0.0,
+                  -100.0,
+                  6109800.0
+                ]
+              }
+            },
+            "terrain": {
+              "source_id": "LGLN:ni_dgm1",
+              "path": "raw/terrain.tif",
+              "product": "DGM1",
+              "units": "metres",
+              "vertical_datum": "DHHN2016 / NHN (EPSG:7837)",
+              "surface": "bare-earth terrain",
+              "native_support_m": 1,
+              "license": "CC BY 4.0",
+              "attribution": "LGLN (2026), CC BY 4.0",
+              "survey_epoch": null,
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": null,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "LGLN DGM product specification (-9999)",
+                "bounds": [
+                  602336.0,
+                  5789904.0,
+                  605471.0,
+                  5792972.0
+                ],
+                "width": 3135,
+                "height": 3068,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  602336.0,
+                  0.0,
+                  -1.0,
+                  5792972.0
+                ]
+              },
+              "unit_evidence": "https://www.lgln.niedersachsen.de/download/207140/Kundeninformation_1_2024.pdf",
+              "metadata_discrepancy": "WCS DescribeCoverage reports W.m-2.Sr-1 and the returned TIFF omits NoData. Metres, DHHN2016 and -9999 NoData are taken from the official DGM product specification; no radiance conversion applied. Original response bytes are retained."
+            },
+            "dipul": {
+              "source_id": "DIPUL:WFS:2.0.0",
+              "product": "WFS 2.0.0 snapshot",
+              "license": "CC BY-ND 4.0",
+              "attribution": "dipul",
+              "responses": [
+                {
+                  "path": "raw/kontrollzonen.geojson",
+                  "type_name": "dipul:kontrollzonen",
+                  "feature_count": 2,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code",
+                    "type_code_detail",
+                    "upper_limit_alt_ref",
+                    "upper_limit_altitude",
+                    "upper_limit_unit"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.086Z"
+                },
+                {
+                  "path": "raw/bahnanlagen.geojson",
+                  "type_name": "dipul:bahnanlagen",
+                  "feature_count": 1,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.658Z"
+                },
+                {
+                  "path": "raw/bundesstrassen.geojson",
+                  "type_name": "dipul:bundesstrassen",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:16:08.276Z"
+                },
+                {
+                  "path": "raw/naturschutzgebiete.geojson",
+                  "type_name": "dipul:naturschutzgebiete",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:19:07.022Z"
+                }
+              ],
+              "coverage": "partial: selected static layers only",
+              "temporary_restrictions": "unverified",
+              "validity": "unresolved; download timestamp is not mission validity",
+              "vertical_reference": "source properties retained; applicability unresolved",
+              "buffers": "source geometries retained unchanged; no extra buffer applied",
+              "sharing": "local inspection only; derived export not enabled"
+            }
+          },
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "exact": false,
+        "solution_kind": "none",
+        "controls": {
+          "algorithm": "astar",
+          "objective": "risk",
+          "cell_m": 100.0,
+          "background_cost": 0.0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 1.0,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        }
+      },
+      "comparison_costs": {
+        "status": "no_exact_route"
+      }
+    },
+    {
+      "label": "weighted Dijkstra",
+      "result": {
+        "algorithm": "dijkstra",
+        "rules_version": "building-length-risk-v1",
+        "cell_size_m": 100.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified"
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.505,
+              52.254
+            ],
+            "cell": "4:3",
+            "length_m": 44.29509002134216,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.54,
+              52.273
+            ],
+            "cell": "26:27",
+            "length_m": 36.6353756570656,
+            "state": "unresolved",
+            "point_state": "unresolved",
+            "reasons": [
+              {
+                "source": "dipul:kontrollzonen/kontrollzonen.99",
+                "reason": "Altitude limit or reference cannot be interpreted."
+              },
+              {
+                "source": "DIPUL",
+                "reason": "Temporary restriction coverage unverified."
+              }
+            ]
+          }
+        ],
+        "start": [
+          10.505,
+          52.254
+        ],
+        "end": [
+          10.54,
+          52.273
+        ],
+        "geometry": null,
+        "length_m": null,
+        "objective": "risk",
+        "objective_cost": null,
+        "risk_length_cost": null,
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "\u00a9 OpenStreetMap contributors",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "4221ff509a7576fd94b3141f1bf20952edaa0ba12a8ac6e8417d4fa07d4ad7ae",
+            "grid_signature": "df6272a881d69131aa2990c9e2c0df16ca8d9c55e91acecd6ecc581570a39769",
+            "license_url": "https://www.openstreetmap.org/copyright",
+            "name": "OpenStreetMap via OSMnx/Overpass",
+            "osm_sha256": "060bc0e7ea5f206e8e1099125bcf3b154c2a632dbb7fa1e5295a9042fa5ef4c9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-09-29T20:15:24.611383+00:00",
+            "synthetic": false
+          },
+          "collection_sha256": "8501cf69b4bb2c2f58a80def15074d93b1f91d1a684f13ac4bd96e8cbf2c6ff4",
+          "boundary_sha256": "5193a6321175aed3e94c9ff2cb02cc07a22af368eff01bd3d56bc8cbdb6c92a7",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [
+            {
+              "id": "node/703470310",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/1583810871",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/9078715414",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/12199215634",
+              "status": "unsupported_geometry"
+            }
+          ],
+          "model_signature": "9cbb3509477d3a04af514a73cfb36d55ef2c1c15ab7ccb626bd19eeb79ac1ab9"
+        },
+        "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+        "status": "unresolved_input",
+        "message": "Coverage or constraint applicability unresolved; conservative policy prevents a validated route.",
+        "runtime_ms": 6438.240699993912,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": false,
+          "config": {
+            "scenario": "civil",
+            "bounds": {
+              "west": 10.5,
+              "south": 52.25,
+              "east": 10.545,
+              "north": 52.277
+            },
+            "start": [
+              10.505,
+              52.254
+            ],
+            "end": [
+              10.54,
+              52.273
+            ],
+            "agl_m": 60,
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "saved_at_utc": "2026-09-29T20:19:07.136671+00:00",
+          "files": [
+            {
+              "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.zip",
+              "started_at_utc": "2026-09-29T20:15:30.576155+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:34.966405+00:00",
+              "last_modified": "Mon, 27 Jan 2025 19:35:30 GMT",
+              "etag": "\"271e9ae-62cb52ddc83e3\"",
+              "bytes": 41019822,
+              "content_type": "application/zip",
+              "path": "raw/ghsl.zip",
+              "sha256": "736d07c99453834235d62c2c9eab9f37450809d6621b9ea8d6255e4ae7f44dd1"
+            },
+            {
+              "path": "population.tif",
+              "sha256": "430fa21a2548652d7663e077764fb923386fc41accbd10571608bafdb15c288b",
+              "derived_from": "raw/ghsl.zip",
+              "member": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.tif",
+              "operation": "native pixel window, no resampling"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:15:35.268004+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:51.318759+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 9281,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-capabilities.xml",
+              "sha256": "3b8c44405d958a0c71945fbb5434f50f6d9e0beebbf5da9e258dbe121458e1f9"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=ni_dgm1",
+              "started_at_utc": "2026-09-29T20:15:51.339551+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:53.936293+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2471,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-description.xml",
+              "sha256": "cc2ddb5cc9152e22ff04081de28cf5967cc5ff1b1e4da6a2044f2d5ce1696c60"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ni_dgm1&format=image%2Ftiff&subset=x%28602336%2C605471%29&subset=y%285789904%2C5792972%29",
+              "started_at_utc": "2026-09-29T20:15:53.954463+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.123238+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 23236946,
+              "content_type": "image/tiff",
+              "path": "raw/terrain.tif",
+              "sha256": "2252028c62822db102f50dcddb731b74f6613fbc5a858f93edd681fc33e10275"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:16:06.177898+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.494572+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 105348,
+              "content_type": "application/xml",
+              "path": "raw/dipul-capabilities.xml",
+              "sha256": "fad02a4d1c0e95aaef5414961410a7b2e7ca0f7d1b6d0d8ea87b18fe059b7505"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Akontrollzonen",
+              "started_at_utc": "2026-09-29T20:16:06.535598+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.911034+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2220,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/kontrollzonen-schema.xml",
+              "sha256": "f9c1481c9d3f791cbd3cd49e953305a799923644e295ecec10b1e091f204f196"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Akontrollzonen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:06.919377+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.190196+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 4946,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/kontrollzonen.geojson",
+              "sha256": "88cbd0b89397dbddfb8a9e833b246979cf3fc436fbe8e4403944acf3847c3c6d"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abahnanlagen",
+              "started_at_utc": "2026-09-29T20:16:07.221592+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.479424+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1762,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bahnanlagen-schema.xml",
+              "sha256": "92b22af7dfc1cf25f17c88c987d71a728bec51085553c5fbb0ee71025b533b0a"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abahnanlagen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:07.488937+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.808937+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 94284,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bahnanlagen.geojson",
+              "sha256": "92eae3d96a1c816cc876fc4e44f08924c0b72a8bb2809c9e8ed52f409d357b81"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abundesstrassen",
+              "started_at_utc": "2026-09-29T20:16:07.822318+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.077446+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1771,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bundesstrassen-schema.xml",
+              "sha256": "46ebb38717225bb6b9eafbb5d5a8fc13c5479479781189994794f1815cb8d59e"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abundesstrassen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:08.108529+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.380178+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bundesstrassen.geojson",
+              "sha256": "90355ad47c28cb0c692db0572cd8efc5e6fd4756c4551060de6902f7ba4f4382"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Anaturschutzgebiete",
+              "started_at_utc": "2026-09-29T20:19:06.219732+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:06.841444+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1784,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/naturschutzgebiete-schema.xml",
+              "sha256": "b03deca3380c36eebac949e535d4f52baad35ad36856f5f46cd975f597bfa95c"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Anaturschutzgebiete&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:19:06.850983+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:07.129235+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/naturschutzgebiete.geojson",
+              "sha256": "63833ed7c36440c73771886b08f2b3bb75621204cdea54637947672311f86968"
+            }
+          ],
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "sources": {
+            "ghsl": {
+              "source_id": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19",
+              "path": "population.tif",
+              "product": "GHS-POP R2023A V1.0",
+              "epoch_kind": "estimate",
+              "units": "people per native 100 m cell",
+              "license": "EC reuse policy; acknowledge source",
+              "attribution": "European Commission, Joint Research Centre (JRC), GHS-POP R2023A",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -200.0,
+                "effective_nodata": -200.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  774100.0,
+                  6107000.0,
+                  777800.0,
+                  6109800.0
+                ],
+                "width": 37,
+                "height": 28,
+                "dtype": "float64",
+                "transform": [
+                  100.0,
+                  0.0,
+                  774100.0,
+                  0.0,
+                  -100.0,
+                  6109800.0
+                ]
+              }
+            },
+            "terrain": {
+              "source_id": "LGLN:ni_dgm1",
+              "path": "raw/terrain.tif",
+              "product": "DGM1",
+              "units": "metres",
+              "vertical_datum": "DHHN2016 / NHN (EPSG:7837)",
+              "surface": "bare-earth terrain",
+              "native_support_m": 1,
+              "license": "CC BY 4.0",
+              "attribution": "LGLN (2026), CC BY 4.0",
+              "survey_epoch": null,
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": null,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "LGLN DGM product specification (-9999)",
+                "bounds": [
+                  602336.0,
+                  5789904.0,
+                  605471.0,
+                  5792972.0
+                ],
+                "width": 3135,
+                "height": 3068,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  602336.0,
+                  0.0,
+                  -1.0,
+                  5792972.0
+                ]
+              },
+              "unit_evidence": "https://www.lgln.niedersachsen.de/download/207140/Kundeninformation_1_2024.pdf",
+              "metadata_discrepancy": "WCS DescribeCoverage reports W.m-2.Sr-1 and the returned TIFF omits NoData. Metres, DHHN2016 and -9999 NoData are taken from the official DGM product specification; no radiance conversion applied. Original response bytes are retained."
+            },
+            "dipul": {
+              "source_id": "DIPUL:WFS:2.0.0",
+              "product": "WFS 2.0.0 snapshot",
+              "license": "CC BY-ND 4.0",
+              "attribution": "dipul",
+              "responses": [
+                {
+                  "path": "raw/kontrollzonen.geojson",
+                  "type_name": "dipul:kontrollzonen",
+                  "feature_count": 2,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code",
+                    "type_code_detail",
+                    "upper_limit_alt_ref",
+                    "upper_limit_altitude",
+                    "upper_limit_unit"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.086Z"
+                },
+                {
+                  "path": "raw/bahnanlagen.geojson",
+                  "type_name": "dipul:bahnanlagen",
+                  "feature_count": 1,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.658Z"
+                },
+                {
+                  "path": "raw/bundesstrassen.geojson",
+                  "type_name": "dipul:bundesstrassen",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:16:08.276Z"
+                },
+                {
+                  "path": "raw/naturschutzgebiete.geojson",
+                  "type_name": "dipul:naturschutzgebiete",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:19:07.022Z"
+                }
+              ],
+              "coverage": "partial: selected static layers only",
+              "temporary_restrictions": "unverified",
+              "validity": "unresolved; download timestamp is not mission validity",
+              "vertical_reference": "source properties retained; applicability unresolved",
+              "buffers": "source geometries retained unchanged; no extra buffer applied",
+              "sharing": "local inspection only; derived export not enabled"
+            }
+          },
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "exact": false,
+        "solution_kind": "none",
+        "controls": {
+          "algorithm": "dijkstra",
+          "objective": "risk",
+          "cell_m": 100.0,
+          "background_cost": 0.0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 1.0,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        }
+      },
+      "comparison_costs": {
+        "status": "no_exact_route"
+      }
+    },
+    {
+      "label": "ABIT* run 1",
+      "result": {
+        "algorithm": "abitstar",
+        "rules_version": "building-length-risk-v1",
+        "status": "timeout",
+        "exact": false,
+        "solution_kind": "none",
+        "geometry": null,
+        "length_m": null,
+        "risk_length_cost": null,
+        "objective_cost": null,
+        "start": [
+          10.505,
+          52.254
+        ],
+        "end": [
+          10.54,
+          52.273
+        ],
+        "analysis_crs": "EPSG:25832",
+        "objective": "risk",
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "\u00a9 OpenStreetMap contributors",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "4221ff509a7576fd94b3141f1bf20952edaa0ba12a8ac6e8417d4fa07d4ad7ae",
+            "grid_signature": "df6272a881d69131aa2990c9e2c0df16ca8d9c55e91acecd6ecc581570a39769",
+            "license_url": "https://www.openstreetmap.org/copyright",
+            "name": "OpenStreetMap via OSMnx/Overpass",
+            "osm_sha256": "060bc0e7ea5f206e8e1099125bcf3b154c2a632dbb7fa1e5295a9042fa5ef4c9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-09-29T20:15:24.611383+00:00",
+            "synthetic": false
+          },
+          "collection_sha256": "8501cf69b4bb2c2f58a80def15074d93b1f91d1a684f13ac4bd96e8cbf2c6ff4",
+          "boundary_sha256": "5193a6321175aed3e94c9ff2cb02cc07a22af368eff01bd3d56bc8cbdb6c92a7",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [
+            {
+              "id": "node/703470310",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/1583810871",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/9078715414",
+              "status": "unsupported_geometry"
+            },
+            {
+              "id": "node/12199215634",
+              "status": "unsupported_geometry"
+            }
+          ],
+          "model_signature": "9cbb3509477d3a04af514a73cfb36d55ef2c1c15ab7ccb626bd19eeb79ac1ab9"
+        },
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified"
+        },
+        "time_budget_s": 0.9999954999948386,
+        "stop_reason": "time_budget",
+        "runtime_ms": 6398.211799998535,
+        "callbacks": {
+          "state": 0,
+          "motion": 0,
+          "cost": 0,
+          "heuristic": 0,
+          "cost_to_go": 0
+        },
+        "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+        "preparation_ms": 6343.430799999624,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": false,
+          "config": {
+            "scenario": "civil",
+            "bounds": {
+              "west": 10.5,
+              "south": 52.25,
+              "east": 10.545,
+              "north": 52.277
+            },
+            "start": [
+              10.505,
+              52.254
+            ],
+            "end": [
+              10.54,
+              52.273
+            ],
+            "agl_m": 60,
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "saved_at_utc": "2026-09-29T20:19:07.136671+00:00",
+          "files": [
+            {
+              "url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_100/V1-0/tiles/GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.zip",
+              "started_at_utc": "2026-09-29T20:15:30.576155+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:34.966405+00:00",
+              "last_modified": "Mon, 27 Jan 2025 19:35:30 GMT",
+              "etag": "\"271e9ae-62cb52ddc83e3\"",
+              "bytes": 41019822,
+              "content_type": "application/zip",
+              "path": "raw/ghsl.zip",
+              "sha256": "736d07c99453834235d62c2c9eab9f37450809d6621b9ea8d6255e4ae7f44dd1"
+            },
+            {
+              "path": "population.tif",
+              "sha256": "430fa21a2548652d7663e077764fb923386fc41accbd10571608bafdb15c288b",
+              "derived_from": "raw/ghsl.zip",
+              "member": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19.tif",
+              "operation": "native pixel window, no resampling"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:15:35.268004+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:51.318759+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 9281,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-capabilities.xml",
+              "sha256": "3b8c44405d958a0c71945fbb5434f50f6d9e0beebbf5da9e258dbe121458e1f9"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=DescribeCoverage&coverageId=ni_dgm1",
+              "started_at_utc": "2026-09-29T20:15:51.339551+00:00",
+              "retrieved_at_utc": "2026-09-29T20:15:53.936293+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2471,
+              "content_type": "text/xml; charset=UTF-8",
+              "path": "raw/dgm-description.xml",
+              "sha256": "cc2ddb5cc9152e22ff04081de28cf5967cc5ff1b1e4da6a2044f2d5ce1696c60"
+            },
+            {
+              "url": "https://opendata.geoservices.lgln.niedersachsen.de/dgm_wcs?service=WCS&version=2.0.1&request=GetCoverage&coverageId=ni_dgm1&format=image%2Ftiff&subset=x%28602336%2C605471%29&subset=y%285789904%2C5792972%29",
+              "started_at_utc": "2026-09-29T20:15:53.954463+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.123238+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 23236946,
+              "content_type": "image/tiff",
+              "path": "raw/terrain.tif",
+              "sha256": "2252028c62822db102f50dcddb731b74f6613fbc5a858f93edd681fc33e10275"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetCapabilities",
+              "started_at_utc": "2026-09-29T20:16:06.177898+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.494572+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 105348,
+              "content_type": "application/xml",
+              "path": "raw/dipul-capabilities.xml",
+              "sha256": "fad02a4d1c0e95aaef5414961410a7b2e7ca0f7d1b6d0d8ea87b18fe059b7505"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Akontrollzonen",
+              "started_at_utc": "2026-09-29T20:16:06.535598+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:06.911034+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 2220,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/kontrollzonen-schema.xml",
+              "sha256": "f9c1481c9d3f791cbd3cd49e953305a799923644e295ecec10b1e091f204f196"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Akontrollzonen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:06.919377+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.190196+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 4946,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/kontrollzonen.geojson",
+              "sha256": "88cbd0b89397dbddfb8a9e833b246979cf3fc436fbe8e4403944acf3847c3c6d"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abahnanlagen",
+              "started_at_utc": "2026-09-29T20:16:07.221592+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.479424+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1762,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bahnanlagen-schema.xml",
+              "sha256": "92b22af7dfc1cf25f17c88c987d71a728bec51085553c5fbb0ee71025b533b0a"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abahnanlagen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:07.488937+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:07.808937+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 94284,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bahnanlagen.geojson",
+              "sha256": "92eae3d96a1c816cc876fc4e44f08924c0b72a8bb2809c9e8ed52f409d357b81"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Abundesstrassen",
+              "started_at_utc": "2026-09-29T20:16:07.822318+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.077446+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1771,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/bundesstrassen-schema.xml",
+              "sha256": "46ebb38717225bb6b9eafbb5d5a8fc13c5479479781189994794f1815cb8d59e"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Abundesstrassen&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:16:08.108529+00:00",
+              "retrieved_at_utc": "2026-09-29T20:16:08.380178+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/bundesstrassen.geojson",
+              "sha256": "90355ad47c28cb0c692db0572cd8efc5e6fd4756c4551060de6902f7ba4f4382"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=DescribeFeatureType&typeNames=dipul%3Anaturschutzgebiete",
+              "started_at_utc": "2026-09-29T20:19:06.219732+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:06.841444+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 1784,
+              "content_type": "application/gml+xml; version=3.2",
+              "path": "raw/naturschutzgebiete-schema.xml",
+              "sha256": "b03deca3380c36eebac949e535d4f52baad35ad36856f5f46cd975f597bfa95c"
+            },
+            {
+              "url": "https://uas-betrieb.de/geoservices/dipul/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=dipul%3Anaturschutzgebiete&outputFormat=application%2Fjson&count=10000&srsName=CRS%3A84&bbox=10.5%2C52.25%2C10.545%2C52.277%2Curn%3Aogc%3Adef%3Acrs%3AOGC%3A1.3%3ACRS84",
+              "started_at_utc": "2026-09-29T20:19:06.850983+00:00",
+              "retrieved_at_utc": "2026-09-29T20:19:07.129235+00:00",
+              "last_modified": null,
+              "etag": null,
+              "bytes": 147,
+              "content_type": "application/json;charset=UTF-8",
+              "path": "raw/naturschutzgebiete.geojson",
+              "sha256": "63833ed7c36440c73771886b08f2b3bb75621204cdea54637947672311f86968"
+            }
+          ],
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "sources": {
+            "ghsl": {
+              "source_id": "GHS_POP_E2020_GLOBE_R2023A_54009_100_V1_0_R3_C19",
+              "path": "population.tif",
+              "product": "GHS-POP R2023A V1.0",
+              "epoch_kind": "estimate",
+              "units": "people per native 100 m cell",
+              "license": "EC reuse policy; acknowledge source",
+              "attribution": "European Commission, Joint Research Centre (JRC), GHS-POP R2023A",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -200.0,
+                "effective_nodata": -200.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  774100.0,
+                  6107000.0,
+                  777800.0,
+                  6109800.0
+                ],
+                "width": 37,
+                "height": 28,
+                "dtype": "float64",
+                "transform": [
+                  100.0,
+                  0.0,
+                  774100.0,
+                  0.0,
+                  -100.0,
+                  6109800.0
+                ]
+              }
+            },
+            "terrain": {
+              "source_id": "LGLN:ni_dgm1",
+              "path": "raw/terrain.tif",
+              "product": "DGM1",
+              "units": "metres",
+              "vertical_datum": "DHHN2016 / NHN (EPSG:7837)",
+              "surface": "bare-earth terrain",
+              "native_support_m": 1,
+              "license": "CC BY 4.0",
+              "attribution": "LGLN (2026), CC BY 4.0",
+              "survey_epoch": null,
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": null,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "LGLN DGM product specification (-9999)",
+                "bounds": [
+                  602336.0,
+                  5789904.0,
+                  605471.0,
+                  5792972.0
+                ],
+                "width": 3135,
+                "height": 3068,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  602336.0,
+                  0.0,
+                  -1.0,
+                  5792972.0
+                ]
+              },
+              "unit_evidence": "https://www.lgln.niedersachsen.de/download/207140/Kundeninformation_1_2024.pdf",
+              "metadata_discrepancy": "WCS DescribeCoverage reports W.m-2.Sr-1 and the returned TIFF omits NoData. Metres, DHHN2016 and -9999 NoData are taken from the official DGM product specification; no radiance conversion applied. Original response bytes are retained."
+            },
+            "dipul": {
+              "source_id": "DIPUL:WFS:2.0.0",
+              "product": "WFS 2.0.0 snapshot",
+              "license": "CC BY-ND 4.0",
+              "attribution": "dipul",
+              "responses": [
+                {
+                  "path": "raw/kontrollzonen.geojson",
+                  "type_name": "dipul:kontrollzonen",
+                  "feature_count": 2,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code",
+                    "type_code_detail",
+                    "upper_limit_alt_ref",
+                    "upper_limit_altitude",
+                    "upper_limit_unit"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.086Z"
+                },
+                {
+                  "path": "raw/bahnanlagen.geojson",
+                  "type_name": "dipul:bahnanlagen",
+                  "feature_count": 1,
+                  "property_names": [
+                    "external_reference",
+                    "generated_name_DE",
+                    "generated_name_EN",
+                    "legal_ref",
+                    "lower_limit_alt_ref",
+                    "lower_limit_altitude",
+                    "lower_limit_unit",
+                    "name",
+                    "type_code"
+                  ],
+                  "source_timestamp": "2026-09-29T20:16:07.658Z"
+                },
+                {
+                  "path": "raw/bundesstrassen.geojson",
+                  "type_name": "dipul:bundesstrassen",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:16:08.276Z"
+                },
+                {
+                  "path": "raw/naturschutzgebiete.geojson",
+                  "type_name": "dipul:naturschutzgebiete",
+                  "feature_count": 0,
+                  "property_names": [],
+                  "source_timestamp": "2026-09-29T20:19:07.022Z"
+                }
+              ],
+              "coverage": "partial: selected static layers only",
+              "temporary_restrictions": "unverified",
+              "validity": "unresolved; download timestamp is not mission validity",
+              "vertical_reference": "source properties retained; applicability unresolved",
+              "buffers": "source geometries retained unchanged; no extra buffer applied",
+              "sharing": "local inspection only; derived export not enabled"
+            }
+          },
+          "connector_policy": "Exact endpoints in continuous space.",
+          "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "controls": {
+          "algorithm": "abitstar",
+          "objective": "risk",
+          "cell_m": 100.0,
+          "background_cost": 0.0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 1.0,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        },
+        "randomness": {
+          "seed_supported": false,
+          "seed": null,
+          "reason": "Bindings do not expose per-task planner/sampler seeding; global RNG is not reset."
+        }
+      },
+      "comparison_costs": {
+        "status": "no_exact_route"
+      }
+    }
+  ],
+  "runtime_ms": 40963.44490000047,
+  "environment": {
+    "python": "3.13.13",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "ompl": "2.0.1+uas.1",
+      "shapely": "2.1.2",
+      "pyproj": "3.8.0",
+      "rasterio": "1.5.1"
+    }
+  },
+  "abitstar_summary": {
+    "repetitions": 1,
+    "time_budget_s_per_run": 1.0,
+    "total_solve_budget_s": 1.0,
+    "verified_exact_solution_rate": 0.0,
+    "objective_distribution": null,
+    "seed_supported": false,
+    "seeds": [
+      null
+    ]
+  },
+  "assumptions": {
+    "rules_version": "building-length-risk-v1",
+    "classification_version": "ramke-building-tags-v1",
+    "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+    "analysis_crs": "EPSG:25832",
+    "overlap_policy": "maximum_building_score",
+    "background_cost": 0.0,
+    "background_status": "explicit_assumption",
+    "risk_weight": 0.9,
+    "distance_weight": 0.1,
+    "safety_distance_m": 0.0,
+    "source": {
+      "attribution": "\u00a9 OpenStreetMap contributors",
+      "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+      "experiment_signature": "4221ff509a7576fd94b3141f1bf20952edaa0ba12a8ac6e8417d4fa07d4ad7ae",
+      "grid_signature": "df6272a881d69131aa2990c9e2c0df16ca8d9c55e91acecd6ecc581570a39769",
+      "license_url": "https://www.openstreetmap.org/copyright",
+      "name": "OpenStreetMap via OSMnx/Overpass",
+      "osm_sha256": "060bc0e7ea5f206e8e1099125bcf3b154c2a632dbb7fa1e5295a9042fa5ef4c9",
+      "risk_rules_version": "building-length-risk-v1",
+      "saved_at_utc": "2026-09-29T20:15:24.611383+00:00",
+      "synthetic": false
+    },
+    "collection_sha256": "8501cf69b4bb2c2f58a80def15074d93b1f91d1a684f13ac4bd96e8cbf2c6ff4",
+    "boundary_sha256": "5193a6321175aed3e94c9ff2cb02cc07a22af368eff01bd3d56bc8cbdb6c92a7",
+    "input_crs": "EPSG:4326",
+    "diagnostics": [
+      {
+        "id": "node/703470310",
+        "status": "unsupported_geometry"
+      },
+      {
+        "id": "node/1583810871",
+        "status": "unsupported_geometry"
+      },
+      {
+        "id": "node/9078715414",
+        "status": "unsupported_geometry"
+      },
+      {
+        "id": "node/12199215634",
+        "status": "unsupported_geometry"
+      }
+    ],
+    "model_signature": "9cbb3509477d3a04af514a73cfb36d55ef2c1c15ab7ccb626bd19eeb79ac1ab9"
+  },
+  "limitations": [
+    "Scores are ordinal building preferences, not population or collision probabilities.",
+    "The distance baseline is re-scored under the same weighted model for comparison.",
+    "Grid and continuous spaces have different candidates; optimality claims are separate.",
+    "Per-task seeding is unavailable; timings and stochastic paths need not repeat exactly.",
+    "Timeouts do not establish continuous-space infeasibility."
+  ]
+}

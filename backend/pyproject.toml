@@ -18,6 +18,12 @@ dependencies = [
 [project.scripts]
 uas-planner = "uas_planner.cli:main"
 
+[project.optional-dependencies]
+ompl-windows = ["ompl==2.0.1+uas.1; sys_platform == 'win32' and platform_machine == 'AMD64'"]
+
+[tool.uv.sources]
+ompl = { path = "vendor/ompl-2.0.1+uas.1-cp313-cp313-win_amd64.whl" }
+
 [build-system]
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"

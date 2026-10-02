@@ -120,6 +120,79 @@ Open **http://127.0.0.1:5173**. Select `offline-sample`; switch off **Basemap** 
 | http://127.0.0.1:8000/api/health | Backend health; returns `{"status":"ok"}` |
 | http://127.0.0.1:8000/ | No page is registered; `Not Found` is expected |
 
+## Optional OMPL / ABIT* on native Windows
+
+Iteration 006 Part 2's dependency probe passed on Windows x64 / Python 3.13.13.
+The route uses the official OMPL 2.0.1 C++ ABIT* algorithm with local Python
+binding and packaging fixes. Part 2 adds an offline Python adapter; the
+normal quick start above does not require OMPL. No Linux/WSL setup is needed
+for this verified Windows route.
+
+| Dependency | Verified version / purpose |
+| --- | --- |
+| Visual Studio 2022 Build Tools | 17.14.37710.0; MSVC x64/x86 14.44.35207, native source builds |
+| Windows SDK | 10.0.26100.0, native source builds |
+| CMake / Ninja | 4.4.3 / 1.13.2 |
+| vcpkg | Pinned checkout; Boost 1.92.0 serialization, program-options, math, graph and odeint; Eigen 5.0.1 |
+| scikit-build-core | 1.1.0, Python wheel packaging |
+| Nanobind | Pinned OMPL source submodule, Python bindings |
+| OMPL wheel | Patched `2.0.1+uas.1`, included under `backend/vendor`, Python 3.13 x64 only |
+
+The compiler/SDK are build prerequisites. The wheel includes its Boost runtime
+DLL; a plain PyPI `ompl` installation is not the verified Windows package.
+The wheel was tested on the build host, not a separate clean Windows machine.
+See the [source pins, patches, build commands and runtime evidence](doc/iteration/iteration-006/part2-windows-verification.md).
+Install the optional planner and run its tests from the repository root:
+
+```powershell
+uv sync --project backend --locked --extra ompl-windows
+uv run --project backend --locked --extra ompl-windows pytest tests/test_abitstar.py -q
+```
+
+The lock pins the repository wheel's SHA-256. Compiler tools are unnecessary for
+installing it on a compatible Windows x64 Python 3.13 environment; the Windows
+MSVC runtime must be available. Use `--extra ompl-windows` on subsequent `uv run`
+or `uv sync` commands to retain the optional planner. Other platforms retain
+graph routing and receive `planner_unavailable` for ABIT* unless a compatible
+patched native build is separately installed. Linux ABIT* is not runtime-verified.
+
+The Python entry point is `plan_risk_route(..., algorithm="abitstar",
+background_cost=0, time_budget_s=3, cancel=event.is_set)`. Background 0 is an
+explicit research assumption. Results distinguish exact success, approximate
+candidate, timeout, cancellation, invalid endpoint, unresolved input, unavailable
+planner and computation failure. Returned exact paths are rechecked against the
+full vector constraints and their costs are recomputed. Budget/cancellation are
+cooperative; preparation and final validation can add overhead. CLI/API/UI controls and independently scored comparisons are available in Part 3. See [Part 2 usage and limits](doc/iteration/iteration-006/part2.md)
+and [binary source/build provenance](backend/vendor/README.md).
+
+## Iteration 006 Part 3: controls and comparison
+
+CLI/API/UI now select A*, Dijkstra or ABIT*, distance or weighted building risk,
+weights, an explicit background score, safety distance and ABIT* time budget.
+Existing requests default to distance-only A*. Blank background remains
+unassessed; background 0 is an explicit research assumption. Population is separate.
+
+Create a **new** synthetic low-risk-detour dataset and compare offline:
+
+```powershell
+uv run --project backend --locked uas-planner route-demo --low-risk --output data/synthetic-risk-demo
+uv run --project backend --locked --extra ompl-windows uas-planner experiment-route data/synthetic-risk-demo --algorithm abitstar --objective risk --background-cost 0 --cell-m 25 --time-budget-s 3 --output risk-route.geojson
+uv run --project backend --locked --extra ompl-windows uas-planner route-compare data/synthetic-risk-demo --background-cost 0 --cell-m 25 --repetitions 3 --time-budget-s 2 --output risk-comparison.json
+```
+
+Use new output names if they already exist. In the map, choose the synthetic
+dataset, set grid 25 m and background 0, and generate or **Compare algorithms**.
+The UI exports the displayed result without another solve. Status, costs,
+assumptions and provenance are retained; approximate/failed results do not export
+a successful route feature. Parameter changes invalidate displayed results.
+
+`/api/datasets/{id}/experiment/route` accepts algorithm/objective/weights,
+background/clearance/budget and optional endpoints; `/experiment/compare` runs
+the fixed four-planner lineup with bounded repetitions and independent cost checks.
+Per-task native seeds are unsupported and recorded as such. Grid and continuous
+optimality claims remain separate. Real-data unresolved results stay explicit.
+See [operation, budgets, measurements and verification](doc/iteration/iteration-006/part3.md).
+
 ## Acquire real map data
 
 With dependencies installed, run from the repository root:

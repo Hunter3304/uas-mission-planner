@@ -264,6 +264,23 @@ wheels = [
 ]
 
 [[package]]
+name = "ompl"
+version = "2.0.1+uas.1"
+source = { path = "vendor/ompl-2.0.1+uas.1-cp313-cp313-win_amd64.whl" }
+wheels = [
+    { filename = "ompl-2.0.1+uas.1-cp313-cp313-win_amd64.whl", hash = "sha256:215ae162471f66d8c17de389da12c2a51e30daf33cd92cef366cf22a2f0adec2" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "coal", marker = "extra == 'examples'" },
+    { name = "pin", marker = "extra == 'examples'" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "viser", marker = "extra == 'examples'" },
+]
+provides-extras = ["examples", "dev"]
+
+[[package]]
 name = "osmnx"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -628,6 +645,11 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
 ]
 
+[package.optional-dependencies]
+ompl-windows = [
+    { name = "ompl", marker = "platform_machine == 'AMD64' and sys_platform == 'win32'" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "httpx" },
@@ -639,6 +661,7 @@ dev = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.141.1" },
     { name = "geopandas", specifier = ">=1.1.4" },
+    { name = "ompl", marker = "platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'ompl-windows'", path = "vendor/ompl-2.0.1+uas.1-cp313-cp313-win_amd64.whl" },
     { name = "osmnx", specifier = ">=2.1.1" },
     { name = "pyogrio", specifier = ">=0.13.0" },
     { name = "pyproj", specifier = ">=3.8.0" },
@@ -647,6 +670,7 @@ requires-dist = [
     { name = "shapely", specifier = ">=2.1.2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
+provides-extras = ["ompl-windows"]
 
 [package.metadata.requires-dev]
 dev = [

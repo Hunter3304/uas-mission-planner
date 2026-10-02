@@ -951,3 +951,24 @@ td {
 .external-values p {
   margin: 7px 0;
 }
+
+.routing-controls pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+}
+.routing-controls {
+  overflow-wrap: anywhere;
+}
+.routing-controls .external-controls label {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.routing-controls input, .routing-controls select {
+  max-width: 100%;
+  width: 150px;
+}
+.routing-controls .table-scroll {
+  max-width: 100%;
+}
