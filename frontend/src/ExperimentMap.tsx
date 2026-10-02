@@ -1,3 +1,4 @@
+import CollapsiblePanel from './CollapsiblePanel'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FeatureCollection } from 'geojson'
 import { getJson } from './api'
@@ -209,8 +210,7 @@ export default function ExperimentMap(props: MapProps) {
   return (
     <>
       {props.dataset.has_experiment && (
-        <section className="external-panel" aria-label="External layers">
-          <h3>Independent source layers</h3>
+        <CollapsiblePanel className="external-panel" title="Independent source layers" ariaLabel="External layers">
           {error && <p role="alert">External data unavailable: {error}</p>}
           {!snapshot && !error && <p role="status">Verifying saved external payloads…</p>}
           {snapshot && (
@@ -260,8 +260,37 @@ export default function ExperimentMap(props: MapProps) {
                 </button>
               </div>
               {gridError && <p role="alert">Grid unavailable: {gridError}</p>}
-              {endpoints && <div className="routing-controls" aria-label="Route planning">
-                <h3>Route planning</h3>
+              {grid && <p className="subtle">{grid.cell_count} cells · {grid.edge_count} candidate edges · unresolved inputs blocked by policy. Click a grid cell for reasons.</p>}
+              <div className="external-legend" aria-label="Population legend">
+                {[
+                  [0, '0'],
+                  [1, '>0–<25'],
+                  [25, '25–<100'],
+                  [100, '≥100'],
+                  [null, 'Unknown / NoData'],
+                ].map(([value, text]) => (
+                  <span key={String(text)}>
+                    <i style={{ background: populationColor(value) }} />
+                    {text}
+                  </span>
+                ))}
+                <span>people / native 100 m cell; color bins only</span>
+                <span>
+                  <i style={{ background: '#8b5bb5' }} />
+                  DIPUL: applicability unresolved
+                </span>
+              </div>
+              <p className="subtle">
+                Click inside the query boundary to inspect native values and heights. Population
+                footprints retain their full native support. DIPUL shows selected static layers
+                only; temporary restrictions and mission-time applicability are unverified.
+              </p>
+            </>
+          )}
+        </CollapsiblePanel>
+      )}
+      {snapshot && <>
+              {endpoints && <CollapsiblePanel className="external-panel routing-controls" title="Route planning">
                 <div className="external-controls">
                   <label>Algorithm <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}>
                     <option value="astar">A*</option><option value="dijkstra">Dijkstra</option><option value="abitstar">ABIT*</option>
@@ -269,9 +298,11 @@ export default function ExperimentMap(props: MapProps) {
                   <label>Objective <select value={objective} onChange={(e) => setObjective(e.target.value)}>
                     <option value="distance">Distance</option><option value="risk">Weighted building risk</option>
                   </select></label>
+                  {objective === 'risk' && <>
                   <label>Risk weight <input type="number" min="0" step="0.1" value={riskWeight} onChange={(e) => setRiskWeight(Number(e.target.value))} /></label>
                   <label>Distance weight <input type="number" min="0" step="0.1" value={distanceWeight} onChange={(e) => setDistanceWeight(Number(e.target.value))} /></label>
                   <label>Background score assumption <input type="number" min="0" step="any" placeholder="Unassessed" value={backgroundCost} onChange={(e) => setBackgroundCost(e.target.value)} /></label>
+                  </>}
                   <label>Safety distance (m) <input type="number" min="0" step="any" value={safetyDistance} onChange={(e) => setSafetyDistance(Number(e.target.value))} /></label>
                   <label>ABIT* budget (s) <input type="number" min="0" max="60" step="0.1" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></label>
                 </div>
@@ -318,40 +349,11 @@ export default function ExperimentMap(props: MapProps) {
                   {comparison.abitstar_summary.objective_distribution && <p>Objective distribution: {JSON.stringify(comparison.abitstar_summary.objective_distribution)}</p>}
                   {comparison.limitations.map((item) => <p className="subtle" key={item}>{item}</p>)}
                 </div>}
-              </div>}
-              {grid && <p className="subtle">{grid.cell_count} cells · {grid.edge_count} candidate edges · unresolved inputs blocked by policy. Click a grid cell for reasons.</p>}
-              <div className="external-legend" aria-label="Population legend">
-                {[
-                  [0, '0'],
-                  [1, '>0–<25'],
-                  [25, '25–<100'],
-                  [100, '≥100'],
-                  [null, 'Unknown / NoData'],
-                ].map(([value, text]) => (
-                  <span key={String(text)}>
-                    <i style={{ background: populationColor(value) }} />
-                    {text}
-                  </span>
-                ))}
-                <span>people / native 100 m cell; color bins only</span>
-                <span>
-                  <i style={{ background: '#8b5bb5' }} />
-                  DIPUL: applicability unresolved
-                </span>
-              </div>
-              <p className="subtle">
-                Click inside the query boundary to inspect native values and heights. Population
-                footprints retain their full native support. DIPUL shows selected static layers
-                only; temporary restrictions and mission-time applicability are unverified.
-              </p>
-            </>
-          )}
-        </section>
-      )}
+              </CollapsiblePanel>}
+      </>}
       <MapCanvas {...props} external={overlays} />
       {snapshot && (
-        <section className="external-panel" aria-label="External inspection">
-          <h3>Location and source inspection</h3>
+        <CollapsiblePanel className="external-panel" title="Location and source inspection" ariaLabel="External inspection">
           {inspecting && <p role="status">Inspecting location…</p>}
           {pointError && <p role="alert">{pointError}</p>}
           {location && (
@@ -463,7 +465,7 @@ export default function ExperimentMap(props: MapProps) {
               in the local experiment directory.
             </p>
           </details>
-        </section>
+        </CollapsiblePanel>
       )}
     </>
   )

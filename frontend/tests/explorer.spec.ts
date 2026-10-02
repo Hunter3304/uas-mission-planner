@@ -109,6 +109,7 @@ test('layers use union counts, features remain usable without basemap, tags are 
   await expect(page.getByTestId('visible-count')).toHaveText('0 / 3')
   await expect(page.locator('.leaflet-overlay-pane path.leaflet-interactive')).toHaveCount(0)
   await page.getByLabel('Natural features').check()
+  await page.getByRole('button', { name: 'Expand Feature browser', exact: true }).click()
   await page.getByLabel('Search features').fill('node/1')
   await page.getByRole('button', { name: 'node/1', exact: true }).click()
   await expect(page.locator('.properties')).toContainText(unsafeName)

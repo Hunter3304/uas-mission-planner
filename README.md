@@ -337,3 +337,18 @@ GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for local independe
 inspection in Part 1. The other assessed sources remain documentation-only.
 
 This is a local small-area prototype that loads datasets into memory and revalidates API reads. Building tag costs are ordinal research classifications. Browser-triggered acquisition, background jobs, large-area performance, population/cost fusion, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.
+
+## Explorer panel controls
+
+Use **Collapse / Expand** on the cost analysis, independent source layers, route
+planning, location/source inspection, feature browser and feature details panels.
+The map stays visible and folding preserves planner inputs and results. Feature
+browser/details start collapsed, can be opened manually, and both open when any
+feature is selected. Clearing selection collapses both.
+
+**Distance** hides Risk weight, Distance weight and Background score assumption;
+**Weighted building risk** shows them and restores their values. Safety distance
+and ABIT* budget remain available. Distance objective cost is horizontal route
+length in metres. Weighted objective cost is `risk_weight * integrated_building_score_length
++ distance_weight * horizontal_length`; background must be explicitly assessed.
+See [UI validation](doc/iteration/iteration-006/ui-panels.md).

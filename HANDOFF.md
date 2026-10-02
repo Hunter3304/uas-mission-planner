@@ -2,6 +2,23 @@
 
 ## Current status
 
+### Explorer panel refinement (2026-10-02)
+
+- Issue #61, assigned to Hunter3304 in Milestone 6, tracks the user-requested UI
+  refinement. Branch `feature/61-collapsible-panels` builds on the published
+  `feature/60-planner-controls`; parent integration is still pending.
+- Six panels fold independently while the map remains available. Feature panels
+  are always present, initially collapsed, manually expandable and both open on
+  selection of any feature. Clearing selection collapses them.
+- Distance hides only the three risk inputs; switching objectives restores
+  values. Folding preserves inputs/results.
+- ESLint and production build passed; 9 mocked browser tests and all 11 real API
+  smoke tests passed. Mobile screenshot reviewed with no horizontal overflow.
+- Evidence and operation: `doc/iteration/iteration-006/ui-panels.md`.
+- UI changes are prepared for a separate PR into the parent planner branch; no
+  integration merge or branch deletion has been performed.
+
+
 ### Feature-branch publication authorized (2026-10-02)
 
 - User requested commit and remote push of the reviewed local implementation.
