@@ -61,4 +61,5 @@ if __name__ == "__main__":
         )
         create_experiment_fixture(root / "z-external-experiment")
         create_route_demo(root / "z-routing-demo")
+        create_route_demo(root / "z-risk-demo", low_risk=True)
         uvicorn.run(create_app(root), host="127.0.0.1", port=8011)

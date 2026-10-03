@@ -1,3 +1,4 @@
+import CollapsiblePanel from './CollapsiblePanel'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { downloadDataset, getJson } from './api'
 import ExperimentMap from './ExperimentMap'
@@ -392,12 +393,9 @@ export default function App() {
                     : 'All layers are hidden. Enable a layer to show features.'}
                 </p>
               )}
-              <div className="detail-grid">
-                <section className="feature-panel">
+              <div className="detail-grid" key={selected ? featureKey(selected) : 'unselected'}>
+                <CollapsiblePanel className="feature-panel" title="Feature browser" badge={<span className="count-pill">{filtered.length}</span>} defaultExpanded={Boolean(selected)}>
                   <div className="section-row">
-                    <h3>
-                      Feature browser <span className="count-pill">{filtered.length}</span>
-                    </h3>
                     <input
                       aria-label="Search features"
                       className="search"
@@ -474,10 +472,9 @@ export default function App() {
                       </button>
                     </div>
                   </div>
-                </section>
-                <section className="inspector">
+                </CollapsiblePanel>
+                <CollapsiblePanel className="inspector" title="Feature details" defaultExpanded={Boolean(selected)}>
                   <div className="section-row">
-                    <h3>Feature details</h3>
                     {selected && (
                       <button className="text-button" onClick={() => setSelected(null)}>
                         Clear
@@ -513,7 +510,7 @@ export default function App() {
                       </p>
                     </div>
                   )}
-                </section>
+                </CollapsiblePanel>
               </div>
               <footer className="data-footer">
                 <span>

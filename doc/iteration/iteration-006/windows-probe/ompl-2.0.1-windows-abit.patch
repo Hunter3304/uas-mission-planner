@@ -1,0 +1,184 @@
+diff --git a/py-bindings/CMakeLists.txt b/py-bindings/CMakeLists.txt
+index 0767621..b935b83 100644
+--- a/py-bindings/CMakeLists.txt
++++ b/py-bindings/CMakeLists.txt
+@@ -51,7 +51,9 @@ else()
+ endif()
+ 
+ target_link_libraries(_ompl PRIVATE ompl::ompl)
+-target_compile_options(_ompl PRIVATE -Wno-unused-parameter)
++if(NOT MSVC)
++    target_compile_options(_ompl PRIVATE -Wno-unused-parameter)
++endif()
+ 
+ # Set RPATH so the module can find libompl
+ if(APPLE)
+@@ -97,6 +99,9 @@ add_custom_command(
+ 
+ # install module
+ install(TARGETS _ompl LIBRARY DESTINATION ${OMPL_PYTHON_INSTALL_DIR})
++if(WIN32)
++    install(FILES $<TARGET_RUNTIME_DLLS:_ompl> DESTINATION ${OMPL_PYTHON_INSTALL_DIR})
++endif()
+ # install ompl shared lib
+ install(TARGETS ompl DESTINATION ${OMPL_PYTHON_INSTALL_DIR})
+ # install python stubs
+diff --git a/py-bindings/base/Cost.cpp b/py-bindings/base/Cost.cpp
+index 633b1fb..b272426 100644
+--- a/py-bindings/base/Cost.cpp
++++ b/py-bindings/base/Cost.cpp
+@@ -1,3 +1,4 @@
++#include <string>
+ #include <nanobind/nanobind.h>
+ #include "ompl/base/Cost.h"
+ #include "init.h"
+diff --git a/py-bindings/base/MotionValidator.cpp b/py-bindings/base/MotionValidator.cpp
+index 56550ea..3245eb1 100644
+--- a/py-bindings/base/MotionValidator.cpp
++++ b/py-bindings/base/MotionValidator.cpp
+@@ -16,7 +16,14 @@ public:
+     bool checkMotion(const ompl::base::State *s1, const ompl::base::State *s2,
+                      std::pair<ompl::base::State *, double> &lastValid) const override
+     {
+-        return checkMotion(s1, s2);
++        if (checkMotion(s1, s2))
++            return true;
++        // Conservative valid prefix: s1 is assumed valid by OMPL's contract.
++        // Preserve the output entirely on success; report t=0 on failure.
++        if (lastValid.first)
++            si_->copyState(lastValid.first, s1);
++        lastValid.second = 0.0;
++        return false;
+     }
+ };
+ void ompl::binding::base::init_MotionValidator(nb::module_ &m)
+@@ -25,6 +32,15 @@ void ompl::binding::base::init_MotionValidator(nb::module_ &m)
+         .def(nb::init<ompl::base::SpaceInformation *>())
+         .def("checkMotion", nb::overload_cast<const ompl::base::State *, const ompl::base::State *>(
+                                 &ompl::base::MotionValidator::checkMotion, nb::const_))
++        .def("checkMotionWithLastValid",
++             [](const ompl::base::MotionValidator &self, const ompl::base::State *s1,
++                const ompl::base::State *s2, ompl::base::State *output, double initialFraction)
++             {
++                 std::pair<ompl::base::State *, double> lastValid{output, initialFraction};
++                 bool valid = self.checkMotion(s1, s2, lastValid);
++                 return nb::make_tuple(valid, lastValid.second);
++             }, nb::arg("s1"), nb::arg("s2"), nb::arg("output").none(),
++             nb::arg("initial_fraction") = 1.0)
+         .def("getValidMotionCount", &ompl::base::MotionValidator::getValidMotionCount)
+         .def("getInvalidMotionCount", &ompl::base::MotionValidator::getInvalidMotionCount)
+         .def("getCheckedMotionCount", &ompl::base::MotionValidator::getCheckedMotionCount)
+diff --git a/py-bindings/base/OptimizationObjective.cpp b/py-bindings/base/OptimizationObjective.cpp
+index 36c5e88..090097f 100644
+--- a/py-bindings/base/OptimizationObjective.cpp
++++ b/py-bindings/base/OptimizationObjective.cpp
+@@ -1,4 +1,5 @@
+ #include <nanobind/nanobind.h>
++#include <nanobind/stl/function.h>
+ #include <nanobind/stl/shared_ptr.h>
+ #include <nanobind/trampoline.h>
+ #include <nanobind/stl/string.h>
+diff --git a/py-bindings/base/spaces/RealVectorStateSpace.cpp b/py-bindings/base/spaces/RealVectorStateSpace.cpp
+index de57fd3..3b34f55 100644
+--- a/py-bindings/base/spaces/RealVectorStateSpace.cpp
++++ b/py-bindings/base/spaces/RealVectorStateSpace.cpp
+@@ -36,17 +36,17 @@ void ompl::binding::base::initSpaces_RealVectorStateSpace(nb::module_ &m)
+                  }
+ 
+                  // Extract stop (required)
+-                 ssize_t stop = nb::cast<ssize_t>(slice.attr("stop"));
++                 nb::ssize_t stop = nb::cast<nb::ssize_t>(slice.attr("stop"));
+ 
+                  // Extract start (default 0)
+-                 ssize_t start = 0;
++                 nb::ssize_t start = 0;
+                  if (!slice.attr("start").is_none())
+-                     start = nb::cast<ssize_t>(slice.attr("start"));
++                     start = nb::cast<nb::ssize_t>(slice.attr("start"));
+ 
+                  // Extract step (default 1)
+-                 ssize_t step = 1;
++                 nb::ssize_t step = 1;
+                  if (!slice.attr("step").is_none())
+-                     step = nb::cast<ssize_t>(slice.attr("step"));
++                     step = nb::cast<nb::ssize_t>(slice.attr("step"));
+ 
+                  // Reject negative or zero step
+                  if (step <= 0)
+@@ -98,17 +98,17 @@ void ompl::binding::base::initSpaces_RealVectorStateSpace(nb::module_ &m)
+                 }
+ 
+                 // Extract stop (required)
+-                ssize_t stop = nb::cast<ssize_t>(slice.attr("stop"));
++                nb::ssize_t stop = nb::cast<nb::ssize_t>(slice.attr("stop"));
+ 
+                 // Extract start (default 0)
+-                ssize_t start = 0;
++                nb::ssize_t start = 0;
+                 if (!slice.attr("start").is_none())
+-                    start = nb::cast<ssize_t>(slice.attr("start"));
++                    start = nb::cast<nb::ssize_t>(slice.attr("start"));
+ 
+                 // Extract step (default 1)
+-                ssize_t step = 1;
++                nb::ssize_t step = 1;
+                 if (!slice.attr("step").is_none())
+-                    step = nb::cast<ssize_t>(slice.attr("step"));
++                    step = nb::cast<nb::ssize_t>(slice.attr("step"));
+ 
+                 // Reject negative or zero step
+                 if (step <= 0)
+diff --git a/py-bindings/geometric/init.h b/py-bindings/geometric/init.h
+index 6ee9596..aebb0f0 100644
+--- a/py-bindings/geometric/init.h
++++ b/py-bindings/geometric/init.h
+@@ -11,6 +11,7 @@ namespace ompl::binding::geometric
+     void initPlannersRrt_SORRTstar(nanobind::module_ &m);
+     void initPlannersRrt_AORRTC(nanobind::module_ &m);
+     void initPlannersInformedtrees_BITstar(nanobind::module_ &m);
++    void initPlannersInformedtrees_ABITstar(nanobind::module_ &m);
+     void initPlannersFmt_FMT(nanobind::module_ &m);
+     void initPlannersFmt_BFMT(nanobind::module_ &m);
+     void initPlannersKpiece_KPIECE1(nanobind::module_ &m);
+diff --git a/py-bindings/python.cpp b/py-bindings/python.cpp
+index da7f3f3..1c6fea2 100644
+--- a/py-bindings/python.cpp
++++ b/py-bindings/python.cpp
+@@ -87,6 +87,7 @@ NB_MODULE(_ompl, m)
+     ompl::binding::geometric::initPlannersRrt_SORRTstar(geometric);
+     ompl::binding::geometric::initPlannersRrt_AORRTC(geometric);
+     ompl::binding::geometric::initPlannersInformedtrees_BITstar(geometric);
++    ompl::binding::geometric::initPlannersInformedtrees_ABITstar(geometric);
+     ompl::binding::geometric::initPlannersFmt_FMT(geometric);
+     ompl::binding::geometric::initPlannersFmt_BFMT(geometric);
+     ompl::binding::geometric::initPlannersKpiece_KPIECE1(geometric);
+diff --git a/py-bindings/geometric/planners/informedtrees/ABITstar.cpp b/py-bindings/geometric/planners/informedtrees/ABITstar.cpp
+new file mode 100644
+--- /dev/null
++++ b/py-bindings/geometric/planners/informedtrees/ABITstar.cpp
+@@ -0,0 +1,25 @@
++#include <nanobind/nanobind.h>
++#include <nanobind/stl/shared_ptr.h>
++#include <nanobind/stl/string.h>
++
++#include "ompl/geometric/planners/informedtrees/ABITstar.h"
++#include "../../init.h"
++
++namespace nb = nanobind;
++namespace ob = ompl::base;
++namespace og = ompl::geometric;
++
++void ompl::binding::geometric::initPlannersInformedtrees_ABITstar(nb::module_ &m)
++{
++    nb::class_<og::ABITstar, og::BITstar>(m, "ABITstar")
++        .def(nb::init<const ob::SpaceInformationPtr &, const std::string &>(),
++             nb::arg("si"), nb::arg("name") = "ABITstar")
++        .def("setInitialInflationFactor", &og::ABITstar::setInitialInflationFactor)
++        .def("getInitialInflationFactor", &og::ABITstar::getInitialInflationFactor)
++        .def("setInflationScalingParameter", &og::ABITstar::setInflationScalingParameter)
++        .def("getInflationScalingParameter", &og::ABITstar::getInflationScalingParameter)
++        .def("setTruncationScalingParameter", &og::ABITstar::setTruncationScalingParameter)
++        .def("getTruncationScalingParameter", &og::ABITstar::getTruncationScalingParameter)
++        .def("getCurrentInflationFactor", &og::ABITstar::getCurrentInflationFactor)
++        .def("getCurrentTruncationFactor", &og::ABITstar::getCurrentTruncationFactor);
++}

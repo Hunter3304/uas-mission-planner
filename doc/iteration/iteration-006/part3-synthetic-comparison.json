@@ -1,0 +1,1874 @@
+{
+  "status": "complete",
+  "synthetic": true,
+  "runs": [
+    {
+      "label": "distance A*",
+      "result": {
+        "algorithm": "astar",
+        "rules_version": "distance-grid-v2",
+        "cell_size_m": 25.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.5193,
+              52.2705
+            ],
+            "cell": "6:0",
+            "length_m": 10.77934249873608,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.5217,
+              52.2705
+            ],
+            "cell": "6:7",
+            "length_m": 8.197346972971829,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          }
+        ],
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.519156828737485,
+              52.270459074109766
+            ],
+            [
+              10.519496781104404,
+              52.270454699144
+            ],
+            [
+              10.519863027286984,
+              52.270449984697805
+            ],
+            [
+              10.520229273368532,
+              52.270445269115974
+            ],
+            [
+              10.520595519349023,
+              52.27044055239853
+            ],
+            [
+              10.520961765228435,
+              52.27043583454546
+            ],
+            [
+              10.52132801100674,
+              52.27043111555675
+            ],
+            [
+              10.52169425668392,
+              52.27042639543241
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 192.1818648898733,
+        "objective": "distance",
+        "objective_cost": 192.1818648898733,
+        "risk_length_cost": null,
+        "safety_distance_m": 0.0,
+        "status": "success",
+        "nodes": [
+          "start",
+          "6:0",
+          "6:1",
+          "6:2",
+          "6:3",
+          "6:4",
+          "6:5",
+          "6:6",
+          "6:7",
+          "end"
+        ],
+        "expanded": 10,
+        "runtime_ms": 33.20380000513978,
+        "exact": true,
+        "solution_kind": "exact",
+        "controls": {
+          "algorithm": "astar",
+          "objective": "distance",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0,
+            "distance": 1
+          }
+        },
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Shortest horizontal distance on the constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "optimality": "Shortest horizontal distance on the constructed graph only."
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 192.18186489069672,
+        "risk_length_cost": 163.82433439791203,
+        "objective_cost": 166.66008744719048
+      }
+    },
+    {
+      "label": "weighted A*",
+      "result": {
+        "algorithm": "astar",
+        "rules_version": "building-length-risk-v1",
+        "cell_size_m": 25.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.5193,
+              52.2705
+            ],
+            "cell": "6:0",
+            "length_m": 10.77934249873608,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.5217,
+              52.2705
+            ],
+            "cell": "6:7",
+            "length_m": 8.197346972971829,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          }
+        ],
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.519156828737485,
+              52.270459074109766
+            ],
+            [
+              10.519496781104404,
+              52.270454699144
+            ],
+            [
+              10.519855341644654,
+              52.27022530024666
+            ],
+            [
+              10.520213898484336,
+              52.26999590028023
+            ],
+            [
+              10.520580140764265,
+              52.26999118363873
+            ],
+            [
+              10.52094638294312,
+              52.26998646586163
+            ],
+            [
+              10.521320317963243,
+              52.27020643125752
+            ],
+            [
+              10.52169425668392,
+              52.27042639543241
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 233.60322112790394,
+        "objective": "risk",
+        "objective_cost": 23.360322112790392,
+        "risk_length_cost": 0.0,
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+            "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+            "license_url": null,
+            "name": "Synthetic demonstration sample",
+            "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+            "synthetic": true
+          },
+          "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+          "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [],
+          "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+        },
+        "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+        "status": "success",
+        "nodes": [
+          "start",
+          "6:0",
+          "6:1",
+          "5:2",
+          "4:3",
+          "4:4",
+          "4:5",
+          "5:6",
+          "6:7",
+          "end"
+        ],
+        "expanded": 20,
+        "assessment_flags": {
+          "has_default": false,
+          "background_assumed": true,
+          "source_ids": []
+        },
+        "runtime_ms": 119.75139999412932,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "exact": true,
+        "solution_kind": "exact",
+        "controls": {
+          "algorithm": "astar",
+          "objective": "risk",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        }
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 233.60322112790394,
+        "risk_length_cost": 0.0,
+        "objective_cost": 23.360322112790392
+      }
+    },
+    {
+      "label": "weighted Dijkstra",
+      "result": {
+        "algorithm": "dijkstra",
+        "rules_version": "building-length-risk-v1",
+        "cell_size_m": 25.0,
+        "analysis_crs": "EPSG:25832",
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "connectors": [
+          {
+            "endpoint": "start",
+            "coordinate": [
+              10.5193,
+              52.2705
+            ],
+            "cell": "6:0",
+            "length_m": 10.77934249873608,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          },
+          {
+            "endpoint": "end",
+            "coordinate": [
+              10.5217,
+              52.2705
+            ],
+            "cell": "6:7",
+            "length_m": 8.197346972971829,
+            "state": "permitted",
+            "point_state": "permitted",
+            "reasons": []
+          }
+        ],
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.519156828737485,
+              52.270459074109766
+            ],
+            [
+              10.519496781104404,
+              52.270454699144
+            ],
+            [
+              10.519855341644654,
+              52.27022530024666
+            ],
+            [
+              10.520213898484336,
+              52.26999590028023
+            ],
+            [
+              10.520580140764265,
+              52.26999118363873
+            ],
+            [
+              10.52094638294312,
+              52.26998646586163
+            ],
+            [
+              10.521320317963243,
+              52.27020643125752
+            ],
+            [
+              10.52169425668392,
+              52.27042639543241
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 233.60322112790394,
+        "objective": "risk",
+        "objective_cost": 23.360322112790392,
+        "risk_length_cost": 0.0,
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+            "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+            "license_url": null,
+            "name": "Synthetic demonstration sample",
+            "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+            "synthetic": true
+          },
+          "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+          "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [],
+          "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+        },
+        "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+        "status": "success",
+        "nodes": [
+          "start",
+          "6:0",
+          "6:1",
+          "5:2",
+          "4:3",
+          "4:4",
+          "4:5",
+          "5:6",
+          "6:7",
+          "end"
+        ],
+        "expanded": 108,
+        "assessment_flags": {
+          "has_default": false,
+          "background_assumed": true,
+          "source_ids": []
+        },
+        "runtime_ms": 121.05800000426825,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Containing cell only; stable ID on boundaries; no direct start-goal edge.",
+          "optimality": "Minimum weighted objective on the assessed constructed graph only.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "exact": true,
+        "solution_kind": "exact",
+        "controls": {
+          "algorithm": "dijkstra",
+          "objective": "risk",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        }
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 233.60322112790394,
+        "risk_length_cost": 0.0,
+        "objective_cost": 23.360322112790392
+      }
+    },
+    {
+      "label": "ABIT* run 1",
+      "result": {
+        "algorithm": "abitstar",
+        "rules_version": "building-length-risk-v1",
+        "status": "success",
+        "exact": true,
+        "solution_kind": "exact",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.51970802908554,
+              52.270706272860835
+            ],
+            [
+              10.519868184751875,
+              52.270780255662395
+            ],
+            [
+              10.519993255904147,
+              52.27082318018917
+            ],
+            [
+              10.520180344484267,
+              52.27090640624455
+            ],
+            [
+              10.52021720952816,
+              52.27090220402041
+            ],
+            [
+              10.520476424053763,
+              52.270926884094486
+            ],
+            [
+              10.520746612275389,
+              52.27091837000607
+            ],
+            [
+              10.520993801800346,
+              52.27084136401758
+            ],
+            [
+              10.52108077308713,
+              52.27080102024541
+            ],
+            [
+              10.52122927247604,
+              52.27073535661613
+            ],
+            [
+              10.52140611833416,
+              52.27062910134024
+            ],
+            [
+              10.521563571095449,
+              52.270565290233506
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 194.67230861619487,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.467230861619488,
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "analysis_crs": "EPSG:25832",
+        "objective": "risk",
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+            "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+            "license_url": null,
+            "name": "Synthetic demonstration sample",
+            "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+            "synthetic": true
+          },
+          "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+          "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [],
+          "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+        },
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "time_budget_s": 1.9999956999963615,
+        "stop_reason": "time_budget",
+        "runtime_ms": 2005.8516999997664,
+        "callbacks": {
+          "state": 1006,
+          "motion": 474,
+          "cost": 3035,
+          "heuristic": 231419,
+          "cost_to_go": 4921
+        },
+        "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+        "native_status": "Exact solution",
+        "setup_ms": 1.5934999973978847,
+        "validation_ms": 4.892099997960031,
+        "assessment_flags": {
+          "has_default": false,
+          "background_assumed": true,
+          "source_ids": []
+        },
+        "preparation_ms": 13.357999996514991,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Exact endpoints in continuous space.",
+          "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "controls": {
+          "algorithm": "abitstar",
+          "objective": "risk",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        },
+        "randomness": {
+          "seed_supported": false,
+          "seed": null,
+          "reason": "Bindings do not expose per-task planner/sampler seeding; global RNG is not reset."
+        }
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 194.67230861619487,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.467230861619488
+      }
+    },
+    {
+      "label": "ABIT* run 2",
+      "result": {
+        "algorithm": "abitstar",
+        "rules_version": "building-length-risk-v1",
+        "status": "success",
+        "exact": true,
+        "solution_kind": "exact",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.519465860906994,
+              52.27042233333207
+            ],
+            [
+              10.51962883321838,
+              52.27035803026447
+            ],
+            [
+              10.51968101192821,
+              52.27032600017493
+            ],
+            [
+              10.519792944504447,
+              52.27028382827709
+            ],
+            [
+              10.519929724481935,
+              52.27021612129205
+            ],
+            [
+              10.520092052551826,
+              52.27014710980763
+            ],
+            [
+              10.520200462992571,
+              52.27009432815564
+            ],
+            [
+              10.520550538918137,
+              52.27008484722883
+            ],
+            [
+              10.520798460486953,
+              52.27008931811111
+            ],
+            [
+              10.521049840241538,
+              52.27020670020353
+            ],
+            [
+              10.521419541893742,
+              52.27035309419982
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 193.9815868085974,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.39815868085974,
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "analysis_crs": "EPSG:25832",
+        "objective": "risk",
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+            "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+            "license_url": null,
+            "name": "Synthetic demonstration sample",
+            "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+            "synthetic": true
+          },
+          "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+          "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [],
+          "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+        },
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "time_budget_s": 1.9999947999895085,
+        "stop_reason": "time_budget",
+        "runtime_ms": 2006.967599998461,
+        "callbacks": {
+          "state": 1004,
+          "motion": 518,
+          "cost": 2978,
+          "heuristic": 232425,
+          "cost_to_go": 4825
+        },
+        "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+        "native_status": "Exact solution",
+        "setup_ms": 0.7708000048296526,
+        "validation_ms": 5.378699992434122,
+        "assessment_flags": {
+          "has_default": false,
+          "background_assumed": true,
+          "source_ids": []
+        },
+        "preparation_ms": 14.019199996255338,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Exact endpoints in continuous space.",
+          "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "controls": {
+          "algorithm": "abitstar",
+          "objective": "risk",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        },
+        "randomness": {
+          "seed_supported": false,
+          "seed": null,
+          "reason": "Bindings do not expose per-task planner/sampler seeding; global RNG is not reset."
+        }
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 193.9815868085974,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.39815868085974
+      }
+    },
+    {
+      "label": "ABIT* run 3",
+      "result": {
+        "algorithm": "abitstar",
+        "rules_version": "building-length-risk-v1",
+        "status": "success",
+        "exact": true,
+        "solution_kind": "exact",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              10.5193,
+              52.2705
+            ],
+            [
+              10.519845628198292,
+              52.270229138471706
+            ],
+            [
+              10.520010015400342,
+              52.27015215548888
+            ],
+            [
+              10.520174222777126,
+              52.27009264611359
+            ],
+            [
+              10.520498045488964,
+              52.27009349040579
+            ],
+            [
+              10.520800381813038,
+              52.27009347246931
+            ],
+            [
+              10.521556025071739,
+              52.270497508100306
+            ],
+            [
+              10.5217,
+              52.2705
+            ]
+          ]
+        },
+        "length_m": 195.99921800335318,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.599921800335316,
+        "start": [
+          10.5193,
+          52.2705
+        ],
+        "end": [
+          10.5217,
+          52.2705
+        ],
+        "analysis_crs": "EPSG:25832",
+        "objective": "risk",
+        "safety_distance_m": 0.0,
+        "risk_model": {
+          "rules_version": "building-length-risk-v1",
+          "classification_version": "ramke-building-tags-v1",
+          "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+          "analysis_crs": "EPSG:25832",
+          "overlap_policy": "maximum_building_score",
+          "background_cost": 0.0,
+          "background_status": "explicit_assumption",
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0.0,
+          "source": {
+            "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+            "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+            "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+            "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+            "license_url": null,
+            "name": "Synthetic demonstration sample",
+            "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+            "risk_rules_version": "building-length-risk-v1",
+            "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+            "synthetic": true
+          },
+          "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+          "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+          "input_crs": "EPSG:4326",
+          "diagnostics": [],
+          "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+        },
+        "policy": "block_unresolved",
+        "assumptions": {
+          "scenario": "civil",
+          "agl_m": 60,
+          "mission_start": "2026-10-01T10:00:00+02:00",
+          "mission_end": "2026-10-01T10:15:00+02:00",
+          "temporary_restrictions": "unverified",
+          "constraint_model": "Synthetic obstacles only; no legal or real-source applicability."
+        },
+        "time_budget_s": 1.9999952999933157,
+        "stop_reason": "time_budget",
+        "runtime_ms": 2004.3580000055954,
+        "callbacks": {
+          "state": 1009,
+          "motion": 552,
+          "cost": 2790,
+          "heuristic": 245071,
+          "cost_to_go": 4836
+        },
+        "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+        "native_status": "Exact solution",
+        "setup_ms": 0.9006000036606565,
+        "validation_ms": 3.0881999991834164,
+        "assessment_flags": {
+          "has_default": false,
+          "background_assumed": true,
+          "source_ids": []
+        },
+        "preparation_ms": 14.755399999557994,
+        "experiment": {
+          "schema_version": 1,
+          "synthetic": true,
+          "routing_fixture": "synthetic-obstacles-v1",
+          "demo_kind": "low-risk-detour",
+          "demo_assumptions": {
+            "background_cost": 0
+          },
+          "config": {
+            "bounds": {
+              "west": 10.519,
+              "south": 52.269,
+              "east": 10.522,
+              "north": 52.272
+            },
+            "scenario": "civil",
+            "agl_m": 60,
+            "start": [
+              10.5193,
+              52.2705
+            ],
+            "end": [
+              10.5217,
+              52.2705
+            ],
+            "timezone": "Europe/Berlin",
+            "mission_start": "2026-10-01T10:00:00+02:00",
+            "mission_end": "2026-10-01T10:15:00+02:00",
+            "ghsl_epoch": 2020,
+            "temporary_restrictions": "unverified"
+          },
+          "sources": {
+            "ghsl": {
+              "path": "ghsl.tif",
+              "source_id": "SYNTHETIC-ghsl",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "ESRI:54009",
+                "crs_wkt": "PROJCS[\"World_Mollweide\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Mollweide\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+                "resolution": [
+                  100.0,
+                  100.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  775500.0,
+                  6108800.0,
+                  776000.0,
+                  6109400.0
+                ],
+                "width": 5,
+                "height": 6,
+                "dtype": "float32",
+                "transform": [
+                  100.0,
+                  0.0,
+                  775500.0,
+                  0.0,
+                  -100.0,
+                  6109400.0
+                ]
+              }
+            },
+            "terrain": {
+              "path": "terrain.tif",
+              "source_id": "SYNTHETIC-terrain",
+              "product": "Synthetic routing demo",
+              "attribution": "Synthetic demonstration data",
+              "license": "CC0 synthetic fixture",
+              "raster": {
+                "crs": "EPSG:25832",
+                "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 32N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25832\"]]",
+                "resolution": [
+                  1.0,
+                  1.0
+                ],
+                "nodata": -9999.0,
+                "effective_nodata": -9999.0,
+                "nodata_basis": "GeoTIFF",
+                "bounds": [
+                  603642.0,
+                  5792043.0,
+                  603857.0,
+                  5792384.0
+                ],
+                "width": 215,
+                "height": 341,
+                "dtype": "float32",
+                "transform": [
+                  1.0,
+                  0.0,
+                  603642.0,
+                  0.0,
+                  -1.0,
+                  5792384.0
+                ]
+              },
+              "vertical_datum": "Synthetic metres NHN / DHHN2016"
+            },
+            "dipul": {
+              "source_id": "SYNTHETIC-zones",
+              "product": "Synthetic routing obstacles",
+              "license": "CC0 synthetic fixture",
+              "attribution": "Synthetic demonstration data",
+              "coverage": "Synthetic model only, no real restriction coverage",
+              "responses": [
+                {
+                  "path": "zones.geojson",
+                  "type_name": "synthetic:obstacle",
+                  "feature_count": 0
+                }
+              ]
+            }
+          },
+          "saved_at_utc": "2026-10-01T14:01:27.412849+00:00",
+          "analysis_crs": "EPSG:25832",
+          "display_crs": "EPSG:4326",
+          "files": [
+            {
+              "path": "ghsl.tif",
+              "sha256": "969d8c35ea5d68d27176e8c8b5d48254ddc64b349ce3b0d7e676bb384f7e4b60"
+            },
+            {
+              "path": "terrain.tif",
+              "sha256": "77719b7a500302cfc2ed8048b968dc5f9e5da0a7870c6a55b9aaaa4d39d3ff08"
+            },
+            {
+              "path": "zones.geojson",
+              "sha256": "8820df4d46b6d2a614687f05e787475df61408c51ddea8e3f8deb67b1ee63ae9"
+            }
+          ],
+          "connector_policy": "Exact endpoints in continuous space.",
+          "optimality": "Finite-budget continuous-space result; no finite-run optimality guarantee.",
+          "export_scope": "Own route and provenance only; original source payloads excluded. Retain source attributions and licenses."
+        },
+        "controls": {
+          "algorithm": "abitstar",
+          "objective": "risk",
+          "cell_m": 25,
+          "background_cost": 0,
+          "risk_weight": 0.9,
+          "distance_weight": 0.1,
+          "safety_distance_m": 0,
+          "time_budget_s": 2,
+          "effective_weights": {
+            "risk": 0.9,
+            "distance": 0.1
+          }
+        },
+        "randomness": {
+          "seed_supported": false,
+          "seed": null,
+          "reason": "Bindings do not expose per-task planner/sampler seeding; global RNG is not reset."
+        }
+      },
+      "comparison_costs": {
+        "status": "verified",
+        "length_m": 195.99921800335318,
+        "risk_length_cost": 0.0,
+        "objective_cost": 19.599921800335316
+      }
+    }
+  ],
+  "runtime_ms": 7570.855000012671,
+  "environment": {
+    "python": "3.13.13",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "ompl": "2.0.1+uas.1",
+      "shapely": "2.1.2",
+      "pyproj": "3.8.0",
+      "rasterio": "1.5.1"
+    }
+  },
+  "abitstar_summary": {
+    "repetitions": 3,
+    "time_budget_s_per_run": 2,
+    "total_solve_budget_s": 6,
+    "verified_exact_solution_rate": 1.0,
+    "objective_distribution": {
+      "values": [
+        19.467230861619488,
+        19.39815868085974,
+        19.599921800335316
+      ],
+      "min": 19.39815868085974,
+      "max": 19.599921800335316,
+      "mean": 19.488437114271516,
+      "median": 19.467230861619488
+    },
+    "seed_supported": false,
+    "seeds": [
+      null,
+      null,
+      null
+    ]
+  },
+  "assumptions": {
+    "rules_version": "building-length-risk-v1",
+    "classification_version": "ramke-building-tags-v1",
+    "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+    "analysis_crs": "EPSG:25832",
+    "overlap_policy": "maximum_building_score",
+    "background_cost": 0.0,
+    "background_status": "explicit_assumption",
+    "risk_weight": 0.9,
+    "distance_weight": 0.1,
+    "safety_distance_m": 0.0,
+    "source": {
+      "attribution": "Synthetic sample; not surveyed or acquired from OpenStreetMap.",
+      "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0",
+      "experiment_signature": "75126d3863d844017c312ec5c5962c68b7708f9ad8bcdf86b5b33e1c3bcdd56b",
+      "grid_signature": "59e2edd37ac9595c83e79d95d5967180787a634a6e727036f0b737d14cdc9881",
+      "license_url": null,
+      "name": "Synthetic demonstration sample",
+      "osm_sha256": "bdea5145f71faa198e039e1c6ee1d1388d71346718cea9989a40d87ede1556b9",
+      "risk_rules_version": "building-length-risk-v1",
+      "saved_at_utc": "2026-10-01T14:01:27.285343+00:00",
+      "synthetic": true
+    },
+    "collection_sha256": "cbdda87f90a98796e9ff857a0e7e9bf809d493cc0fe429a550a3d9de853654b3",
+    "boundary_sha256": "38b3689bfa1bec5c510e81aea1dbcefbc09e4efae70bf4dbefea6ac899334fa1",
+    "input_crs": "EPSG:4326",
+    "diagnostics": [],
+    "model_signature": "d0a3ca6006929d515e68a14331188d52d8f4c5e08d782e642864ef42e06ddccd"
+  },
+  "limitations": [
+    "Scores are ordinal building preferences, not population or collision probabilities.",
+    "The distance baseline is re-scored under the same weighted model for comparison.",
+    "Grid and continuous spaces have different candidates; optimality claims are separate.",
+    "Per-task seeding is unavailable; timings and stochastic paths need not repeat exactly.",
+    "Timeouts do not establish continuous-space infeasibility."
+  ]
+}

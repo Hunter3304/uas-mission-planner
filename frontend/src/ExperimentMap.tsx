@@ -1,7 +1,8 @@
+import CollapsiblePanel from './CollapsiblePanel'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FeatureCollection } from 'geojson'
 import { getJson } from './api'
-import { populationColor, type ExternalFeature, type Experiment, type GridData, type GridCell, type RouteResult } from './external'
+import { populationColor, type ExternalFeature, type Experiment, type GridData, type GridCell, type RouteResult, type ComparisonReport } from './external'
 import MapCanvas, { type Props as MapProps } from './MapCanvas'
 
 interface Location {
@@ -19,6 +20,8 @@ const number = (value: number | null | undefined) =>
 const routeLabels: Record<string, string> = {
   success: 'Route found', invalid_endpoint: 'Invalid endpoint',
   unresolved_input: 'Unresolved input', no_path_on_grid: 'No path on this grid',
+  planner_unavailable: 'Planner unavailable', timeout: 'Timed out without exact route',
+  approximate_solution: 'Approximate candidate only', cancelled: 'Cancelled',
   resource_limit: 'Search limit reached', computational_failure: 'Route validation failed',
 }
 
@@ -46,6 +49,17 @@ export default function ExperimentMap(props: MapProps) {
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [routeError, setRouteError] = useState('')
   const [routing, setRouting] = useState(false)
+  const [algorithm, setAlgorithm] = useState('astar')
+  const [objective, setObjective] = useState('distance')
+  const [riskWeight, setRiskWeight] = useState(0.9)
+  const [distanceWeight, setDistanceWeight] = useState(0.1)
+  const [backgroundCost, setBackgroundCost] = useState('')
+  const [safetyDistance, setSafetyDistance] = useState(0)
+  const [budget, setBudget] = useState(3)
+  const [repetitions, setRepetitions] = useState(3)
+  const [comparison, setComparison] = useState<ComparisonReport | null>(null)
+  const [comparing, setComparing] = useState(false)
+  const comparisonController = useRef<AbortController | null>(null)
   const [showReference, setShowReference] = useState(false)
   const routeController = useRef<AbortController | null>(null)
   const base = `/api/datasets/${encodeURIComponent(props.dataset.id)}/experiment`
@@ -119,8 +133,11 @@ export default function ExperimentMap(props: MapProps) {
     setRoute(null)
     setRouteError('')
     setRouting(false)
-    return () => routeController.current?.abort()
-  }, [base, cellSize, endpoints, routeController])
+    comparisonController.current?.abort()
+    setComparison(null)
+    setComparing(false)
+    return () => { routeController.current?.abort(); comparisonController.current?.abort() }
+  }, [base, cellSize, endpoints, algorithm, objective, riskWeight, distanceWeight, backgroundCost, safetyDistance, budget, repetitions])
   const onLocation = useCallback((lon: number, lat: number) => {
     if (selection === 'inspect') setPoint([lon, lat])
     else {
@@ -128,7 +145,13 @@ export default function ExperimentMap(props: MapProps) {
       setSelection('inspect')
     }
   }, [selection])
+  const controlQuery = () => ({
+    cell_m: String(cellSize), algorithm, objective, risk_weight: String(riskWeight),
+    distance_weight: String(distanceWeight), safety_distance_m: String(safetyDistance),
+    time_budget_s: String(budget), ...(backgroundCost === '' ? {} : { background_cost: backgroundCost }),
+  })
   const routeQuery = () => new URLSearchParams({
+    ...controlQuery(),
     cell_m: String(cellSize), start_lon: String(endpoints!.start[0]), start_lat: String(endpoints!.start[1]),
     end_lon: String(endpoints!.end[0]), end_lat: String(endpoints!.end[1]),
   })
@@ -148,16 +171,37 @@ export default function ExperimentMap(props: MapProps) {
       if (!controller.signal.aborted) setRouting(false)
     }
   }
-  const exportRoute = async () => {
+  const download = (value: unknown, filename: string, type: string) => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  const exportRoute = () => {
+    if (!route) return
+    const { geometry, ...metadata } = route
+    download({ type: 'FeatureCollection', metadata, features: route.status === 'success'
+      ? [{ type: 'Feature', geometry, properties: { length_m: route.length_m,
+        risk_length_cost: route.risk_length_cost, objective_cost: route.objective_cost,
+        rules_version: route.rules_version } }] : [] }, `${props.dataset.id}-route.geojson`, 'application/geo+json')
+  }
+  const compareRoutes = async () => {
+    comparisonController.current?.abort()
+    const controller = new AbortController()
+    comparisonController.current = controller
+    setComparing(true)
+    setComparison(null)
+    setRouteError('')
     try {
-      const collection = await getJson<FeatureCollection>(`${base}/route?${routeQuery()}&export=true`)
-      const url = URL.createObjectURL(new Blob([JSON.stringify(collection, null, 2)], { type: 'application/geo+json' }))
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${props.dataset.id}-route.geojson`
-      link.click()
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-    } catch (err) { setRouteError((err as Error).message) }
+      const query = routeQuery()
+      query.set('repetitions', String(repetitions))
+      const result = await getJson<ComparisonReport>(`${base}/compare?${query}`, controller.signal)
+      if (!controller.signal.aborted) setComparison(result)
+    } catch (err) {
+      if (!controller.signal.aborted) setRouteError((err as Error).message)
+    } finally { if (!controller.signal.aborted) setComparing(false) }
   }
   const onFeature = useCallback((feature: ExternalFeature) => setSelected(feature), [])
   const overlays = snapshot
@@ -166,8 +210,7 @@ export default function ExperimentMap(props: MapProps) {
   return (
     <>
       {props.dataset.has_experiment && (
-        <section className="external-panel" aria-label="External layers">
-          <h3>Independent source layers</h3>
+        <CollapsiblePanel className="external-panel" title="Independent source layers" ariaLabel="External layers">
           {error && <p role="alert">External data unavailable: {error}</p>}
           {!snapshot && !error && <p role="status">Verifying saved external payloads…</p>}
           {snapshot && (
@@ -217,33 +260,6 @@ export default function ExperimentMap(props: MapProps) {
                 </button>
               </div>
               {gridError && <p role="alert">Grid unavailable: {gridError}</p>}
-              {endpoints && <div className="routing-controls" aria-label="Route planning">
-                <h3>Constrained shortest route</h3>
-                {(['start', 'end'] as const).map((name) => <div key={name} className="external-controls">
-                  <button onClick={() => setSelection(name)}>Select {name} on map</button>
-                  {([0, 1] as const).map((axis) => <label key={axis}>{name} {axis === 0 ? 'longitude' : 'latitude'}
-                    <input type="number" step="any" value={endpoints[name][axis]} onChange={(event) => {
-                      const coordinate: [number, number] = [...endpoints[name]]
-                      coordinate[axis] = Number(event.target.value)
-                      setEndpoints({ ...endpoints, [name]: coordinate })
-                    }} />
-                  </label>)}
-                </div>)}
-                {selection !== 'inspect' && <p role="status">Click the map to choose {selection}. <button onClick={() => setSelection('inspect')}>Cancel selection</button></p>}
-                <div className="external-controls">
-                  <button disabled={!grid || routing} onClick={generateRoute}>{routing ? 'Searching…' : 'Generate shortest route'}</button>
-                  <button disabled={!route || routing} onClick={exportRoute}>Export route GeoJSON</button>
-                  <label><input type="checkbox" checked={showReference} onChange={(e) => setShowReference(e.target.checked)} /> Straight-line reference (not constraint validated)</label>
-                </div>
-                {routeError && <p role="alert">Route unavailable: {routeError}</p>}
-                {route && <div role="status" data-testid="route-result">
-                  <strong>{routeLabels[route.status] ?? route.status}</strong>{route.message && `: ${route.message}`}
-                  {route.length_m != null && <p>Horizontal length: {route.length_m.toFixed(3)} m</p>}
-                  <p>Runtime: {route.runtime_ms.toFixed(1)} ms · A* · {route.rules_version}</p>
-                  {route.experiment.synthetic && <p>Synthetic constraint demo; no real flight applicability.</p>}
-                </div>}
-                <p className="subtle">Distance only; population and OSM scores do not change route weights. Exact endpoints are retained. Optimality applies to this grid graph. Unknown real restriction coverage prevents a validated route.</p>
-              </div>}
               {grid && <p className="subtle">{grid.cell_count} cells · {grid.edge_count} candidate edges · unresolved inputs blocked by policy. Click a grid cell for reasons.</p>}
               <div className="external-legend" aria-label="Population legend">
                 {[
@@ -271,12 +287,73 @@ export default function ExperimentMap(props: MapProps) {
               </p>
             </>
           )}
-        </section>
+        </CollapsiblePanel>
       )}
+      {snapshot && <>
+              {endpoints && <CollapsiblePanel className="external-panel routing-controls" title="Route planning">
+                <div className="external-controls">
+                  <label>Algorithm <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}>
+                    <option value="astar">A*</option><option value="dijkstra">Dijkstra</option><option value="abitstar">ABIT*</option>
+                  </select></label>
+                  <label>Objective <select value={objective} onChange={(e) => setObjective(e.target.value)}>
+                    <option value="distance">Distance</option><option value="risk">Weighted building risk</option>
+                  </select></label>
+                  {objective === 'risk' && <>
+                  <label>Risk weight <input type="number" min="0" step="0.1" value={riskWeight} onChange={(e) => setRiskWeight(Number(e.target.value))} /></label>
+                  <label>Distance weight <input type="number" min="0" step="0.1" value={distanceWeight} onChange={(e) => setDistanceWeight(Number(e.target.value))} /></label>
+                  <label>Background score assumption <input type="number" min="0" step="any" placeholder="Unassessed" value={backgroundCost} onChange={(e) => setBackgroundCost(e.target.value)} /></label>
+                  </>}
+                  <label>Safety distance (m) <input type="number" min="0" step="any" value={safetyDistance} onChange={(e) => setSafetyDistance(Number(e.target.value))} /></label>
+                  <label>ABIT* budget (s) <input type="number" min="0" max="60" step="0.1" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></label>
+                </div>
+                {(['start', 'end'] as const).map((name) => <div key={name} className="external-controls">
+                  <button onClick={() => setSelection(name)}>Select {name} on map</button>
+                  {([0, 1] as const).map((axis) => <label key={axis}>{name} {axis === 0 ? 'longitude' : 'latitude'}
+                    <input type="number" step="any" value={endpoints[name][axis]} onChange={(event) => {
+                      const coordinate: [number, number] = [...endpoints[name]]
+                      coordinate[axis] = Number(event.target.value)
+                      setEndpoints({ ...endpoints, [name]: coordinate })
+                    }} />
+                  </label>)}
+                </div>)}
+                {selection !== 'inspect' && <p role="status">Click the map to choose {selection}. <button onClick={() => setSelection('inspect')}>Cancel selection</button></p>}
+                <div className="external-controls">
+                  <button disabled={!grid || routing || comparing} onClick={generateRoute}>{routing ? 'Searching…' : 'Generate route'}</button>
+                  <button disabled={!route || routing} onClick={exportRoute}>Export route GeoJSON</button>
+                  <label><input type="checkbox" checked={showReference} onChange={(e) => setShowReference(e.target.checked)} /> Straight-line reference (not constraint validated)</label>
+                </div>
+                {routeError && <p role="alert">Route unavailable: {routeError}</p>}
+                {route && <div role="status" data-testid="route-result">
+                  <strong>{routeLabels[route.status] ?? route.status}</strong>{route.message && `: ${route.message}`}
+                  {route.length_m != null && <p>Horizontal length: {route.length_m.toFixed(3)} m</p>}
+                  <p>Runtime: {route.runtime_ms.toFixed(1)} ms · {route.algorithm} · {route.objective} · {route.rules_version}</p>
+                  <p>Solution: {route.solution_kind} · exact: {String(route.exact)}</p>
+                  <p>Risk length cost: {number(route.risk_length_cost)} · objective cost: {number(route.objective_cost)}</p>
+                  <p>{route.optimality}</p>
+                  <details><summary>Model assumptions and controls</summary><pre>{JSON.stringify({ controls: route.controls, assumptions: route.assumptions, risk_model: route.risk_model }, null, 2)}</pre></details>
+                  {route.candidate != null && <p>Approximate candidate is diagnostic only; no exact route geometry is exported.</p>}
+                  {route.experiment.synthetic && <p>Synthetic constraint demo; no real flight applicability.</p>}
+                </div>}
+                <p className="subtle">Distance uses length only. Weighted risk integrates building scores along the route; background must be explicitly assessed. Population does not affect this objective. Unknown real restriction coverage prevents a validated route.</p>
+                <div className="external-controls">
+                  <label>ABIT* repetitions <input type="number" min="1" max="10" value={repetitions} onChange={(e) => setRepetitions(Number(e.target.value))} /></label>
+                  <button disabled={!grid || routing || comparing} onClick={compareRoutes}>{comparing ? 'Comparing…' : 'Compare algorithms'}</button>
+                  <button disabled={!comparison || comparing} onClick={() => download(comparison, `${props.dataset.id}-comparison.json`, 'application/json')}>Export comparison</button>
+                </div>
+                <p className="subtle">Comparison uses the selected endpoints, weights, background, clearance and grid. Total ABIT* budgets are limited to 60 s. Per-task random seeding is unavailable.</p>
+                {comparison && <div data-testid="comparison-result">
+                  <p>{comparison.synthetic ? 'Synthetic experiment' : 'Saved real-data experiment'} · {comparison.status}</p>
+                  <div className="table-scroll"><table><thead><tr><th>Planner</th><th>Status</th><th>Length (m)</th><th>Risk cost</th><th>Comparable objective</th><th>Runtime (ms)</th><th>Verification</th></tr></thead>
+                    <tbody>{comparison.runs.map((run) => <tr key={run.label}><td>{run.label}</td><td>{run.result.status}</td><td>{number(run.result.length_m)}</td><td>{number(run.comparison_costs.risk_length_cost)}</td><td>{number(run.comparison_costs.objective_cost)}</td><td>{run.result.runtime_ms.toFixed(1)}</td><td>{run.comparison_costs.status}</td></tr>)}</tbody></table></div>
+                  <p>Verified ABIT* exact-solution rate: {(comparison.abitstar_summary.verified_exact_solution_rate * 100).toFixed(1)}% / {comparison.abitstar_summary.repetitions} runs</p>
+                  {comparison.abitstar_summary.objective_distribution && <p>Objective distribution: {JSON.stringify(comparison.abitstar_summary.objective_distribution)}</p>}
+                  {comparison.limitations.map((item) => <p className="subtle" key={item}>{item}</p>)}
+                </div>}
+              </CollapsiblePanel>}
+      </>}
       <MapCanvas {...props} external={overlays} />
       {snapshot && (
-        <section className="external-panel" aria-label="External inspection">
-          <h3>Location and source inspection</h3>
+        <CollapsiblePanel className="external-panel" title="Location and source inspection" ariaLabel="External inspection">
           {inspecting && <p role="status">Inspecting location…</p>}
           {pointError && <p role="alert">{pointError}</p>}
           {location && (
@@ -388,7 +465,7 @@ export default function ExperimentMap(props: MapProps) {
               in the local experiment directory.
             </p>
           </details>
-        </section>
+        </CollapsiblePanel>
       )}
     </>
   )

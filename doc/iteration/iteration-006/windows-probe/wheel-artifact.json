@@ -1,0 +1,8 @@
+{
+  "path": "D:/Aostfalia/tmp/ompl-windows-probe/wheels/ompl-2.0.1-cp313-cp313-win_amd64.whl",
+  "sha256": "90b80ff8168d43a6330f7e3c5cee09458a13ce8ad5e95a083af3c43bdf2b8586",
+  "source_commit": "c509861210a63ec962bbec72c52823abc16b102e",
+  "patched": true,
+  "python": "3.13.13",
+  "platform": "win_amd64"
+}

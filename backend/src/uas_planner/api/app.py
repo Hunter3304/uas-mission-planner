@@ -6,9 +6,10 @@ import os
 import re
 from functools import lru_cache
 from pathlib import Path
+from time import perf_counter
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, Response
 
 from uas_planner import __version__
@@ -24,7 +25,8 @@ from uas_planner.core.experiment import (
     zone_layer,
 )
 from uas_planner.core.grid import build_grid
-from uas_planner.core.routing import connect_endpoints, plan_route, route_context, route_geojson
+from uas_planner.core.planning import plan_saved_route
+from uas_planner.core.routing import route_geojson
 from uas_planner.storage.dataset import load_dataset
 
 LAYER_NAMES = ("building", "highway", "landuse", "natural")
@@ -165,8 +167,16 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         end_lon: float | None = None,
         end_lat: float | None = None,
         export: bool = False,
+        algorithm: Literal["astar", "dijkstra", "abitstar"] = "astar",
+        objective: Literal["distance", "risk"] = "distance",
+        risk_weight: float = Query(0.9, ge=0, allow_inf_nan=False),
+        distance_weight: float = Query(0.1, ge=0, allow_inf_nan=False),
+        background_cost: float | None = Query(None, ge=0, allow_inf_nan=False),
+        safety_distance_m: float = Query(0, ge=0, allow_inf_nan=False),
+        time_budget_s: float = Query(3, ge=0, le=60, allow_inf_nan=False),
     ):
         path, manifest = external(dataset_id)
+        started = perf_counter()
         try:
             selected = {}
             for name, lon, lat in (("start", start_lon, start_lat), ("end", end_lon, end_lat)):
@@ -174,8 +184,21 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                     raise ValueError("Supply both longitude and latitude for each endpoint.")
                 selected[name] = manifest["config"][name] if lon is None else [lon, lat]
             grid = prepared_grid(str(path), json.dumps(manifest, sort_keys=True), cell_m)
-            result = plan_route(connect_endpoints(grid, selected))
-            result["experiment"] = route_context(manifest, selected)
+            result = plan_saved_route(
+                path,
+                manifest,
+                grid=grid,
+                cell_m=cell_m,
+                endpoints=selected,
+                algorithm=algorithm,
+                objective=objective,
+                risk_weight=risk_weight,
+                distance_weight=distance_weight,
+                background_cost=background_cost,
+                safety_distance_m=safety_distance_m,
+                time_budget_s=time_budget_s,
+                started_at=started,
+            )
             if export:
                 return Response(
                     json.dumps(route_geojson(result), allow_nan=False),
@@ -185,6 +208,45 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                     },
                 )
             return result
+        except (ValueError, KeyError, OSError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @api.get("/api/datasets/{dataset_id}/experiment/compare")
+    def experiment_compare(
+        dataset_id: str,
+        cell_m: float = 25,
+        background_cost: float | None = Query(None, ge=0, allow_inf_nan=False),
+        risk_weight: float = Query(0.9, ge=0, allow_inf_nan=False),
+        distance_weight: float = Query(0.1, ge=0, allow_inf_nan=False),
+        safety_distance_m: float = Query(0, ge=0, allow_inf_nan=False),
+        time_budget_s: float = Query(3, ge=0, le=60, allow_inf_nan=False),
+        repetitions: int = Query(3, ge=1, le=10),
+        start_lon: float | None = None,
+        start_lat: float | None = None,
+        end_lon: float | None = None,
+        end_lat: float | None = None,
+    ):
+        from uas_planner.core.comparison import compare_routes
+
+        path, manifest = external(dataset_id)
+        try:
+            selected = {}
+            for name, lon, lat in (("start", start_lon, start_lat), ("end", end_lon, end_lat)):
+                if (lon is None) != (lat is None):
+                    raise ValueError("Supply both longitude and latitude for each endpoint.")
+                selected[name] = manifest["config"][name] if lon is None else [lon, lat]
+            return compare_routes(
+                path,
+                manifest,
+                cell_m=cell_m,
+                background_cost=background_cost,
+                risk_weight=risk_weight,
+                distance_weight=distance_weight,
+                safety_distance_m=safety_distance_m,
+                time_budget_s=time_budget_s,
+                repetitions=repetitions,
+                endpoints=selected,
+            )
         except (ValueError, KeyError, OSError) as exc:
             raise HTTPException(422, str(exc)) from exc
 

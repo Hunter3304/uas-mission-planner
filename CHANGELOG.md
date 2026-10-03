@@ -1,5 +1,36 @@
 # Changelog
 
+## Unreleased — Explorer panel controls
+
+- Accessible folding controls for all six analysis/planning/inspection panels.
+- Feature panels stay available and open together for any selected feature.
+- Risk inputs appear only for the weighted objective, retaining previous values.
+- Map and route results survive folding; real API and mobile coverage added.
+
+## Unreleased — Iteration 006 Part 3
+
+- Compatible CLI/API/UI planner, objective, weight, clearance, background and
+  ABIT* budget controls; exact/approximate status, costs and assumptions displayed.
+- UI exports the displayed snapshot without replanning; failure diagnostics and
+  full provenance preserve real-data uncertainty.
+- Synthetic low-risk detour and bounded four-planner comparisons with independent
+  endpoint/constraint/cost checks, repeated ABIT* distributions and environment versions.
+- Explicit unsupported per-task seeds; native callback cycles removed while
+  retaining OMPL metric arithmetic; native CLI stdout remains JSON.
+- Backend and real API/browser coverage plus reproducibility documentation.
+
+## Unreleased — Iteration 006 Part 2
+
+- Optional official OMPL C++ ABIT* adapter for native Windows Python 3.13,
+  using a pinned patched wheel with source/build provenance and licenses.
+- Independent continuous-space tasks share metric risk/geometry rules, enforce
+  cooperative total planning budgets and cancellation, and return structured
+  exact/approximate/timeout/unresolved/failure outcomes.
+- Exact final routes preserve endpoints, recheck full constraints and recompute
+  length/risk/objective. No global path files or graph_tool dependency.
+- README installation and Windows native tests added; graph routing remains
+  available without OMPL. New CLI/API/UI controls remain deferred to Part 3.
+
 ## Unreleased — Iteration 006 Part 1
 
 - Metric centreline building-risk integration using existing tag classifications,

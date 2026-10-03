@@ -48,6 +48,17 @@ export interface RouteResult {
   message?: string
   geometry: Geometry | null
   length_m: number | null
+  risk_length_cost?: number | null
+  objective_cost?: number | null
+  algorithm: string
+  objective: string
+  exact: boolean
+  solution_kind: string
+  optimality: string
+  assumptions: unknown
+  risk_model?: unknown
+  controls?: unknown
+  candidate?: unknown
   runtime_ms: number
   rules_version: string
   experiment: { synthetic: boolean }
@@ -81,3 +92,14 @@ export const populationColor = (value: unknown) =>
         : Number(value) < 100
           ? '#48a47b'
           : '#005c4b'
+
+export interface ComparisonReport {
+  status: string
+  synthetic: boolean
+  runs: { label: string; result: RouteResult; comparison_costs: {
+    status: string; length_m?: number; risk_length_cost?: number; objective_cost?: number
+  } }[]
+  abitstar_summary: { verified_exact_solution_rate: number; repetitions: number;
+    seed_supported: boolean; objective_distribution: { min: number; max: number; mean: number; median: number } | null }
+  limitations: string[]
+}

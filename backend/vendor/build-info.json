@@ -1,0 +1,27 @@
+{
+  "wheel": "ompl-2.0.1+uas.1-cp313-cp313-win_amd64.whl",
+  "sha256": "215ae162471f66d8c17de389da12c2a51e30daf33cd92cef366cf22a2f0adec2",
+  "size": 4654452,
+  "source": "https://github.com/ompl/ompl",
+  "source_tag": "2.0.1",
+  "source_commit": "c509861210a63ec962bbec72c52823abc16b102e",
+  "nanobind_commit": "c5a3a378aa61d104c82ca053cb1e367782cd3618",
+  "robin_map_commit": "4ec1bf19c6a96125ea22062f38c2cf5b958e448e",
+  "vcpkg_commit": "eb2d3a3279fd019cb7733072d86900d0ad2a1aef",
+  "patch": "doc/iteration/iteration-006/windows-probe/ompl-2.0.1-uas.1.patch",
+  "patch_sha256": "f31d390752176d317da401af4b64a3b5c37d84711fd329756832fdf72ca72ae1",
+  "python": "3.13.13",
+  "MSVC": "14.44.35207",
+  "Windows_SDK": "10.0.26100.0",
+  "CMake": "4.4.3",
+  "Ninja": "1.13.2",
+  "scikit_build_core": "1.1.0",
+  "Boost": "1.92.0",
+  "Eigen": "5.0.1",
+  "build": "Release; static OMPL; VAMP/demos/tests OFF; x64-windows",
+  "licenses": [
+    "OMPL-LICENSE.txt",
+    "BOOST-LICENSE.txt",
+    "EIGEN-LICENSE.txt"
+  ]
+}

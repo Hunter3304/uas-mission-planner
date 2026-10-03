@@ -951,3 +951,43 @@ td {
 .external-values p {
   margin: 7px 0;
 }
+
+.routing-controls pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow: auto;
+}
+.routing-controls {
+  overflow-wrap: anywhere;
+}
+.routing-controls .external-controls label {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.routing-controls input, .routing-controls select {
+  max-width: 100%;
+  width: 150px;
+}
+.routing-controls .table-scroll {
+  max-width: 100%;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.panel-heading h3 { margin: 0; }
+.panel-heading button {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid #dce4e1;
+  border-radius: 6px;
+  background: #f5f8f6;
+  cursor: pointer;
+}
+.panel-heading button:focus-visible { outline: 2px solid #26866c; outline-offset: 2px; }
+[hidden] { display: none !important; }

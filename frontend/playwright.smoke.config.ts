@@ -5,7 +5,7 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:5175', channel: process.env.PLAYWRIGHT_CHANNEL },
   webServer: [
     {
-      command: 'uv run --project ../backend --locked python ../backend/tests/serve_sample.py',
+      command: 'uv run --project ../backend --locked --extra ompl-windows python ../backend/tests/serve_sample.py',
       url: 'http://127.0.0.1:8011/api/health',
       reuseExistingServer: false,
     },
