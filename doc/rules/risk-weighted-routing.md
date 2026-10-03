@@ -132,3 +132,22 @@ model provenance is copied into results so editing a result cannot change it.
 
 Regression evidence and remaining work are recorded in
 [Part 1 feedback](../iteration/iteration-006/part1.md).
+
+## Public controls and comparisons — Part 3
+
+`core/planning.py` is the shared CLI/API entry point. Default `distance` uses
+weights 0/1 regardless of supplied risk weights and does not require assessed
+building coverage; distance ABIT* uses an empty zero-background metric model.
+`risk` uses the assessed surface and supplied weights. Both preserve the same
+hard constraints and clearance. Blank background is never silently zero.
+
+Comparisons evaluate distance A*, weighted A*, weighted Dijkstra and repeated
+ABIT* on identical endpoints/costs/constraints. Re-score the distance baseline
+with the weighted model before comparing objectives. Independently check final
+endpoints, constraints and segment costs. Grid and finite-budget continuous
+optimality remain separate. Per-task native seeds are unsupported; reports
+record null seeds, budgets, repeated outcomes/distributions and versions.
+
+Exact paths and failure/approximate diagnostics retain controls and provenance.
+UI exports preserve the displayed result; API GET exports describe that solve.
+See [Part 3 operations and evidence](../iteration/iteration-006/part3.md).

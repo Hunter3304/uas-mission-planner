@@ -1,3 +1,4 @@
+import CollapsiblePanel from './CollapsiblePanel'
 import { layers, type LayerKey, type BuildingCost, type MapData, type MapFeature } from './types'
 
 const names = {
@@ -47,14 +48,8 @@ export function CostOverview({
       </p>
     )
   return (
-    <section className="cost-overview" aria-label={`${name} cost analysis`}>
+    <CollapsiblePanel className="cost-overview" title={`${name} cost analysis`} badge={<span className="count-pill">{summary.buildings} {layer === 'building' ? 'buildings' : 'objects'}</span>}>
       <div className="section-row">
-        <h3>
-          {name} cost analysis{' '}
-          <span className="count-pill">
-            {summary.buildings} {layer === 'building' ? 'buildings' : 'objects'}
-          </span>
-        </h3>
         <label className="cost-toggle">
           <input
             type="checkbox"
@@ -133,7 +128,7 @@ export function CostOverview({
           <p>No unmatched values in supported tag categories.</p>
         )}
       </details>
-    </section>
+    </CollapsiblePanel>
   )
 }
 

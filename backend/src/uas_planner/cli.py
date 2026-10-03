@@ -11,6 +11,15 @@ from uas_planner.core.area import BoundingBox
 from uas_planner.storage.dataset import load_dataset, save_dataset
 
 
+def _quiet_native_logs():
+    """Keep CLI stdout machine-readable; native warnings/errors use stderr."""
+    try:
+        from ompl.util import LogLevel, setLogLevel
+    except (ImportError, OSError):
+        return
+    setLogLevel(LogLevel.LOG_WARN)
+
+
 def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
@@ -49,13 +58,33 @@ def parser():
         "route-demo", help="Create an explicitly synthetic offline routing experiment"
     )
     demo.add_argument("--output", type=Path, required=True)
-    route = commands.add_parser(
-        "experiment-route", help="Plan distance-only route from verified offline data"
-    )
+    demo.add_argument("--low-risk", action="store_true", help="Synthetic building-risk detour")
+    route = commands.add_parser("experiment-route", help="Plan a route from verified offline data")
     route.add_argument("directory", type=Path)
     route.add_argument("--cell-m", type=float, default=50)
     route.add_argument("--start", nargs=2, type=float, metavar=("LON", "LAT"))
     route.add_argument("--end", nargs=2, type=float, metavar=("LON", "LAT"))
+    route.add_argument("--algorithm", choices=("astar", "dijkstra", "abitstar"), default="astar")
+    route.add_argument("--objective", choices=("distance", "risk"), default="distance")
+    route.add_argument("--risk-weight", type=float, default=0.9)
+    route.add_argument("--distance-weight", type=float, default=0.1)
+    route.add_argument("--background-cost", type=float)
+    route.add_argument("--safety-distance-m", type=float, default=0)
+    route.add_argument("--time-budget-s", type=float, default=3)
+    compare = commands.add_parser(
+        "route-compare", help="Offline comparison with independent cost checks"
+    )
+    compare.add_argument("directory", type=Path)
+    compare.add_argument("--start", nargs=2, type=float, metavar=("LON", "LAT"))
+    compare.add_argument("--end", nargs=2, type=float, metavar=("LON", "LAT"))
+    compare.add_argument("--cell-m", type=float, default=25)
+    compare.add_argument("--risk-weight", type=float, default=0.9)
+    compare.add_argument("--distance-weight", type=float, default=0.1)
+    compare.add_argument("--background-cost", type=float)
+    compare.add_argument("--safety-distance-m", type=float, default=0)
+    compare.add_argument("--time-budget-s", type=float, default=3)
+    compare.add_argument("--repetitions", type=int, default=3)
+    compare.add_argument("--output", type=Path, help="New comparison JSON; never overwrite")
     route.add_argument("--output", type=Path, help="New route GeoJSON file; never overwrite")
     return result
 
@@ -66,27 +95,65 @@ def main(argv=None):
         if args.command == "route-demo":
             from uas_planner.route_demo import create_route_demo
 
-            print(json.dumps(create_route_demo(args.output), indent=2, allow_nan=False))
+            print(
+                json.dumps(
+                    create_route_demo(args.output, low_risk=args.low_risk),
+                    indent=2,
+                    allow_nan=False,
+                )
+            )
             return 0
+        if args.command == "route-compare":
+            from uas_planner.core.comparison import compare_routes
+            from uas_planner.core.experiment import load_experiment
+
+            _quiet_native_logs()
+            manifest = load_experiment(args.directory)
+            result = compare_routes(
+                args.directory,
+                manifest,
+                cell_m=args.cell_m,
+                risk_weight=args.risk_weight,
+                distance_weight=args.distance_weight,
+                background_cost=args.background_cost,
+                safety_distance_m=args.safety_distance_m,
+                time_budget_s=args.time_budget_s,
+                repetitions=args.repetitions,
+                endpoints={
+                    name: getattr(args, name) or manifest["config"][name]
+                    for name in ("start", "end")
+                },
+            )
+            if args.output:
+                with args.output.open("x", encoding="utf-8") as stream:
+                    json.dump(result, stream, indent=2, allow_nan=False)
+                    stream.write("\n")
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0 if result["status"] == "complete" else 2
         if args.command == "experiment-route":
             from uas_planner.core.experiment import load_experiment
-            from uas_planner.core.grid import build_grid
-            from uas_planner.core.routing import (
-                connect_endpoints,
-                plan_route,
-                route_context,
-                route_geojson,
-            )
+            from uas_planner.core.planning import plan_saved_route
+            from uas_planner.core.routing import route_geojson
 
+            if args.algorithm == "abitstar":
+                _quiet_native_logs()
             manifest = load_experiment(args.directory)
             endpoints = {
                 name: getattr(args, name) or manifest["config"][name] for name in ("start", "end")
             }
-            # Build default graph first so invalid selected endpoints become explicit results.
-            result = plan_route(
-                connect_endpoints(build_grid(args.directory, manifest, args.cell_m), endpoints)
+            result = plan_saved_route(
+                args.directory,
+                manifest,
+                endpoints=endpoints,
+                cell_m=args.cell_m,
+                algorithm=args.algorithm,
+                objective=args.objective,
+                risk_weight=args.risk_weight,
+                distance_weight=args.distance_weight,
+                background_cost=args.background_cost,
+                safety_distance_m=args.safety_distance_m,
+                time_budget_s=args.time_budget_s,
             )
-            result["experiment"] = route_context(manifest, endpoints)
             if args.output:
                 with args.output.open("x", encoding="utf-8") as stream:
                     json.dump(route_geojson(result), stream, indent=2, allow_nan=False)

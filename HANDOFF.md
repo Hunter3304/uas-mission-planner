@@ -2,6 +2,209 @@
 
 ## Current status
 
+### Accepted delivery integration (2026-10-03)
+
+- User accepted the implementation and explicitly authorized remote merge.
+- PR #62 merged UI into the planner branch at 65c7580; its Windows/Linux Python
+  and frontend CI passed. UI feature branch deleted locally/remotely.
+- PR #63 integrates native Part 2, Part 3 controls and accepted UI into
+  iteration/006 before the final main delivery PR. Earlier pending/uncommitted
+  statements below are historical snapshots.
+- No runtime behavior changed during integration; validation is recorded in
+  part3-validation.md and ui-panels.md. Retain iteration branches as history.
+
+
+### Explorer panel refinement (2026-10-02)
+
+- Issue #61, assigned to Hunter3304 in Milestone 6, tracks the user-requested UI
+  refinement. Branch `feature/61-collapsible-panels` builds on the published
+  `feature/60-planner-controls`; parent integration is still pending.
+- Six panels fold independently while the map remains available. Feature panels
+  are always present, initially collapsed, manually expandable and both open on
+  selection of any feature. Clearing selection collapses them.
+- Distance hides only the three risk inputs; switching objectives restores
+  values. Folding preserves inputs/results.
+- ESLint and production build passed; 9 mocked browser tests and all 11 real API
+  smoke tests passed. Mobile screenshot reviewed with no horizontal overflow.
+- Evidence and operation: `doc/iteration/iteration-006/ui-panels.md`.
+- UI changes are prepared for a separate PR into the parent planner branch; no
+  integration merge or branch deletion has been performed.
+
+
+### Feature-branch publication authorized (2026-10-02)
+
+- User requested commit and remote push of the reviewed local implementation.
+  Publication branch: `feature/60-planner-controls`, including the retained Part 2
+  native dependency/adapter and Part 3 controls, comparisons, tests and evidence.
+- PR creation and integration merges are not part of this push request. Earlier
+  local/uncommitted statements below describe the 2026-10-01 validation state.
+
+### Iteration 006 Part 3 local implementation (2026-10-01, latest)
+
+- User authorized Part 3 and explicitly approved Issue #60 creation/assignment
+  to Hunter3304 in Milestone 6. `feature/60-planner-controls` preserves all
+  uncommitted Part 2 changes on the existing iteration/006 base.
+- Shared planner controls power compatible CLI/API distance/risk requests and
+  map controls/status/assumptions. UI exports the displayed snapshot without
+  another solve; changing parameters invalidates results. Mobile reports wrap.
+- Synthetic low-risk demo and four-planner comparisons independently verify
+  endpoints/constraints/costs; report bounded native repeats, distributions,
+  environment versions and unsupported per-task seeds.
+- Native callback cycles fixed with weak ownership while retaining OMPL metric
+  arithmetic. CLI native stdout is JSON, tested in a bounded subprocess.
+- Measurements and separate real unresolved/timeout evidence are under
+  `doc/iteration/iteration-006/`; see `part3.md` for operation and limitations.
+- Validation: full backend regression 158 passed / 1 existing Windows symlink
+  permission skip (44.16 s); after independent requested-endpoint verification
+  tightening, all 8 planner-control tests passed (21.24 s), including injected
+  cost/endpoint corruption. Ruff check/format passed. Frontend ESLint/build,
+  9 mocked Chrome checks and 9 real API Chrome smoke checks passed (30.5 s).
+  Detailed commands/evidence: `doc/iteration/iteration-006/part3-validation.md`.
+- Changes remain local/uncommitted. No push, PR, integration merge, acquisition
+  or branch deletion performed. Remote CI, Linux native runtime and a clean
+  second Windows host remain unverified. Earlier sections preserve history.
+
+### Iteration 006 Part 2 implementation (2026-10-01, latest)
+
+- User resumed Part 2 after the verified native Windows route and requested
+  README dependency instructions. Issue #59 created in Milestone 6 before
+  `feature/59-ompl-abitstar`; iteration/006 fast-forwarded to main e54e245.
+- Implemented `core/abitstar.py`: official C++ ABIT*, per-task native setup and
+  callbacks, shared metric geometry/risk costs and admissible heuristics,
+  cooperative budget/cancellation, explicit exact/approximate/timeout/unresolved/
+  unavailable/failure outcomes, full final revalidation and cost recomputation.
+  Saved-data entry point: `plan_risk_route(..., algorithm="abitstar")`.
+- Optional `ompl-windows` extra now pins repository wheel `2.0.1+uas.1` by hash
+  in uv.lock. Installed into backend venv. Wheel is ~4.7 MB, includes Boost DLL
+  and licenses; vendor build-info and complete source patch record provenance.
+  README records dependencies and `--extra ompl-windows` installation/use.
+- Local validation: 151 backend passes and one existing Windows permission skip;
+  Ruff check/format, frontend ESLint/build and nine mocked Chrome checks passed.
+  Twelve new tests exercise actual native ABIT* and failure/concurrency contracts.
+  Detailed validation/status in doc/iteration/iteration-006/part2.md.
+  CI configured to exercise native Windows tests while retaining Linux baseline;
+  remote CI, Linux ABIT* and a second clean Windows host remain unverified.
+- Local changes are not committed/pushed/merged. Preserve all earlier unrelated
+  HANDOFF additions. No Part 3 controls or real-data acquisition implemented.
+
+### Official OMPL native Windows route (2026-10-01, latest decision)
+
+- User explicitly deferred native Python ABIT* and requested plan revision first,
+  then native Windows verification of official OMPL. The revised iteration-006
+  plan supersedes both the Python route and earlier WSL proposal below.
+- Verification record: `doc/iteration/iteration-006/part2-windows-verification.md`.
+  Official 2.0.1 source pinned to `c509861210a63ec962bbec72c52823abc16b102e`;
+  Nanobind submodules and build helpers prepared only under
+  `D:/Aostfalia/tmp/ompl-windows-probe`. Project dependencies/venv unchanged.
+- Actual CMake preflight failed for both VS 2022 (no Visual Studio instance)
+  and Ninja (no C++ compiler). This is missing tooling, not demonstrated
+  incompatibility of OMPL with Windows.
+- Source audit confirms official C++ ABITstar exists but Python ABITstar is not
+  registered in 2.0.1. The motion-validator last-valid overload also needs
+  verification/repair. Binding patches are now compiled and runtime-tested.
+- User explicitly approved MSVC/SDK installation. Microsoft-signed Build Tools
+  installer returned 0 through UAC elevation; VS 2022 17.14.37710.0, MSVC
+  14.44.35207 and SDK 10.0.26100.0 installed. No automatic reboot. Isolated
+  vcpkg dependencies built successfully. Official C++ core and patched Python
+  3.13 x64 extension compiled; wheel built and installed offline into a new
+  isolated environment. ABIT* exact obstacle-detour solve passed in 3.0003 s,
+  with custom geometry/cost/heuristic callbacks, last-valid checks, independent
+  path/cost validation and immediate cancellation (0.000084 s).
+- Patches, build/probe scripts, result and artifact SHA256 saved under
+  `doc/iteration/iteration-006/windows-probe`; README now documents the added
+  native build/runtime dependencies. Application venv and lock remain unchanged.
+  Linux runtime and a second clean Windows machine remain unverified.
+- Part 2 remains incomplete; no application adapter, new OS runtime, commit,
+  push or merge. Preserve historical investigation notes and unrelated edits.
+
+### Native Python ABIT* decision and survey (2026-10-01)
+
+- User declined Linux runtime setup and explicitly authorized native Python
+  ABIT*, requesting discovery of validated reusable implementations first.
+  This supersedes the pending WSL proposal below; no runtime approval is needed
+  for the selected native Python implementation. Part 3 remains deferred.
+- Survey: `doc/iteration/iteration-006/part2-python-survey.md`. Reviewed three
+  public Python candidates and academic Python baseline evidence. No reviewed
+  candidate establishes a validated drop-in risk-weighted ABIT* implementation.
+- Reproduced robotics-study/navigation_basic's six ABIT* tests on Windows Python
+  3.13.13: 6 passed in 1.20 s with `-X utf8`; default GBK decoding fails before
+  algorithm execution. Isolated checkout at `D:/Aostfalia/tmp/abit-research-navigation`,
+  revision `a98698104edf66329a1fa5c4d6b4e07dc4397903`. No package installed.
+- That candidate has simplified scheduling, distance-only objective, no time
+  budget/cancellation and no identified redistribution license. Do not vendor it
+  or claim formal correctness from six tests. Implement independently from the
+  original ABIT* specification and reuse Part 1 cost/constraint functions.
+- Plan updated for the explicit native Python decision. Application implementation
+  remains outstanding; issue assignment must precede the Part 2 feature branch.
+
+### Iteration 006 Part 2 dependency gate (2026-10-01)
+
+- User authorized Part 2 implementation. Local main is `e54e245`, including
+  merged Part 1 integration PR #58. Part 3 remains deferred.
+- Actual native Windows CPython 3.13.13 OMPL 2.0.1 binary-install dry-run failed:
+  no matching `win_amd64` wheel. Linux x86-64 cross-platform dry-run resolves,
+  but actual Linux imports/ABIT* callbacks/solving have not been executed.
+- No Docker executable found; WSL reports that it is not installed. No new
+  runtime, package dependency, lockfile change or algorithm adapter was installed.
+- Per the approved plan's dependency gate, prepared concrete WSL 2 / Ubuntu
+  24.04 / Python 3.13.13 / OMPL 2.0.1 proposal for review in
+  `doc/iteration/iteration-006/part2-runtime-gate.md`. Await runtime approval
+  before host installation; Part 2 is not complete. Create/assign its issue
+  before creating a feature branch when implementation resumes.
+- Preserved pre-existing HANDOFF edits; this investigation is local documentation
+  only, with no commit, push, PR or merge. Application code is unchanged.
+
+### Open work — Real Braunschweig route validation (2026-09-30)
+
+Part 3's search/UI/export implementation is delivered, but a validated route on
+the real `braunschweig-part1-v2` data has **not** been achieved. The user requested
+that this unfinished real-data status be recorded for continuation.
+
+- The saved DIPUL snapshot contains only control zones, railway facilities,
+  federal roads and nature reserves. It does not contain the temporary operating
+  restriction layer. The existing global "Temporary restriction coverage
+  unverified" reason is a preparation-policy uncertainty, not an observed ban
+  across Braunschweig. Changing endpoints alone cannot bypass it: all real
+  connections remain excluded by `block_unresolved`.
+- Mission interval: 2026-10-01 10:00–10:15 Europe/Berlin, equivalent to
+  08:00–08:15 UTC, civil scenario, 60 m AGL. No finding of "no applicable
+  temporary restrictions" has been established for this interval and area.
+- Next: verify current DIPUL capabilities/schema, query bounded temporary
+  restriction geometry and inspect effective dates, activation schedules,
+  vertical limits and applicability. Official documentation lists
+  `dipul:temporaere_betriebseinschraenkungen` and
+  `dipul:inaktive_temporaere_betriebseinschraenkungen`; the saved capabilities
+  confirmed the former only. Verify the latter's actual availability and semantics
+  before claiming coverage of inactive/future restrictions. Include all relevant
+  published restrictions overlapping the mission interval, not merely those
+  active at download time.
+- Cross-check with an official DFS NOTAM briefing and relevant AIP supplements
+  for the area/time/height. Preserve original responses, briefing references,
+  retrieval time, query scope, source versions and checksums. Any coverage finding
+  is limited to information published at the time of checking; refresh near the
+  mission. This session inspected documentation and existing payloads only;
+  temporary-layer acquisition, NOTAM verification and time-applicability
+  implementation remain unfinished.
+- Resolve the independent static-zone legal/scenario conditions and MSL terrain
+  profile limitations as well. Verifying temporary coverage alone does not make
+  every zone or connection permitted. Extend the explicit constraint model,
+  test time/height interpretations, then select connected real endpoints and
+  revalidate the final route. Do not silently mark unknown inputs permitted or
+  promote a synthetic route to a real-source validated result.
+- Official references: [DIPUL WFS/WMS layers](https://www.dipul.de/homepage/de/informationen/geografische-gebiete/wfs-wms/),
+  [temporary restrictions](https://www.dipul.de/homepage/de/temporaere-betriebseinschraenkungen/),
+  [DFS NOTAM guide](https://www.dfs.de/homepage/de/medien/ifr-vfr-informationen/vfr-informationen/21-10-2022-notam-von-a-bis-z/2823-notam-heftchen-neu-2022-web-ds.pdf?cid=hmg).
+
+`synthetic-route-demo` occupies the geographic rectangle west 10.519, south
+52.269, east 10.522, north 52.272 (EPSG:4326) in Braunschweig: approximately
+205 m east–west by 334 m north–south, geodesic area 0.06836 km² (6.84 hectares).
+Its OSM-like
+features, population raster, terrain and restriction wall are generated test
+data, not acquired observations. The optional OSM basemap is real map context
+only. See `backend/src/uas_planner/route_demo.py` and `sample.py`.
+
+### Delivered implementation and historical evidence
+
 - Part 3 was authorized on 2026-09-30. Issue #51 in existing Milestone #5 was
   created before `feature/51-constrained-routing`, based on iteration/005
   synchronized to main. Implementation adds deterministic distance-only A*,

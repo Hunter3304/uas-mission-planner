@@ -1,7 +1,13 @@
 # Iteration 006 — Risk-weighted routing and ABIT* integration
 
 Status: Plan approved; Part 1 implementation authorized on 2026-09-30.
-Parts 2 and 3 are deferred until the user requests them.
+Part 2 implementation authorized on 2026-10-01 and resumed after the native
+Windows dependency gate passed. Local implementation and validation are complete;
+publication and integration remain pending.
+Native Python reimplementation is deferred; no Linux runtime is selected.
+Part 3 implementation authorized on 2026-10-01; local controls, comparisons and
+documentation implemented on `feature/60-planner-controls` (Issue #60, Milestone 6).
+Part 2/3 feature-branch publication authorized on 2026-10-02; integration remains pending.
 Date: 2026-09-30 (Europe/Berlin).
 
 ## Objective
@@ -95,14 +101,27 @@ Acceptance: analytically known segment costs match; A* and Dijkstra return equal
 objective values on controlled graphs; reported physical length is independent
 of objective value; unknown inputs stay explicit; existing distance mode works.
 
-### Part 2 — OMPL/ABIT* adapter and bounded execution
+### Part 2 — Official OMPL/ABIT* adapter and bounded execution
 
-1. Verify official OMPL binding/API and installation compatibility with Python
-   3.13 on Windows/Linux before changing dependencies. Exercise the actual custom
-   objective and validator callbacks, including motion-validation overloads.
-2. Integrate `ABITstar` using planner names instead of numeric indexes. Expose
-   one planner contract with independent instances per task. Use `initialize()`
-   and `simple_setup` rather than a method/attribute named `setup`.
+Windows dependency gate passed on 2026-10-01: official OMPL 2.0.1 plus recorded
+binding/portability patches compiled into a Python 3.13 x64 wheel. Fresh isolated
+wheel installation, actual ABIT* solve, all custom callbacks, conservative
+last-valid semantics, deadline/cancellation and independent path/cost checks
+passed. See [verification](../iteration/iteration-006/part2-windows-verification.md)
+and README dependencies. Part 2 local adapter acceptance now passed (Issue #59);
+Linux execution and distribution to a second Windows machine are unverified.
+
+1. Verify a reproducible native Windows source build of official OMPL and its
+   Python 3.13 bindings in an isolated directory/environment before changing
+   project dependencies. Check MSVC/CMake/Ninja, Boost/Eigen and Nanobind; pin
+   the source revision and record any portability/binding patches. Compilation
+   or import alone is insufficient: instantiate ABITstar, exercise custom
+   objective/state/motion callbacks (including motion-validator overloads), and
+   solve and independently validate a controlled fixture. Preserve Linux support
+   with a separately tested installation path; do not install WSL or Docker.
+2. Integrate official ABITstar through a named planner contract with independent
+   instances per task. Use `initialize()` and `simple_setup` rather than a
+   method/attribute named `setup`. Keep native Python reimplementation deferred.
 3. Share Part 1's metric state/motion checks and segment costs. Verify admissible
    cost-to-go behavior for the custom objective; start with a conservative lower
    bound rather than copying the reference heuristic blindly.
@@ -121,10 +140,13 @@ Acceptance: bounded ABIT* run returns a fully validated exact path on controlled
 fixtures; approximate results do not masquerade as exact; cancellation/timeouts
 are explicit; simultaneous tasks do not overwrite outputs or share search state.
 
-Dependency decision gate: if bindings cannot run on the existing supported
-platforms, document the tested failure and prepare a concrete isolated runtime
-proposal for review. Do not silently replace ABIT*, install an unreviewed runtime,
-or mark this part complete. Part 1 remains independently deliverable.
+Dependency decision gate: missing Windows wheels do not prove source-build
+failure. The user requested plan revision followed by actual native Windows
+verification on 2026-10-01, superseding the native Python decision. Record tested
+failures and concrete remedies if compilation/bindings cannot pass the gate;
+do not silently change algorithms, Python baseline or operating system. Part 1
+remains independently deliverable. Part 2 is not complete until actual custom
+callbacks and final validated ABIT* paths run successfully.
 
 ### Part 3 — API/CLI/UI, comparisons and delivery
 
@@ -175,4 +197,14 @@ iteration history and follow verified post-merge feature-branch cleanup.
 Part 1 is tracked by Milestone 6 and Issue #56, with implementation branch
 `feature/56-risk-weighted-routing` based on `iteration/006`. The user also
 requested that the implemented calculation rules be recorded under `doc/rules/`.
-No OMPL dependency installation or Part 2/3 implementation is authorized yet.
+Part 2 implementation was authorized on 2026-10-01 after the official Windows
+source-build gate. Issue #59 in Milestone 6 precedes branch
+`feature/59-ompl-abitstar`, based on `iteration/006` synchronized to main e54e245.
+Local adapter/tests/README and lock are implemented; see Part 2 feedback.
+The runtime-gate and Python-candidate survey remain historical
+evidence; neither WSL nor native Python reimplementation is the current route.
+Part 3 implementation authorized on 2026-10-01. The user explicitly approved
+Issue #60 creation/assignment in Milestone 6 before `feature/60-planner-controls`.
+The branch preserves uncommitted Part 2 work on the same iteration/006 base.
+See `doc/iteration/iteration-006/part3.md` for local outcome and validation;
+commit/push/integration and remote CI remain pending.
