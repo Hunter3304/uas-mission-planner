@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Explorer panel controls
+
+- Accessible folding controls for all six analysis/planning/inspection panels.
+- Feature panels stay available and open together for any selected feature.
+- Risk inputs appear only for the weighted objective, retaining previous values.
+- Map and route results survive folding; real API and mobile coverage added.
+
 ## Unreleased — Iteration 006 Part 3
 
 - Compatible CLI/API/UI planner, objective, weight, clearance, background and
