@@ -352,3 +352,8 @@ and ABIT* budget remain available. Distance objective cost is horizontal route
 length in metres. Weighted objective cost is `risk_weight * integrated_building_score_length
 + distance_weight * horizontal_length`; background must be explicitly assessed.
 See [UI validation](doc/iteration/iteration-006/ui-panels.md).
+
+
+Iteration 006 Part 2/3 and explorer panel controls were accepted on 2026-10-03.
+Integration follows [PR #63](https://github.com/Hunter3304/uas-mission-planner/pull/63);
+see HANDOFF for the final main delivery state.

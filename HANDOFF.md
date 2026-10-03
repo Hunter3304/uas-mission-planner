@@ -2,6 +2,18 @@
 
 ## Current status
 
+### Accepted delivery integration (2026-10-03)
+
+- User accepted the implementation and explicitly authorized remote merge.
+- PR #62 merged UI into the planner branch at 65c7580; its Windows/Linux Python
+  and frontend CI passed. UI feature branch deleted locally/remotely.
+- PR #63 integrates native Part 2, Part 3 controls and accepted UI into
+  iteration/006 before the final main delivery PR. Earlier pending/uncommitted
+  statements below are historical snapshots.
+- No runtime behavior changed during integration; validation is recorded in
+  part3-validation.md and ui-panels.md. Retain iteration branches as history.
+
+
 ### Explorer panel refinement (2026-10-02)
 
 - Issue #61, assigned to Hunter3304 in Milestone 6, tracks the user-requested UI
