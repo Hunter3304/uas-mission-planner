@@ -29,3 +29,10 @@ Other panels initially remain expanded. No backend/planner calculation changed.
 
 This UI branch is based on feature/60-planner-controls while the Part 2/3 parent
 implementation awaits integration. The separate PR isolates the UI changes.
+
+## Accepted delivery
+
+On 2026-10-03 the user accepted and authorized merge. PR #62 merged the UI,
+PR #63 integrated Part 2/3 into iteration/006, and PR #64 delivered to main
+at 31f4930. Integration CI passed on Windows/Linux and frontend. Issues
+#59/#60/#61 closed; feature branches cleaned up, iteration/006 retained.

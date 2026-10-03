@@ -2,6 +2,19 @@
 
 ## Current status
 
+### Main delivery completed (2026-10-03)
+
+- Accepted native planning, Part 3 controls and collapsible UI delivered through
+  PR #62 -> PR #63 -> PR #64. Main merge commit: 31f4930.
+- PR #63 and #64 Windows/Linux Python and frontend CI passed before merge.
+- Issues #59, #60 and #61 verified closed as completed after main merge.
+- feature/59-ompl-abitstar, feature/60-planner-controls and
+  feature/61-collapsible-panels removed locally; the published feature/60 and
+  feature/61 branches removed remotely. Remote refs pruned. iteration/006 retained.
+- Local workspace synchronized to main, with no application changes during
+  integration. Earlier pending-state sections below are historical.
+
+
 ### Accepted delivery integration (2026-10-03)
 
 - User accepted the implementation and explicitly authorized remote merge.

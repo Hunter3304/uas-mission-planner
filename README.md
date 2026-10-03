@@ -355,5 +355,5 @@ See [UI validation](doc/iteration/iteration-006/ui-panels.md).
 
 
 Iteration 006 Part 2/3 and explorer panel controls were accepted on 2026-10-03.
-Integration follows [PR #63](https://github.com/Hunter3304/uas-mission-planner/pull/63);
-see HANDOFF for the final main delivery state.
+Delivered to main through [PR #64](https://github.com/Hunter3304/uas-mission-planner/pull/64)
+after successful Windows/Linux Python and frontend CI. See HANDOFF for integration records.
