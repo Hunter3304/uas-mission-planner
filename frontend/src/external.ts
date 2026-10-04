@@ -44,6 +44,14 @@ export interface ExternalOverlays {
   showReference?: boolean
 }
 export interface RouteResult {
+  planning_mode?: 'strict' | 'research'
+  preparation_ms?: number
+  planner_ms?: number
+  crossed_unresolved_zones?: { source: string; reason: string }[]
+  readiness?: {
+    global_reasons: { source: string; reason: string }[]
+    endpoint_reasons: { endpoint: string; state: string; reasons: { source: string; reason: string }[] }[]
+  }
   status: string
   message?: string
   geometry: Geometry | null

@@ -1,10 +1,4 @@
-"""Offline Part 1 entry point using verified snapshots and existing grid planners."""
-
-from time import perf_counter
-
-from uas_planner.core.grid import build_grid
-from uas_planner.core.risk import prepare_risk_model
-from uas_planner.core.routing import connect_endpoints, plan_route, route_context
+"""Compatibility entry point for weighted saved-data planning."""
 
 
 def plan_risk_route(
@@ -21,42 +15,24 @@ def plan_risk_route(
     safety_distance_m=0,
     time_budget_s=3,
     cancel=None,
+    planning_mode="strict",
 ):
-    """Plan without new acquisition. Background is unassessed unless supplied.
+    """Compatibility entry point using shared readiness, timing and research controls."""
+    from uas_planner.core.planning import plan_saved_route
 
-    The caller provides an integrity-verified experiment manifest (load_experiment).
-    An optional grid is already prepared from that same manifest.
-    """
-    started = perf_counter()
-    if algorithm not in ("astar", "dijkstra", "abitstar"):
-        raise ValueError("Unknown routing algorithm.")
-    selected = endpoints or {name: manifest["config"][name] for name in ("start", "end")}
-    prepared = grid if grid is not None else build_grid(directory, manifest, cell_m)
-    model = prepare_risk_model(
+    return plan_saved_route(
         directory,
         manifest,
-        prepared,
+        grid=grid,
+        cell_m=cell_m,
+        endpoints=endpoints,
+        algorithm=algorithm,
+        objective="risk",
         background_cost=background_cost,
         risk_weight=risk_weight,
         distance_weight=distance_weight,
         safety_distance_m=safety_distance_m,
+        time_budget_s=time_budget_s,
+        cancel=cancel,
+        planning_mode=planning_mode,
     )
-    if algorithm == "abitstar":
-        from uas_planner.core.abitstar import plan_abitstar
-
-        preparation_ms = (perf_counter() - started) * 1000
-        result = plan_abitstar(
-            prepared,
-            model,
-            selected,
-            time_budget_s=time_budget_s,
-            cancel=cancel,
-            started_at=started,
-        )
-        result["preparation_ms"] = preparation_ms
-    else:
-        connected = connect_endpoints(prepared, selected, safety_distance_m=safety_distance_m)
-        result = plan_route(connected, algorithm=algorithm, risk_model=model)
-    result["experiment"] = route_context(manifest, selected)
-    result["experiment"]["optimality"] = result["optimality"]
-    return result

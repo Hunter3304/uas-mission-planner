@@ -49,6 +49,7 @@ export default function ExperimentMap(props: MapProps) {
   const [route, setRoute] = useState<RouteResult | null>(null)
   const [routeError, setRouteError] = useState('')
   const [routing, setRouting] = useState(false)
+  const [planningMode, setPlanningMode] = useState('strict')
   const [algorithm, setAlgorithm] = useState('astar')
   const [objective, setObjective] = useState('distance')
   const [riskWeight, setRiskWeight] = useState(0.9)
@@ -65,6 +66,7 @@ export default function ExperimentMap(props: MapProps) {
   const base = `/api/datasets/${encodeURIComponent(props.dataset.id)}/experiment`
   useEffect(() => {
     const controller = new AbortController()
+    setPlanningMode('strict')
     setSnapshot(null)
     setError('')
     setSelected(null)
@@ -137,7 +139,7 @@ export default function ExperimentMap(props: MapProps) {
     setComparison(null)
     setComparing(false)
     return () => { routeController.current?.abort(); comparisonController.current?.abort() }
-  }, [base, cellSize, endpoints, algorithm, objective, riskWeight, distanceWeight, backgroundCost, safetyDistance, budget, repetitions])
+  }, [base, cellSize, endpoints, algorithm, objective, riskWeight, distanceWeight, backgroundCost, safetyDistance, budget, repetitions, planningMode])
   const onLocation = useCallback((lon: number, lat: number) => {
     if (selection === 'inspect') setPoint([lon, lat])
     else {
@@ -146,7 +148,7 @@ export default function ExperimentMap(props: MapProps) {
     }
   }, [selection])
   const controlQuery = () => ({
-    cell_m: String(cellSize), algorithm, objective, risk_weight: String(riskWeight),
+    cell_m: String(cellSize), algorithm, objective, planning_mode: planningMode, risk_weight: String(riskWeight),
     distance_weight: String(distanceWeight), safety_distance_m: String(safetyDistance),
     time_budget_s: String(budget), ...(backgroundCost === '' ? {} : { background_cost: backgroundCost }),
   })
@@ -292,6 +294,9 @@ export default function ExperimentMap(props: MapProps) {
       {snapshot && <>
               {endpoints && <CollapsiblePanel className="external-panel routing-controls" title="Route planning">
                 <div className="external-controls">
+                  <label>Planning mode <select value={planningMode} onChange={(e) => setPlanningMode(e.target.value)}>
+                    <option value="strict">Strict constraints</option><option value="research">Research assumptions</option>
+                  </select></label>
                   <label>Algorithm <select value={algorithm} onChange={(e) => setAlgorithm(e.target.value)}>
                     <option value="astar">A*</option><option value="dijkstra">Dijkstra</option><option value="abitstar">ABIT*</option>
                   </select></label>
@@ -304,8 +309,11 @@ export default function ExperimentMap(props: MapProps) {
                   <label>Background score assumption <input type="number" min="0" step="any" placeholder="Unassessed" value={backgroundCost} onChange={(e) => setBackgroundCost(e.target.value)} /></label>
                   </>}
                   <label>Safety distance (m) <input type="number" min="0" step="any" value={safetyDistance} onChange={(e) => setSafetyDistance(Number(e.target.value))} /></label>
-                  <label>ABIT* budget (s) <input type="number" min="0" max="60" step="0.1" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></label>
+                  <label>ABIT* search budget (s) <input type="number" min="0" max="60" step="0.1" value={budget} onChange={(e) => setBudget(Number(e.target.value))} /></label>
                 </div>
+                <p className="subtle">Search budget excludes data preparation. Constraint grid colours retain the strict source assessment.</p>
+                {planningMode === 'research' && <p role="note">Research route: unresolved DIPUL restrictions are assumed not to exclude travel. Legal checks are incomplete. Known obstacles and missing terrain remain excluded. Building risk uses polygon footprints only; point and line buildings have no inferred extent.</p>}
+                <p className="subtle">Saved mission interval: {snapshot.experiment.config.mission_start} — {snapshot.experiment.config.mission_end}. Research uses this saved scenario.</p>
                 {(['start', 'end'] as const).map((name) => <div key={name} className="external-controls">
                   <button onClick={() => setSelection(name)}>Select {name} on map</button>
                   {([0, 1] as const).map((axis) => <label key={axis}>{name} {axis === 0 ? 'longitude' : 'latitude'}
@@ -324,8 +332,13 @@ export default function ExperimentMap(props: MapProps) {
                 </div>
                 {routeError && <p role="alert">Route unavailable: {routeError}</p>}
                 {route && <div role="status" data-testid="route-result">
+                  {route.planning_mode === 'research' && <p><strong>Research route — constraint verification incomplete</strong></p>}
                   <strong>{routeLabels[route.status] ?? route.status}</strong>{route.message && `: ${route.message}`}
                   {route.length_m != null && <p>Horizontal length: {route.length_m.toFixed(3)} m</p>}
+                  {route.preparation_ms != null && <p>Preparation: {route.preparation_ms.toFixed(1)} ms · Planner: {(route.planner_ms ?? 0).toFixed(1)} ms</p>}
+                  {route.crossed_unresolved_zones && <p>Unverified zones crossed: {route.crossed_unresolved_zones.length}</p>}
+                  {route.readiness?.global_reasons.map((reason, index) => <p key={index}>Global: {reason.reason}</p>)}
+                  {route.readiness?.endpoint_reasons.map((endpoint) => <p key={endpoint.endpoint}>{endpoint.endpoint}: {endpoint.reasons.map((reason) => reason.reason).join('; ')}</p>)}
                   <p>Runtime: {route.runtime_ms.toFixed(1)} ms · {route.algorithm} · {route.objective} · {route.rules_version}</p>
                   <p>Solution: {route.solution_kind} · exact: {String(route.exact)}</p>
                   <p>Risk length cost: {number(route.risk_length_cost)} · objective cost: {number(route.objective_cost)}</p>

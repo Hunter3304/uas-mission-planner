@@ -65,6 +65,7 @@ def parser():
     route.add_argument("--start", nargs=2, type=float, metavar=("LON", "LAT"))
     route.add_argument("--end", nargs=2, type=float, metavar=("LON", "LAT"))
     route.add_argument("--algorithm", choices=("astar", "dijkstra", "abitstar"), default="astar")
+    route.add_argument("--planning-mode", choices=("strict", "research"), default="strict")
     route.add_argument("--objective", choices=("distance", "risk"), default="distance")
     route.add_argument("--risk-weight", type=float, default=0.9)
     route.add_argument("--distance-weight", type=float, default=0.1)
@@ -77,6 +78,7 @@ def parser():
     compare.add_argument("directory", type=Path)
     compare.add_argument("--start", nargs=2, type=float, metavar=("LON", "LAT"))
     compare.add_argument("--end", nargs=2, type=float, metavar=("LON", "LAT"))
+    compare.add_argument("--planning-mode", choices=("strict", "research"), default="strict")
     compare.add_argument("--cell-m", type=float, default=25)
     compare.add_argument("--risk-weight", type=float, default=0.9)
     compare.add_argument("--distance-weight", type=float, default=0.1)
@@ -118,6 +120,7 @@ def main(argv=None):
                 background_cost=args.background_cost,
                 safety_distance_m=args.safety_distance_m,
                 time_budget_s=args.time_budget_s,
+                planning_mode=args.planning_mode,
                 repetitions=args.repetitions,
                 endpoints={
                     name: getattr(args, name) or manifest["config"][name]
@@ -146,6 +149,7 @@ def main(argv=None):
                 manifest,
                 endpoints=endpoints,
                 cell_m=args.cell_m,
+                planning_mode=args.planning_mode,
                 algorithm=args.algorithm,
                 objective=args.objective,
                 risk_weight=args.risk_weight,

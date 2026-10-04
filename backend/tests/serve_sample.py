@@ -62,4 +62,9 @@ if __name__ == "__main__":
         create_experiment_fixture(root / "z-external-experiment")
         create_route_demo(root / "z-routing-demo")
         create_route_demo(root / "z-risk-demo", low_risk=True)
+        research = create_route_demo(root / "z-research-demo", low_risk=True)
+        research.pop("routing_fixture")
+        from uas_planner.core.experiment import write_json
+
+        write_json(root / "z-research-demo/experiment.json", research)
         uvicorn.run(create_app(root), host="127.0.0.1", port=8011)

@@ -1,0 +1,58 @@
+{
+  "dataset": "braunschweig-part1-v2",
+  "source_integrity_verified": true,
+  "routes": [
+    {
+      "file": "iteration007-abitstar.geojson",
+      "status": "independently_verified",
+      "segments": 13,
+      "length_m": 3426.8552444785923,
+      "risk_length_cost": 371.6761600660238,
+      "objective_cost": 677.1940685072807
+    },
+    {
+      "file": "iteration007-connected-astar.geojson",
+      "status": "independently_verified",
+      "segments": 52,
+      "length_m": 2997.056274847152,
+      "risk_length_cost": 18.474434062200363,
+      "objective_cost": 316.33261814069556
+    },
+    {
+      "file": "iteration007-connected-dijkstra.geojson",
+      "status": "independently_verified",
+      "segments": 52,
+      "length_m": 2997.056274847118,
+      "risk_length_cost": 18.474434062200363,
+      "objective_cost": 316.33261814069215
+    },
+    {
+      "file": "iteration007-connected-abitstar.geojson",
+      "status": "independently_verified",
+      "segments": 12,
+      "length_m": 3489.7542893668337,
+      "risk_length_cost": 368.57495062116476,
+      "objective_cost": 680.6928844957317
+    }
+  ],
+  "original_astar_failure": {
+    "status": "unresolved_input",
+    "message": "Endpoint-to-grid connector has unassessed building risk (way/49170599); choose another endpoint or a finer grid.",
+    "readiness": {
+      "global_reasons": [],
+      "endpoint_reasons": [
+        {
+          "endpoint": "start",
+          "state": "unresolved",
+          "reasons": [
+            {
+              "source": "building_risk",
+              "reason": "Endpoint-to-grid connector has unassessed building risk (way/49170599); choose another endpoint or a finer grid."
+            }
+          ]
+        }
+      ]
+    },
+    "planner_ms": 0.0
+  }
+}

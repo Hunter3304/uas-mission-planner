@@ -24,6 +24,7 @@ def compare_routes(
     time_budget_s=3,
     repetitions=3,
     endpoints=None,
+    planning_mode="strict",
 ):
     if (
         isinstance(repetitions, bool)
@@ -36,11 +37,16 @@ def compare_routes(
         raise ValueError("Comparison ABIT* solve budgets must total at most 60 seconds.")
     started = perf_counter()
     grid = build_grid(directory, manifest, cell_m)
+    from uas_planner.core.research import planning_grid
+
+    selected = endpoints or {name: manifest["config"][name] for name in ("start", "end")}
+    grid = planning_grid(grid, planning_mode, selected, safety_distance_m)
     model = prepare_risk_model(
         directory,
         manifest,
         grid,
         background_cost=background_cost,
+        unsupported_policy="polygon_only_research" if planning_mode == "research" else "block",
         risk_weight=risk_weight,
         distance_weight=distance_weight,
         safety_distance_m=safety_distance_m,
@@ -68,6 +74,7 @@ def compare_routes(
             safety_distance_m=safety_distance_m,
             time_budget_s=time_budget_s,
             endpoints=selected,
+            planning_mode=planning_mode,
         )
         verification = {"status": "no_exact_route"}
         if result["exact"]:

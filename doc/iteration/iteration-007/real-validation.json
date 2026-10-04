@@ -1,0 +1,107 @@
+{
+  "dataset": "braunschweig-part1-v2",
+  "synthetic": false,
+  "cell_m": 50,
+  "endpoints": {
+    "start": [
+      10.505,
+      52.254
+    ],
+    "end": [
+      10.54,
+      52.255
+    ]
+  },
+  "runs": [
+    {
+      "status": "unresolved_input",
+      "message": "Temporary restriction coverage unverified; strict policy excludes all travel.; Temporary restriction coverage unverified.",
+      "planning_mode": "strict",
+      "algorithm": "astar",
+      "length_m": null,
+      "objective_cost": null,
+      "risk_length_cost": null,
+      "runtime_ms": 839.3799999903422,
+      "preparation_ms": 831.6800000029616,
+      "planner_ms": 0.0,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": []
+    },
+    {
+      "status": "unresolved_input",
+      "message": "Temporary restriction coverage unverified; strict policy excludes all travel.; Temporary restriction coverage unverified.",
+      "planning_mode": "strict",
+      "algorithm": "dijkstra",
+      "length_m": null,
+      "objective_cost": null,
+      "risk_length_cost": null,
+      "runtime_ms": 618.358800013084,
+      "preparation_ms": 607.7378000190947,
+      "planner_ms": 0.0,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": []
+    },
+    {
+      "status": "unresolved_input",
+      "message": "Temporary restriction coverage unverified; strict policy excludes all travel.; Temporary restriction coverage unverified.",
+      "planning_mode": "strict",
+      "algorithm": "abitstar",
+      "length_m": null,
+      "objective_cost": null,
+      "risk_length_cost": null,
+      "runtime_ms": 1715.085600008024,
+      "preparation_ms": 1704.1611000022385,
+      "planner_ms": 0.0,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": []
+    },
+    {
+      "status": "unresolved_input",
+      "message": "Unresolved states or connections excluded by conservative policy; no validated path available.",
+      "planning_mode": "research",
+      "algorithm": "astar",
+      "length_m": null,
+      "objective_cost": null,
+      "risk_length_cost": null,
+      "runtime_ms": 23632.50470001367,
+      "preparation_ms": 16893.520400015404,
+      "planner_ms": 6738.979899993865,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": [
+        "Research only: unresolved DIPUL time, height and scenario applicability and temporary-restriction coverage are assumed not to exclude travel. Building risk integrates polygon footprints only; non-polygon building objects are omitted without inferring their extent, with source diagnostics retained. No flight permission or legal validation; terrain samples do not prove 3D clearance."
+      ]
+    },
+    {
+      "status": "unresolved_input",
+      "message": "Unresolved states or connections excluded by conservative policy; no validated path available.",
+      "planning_mode": "research",
+      "algorithm": "dijkstra",
+      "length_m": null,
+      "objective_cost": null,
+      "risk_length_cost": null,
+      "runtime_ms": 14917.377599980682,
+      "preparation_ms": 9344.993599981535,
+      "planner_ms": 5572.379199991701,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": [
+        "Research only: unresolved DIPUL time, height and scenario applicability and temporary-restriction coverage are assumed not to exclude travel. Building risk integrates polygon footprints only; non-polygon building objects are omitted without inferring their extent, with source diagnostics retained. No flight permission or legal validation; terrain samples do not prove 3D clearance."
+      ]
+    },
+    {
+      "status": "success",
+      "message": null,
+      "planning_mode": "research",
+      "algorithm": "abitstar",
+      "length_m": 3426.8552444785923,
+      "objective_cost": 677.1940685072807,
+      "risk_length_cost": 371.6761600660238,
+      "runtime_ms": 10565.208000014536,
+      "preparation_ms": 7547.363700025016,
+      "planner_ms": 3015.4845000070054,
+      "crossed_unresolved_zones": [],
+      "research_assumptions": [
+        "Research only: unresolved DIPUL time, height and scenario applicability and temporary-restriction coverage are assumed not to exclude travel. Building risk integrates polygon footprints only; non-polygon building objects are omitted without inferring their extent, with source diagnostics retained. No flight permission or legal validation; terrain samples do not prove 3D clearance."
+      ]
+    }
+  ]
+}

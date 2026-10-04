@@ -235,7 +235,11 @@ def plan_route(
             status="invalid_endpoint",
             message="Endpoint outside bounds or touching a modeled obstacle.",
         )
-    elif "unresolved" in point_states or any(p["assessment"] == "unresolved" for p in risk_points):
+    elif (
+        "unresolved" in point_states
+        or any(c["state"] == "unresolved" for c in connectors.values())
+        or any(p["assessment"] == "unresolved" for p in risk_points)
+    ):
         result.update(
             status="unresolved_input",
             message="Coverage or constraint applicability unresolved; conservative policy prevents a validated route.",

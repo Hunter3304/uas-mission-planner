@@ -63,6 +63,7 @@ class RiskModel:
         distance_weight=0.1,
         source=None,
         safety_distance_m=0,
+        unsupported_policy="block",
     ):
         self.crs = metric_crs(analysis_crs)
         forward = _coordinate_transform(input_crs, self.crs.to_string())
@@ -81,6 +82,8 @@ class RiskModel:
         if self.risk_weight + self.distance_weight == 0:
             raise ValueError("At least one objective weight must be positive.")
         self.safety_distance_m = nonnegative(safety_distance_m, "Safety distance")
+        if unsupported_policy not in ("block", "polygon_only_research"):
+            raise ValueError("Unknown unsupported building geometry policy.")
         self.records, self.diagnostics = [], []
         self.unsupported = False
         for feature in collection["features"]:
@@ -98,7 +101,7 @@ class RiskModel:
             if not geometry.intersects(self.boundary):
                 continue
             if geometry.geom_type not in ("Polygon", "MultiPolygon"):
-                self.unsupported = True
+                self.unsupported |= unsupported_policy == "block"
                 self.diagnostics.append({"id": ident, "status": "unsupported_geometry"})
                 continue
             geometry = geometry.intersection(self.boundary)
@@ -131,6 +134,7 @@ class RiskModel:
             "boundary_sha256": signature(boundary),
             "input_crs": CRS.from_user_input(input_crs).to_string(),
             "diagnostics": self.diagnostics,
+            "unsupported_geometry_policy": unsupported_policy,
         }
         self.provenance["model_signature"] = signature(self.provenance)
 
