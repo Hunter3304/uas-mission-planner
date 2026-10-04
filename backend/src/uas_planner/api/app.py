@@ -167,6 +167,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         end_lon: float | None = None,
         end_lat: float | None = None,
         export: bool = False,
+        planning_mode: Literal["strict", "research"] = "strict",
         algorithm: Literal["astar", "dijkstra", "abitstar"] = "astar",
         objective: Literal["distance", "risk"] = "distance",
         risk_weight: float = Query(0.9, ge=0, allow_inf_nan=False),
@@ -190,6 +191,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 grid=grid,
                 cell_m=cell_m,
                 endpoints=selected,
+                planning_mode=planning_mode,
                 algorithm=algorithm,
                 objective=objective,
                 risk_weight=risk_weight,
@@ -214,6 +216,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     @api.get("/api/datasets/{dataset_id}/experiment/compare")
     def experiment_compare(
         dataset_id: str,
+        planning_mode: Literal["strict", "research"] = "strict",
         cell_m: float = 25,
         background_cost: float | None = Query(None, ge=0, allow_inf_nan=False),
         risk_weight: float = Query(0.9, ge=0, allow_inf_nan=False),
@@ -244,6 +247,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 distance_weight=distance_weight,
                 safety_distance_m=safety_distance_m,
                 time_budget_s=time_budget_s,
+                planning_mode=planning_mode,
                 repetitions=repetitions,
                 endpoints=selected,
             )

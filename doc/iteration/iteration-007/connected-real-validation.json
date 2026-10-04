@@ -1,0 +1,55 @@
+{
+  "dataset": "braunschweig-part1-v2",
+  "synthetic": false,
+  "endpoints": {
+    "start": [
+      10.504709863937636,
+      52.2537613755198
+    ],
+    "end": [
+      10.539918336772804,
+      52.25510557964907
+    ]
+  },
+  "cell_m": 50,
+  "objective": "risk",
+  "background_cost": 0,
+  "runs": [
+    {
+      "algorithm": "astar",
+      "status": "success",
+      "message": null,
+      "length_m": 2997.056274847152,
+      "risk_length_cost": 18.474434062200363,
+      "objective_cost": 316.33261814069556,
+      "preparation_ms": 13958.625200000824,
+      "planner_ms": 7253.824499988696,
+      "runtime_ms": 21216.716299997643,
+      "crossed_unresolved_zones": []
+    },
+    {
+      "algorithm": "dijkstra",
+      "status": "success",
+      "message": null,
+      "length_m": 2997.056274847118,
+      "risk_length_cost": 18.474434062200363,
+      "objective_cost": 316.33261814069215,
+      "preparation_ms": 10681.450499978382,
+      "planner_ms": 7227.782200003276,
+      "runtime_ms": 17911.271299992222,
+      "crossed_unresolved_zones": []
+    },
+    {
+      "algorithm": "abitstar",
+      "status": "success",
+      "message": null,
+      "length_m": 3489.7542893668337,
+      "risk_length_cost": 368.57495062116476,
+      "objective_cost": 680.6928844957317,
+      "preparation_ms": 10482.698000007076,
+      "planner_ms": 3019.78770000278,
+      "runtime_ms": 13505.435900005978,
+      "crossed_unresolved_zones": []
+    }
+  ]
+}

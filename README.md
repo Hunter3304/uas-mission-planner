@@ -30,6 +30,38 @@ inspection. Windows/Linux Python and frontend CI passed before and after merge.
 The real 50 m grid has 3,809 cells and 14,867 candidate edges; initial preparation
 took about 35 seconds locally, so allow it to finish before inspecting cells.
 
+## Iteration 007: real-area research routing (local implementation)
+
+The default **Planning mode: Strict constraints** now reports unresolved source
+coverage before native search, including with an ABIT* zero-second budget.
+**ABIT* search budget (s)** excludes grid and building-model preparation. Results
+report preparation, planner and total durations; cooperative setup/validation can
+add overhead. The existing 10,000-cell cap and browser request timeout remain.
+
+To calculate on `braunschweig-part1-v2`, select **Research assumptions** explicitly.
+This assumes unresolved DIPUL applicability does not exclude travel and integrates
+polygon building footprints only; non-polygon building diagnostics are retained.
+Known obstacles, missing terrain, boundaries, clearance and unscored polygon risk
+remain excluded. This is a research route with incomplete constraint verification.
+Strict grid colours and original source layers remain available for inspection.
+Saved mission dates are historical (2026-10-01), not a newly verified flight window.
+
+For a verified weighted A*/Dijkstra example, use grid 50 m, background 0, weights
+0.9/0.1, safety distance 0, start `(10.504709863937636, 52.2537613755198)` and
+end `(10.539918336772804, 52.25510557964907)`. Both returned approximately 2,997 m
+with objective 316.333. Original points `(10.505, 52.254)` to `(10.54, 52.255)`
+produced a verified ABIT* research route with a 3 s search budget, but their
+start-to-grid connector intersects unscored building `way/49170599`; graph
+planners explain that local blocker rather than assuming a score. ABIT* stochastic
+paths and success within a fixed budget can vary between runs.
+
+CLI: add `--planning-mode research` to `experiment-route` or `route-compare`.
+API: add `planning_mode=research` to `/experiment/route` or `/experiment/compare`.
+UI exports the displayed result with mode, assumptions, crossed uncertain zones,
+source provenance and timings. Parameter/mode changes invalidate old results.
+See [approved plan](doc/plan/iteration-007.md) and
+[delivery evidence](doc/iteration/iteration-007/outcome.md).
+
 ## Part 3: constrained shortest route
 
 Part 3 was delivered to main on 2026-09-30 through

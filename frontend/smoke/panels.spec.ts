@@ -58,7 +58,7 @@ test('main panels fold without hiding the map or losing planner inputs and resul
   await expect(page.getByLabel('Distance weight', { exact: true })).toHaveCount(0)
   await expect(page.getByLabel('Background score assumption')).toHaveCount(0)
   await expect(page.getByLabel('Safety distance (m)')).toBeVisible()
-  await expect(page.getByLabel('ABIT* budget (s)')).toBeVisible()
+  await expect(page.getByLabel('ABIT* search budget (s)')).toBeVisible()
   await objective.selectOption('risk')
   await page.getByLabel('Risk weight', { exact: true }).fill('0.7')
   await page.getByLabel('Background score assumption').fill('0')

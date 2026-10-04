@@ -2,6 +2,28 @@
 
 ## Current status
 
+### Iteration 007 Parts 1/2 local delivery (2026-10-03)
+
+- User authorized writing the Iteration 007 plan and implementing Parts 1/2 only.
+- Shared planner adds explicit strict/research mode, readiness before native setup,
+  separate preparation/planner timing and full ABIT* search budget after preparation.
+- Research retains strict source data/cache integrity, obstacles, unknown terrain,
+  boundaries, clearance and unscored polygon support. It explicitly assumes unresolved
+  DIPUL applicability and polygon-only building risk; omitted non-polygon IDs remain
+  in risk provenance. CLI/API/UI/comparisons/export carry the selected mode.
+- Real 50 m Braunschweig weighted A*/Dijkstra demonstration succeeded (~2,997 m,
+  objective ~316.333). Original screenshot endpoints also succeeded with native ABIT*
+  at 3 s; their graph start connector crosses unscored way/49170599 and is explained.
+- Strict real inputs remain unresolved. Source acquisition/legal applicability,
+  updated mission scheduling and Part 3 are deferred. Saved dates are historical.
+- Plan: doc/plan/iteration-007.md; evidence: doc/iteration/iteration-007/outcome.md.
+- Remote feature-branch publication authorized on 2026-10-04. Local obsolete datasets
+  braunschweig-demo, incomplete braunschweig-part1 and duplicated braunschweig-part1-osm
+  removed; the latter GeoPackage matched v2/osm SHA-256 exactly. Kept v2 and the three
+  independently useful synthetic/offline fixtures. Superseded Iteration 005 draft removed.
+  Publication result is recorded in the final chat response. No PR or merge requested.
+
+
 ### Main delivery completed (2026-10-03)
 
 - Accepted native planning, Part 3 controls and collapsible UI delivered through
@@ -333,8 +355,9 @@ only. See `backend/src/uas_planner/route_demo.py` and `sample.py`.
   altitude/time fixed initially and potentially optimized later. Implementation
   remains explicitly deferred pending discussion.
 - Read relevant Ramke thesis sections and recorded proposed sequencing, spatial
-  model and unresolved decisions in `doc/plan/iteration-005-draft.md`. This is not
-  an approved iteration plan; no milestone/issues/branches were created.
+  model and unresolved decisions in the former Iteration 005 draft (removed on
+  2026-10-04 after being superseded by `doc/plan/iteration-005.md`). At that time
+  no milestone/issues/branches were created.
 - Created the Chinese six-source PDF report at
   `D:/Aostfalia/praxis/datasource/六项数据源评估报告_2026-09-29.pdf`.
 - PDF validation: 9 pages, embedded Chinese fonts, 17 external reference links;
