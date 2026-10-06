@@ -30,6 +30,24 @@ inspection. Windows/Linux Python and frontend CI passed before and after merge.
 The real 50 m grid has 3,809 cells and 14,867 candidate edges; initial preparation
 took about 35 seconds locally, so allow it to finish before inspecting cells.
 
+## Iteration 008 Part 1: Hannover regional sources
+
+The new [regional source workflow](doc/experiments/iteration-008/README.md)
+uses all eight supplied Hannover/Lehrte hospital and laboratory/practice addresses,
+with a configurable detour margin. The saved configuration covers about 411.74 km²
+and uses a dated Geofabrik OSM extract with offline regional selection;
+an alternative Overpass configuration uses 32 bounded requests. `study-fetch`,
+`study-inspect`, `study-rebuild` and `study-configure` provide explicit acquisition,
+offline integrity checks, rebuilding from original responses and region changes.
+OSM, all advertised DIPUL layers and native GHSL population are separate sources.
+See [Part 1 evidence](doc/iteration/iteration-008/part1.md).
+
+This source snapshot is separate from the small-area flight experiment schema.
+Regional constraint preparation and planner/UI integration remain later parts;
+the existing building-risk/distance objective retains weights 0.9/0.1.
+Mission defaults are 100 m AGL and 30 m/s (ranges 100–120 m and 25–35 m/s).
+A complete source snapshot does not establish flight permission or route readiness.
+
 ## Iteration 007: real-area research routing (local implementation)
 
 The default **Planning mode: Strict constraints** now reports unresolved source

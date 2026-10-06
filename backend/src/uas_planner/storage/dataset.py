@@ -12,7 +12,7 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
-from uas_planner.core.area import BoundingBox
+from uas_planner.core.area import BoundingBox, StudyRegion, dataset_area
 
 IDENTITY = ["element_type", "osm_id"]
 RESERVED = {*IDENTITY, "geometry", "tags_json"}
@@ -41,7 +41,7 @@ def _validate_metadata(metadata):
     ):
         raise ValueError("Dataset tag columns must be unique names without reserved fields.")
     try:
-        BoundingBox(**metadata["query_bounds"])
+        dataset_area(metadata)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("Dataset metadata requires valid query bounds.") from exc
 
@@ -74,6 +74,7 @@ def save_dataset(
     tags: dict,
     *,
     synthetic: bool = False,
+    tag_objects: list[dict] | None = None,
 ) -> dict:
     """Create a new dataset; manifest written last marks successful completion.
 
@@ -90,13 +91,26 @@ def save_dataset(
     if frame.geometry.isna().any() or frame.geometry.is_empty.any():
         raise ValueError("Dataset contains missing or empty geometries.")
     frame = frame.to_crs(4326)
-    tag_columns = [name for name in frame.columns if name not in [*IDENTITY, frame.geometry.name]]
+    if tag_objects is not None:
+        if len(tag_objects) != len(frame) or not all(isinstance(row, dict) for row in tag_objects):
+            raise ValueError("Sparse tag objects must match the feature rows.")
+        names = {name for row in tag_objects for name in row}
+        if not all(isinstance(name, str) for name in names):
+            raise ValueError("Tag names must be strings.")
+        tag_columns = sorted(names)
+    else:
+        tag_columns = [
+            name for name in frame.columns if name not in [*IDENTITY, frame.geometry.name]
+        ]
     if RESERVED.intersection(tag_columns):
         raise ValueError("Dataset tag columns conflict with reserved fields.")
-    rows = [
-        json.dumps({name: _json_value(row[name]) for name in tag_columns}, allow_nan=False)
-        for _, row in frame.iterrows()
-    ]
+    if tag_objects is not None:
+        rows = [json.dumps(_json_value(row), allow_nan=False) for row in tag_objects]
+    else:
+        rows = [
+            json.dumps({name: _json_value(row[name]) for name in tag_columns}, allow_nan=False)
+            for _, row in frame.iterrows()
+        ]
     output = frame[IDENTITY + [frame.geometry.name]].copy()
     output["tags_json"] = rows
     directory.mkdir(parents=True, exist_ok=False)
@@ -104,14 +118,17 @@ def save_dataset(
     output.to_file(path, layer="features", driver="GPKG", engine="pyogrio", index=False)
     metadata = {
         "schema_version": 1,
-        "source": "OpenStreetMap via OSMnx/Overpass",
+        "source": frame.attrs.get("source", "OpenStreetMap via OSMnx/Overpass"),
         "attribution": "© OpenStreetMap contributors",
         "license_url": "https://www.openstreetmap.org/copyright",
         "saved_at_utc": datetime.now(timezone.utc).isoformat(),
         "acquisition_started_at_utc": frame.attrs.get("acquisition_started_at_utc"),
         "acquisition_finished_at_utc": frame.attrs.get("acquisition_finished_at_utc"),
-        "cache_policy": "OSMnx cache enabled; acquisition time is not the source edit time.",
+        "cache_policy": frame.attrs.get(
+            "cache_policy", "OSMnx cache enabled; acquisition time is not the source edit time."
+        ),
         "query_bounds": asdict(area),
+        "area_scope": "region" if isinstance(area, StudyRegion) else "small",
         "query_area_km2": area.area_km2,
         "query_tags": tags,
         "geometry_policy": "Complete source features intersecting the query; not clipped.",

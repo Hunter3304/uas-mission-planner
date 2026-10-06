@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, Response
 
 from uas_planner import __version__
-from uas_planner.core.area import BoundingBox
+from uas_planner.core.area import dataset_area
 from uas_planner.core.costs import analyze_all_layers, analyze_collection
 from uas_planner.core.experiment import (
     checksum,
@@ -70,7 +70,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 raise HTTPException(404, "Dataset not found.")
         try:
             frame, metadata = load_dataset(path, compact=compact)
-            BoundingBox(**metadata["query_bounds"])
+            dataset_area(metadata)
             return path, frame, metadata
         except Exception as exc:
             logger.warning("Cannot verify dataset %s: %s", dataset_id, type(exc).__name__)

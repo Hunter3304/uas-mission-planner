@@ -24,6 +24,20 @@ def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
+    study = commands.add_parser("study-fetch", help="Acquire a complete regional source snapshot")
+    study.add_argument("--config", type=Path, required=True)
+    study.add_argument("--output", type=Path, required=True)
+    study.add_argument("--resume", action="store_true")
+    study.add_argument("--cache", type=Path, default=Path(".cache/source-downloads"))
+    study_inspect = commands.add_parser("study-inspect", help="Verify regional sources offline")
+    study_inspect.add_argument("directory", type=Path)
+    rebuild = commands.add_parser("study-rebuild", help="Rebuild regional derivatives offline")
+    rebuild.add_argument("directory", type=Path)
+    rebuild.add_argument("--output", type=Path, required=True)
+    configure = commands.add_parser("study-configure", help="Regenerate a region from its sites")
+    configure.add_argument("--config", type=Path, required=True)
+    configure.add_argument("--margin-m", type=float, required=True)
+    configure.add_argument("--output", type=Path, required=True)
     fetch = commands.add_parser("fetch", help="Acquire, save, and verify a new dataset")
     for name in ("west", "south", "east", "north"):
         fetch.add_argument(f"--{name}", type=float, required=True)
@@ -94,6 +108,39 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command.startswith("study-"):
+            from dataclasses import asdict
+
+            from uas_planner.acquisition.study import (
+                acquire_study,
+                inspect_study,
+                rebuild_study,
+                region_for_locations,
+                validate_study,
+            )
+            from uas_planner.core.experiment import read_json
+
+            if args.command == "study-fetch":
+                result = acquire_study(
+                    read_json(args.config),
+                    args.output,
+                    resume=args.resume,
+                    download_cache=args.cache,
+                )
+            elif args.command == "study-rebuild":
+                result = rebuild_study(args.directory, args.output)
+            elif args.command == "study-configure":
+                result = read_json(args.config)
+                result["bounds"] = asdict(region_for_locations(result["locations"], args.margin_m))
+                result["detour_margin_m"] = args.margin_m
+                validate_study(result)
+                with args.output.open("x", encoding="utf-8") as stream:
+                    json.dump(result, stream, indent=2, allow_nan=False)
+                    stream.write("\n")
+            else:
+                result = inspect_study(args.directory)
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
         if args.command == "route-demo":
             from uas_planner.route_demo import create_route_demo
 

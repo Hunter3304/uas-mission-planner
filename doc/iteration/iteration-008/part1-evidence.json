@@ -1,0 +1,190 @@
+{
+  "snapshot": "data/hannover-part1-v4",
+  "region_area_km2": 411.74130068017575,
+  "sites": 8,
+  "osm_features": 326334,
+  "osm_layers": {
+    "building": 175367,
+    "highway": 110706,
+    "landuse": 9549,
+    "natural": 30837
+  },
+  "geometry_counts": {
+    "MultiPolygon": 187713,
+    "LineString": 91736,
+    "Point": 46875,
+    "GeometryCollection": 10
+  },
+  "invalid_geometry_count": 13,
+  "osm_tag_columns": 1481,
+  "dipul_layers": 31,
+  "dipul_features": 324,
+  "dipul_counts": {
+    "dipul:bahnanlagen": 17,
+    "dipul:behoerden": 33,
+    "dipul:binnenwasserstrassen": 11,
+    "dipul:bundesautobahnen": 10,
+    "dipul:bundesstrassen": 11,
+    "dipul:diplomatische_vertretungen": 2,
+    "dipul:ffh-gebiete": 7,
+    "dipul:flugbeschraenkungsgebiete": 0,
+    "dipul:flughaefen": 1,
+    "dipul:flugplaetze": 4,
+    "dipul:freibaeder": 22,
+    "dipul:industrieanlagen": 82,
+    "dipul:internationale_organisationen": 1,
+    "dipul:justizvollzugsanstalten": 4,
+    "dipul:kontrollzonen": 4,
+    "dipul:kraftwerke": 0,
+    "dipul:krankenhaeuser": 27,
+    "dipul:labore": 0,
+    "dipul:militaerische_anlagen": 6,
+    "dipul:nationalparks": 0,
+    "dipul:naturschutzgebiete": 8,
+    "dipul:polizei": 30,
+    "dipul:schifffahrtsanlagen": 4,
+    "dipul:seewasserstrassen": 0,
+    "dipul:sicherheitsbehoerden": 18,
+    "dipul:stromleitungen": 10,
+    "dipul:temporaere_betriebseinschraenkungen": 0,
+    "dipul:umspannwerke": 2,
+    "dipul:vogelschutzgebiete": 0,
+    "dipul:windkraftanlagen": 0,
+    "dipul:wohngrundstuecke": 10
+  },
+  "population": {
+    "shape": [
+      135,
+      323
+    ],
+    "native_cells": 43605,
+    "known_zero_cells": 21935,
+    "nodata_cells": 0,
+    "matches_original_zip": true
+  },
+  "files": 70,
+  "all_checksums_verified": true,
+  "source_format": "geofabrik-pbf",
+  "invalid_geometries": [
+    {
+      "element_type": "relation",
+      "osm_id": 49267,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[10.0947994 52.4206428]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 83227,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7412185 52.3759053]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 109178,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.850219 52.4024272]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 214914,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.8827438 52.3905124]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 410543,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7282235 52.3711366]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 10280032,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.8776257 52.3420222]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 13383495,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.725812 52.3811379]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 14350828,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7420785 52.4025905]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 14713553,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.8714943 52.3823091]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 14891888,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7008124 52.4372696]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 16666106,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7170938 52.4353306]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 18181087,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7138382 52.3728721]"
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 19806817,
+      "geometry_type": "MultiPolygon",
+      "reason": "Self-intersection[9.7380738 52.3494775]"
+    }
+  ],
+  "geometry_collection_ids": [
+    {
+      "element_type": "relation",
+      "osm_id": 2473404
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 4282895
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 4283065
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 10979299
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 11539600
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 11539601
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 11539602
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 13877027
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 17296064
+    },
+    {
+      "element_type": "relation",
+      "osm_id": 19926550
+    }
+  ]
+}

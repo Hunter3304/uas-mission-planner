@@ -2,6 +2,72 @@
 
 ## Current status
 
+### Iteration 008 Part 1 integration authorized (2026-10-06)
+
+- User authorized review and merging the published Part 1 into main through the
+  existing feature -> iteration -> main PR workflow. Parts 2–5 remain deferred.
+- Feature head before integration documentation: `e791783`.
+- CI must pass on each PR before merge. Retain `iteration/008` as history and
+  remove the feature branch only after confirming its merge and synchronization.
+- Final PR/merge commits and cleanup checks are reported in the final chat response.
+  Earlier publication-only restrictions below are historical.
+
+
+### Iteration 008 Part 1 publication authorized (2026-10-06)
+
+- User accepted Part 1 and explicitly authorized its commit and remote push.
+- Publication branch: `feature/66-hannover-acquisition`; include implementation,
+  tests, English plan, workflow guide and recorded validation evidence.
+- Retain local source datasets and download caches outside Git. No application
+  changes since the verified 187-pass delivery; only publication records updated.
+- Push result and remote-head verification are reported in the final chat response.
+  Pull request creation and integration merges are not included in this request.
+- Earlier local-only statements below are historical delivery records.
+
+
+### Iteration 008 Part 1 local delivery (2026-10-05)
+
+- User authorized Part 1 implementation only. Milestone 7 / Issue #66 precede
+  `iteration/008` and `feature/66-hannover-acquisition`; no commit/push/PR/merge.
+- Completed `data/hannover-part1-v4`: eight verified address points, a 5 km detour
+  allowance and 411.74 km² Hannover/Lehrte region. Default configuration and guide
+  are in `doc/experiments/iteration-008/`; evidence in
+  `doc/iteration/iteration-008/part1.md` and `part1-evidence.json`.
+- `study-fetch/inspect/rebuild/configure` acquire, verify, rebuild offline and
+  regenerate boundaries. Regional scope is explicit; legacy 25 km² queries remain.
+- Overpass partial acquisition encountered repeated 504/timeouts. Optional bounded
+  requests, recorded subdivisions and verified resume remain supported. Default
+  OSM input is dated Geofabrik Niedersachsen PBF, with publisher MD5, SHA-256,
+  original extract polygon and local GDAL selection; no new runtime dependency.
+- Regional OSM tags are sparse JSON objects, not a wide null-filled dataframe.
+  Real snapshot: 326,334 objects, 1,481 tag keys; 13 invalid geometries and 10
+  GeometryCollections remain explicitly recorded for Part 2 treatment.
+- DIPUL: all 31 advertised layers, 324 features; temporary layer returned zero,
+  without claiming temporal/legal/NOTAM completeness. GHSL crop: 43,605 native
+  cells, 21,935 known zeros, no NoData; values/masks match original ZIP exactly.
+- Offline inspection verifies all 70 files. Raw-receipt offline rebuild succeeded.
+  Regression: 187 passed / one existing Windows permission skip; Ruff, ESLint and
+  frontend build passed. Evidence is local; source payloads remain excluded from Git.
+- Part 2 must prepare constraints and bounded terrain/vertical-reference support.
+  The source study is not yet a flight experiment or route-ready UI dataset.
+  Parts 2–5 remain deferred; preserve inherited building risk/distance weights
+  0.9/0.1. Configured altitude/speed: 100 m AGL / 30 m/s, ranges 100–120 / 25–35.
+- All version-controlled iteration/project documentation is English.
+
+### Iteration 008 planning draft (2026-10-05)
+
+- Draft: `doc/plan/iteration-008.md`; pending user review, implementation not started.
+- Scope: predefined Hannover/Lehrte region covering all eight supplied sites plus
+  detour space; reproducible OSM/DIPUL/GHSL snapshots; fixed-altitude 2D routing
+  at 100–120 m and constant cruise speed 25–35 m/s; listed origins/destinations.
+- Retain the approved building risk/distance objective (0.9/0.1) in A*, Dijkstra
+  and ABIT*. Distance-only is a comparison baseline. GHSL inspection is included;
+  population costs/fusion remain deferred.
+- User reaffirmed that all version-controlled iteration/project documents must
+  be English. Draft translated accordingly; Chinese review text stays in chat.
+- Iteration 007 historical plan preserved. No acquisition, application changes,
+  GitHub objects, commit, push or merge performed during this planning session.
+
 ### Iteration 007 Parts 1/2 local delivery (2026-10-03)
 
 - User authorized writing the Iteration 007 plan and implementing Parts 1/2 only.
