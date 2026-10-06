@@ -1,7 +1,7 @@
 # Iteration 008 — Hannover fixed-altitude 2D routing
 
 Date: 2026-10-05 (Europe/Berlin).
-Status: Part 1 implemented and validated locally on 2026-10-05; see doc/iteration/iteration-008/part1.md. Parts 2–5 remain deferred.
+Status: Part 1 delivered to main through PR #68 (`cea5b0e`) on 2026-10-06. Part 2 implemented and validated locally on 2026-10-06, tracked by Milestone 7 / Issue #69 on `feature/69-regional-constraints`, based on `iteration/008`; see doc/iteration/iteration-008/part2.md. User authorized Part 2 publication/integration after final review and successful CI on 2026-10-06. Parts 3–5 remain deferred.
 
 ## Objective and confirmed scope
 

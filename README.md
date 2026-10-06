@@ -48,6 +48,20 @@ the existing building-risk/distance objective retains weights 0.9/0.1.
 Mission defaults are 100 m AGL and 30 m/s (ranges 100–120 m and 25–35 m/s).
 A complete source snapshot does not establish flight permission or route readiness.
 
+Iteration 008 Part 2 adds offline **fixed-altitude regional constraint preparation**
+and independent native GHSL region/corridor inspection. `study-prepare` records
+exact endpoint conflicts, building-height policies, DIPUL altitude/applicability,
+full-motion terrain support and source/rule identity. `study-check` applies the
+same point, motion and connector checks. Native LGLN terrain uses separate bounded,
+checksummed snapshots through `terrain-fetch`; NHN is not silently equated with MSL.
+`study-population` produces native-cell statistics/GeoJSON and an optional SVG
+preview. Read-only `/api/datasets/{id}/study/population` exposes the same inspection
+core. GHSL does not change the building-only 0.9/0.1 routing objective.
+See the [Part 2 operating guide](doc/experiments/iteration-008/README.md#part-2-regional-constraints-and-native-population-inspection)
+and [traceable rules](doc/rules/regional-constraints.md). Unknown height, geometry,
+time, vertical reference and coverage remain explicit; regional route/selector/UI
+integration belongs to Parts 3/4.
+
 ## Iteration 007: real-area research routing (local implementation)
 
 The default **Planning mode: Strict constraints** now reports unresolved source
