@@ -1,0 +1,174 @@
+{
+  "source_attachment": "destination_drone.docx",
+  "locations": [
+    {
+      "id": "mhh",
+      "name": "Medizinische Hochschule Hannover",
+      "type": "hospital",
+      "address": "Carl-Neuberg-Straße 1, 30625 Hannover",
+      "address_source": "https://www.mhh.de/die-mhh/anfahrt-lageplan",
+      "longitude": 9.8044306,
+      "latitude": 52.3834796,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Carl-Neuberg-Stra%C3%9Fe+1&city=Hannover&postalcode=30625&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "relation",
+        "osm_id": 10723649,
+        "display_name": "Medizinische Hochschule Hannover, 1, Carl-Neuberg-Straße, Groß-Buchholz, Buchholz-Kleefeld, Hannover, Region Hannover, Niedersachsen, 30625, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "fde00dca69c46208e27e3b0cdea72d8611f473c0543a2d34db7bf0a6c81366d1"
+      }
+    },
+    {
+      "id": "henriettenstift",
+      "name": "DIAKOVERE Henriettenstift",
+      "type": "hospital",
+      "address": "Marienstraße 72-90, 30171 Hannover",
+      "address_source": "https://www.diakovere.de/gesund-werden/fuer-patienten/kontakt-und-anfahrt/",
+      "longitude": 9.7549621,
+      "latitude": 52.3693498,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Marienstra%C3%9Fe+72-90&city=Hannover&postalcode=30171&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "way",
+        "osm_id": 1272064880,
+        "display_name": "Diakovere Henriettenstift Marienstraße, 72-90, Marienstraße, Südstadt, Südstadt-Bult, Hannover, Region Hannover, Niedersachsen, 30171, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "558b067cd2946a49fa3aff74cc3ac64e87c3a89729cbaaebef1b803d6d2d196c"
+      }
+    },
+    {
+      "id": "rheuma-lister",
+      "name": "Rheumapraxis Hannover – Lister Meile",
+      "type": "practice",
+      "address": "Lister Meile 35, 30161 Hannover",
+      "address_source": "https://www.rheumapraxis-hannover.de/kontakt",
+      "longitude": 9.7454914,
+      "latitude": 52.3830161,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Lister+Meile+35&city=Hannover&postalcode=30161&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "node",
+        "osm_id": 8093716682,
+        "display_name": "Rheumatologische Praxis, 35, Lister Meile, Oststadt, Mitte, Hannover, Region Hannover, Niedersachsen, 30161, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "fb47fb741430d8678208c43694537006c8e5d910e64fe51093d85a9e15ed2b59"
+      }
+    },
+    {
+      "id": "rheuma-podbi",
+      "name": "Rheumapraxis Hannover – Podbielskistraße",
+      "type": "practice",
+      "address": "Podbielskistraße 336, 30655 Hannover",
+      "address_source": "https://www.rheumapraxis-hannover.de/kontakt",
+      "longitude": 9.7967855,
+      "latitude": 52.4044919,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Podbielskistra%C3%9Fe+336&city=Hannover&postalcode=30655&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "way",
+        "osm_id": 774947489,
+        "display_name": "336, Podbielskistraße, Groß-Buchholz, Buchholz-Kleefeld, Hannover, Region Hannover, Niedersachsen, 30655, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "859af6eb4b3d8d5daea34f6de0e4d9b25aacd67217349bd94eae06df1364a113"
+      }
+    },
+    {
+      "id": "limbach-lehrte",
+      "name": "MVZ Labor Limbach Lehrte",
+      "type": "laboratory",
+      "address": "Auf den Pohläckern 12, 31275 Lehrte",
+      "address_source": "https://www.labor-limbach-lehrte.de/datenschutz/",
+      "longitude": 9.9934419,
+      "latitude": 52.3660066,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Auf+den+Pohl%C3%A4ckern+12&city=Lehrte&postalcode=31275&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "node",
+        "osm_id": 4790577644,
+        "display_name": "12, Auf den Pohläckern, Kernstadt Lehrte, Lehrte, Region Hannover, Niedersachsen, 31275, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "71438875aaa74f223e1f59ca7f381419a75b22129e68c59a1274d1b23538bc90"
+      }
+    },
+    {
+      "id": "amedes-georg",
+      "name": "amedes MVZ wagnerstibbe",
+      "type": "laboratory",
+      "address": "Georgstraße 50, 30159 Hannover",
+      "address_source": "https://www.amedes-genetics.de/ueber-uns/standorte-labor.html",
+      "longitude": 9.7404959,
+      "latitude": 52.3718267,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Georgstra%C3%9Fe+50&city=Hannover&postalcode=30159&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "way",
+        "osm_id": 553716688,
+        "display_name": "50, Georgstraße, Altstadt, Mitte, Hannover, Region Hannover, Niedersachsen, 30159, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "da075516ce009eb3d8b669cfecb59e8f820d77850f1e39f0555143688b626c99"
+      }
+    },
+    {
+      "id": "amedes-schiffgraben",
+      "name": "amedes MVZ genetics",
+      "type": "laboratory",
+      "address": "Schiffgraben 30, 30175 Hannover",
+      "address_source": "https://www.amedes-genetics.de/ueber-uns/standorte-labor.html",
+      "longitude": 9.7513771,
+      "latitude": 52.3753923,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Schiffgraben+30&city=Hannover&postalcode=30175&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "node",
+        "osm_id": 1973481827,
+        "display_name": "30, Schiffgraben, Oststadt, Mitte, Hannover, Region Hannover, Niedersachsen, 30175, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "20f89a0f5fc51489c9dd65d3b1d395ab69977edb892cfe16605575be880d0d3d"
+      }
+    },
+    {
+      "id": "friederikenstift",
+      "name": "DIAKOVERE Friederikenstift",
+      "type": "hospital",
+      "address": "Humboldtstraße 5, 30169 Hannover",
+      "address_source": "https://www.diakovere.de/gesund-werden/fuer-patienten/kontakt-und-anfahrt/",
+      "longitude": 9.7246387,
+      "latitude": 52.3711038,
+      "coordinate_status": "address_geocoded_not_landing_site",
+      "address_status": "matched_to_operator_contact_page",
+      "verified_on": "2026-10-05",
+      "coordinate_source": {
+        "provider": "OSM Nominatim",
+        "request_url": "https://nominatim.openstreetmap.org/search?street=Humboldtstra%C3%9Fe+5&city=Hannover&postalcode=30169&country=Germany&format=jsonv2&addressdetails=1&limit=5",
+        "osm_type": "way",
+        "osm_id": 62061812,
+        "display_name": "DIAKOVERE Friederikenstift Humboldtstraße, 5, Humboldtstraße, Calenberger Neustadt, Mitte, Hannover, Region Hannover, Niedersachsen, 30169, Deutschland",
+        "selection": "first matching named facility or exact address; representative point, not landing site",
+        "response_sha256": "d5561cc1aec91e26d145a0ca4eb8f141f2495ca1d881468f4f653c8a6b740b04"
+      }
+    }
+  ],
+  "attachment_sha256": "80794972da20e4d23d2a0266f374a1ad686ebdbf568118c2e6479527f04ece0a"
+}

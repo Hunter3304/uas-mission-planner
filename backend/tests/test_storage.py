@@ -53,6 +53,23 @@ def test_empty_dataset_roundtrip(tmp_path, features):
     assert metadata["feature_count"] == 0
 
 
+def test_sparse_tags_preserve_unknown_values_without_null_column_expansion(tmp_path, features):
+    destination = tmp_path / "sparse"
+    frame = features[["element_type", "osm_id", "geometry"]]
+    tags = [
+        {"natural": "tree", "rare:key": ["a", None]},
+        {"highway": "service"},
+        {"landuse": "forest", "height": "12"},
+    ]
+    save_dataset(frame, destination, AREA, {}, tag_objects=tags)
+    loaded, metadata = load_dataset(destination, compact=True)
+    assert loaded.attrs["source_tags"] == tags
+    assert metadata["tag_columns"] == sorted({key for row in tags for key in row})
+    assert loaded.geometry.geom_equals(frame.geometry).all()
+    stored = gpd.read_file(destination / "features.gpkg", layer="features")
+    assert [json.loads(value) for value in stored["tags_json"]] == tags
+
+
 def test_corrupted_dataset_is_rejected(tmp_path, features):
     destination = tmp_path / "corrupt"
     save_dataset(features, destination, AREA, {})
