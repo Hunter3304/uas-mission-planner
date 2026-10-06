@@ -2,6 +2,21 @@
 
 ## Current status
 
+### Iteration 008 Part 1 integration delivery (2026-10-06)
+
+- PR #67 merged Part 1 into `iteration/008` at `f270ed7` after Windows/Linux
+  backend and frontend CI all passed (run `37450930456`). Issue #66 is closed.
+- Initial Linux CI exposed a few-ULP coordinate comparison; the regression now
+  uses 1e-10 degree absolute tolerance while retaining independent coverage checks.
+  Production code and saved coordinates were unchanged by this fix.
+- Merged feature branch `feature/66-hannover-acquisition` deleted locally/remotely;
+  fetch/prune, branch -a and ls-remote verified cleanup. Retain `iteration/008`.
+- Main delivery is tracked by PR #68 and requires all integration checks to pass.
+  The final main merge commit and CI results are reported in the final chat response.
+- Part 1 is complete; Parts 2–5 remain deferred. Local source snapshots remain
+  unchanged and excluded from Git. Earlier authorization/pending notes are history.
+
+
 ### Iteration 008 Part 1 integration authorized (2026-10-06)
 
 - User authorized review and merging the published Part 1 into main through the

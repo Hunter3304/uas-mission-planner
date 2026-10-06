@@ -132,3 +132,11 @@ Integration CI identified platform-specific PROJ rounding at about 1e-14 degrees
 The regenerated-boundary regression now uses an absolute 1e-10 degree tolerance
 (approximately 0.01 mm), with independent site/partition coverage checks retained.
 No acquisition, stored coordinates or planning behavior changed.
+
+## Integration record, 2026-10-06
+
+Feature PR #67 merged into iteration/008 at f270ed7 after all three jobs passed
+in GitHub Actions run 37450930456. Issue #66 is closed; the merged feature branch
+was removed locally/remotely, followed by prune and both branch/ref checks.
+Main integration is tracked by PR #68 with the same required CI gate. Retain the
+iteration branch and local source snapshot. Parts 2–5 remain deferred.
