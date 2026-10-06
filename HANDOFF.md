@@ -2,6 +2,17 @@
 
 ## Current status
 
+### Iteration 008 Part 1 integration authorized (2026-10-06)
+
+- User authorized review and merging the published Part 1 into main through the
+  existing feature -> iteration -> main PR workflow. Parts 2–5 remain deferred.
+- Feature head before integration documentation: `e791783`.
+- CI must pass on each PR before merge. Retain `iteration/008` as history and
+  remove the feature branch only after confirming its merge and synchronization.
+- Final PR/merge commits and cleanup checks are reported in the final chat response.
+  Earlier publication-only restrictions below are historical.
+
+
 ### Iteration 008 Part 1 publication authorized (2026-10-06)
 
 - User accepted Part 1 and explicitly authorized its commit and remote push.

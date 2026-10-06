@@ -123,3 +123,7 @@ The initial Part 1 implementation was delivered locally on 2026-10-05. The user
 authorized commit and feature-branch publication on 2026-10-06. Source datasets
 remain local and excluded from Git; pull request creation and integration merges
 remain outside this publication request.
+
+On 2026-10-06 the user authorized feature-to-iteration and iteration-to-main PR
+integration after successful remote CI. This delivers Part 1 only; Parts 2–5 remain
+deferred. The iteration is not declared complete by this partial delivery.
