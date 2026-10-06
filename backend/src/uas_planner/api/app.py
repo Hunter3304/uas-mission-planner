@@ -129,6 +129,44 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         _, manifest = external(dataset_id)
         return manifest
 
+    @api.get("/api/datasets/{dataset_id}/study")
+    def regional_study(dataset_id: str):
+        from uas_planner.acquisition.study import inspect_study
+
+        try:
+            return inspect_study(dataset_path(dataset_id))
+        except (ValueError, KeyError, OSError) as exc:
+            raise HTTPException(422, "Cannot verify regional source study.") from exc
+
+    @api.get("/api/datasets/{dataset_id}/study/population")
+    def regional_population(
+        dataset_id: str,
+        geometry_json: str | None = Query(None, max_length=20000),
+        corridor_m: float = Query(0, ge=0, le=1000, allow_inf_nan=False),
+        cells: bool = False,
+    ):
+        from shapely.geometry import box, shape
+
+        from uas_planner.acquisition.study import inspect_study
+        from uas_planner.core.regional import PopulationInspector, metric_geometry
+
+        path = dataset_path(dataset_id)
+        try:
+            manifest = inspect_study(path)
+            geometry = (
+                shape(json.loads(geometry_json))
+                if geometry_json
+                else box(
+                    *[manifest["config"]["bounds"][k] for k in ("west", "south", "east", "north")]
+                )
+            )
+            geometry = metric_geometry(geometry)
+            if corridor_m:
+                geometry = geometry.buffer(corridor_m / 2)
+            return PopulationInspector(path, manifest).query(geometry, include_cells=cells)
+        except (ValueError, KeyError, OSError, TypeError, AttributeError) as exc:
+            raise HTTPException(422, "Cannot inspect regional population query.") from exc
+
     @api.get("/api/datasets/{dataset_id}/experiment/layers/{layer}")
     def experiment_layer(dataset_id: str, layer: Literal["population", "zones"]):
         path, manifest = external(dataset_id)

@@ -1,0 +1,13 @@
+{
+  "scenario": "civil",
+  "timezone": "Europe/Berlin",
+  "mission_start": "2026-10-07T10:00:00+02:00",
+  "mission_end": "2026-10-07T10:15:00+02:00",
+  "agl_m": 100,
+  "speed_m_s": 30,
+  "clearance_m": 0,
+  "vertical_clearance_m": 0,
+  "building_unknown_height": "unresolved",
+  "zone_assessments": {},
+  "description": "Engineering inspection scenario only; not a user flight schedule or verified flight permission."
+}

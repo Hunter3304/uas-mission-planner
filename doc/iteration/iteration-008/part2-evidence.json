@@ -1,0 +1,725 @@
+{
+  "kind": "iteration-008-part2-evidence-summary",
+  "local_full_report_sha256": "d06bb8c926dd17db4cf9a01fbc342b5dcfb0d4b8c9a6e838baf62577041ed24e",
+  "study_manifest_sha256": "6b8a4cfadcc11395d186ee03d0d5a1da237697a624ee6f5c806f2a1e66e0898e",
+  "terrain_manifest_sha256": "fddb68566fc21416d078adc574ebd65337fd919ea8b145c78a3e1c9e696e2686",
+  "terrain_tile_bytes": 1314968709,
+  "terrain_tiles": 120,
+  "backend_passed": 208,
+  "backend_skipped": 1,
+  "new_regression_cases": 21,
+  "scenarios": [
+    {
+      "counts": {
+        "building_obstacle:clear": 13279,
+        "building_obstacle:unresolved": 162010,
+        "building_obstacle:blocked": 1,
+        "conditional_zone:unresolved": 320,
+        "zone_applicability_unresolved:unresolved": 4
+      },
+      "blocked_buildings": [
+        {
+          "source": "way/590712193",
+          "height_m": 282.0,
+          "basis": "reported height plus configured vertical clearance"
+        }
+      ],
+      "geometry_diagnostic_counts": {
+        "invalid_geometry": 13,
+        "non_polygon_building": 67,
+        "unsupported_geometry": 10
+      },
+      "terrain_coverage": {
+        "tile_count": 120,
+        "grid_covers_region": true,
+        "vertical_datum": "DHHN2016_NHN",
+        "value_completeness": "NoData and native pixel budget checked independently for each complete query"
+      },
+      "population": {
+        "product": "GHS-POP R2023A V1.0",
+        "epoch": 2020,
+        "units": "people per native 100 m cell",
+        "native_support_m": 100,
+        "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+        "known_cells": 41725,
+        "unknown_cells": 0,
+        "known_zero_cells": 20415,
+        "known_area_m2": 411042496.0822549,
+        "unknown_area_m2": 0.0,
+        "outside_support_measure": 0.0,
+        "complete_support": true,
+        "estimated_people": 666979.7556445154,
+        "observed_estimated_people": 666979.7556445154,
+        "crossed_cell_population_sum": 672365.1964169797,
+        "observed_crossed_cell_population_sum": 672365.1964169797,
+        "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+        "routing_cost": false
+      },
+      "scenario": {
+        "scenario": "civil",
+        "timezone": "Europe/Berlin",
+        "mission_start": "2026-10-07T10:00:00+02:00",
+        "mission_end": "2026-10-07T10:15:00+02:00",
+        "agl_m": 100,
+        "speed_m_s": 30,
+        "clearance_m": 0,
+        "vertical_clearance_m": 0,
+        "building_unknown_height": "unresolved",
+        "zone_assessments": {},
+        "description": "Engineering inspection scenario only; not a user flight schedule or verified flight permission."
+      },
+      "model_signature": "2f4100dd28e6ed4ad657272410b07b4f132f5c3b3ac7b8b00aa94d9a4b8db8e3",
+      "study_signature": "eb4c5e9238d085ffcc55bcade380d3918b6335471231f1f39b0cb3b6955b72d0",
+      "terrain_signature": "613b4ca4562ab7e47b6cf548717d2407af0f544b52aa2ac8cd590db86802bf7c",
+      "offline_network_forbidden": true,
+      "preparation_and_inspection_s": 37.65706100000534,
+      "endpoints": [
+        {
+          "id": "mhh",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 57.03499984741211,
+            "maximum_m": 57.03499984741211,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.2275",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:flugplaetze/flugplaetze.106",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "henriettenstift",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 53.31100082397461,
+            "maximum_m": 53.31100082397461,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.1749",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "rheuma-lister",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 53.87200164794922,
+            "maximum_m": 53.87200164794922,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "rheuma-podbi",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 56.74700164794922,
+            "maximum_m": 56.74700164794922,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:wohngrundstuecke/wohngrundstuecke.1398",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "limbach-lehrte",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 59.32400131225586,
+            "maximum_m": 59.32400131225586,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": []
+        },
+        {
+          "id": "amedes-georg",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 55.64400100708008,
+            "maximum_m": 55.64400100708008,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:behoerden/behoerden.163",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "amedes-schiffgraben",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 54.58000183105469,
+            "maximum_m": 54.58000183105469,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:behoerden/behoerden.116",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "friederikenstift",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 51.5989990234375,
+            "maximum_m": 51.5989990234375,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:flugplaetze/flugplaetze.671",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.2295",
+              "state": "unresolved"
+            }
+          ]
+        }
+      ],
+      "motions": [
+        {
+          "origin": "rheuma-podbi",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.7967855,
+              52.4044919
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 52.89899826049805,
+            "maximum_m": 60.694000244140625,
+            "pixels": 965594,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 59,
+            "unknown_cells": 0,
+            "known_zero_cells": 0,
+            "known_area_m2": 247048.79326640329,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 987.8117940730234,
+            "observed_estimated_people": 987.8117940730234,
+            "crossed_cell_population_sum": 2426.76971244812,
+            "observed_crossed_cell_population_sum": 2426.76971244812,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        },
+        {
+          "origin": "amedes-georg",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.7404959,
+              52.3718267
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 48.8129997253418,
+            "maximum_m": 65.6729965209961,
+            "pixels": 2196512,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 108,
+            "unknown_cells": 0,
+            "known_zero_cells": 20,
+            "known_area_m2": 461512.98389779485,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 2129.5311139663236,
+            "observed_estimated_people": 2129.5311139663236,
+            "crossed_cell_population_sum": 4894.095816642046,
+            "observed_crossed_cell_population_sum": 4894.095816642046,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        },
+        {
+          "origin": "limbach-lehrte",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.9934419,
+              52.3660066
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 19.06800079345703,
+            "maximum_m": 69.33799743652344,
+            "pixels": 3367702,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 292,
+            "unknown_cells": 0,
+            "known_zero_cells": 83,
+            "known_area_m2": 1307907.490606616,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 2470.56200041501,
+            "observed_estimated_people": 2470.56200041501,
+            "crossed_cell_population_sum": 5333.973725222051,
+            "observed_crossed_cell_population_sum": 5333.973725222051,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        }
+      ]
+    },
+    {
+      "counts": {
+        "building_obstacle:clear": 13279,
+        "building_obstacle:unresolved": 162010,
+        "building_obstacle:blocked": 1,
+        "conditional_zone:unresolved": 320,
+        "zone_applicability_unresolved:unresolved": 4
+      },
+      "blocked_buildings": [
+        {
+          "source": "way/590712193",
+          "height_m": 282.0,
+          "basis": "reported height plus configured vertical clearance"
+        }
+      ],
+      "geometry_diagnostic_counts": {
+        "invalid_geometry": 13,
+        "non_polygon_building": 67,
+        "unsupported_geometry": 10
+      },
+      "terrain_coverage": {
+        "tile_count": 120,
+        "grid_covers_region": true,
+        "vertical_datum": "DHHN2016_NHN",
+        "value_completeness": "NoData and native pixel budget checked independently for each complete query"
+      },
+      "population": {
+        "product": "GHS-POP R2023A V1.0",
+        "epoch": 2020,
+        "units": "people per native 100 m cell",
+        "native_support_m": 100,
+        "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+        "known_cells": 41725,
+        "unknown_cells": 0,
+        "known_zero_cells": 20415,
+        "known_area_m2": 411042496.0822549,
+        "unknown_area_m2": 0.0,
+        "outside_support_measure": 0.0,
+        "complete_support": true,
+        "estimated_people": 666979.7556445154,
+        "observed_estimated_people": 666979.7556445154,
+        "crossed_cell_population_sum": 672365.1964169797,
+        "observed_crossed_cell_population_sum": 672365.1964169797,
+        "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+        "routing_cost": false
+      },
+      "scenario": {
+        "scenario": "civil",
+        "timezone": "Europe/Berlin",
+        "mission_start": "2026-10-07T10:00:00+02:00",
+        "mission_end": "2026-10-07T10:15:00+02:00",
+        "agl_m": 120,
+        "speed_m_s": 30,
+        "clearance_m": 0,
+        "vertical_clearance_m": 0,
+        "building_unknown_height": "unresolved",
+        "zone_assessments": {},
+        "description": "Engineering inspection scenario only; not a user flight schedule or verified flight permission."
+      },
+      "model_signature": "b47983fd02f76b3387e81dd408d4c9c19216de2122b59c35fa10bc59516494ee",
+      "study_signature": "eb4c5e9238d085ffcc55bcade380d3918b6335471231f1f39b0cb3b6955b72d0",
+      "terrain_signature": "613b4ca4562ab7e47b6cf548717d2407af0f544b52aa2ac8cd590db86802bf7c",
+      "offline_network_forbidden": true,
+      "preparation_and_inspection_s": 37.58707790001063,
+      "endpoints": [
+        {
+          "id": "mhh",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 57.03499984741211,
+            "maximum_m": 57.03499984741211,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.2275",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:flugplaetze/flugplaetze.106",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "henriettenstift",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 53.31100082397461,
+            "maximum_m": 53.31100082397461,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.1749",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "rheuma-lister",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 53.87200164794922,
+            "maximum_m": 53.87200164794922,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "rheuma-podbi",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 56.74700164794922,
+            "maximum_m": 56.74700164794922,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:wohngrundstuecke/wohngrundstuecke.1398",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:kontrollzonen/kontrollzonen.57",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "limbach-lehrte",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 59.32400131225586,
+            "maximum_m": 59.32400131225586,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": []
+        },
+        {
+          "id": "amedes-georg",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 55.64400100708008,
+            "maximum_m": 55.64400100708008,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:behoerden/behoerden.163",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "amedes-schiffgraben",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 54.58000183105469,
+            "maximum_m": 54.58000183105469,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:behoerden/behoerden.116",
+              "state": "unresolved"
+            }
+          ]
+        },
+        {
+          "id": "friederikenstift",
+          "state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 51.5989990234375,
+            "maximum_m": 51.5989990234375,
+            "pixels": 1,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "zones": [
+            {
+              "source": "dipul:flugplaetze/flugplaetze.671",
+              "state": "unresolved"
+            },
+            {
+              "source": "dipul:krankenhaeuser/krankenhaeuser.2295",
+              "state": "unresolved"
+            }
+          ]
+        }
+      ],
+      "motions": [
+        {
+          "origin": "rheuma-podbi",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.7967855,
+              52.4044919
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 52.89899826049805,
+            "maximum_m": 60.694000244140625,
+            "pixels": 965594,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 59,
+            "unknown_cells": 0,
+            "known_zero_cells": 0,
+            "known_area_m2": 247048.79326640329,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 987.8117940730234,
+            "observed_estimated_people": 987.8117940730234,
+            "crossed_cell_population_sum": 2426.76971244812,
+            "observed_crossed_cell_population_sum": 2426.76971244812,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        },
+        {
+          "origin": "amedes-georg",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.7404959,
+              52.3718267
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 48.8129997253418,
+            "maximum_m": 65.6729965209961,
+            "pixels": 2196512,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 108,
+            "unknown_cells": 0,
+            "known_zero_cells": 20,
+            "known_area_m2": 461512.98389779485,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 2129.5311139663236,
+            "observed_estimated_people": 2129.5311139663236,
+            "crossed_cell_population_sum": 4894.095816642046,
+            "observed_crossed_cell_population_sum": 4894.095816642046,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        },
+        {
+          "origin": "limbach-lehrte",
+          "destination": "mhh",
+          "coordinates": [
+            [
+              9.9934419,
+              52.3660066
+            ],
+            [
+              9.8044306,
+              52.3834796
+            ]
+          ],
+          "strict_state": "unresolved",
+          "research_state": "unresolved",
+          "terrain": {
+            "status": "known",
+            "minimum_m": 19.06800079345703,
+            "maximum_m": 69.33799743652344,
+            "pixels": 3367702,
+            "vertical_datum": "DHHN2016_NHN",
+            "method": "conservative complete native bounding windows; not center samples or 3D clearance"
+          },
+          "population_corridor_100m": {
+            "product": "GHS-POP R2023A V1.0",
+            "epoch": 2020,
+            "units": "people per native 100 m cell",
+            "native_support_m": 100,
+            "area_basis": "native ESRI:54009 planar cell intersections; distinct from geodesic study area",
+            "known_cells": 292,
+            "unknown_cells": 0,
+            "known_zero_cells": 83,
+            "known_area_m2": 1307907.490606616,
+            "unknown_area_m2": 0.0,
+            "outside_support_measure": 0.0,
+            "complete_support": true,
+            "estimated_people": 2470.56200041501,
+            "observed_estimated_people": 2470.56200041501,
+            "crossed_cell_population_sum": 5333.973725222051,
+            "observed_crossed_cell_population_sum": 5333.973725222051,
+            "interpretation": "Area-weighted native counts assume uniform population within each cell; crossed-cell sum counts whole cells, not people exposed to a flight.",
+            "routing_cost": false
+          }
+        }
+      ]
+    }
+  ]
+}

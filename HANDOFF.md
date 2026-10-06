@@ -2,6 +2,61 @@
 
 ## Current status
 
+### Iteration 008 Part 2 integration authorized (2026-10-06)
+
+- User accepted Part 2 and authorized final review, commit/push and integration
+  through feature -> iteration/008 -> main PRs after successful CI.
+- Final review fixed native GHSL point/line queries on cell edges to include both
+  neighbouring cells; added an independent boundary regression. Area-weighted region
+  and corridor results remain unchanged. Required checks run on the reviewed source.
+- Final reviewed backend regression: 209 passed / one existing Windows permission
+  skip (63.38 s); Ruff lint/format pass. Previous frontend lint/build and offline
+  source evidence remain applicable. Remote Windows/Linux/frontend CI gates both PRs.
+- Keep original study/terrain data local and excluded from Git. Deliver Part 2 only;
+  Parts 3–5 remain deferred. Retain iteration/008 and clean the merged feature branch
+  after confirming integration/synchronization. Earlier local-only notes are history.
+
+### Iteration 008 Part 2 local delivery (2026-10-06)
+
+- User authorized Part 2 implementation. Milestone 7 / Issue #69 was created
+  before `feature/69-regional-constraints`, based on existing `iteration/008`.
+  Part 1 main delivery is confirmed locally at PR #68 merge `cea5b0e`.
+- Implemented offline indexed fixed-AGL constraints, explicit timed scenario,
+  building-height/clearance policies, original geometry diagnostics, compatible
+  vertical-reference checks and source-signature/evidence-scoped zone decisions.
+  Point, full motion, polyline and endpoint connectors share the same checks.
+- Native terrain: bounded 2 km requests, up to three workers, checksummed WCS
+  originals/metadata, explicit verified resume and complete-marker gating. Full
+  `data/hannover-part2-terrain-v1` completed 120/120 tiles (1,314,968,709 TIFF bytes),
+  covering the complete study region. A server 502 after 86 tiles was recovered
+  with two-worker resume. Earlier MHH one-kilometre probe remains separate evidence.
+- Complete conservative terrain windows retain NoData and 4,000,000-pixel query
+  limits; NHN is not implicitly MSL. Known terrain does not establish 3D clearance.
+- GHSL native region/corridor/crossed-cell queries and SVG/cell-GeoJSON inspection
+  are independent of routing cost. Existing soft building max-overlap/background
+  semantics and risk/distance weights 0.9/0.1 are preserved through `RiskModel`.
+- CLI: `terrain-fetch`, `study-prepare`, `study-check`, `study-population`.
+  Read-only API: `/api/datasets/{id}/study` and `/study/population`. Frontend
+  selectors/layer controls and regional algorithm integration remain Parts 3/4.
+- 208 backend passes / one existing Windows permission skip; 21 new cases also
+  passed after final bounds checks. Ruff, ESLint and frontend build passed. Native
+  SVG rendered/inspected in installed Chrome without adding a dependency.
+- Offline real verification forbade network access: 100/120 m scenarios (~37.66 /
+  37.59 s), all eight addresses and three representative motions have known complete
+  terrain support. All remain unresolved due to retained building/source uncertainty.
+  Source reports one 282 m building, 162,010 polygon buildings without usable height,
+  13 invalid geometries, 10 collections and 67 non-polygon building diagnostics.
+- Regional population estimate ~666,980 (2020, uniform native-cell weighting);
+  41,725 intersecting native cells, 20,415 known zeros, no missing support. Counts
+  and native-plane area are distinct from full crop/geodesic study-area totals.
+- Rules: `doc/rules/regional-constraints.md`; outcome/evidence:
+  `doc/iteration/iteration-008/part2.md` / `part2-evidence.json`; operating guide
+  and offline verification script in `doc/experiments/iteration-008/`.
+- Part 2 is implemented locally, with no commit/push/PR/merge requested here.
+  Issue #69 remains open for delivery. Original Part 1 study, terrain files and
+  caches remain local and excluded from Git. Parts 3–5 remain deferred. Earlier
+  Part 2 deferred notes below are historical.
+
 ### Iteration 008 Part 1 integration delivery (2026-10-06)
 
 - PR #67 merged Part 1 into `iteration/008` at `f270ed7` after Windows/Linux

@@ -170,3 +170,86 @@ snapshot; matching immutable source requests may reuse the download cache.
 
 See [Part 1 delivery evidence](../../iteration/iteration-008/part1.md) for the real
 snapshot counts and validation results.
+
+## Part 2: regional constraints and native population inspection
+
+Part 2 adds offline source-to-constraint preparation, separate native terrain
+snapshots and population queries. It does not produce routes or replace the
+Braunschweig `experiment.json` workflow. Rules and uncertainty policies are in
+[regional constraints](../../rules/regional-constraints.md).
+
+`hannover-scenario.json` is an explicit engineering inspection interval on
+2026-10-07, not a flight authorization or user flight schedule. Select your actual
+interval before interpreting applicability. The example retains 100 m AGL,
+30 m/s, zero additional clearance and unresolved missing building heights.
+
+```powershell
+uv run --project backend --locked uas-planner study-prepare data/hannover-part1-v4 --scenario doc/experiments/iteration-008/hannover-scenario.json --terrain data/hannover-part2-terrain-v1 --output .cache/hannover-prepared.json
+uv run --project backend --locked uas-planner study-population data/hannover-part1-v4 --svg .cache/hannover-population.svg --output .cache/hannover-population.json
+```
+
+Output paths must be new. `study-prepare` verifies the original study and terrain
+payloads, records model/rule/source identity, building/zone state counts, source
+geometry diagnostics, exact address conflicts and native population statistics.
+Omit `--terrain` to inspect explicit unknown terrain support; this does not create
+observed elevation or permission. Read the `blocked`, `unresolved`, `assumptions`
+and `terrain` fields, not just the summary state.
+
+For a WGS84 GeoJSON Point or LineString **geometry** file:
+
+```powershell
+uv run --project backend --locked uas-planner study-check data/hannover-part1-v4 --scenario doc/experiments/iteration-008/hannover-scenario.json --terrain data/hannover-part2-terrain-v1 --query .cache/motion.json --mode strict --output .cache/motion-check.json
+uv run --project backend --locked uas-planner study-population data/hannover-part1-v4 --query .cache/motion.json --corridor-m 100 --cells --output .cache/corridor-population.json
+```
+
+`--corridor-m` is total corridor width; half is buffered on each side in metric
+coordinates. `--cells` includes native-cell GeoJSON, not a resampled grid. The SVG
+shows the complete aligned population crop including its edge margin; it does not
+show statutory constraints or flight risk. Missing support makes complete totals
+null and retains observed partial totals.
+
+Read-only API:
+
+- `/api/datasets/{id}/study`: verified regional manifest.
+- `/api/datasets/{id}/study/population`: full-region native population statistics.
+- Optional `geometry_json` is a URL-encoded WGS84 GeoJSON geometry; `corridor_m`
+  and `cells=true` request a corridor and native display layer respectively.
+
+The population API and CLI share `PopulationInspector`. Endpoint selectors,
+regional layer switches and route display remain Part 4.
+
+### Separate bounded native terrain acquisition
+
+Use the exact study bounds, in west/south/east/north order, to reproduce the
+full-region terrain snapshot. `terrain-fetch` permits at most 144 native 2 km
+requests, with up to three workers. Hannover's region requires 120 tiles. This
+is a large separate download; existing original study files remain untouched.
+
+```powershell
+$studyConfig = Get-Content doc/experiments/iteration-008/hannover-study.json -Raw | ConvertFrom-Json
+uv run --project backend --locked uas-planner terrain-fetch --bounds $studyConfig.bounds.west $studyConfig.bounds.south $studyConfig.bounds.east $studyConfig.bounds.north --output data/hannover-part2-terrain-v1 --workers 3
+```
+
+On interruption, use the identical command with `--resume`. Receipted payloads
+are verified and reused; unreceipted files are preserved under archive names before
+fresh acquisition. Completion requires every planned tile and valid native grids.
+Changing bounds requires a new output directory. DGM1 retains its native 1 m
+grid and NHN reference. Incomplete support, NoData and a conservative query budget
+remain explicit; no center sample stands in for full-motion terrain coverage.
+
+`data/hannover-part2-terrain-mhh` is the earlier one-kilometre native acquisition
+probe around MHH. Its coverage is only local; it is not the full-region snapshot.
+
+### Reproduce offline Part 2 evidence
+
+With retained study and completed full-region terrain snapshots:
+
+```powershell
+uv run --project backend --locked python doc/experiments/iteration-008/verify-part2.py --output .cache/hannover-part2-evidence.json
+```
+
+The script explicitly forbids HTTP requests, verifies both snapshots and records
+100/120 m scenarios, all eight address diagnostics and three representative complete
+motions with independent 100 m-wide population corridors. Its motion checks are
+inspection evidence, not searched routes or Part 5 flight experiments. Pixel-budget
+failures, unknown applicability and address conflicts are retained in the output.

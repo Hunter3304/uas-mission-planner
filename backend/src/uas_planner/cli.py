@@ -24,6 +24,42 @@ def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
+    terrain = commands.add_parser("terrain-fetch", help="Acquire bounded native DGM1 tiles")
+    terrain.add_argument(
+        "--bounds", type=float, nargs=4, required=True, metavar=("WEST", "SOUTH", "EAST", "NORTH")
+    )
+    terrain.add_argument("--output", type=Path, required=True)
+    terrain.add_argument("--resume", action="store_true")
+    terrain.add_argument("--workers", type=int, default=1, choices=(1, 2, 3))
+    prepare = commands.add_parser(
+        "study-prepare", help="Prepare fixed-altitude regional constraints offline"
+    )
+    prepare.add_argument("directory", type=Path)
+    prepare.add_argument("--scenario", type=Path, required=True)
+    prepare.add_argument("--terrain", type=Path)
+    prepare.add_argument("--output", type=Path, required=True)
+    check = commands.add_parser(
+        "study-check", help="Check a regional point, complete motion or endpoint connector offline"
+    )
+    check.add_argument("directory", type=Path)
+    check.add_argument("--scenario", type=Path, required=True)
+    check.add_argument("--terrain", type=Path)
+    check.add_argument(
+        "--query", type=Path, required=True, help="WGS84 GeoJSON Point or LineString geometry"
+    )
+    check.add_argument("--mode", choices=("strict", "research"), default="strict")
+    check.add_argument("--output", type=Path)
+    population = commands.add_parser(
+        "study-population", help="Inspect native GHSL region or corridor offline"
+    )
+    population.add_argument("directory", type=Path)
+    population.add_argument(
+        "--query", type=Path, help="GeoJSON geometry in WGS84; omit for the study region"
+    )
+    population.add_argument("--corridor-m", type=float, default=0)
+    population.add_argument("--cells", action="store_true")
+    population.add_argument("--output", type=Path)
+    population.add_argument("--svg", type=Path, help="Standalone native population crop preview")
     study = commands.add_parser("study-fetch", help="Acquire a complete regional source snapshot")
     study.add_argument("--config", type=Path, required=True)
     study.add_argument("--output", type=Path, required=True)
@@ -108,6 +144,72 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command == "terrain-fetch":
+            from uas_planner.acquisition.terrain import acquire_terrain
+
+            result = acquire_terrain(
+                args.bounds, args.output, resume=args.resume, workers=args.workers
+            )
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
+        if args.command in ("study-prepare", "study-population", "study-check"):
+            from shapely.geometry import box, shape
+
+            from uas_planner.acquisition.study import finite_number, inspect_study
+            from uas_planner.core.experiment import read_json
+            from uas_planner.core.regional import (
+                PopulationInspector,
+                RegionalConstraints,
+                metric_geometry,
+                prepare_regional,
+            )
+
+            if args.command == "study-prepare":
+                result = prepare_regional(
+                    args.directory,
+                    read_json(args.scenario),
+                    args.output,
+                    terrain_directory=args.terrain,
+                )
+            elif args.command == "study-check":
+                geometry = shape(read_json(args.query))
+                if geometry.geom_type not in ("Point", "LineString") or geometry.is_empty:
+                    raise ValueError("Constraint query must be a nonempty Point or LineString.")
+                coordinates = list(geometry.coords)
+                model = RegionalConstraints(
+                    args.directory, read_json(args.scenario), terrain_directory=args.terrain
+                )
+                result = model.check(coordinates, mode=args.mode)
+                if args.output:
+                    with args.output.open("x", encoding="utf-8") as stream:
+                        json.dump(result, stream, indent=2, allow_nan=False)
+                        stream.write("\n")
+            else:
+                manifest = inspect_study(args.directory)
+                geometry = (
+                    shape(read_json(args.query))
+                    if args.query
+                    else box(
+                        *[
+                            manifest["config"]["bounds"][k]
+                            for k in ("west", "south", "east", "north")
+                        ]
+                    )
+                )
+                geometry = metric_geometry(geometry)
+                finite_number(args.corridor_m, 0, 1000, "Corridor width")
+                if args.corridor_m:
+                    geometry = geometry.buffer(args.corridor_m / 2)
+                inspector = PopulationInspector(args.directory, manifest)
+                result = inspector.query(geometry, include_cells=args.cells)
+                if args.svg:
+                    inspector.svg(args.svg)
+                if args.output:
+                    with args.output.open("x", encoding="utf-8") as stream:
+                        json.dump(result, stream, indent=2, allow_nan=False)
+                        stream.write("\n")
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
         if args.command.startswith("study-"):
             from dataclasses import asdict
 
