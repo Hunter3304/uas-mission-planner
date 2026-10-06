@@ -127,3 +127,8 @@ remain outside this publication request.
 On 2026-10-06 the user authorized feature-to-iteration and iteration-to-main PR
 integration after successful remote CI. This delivers Part 1 only; Parts 2–5 remain
 deferred. The iteration is not declared complete by this partial delivery.
+
+Integration CI identified platform-specific PROJ rounding at about 1e-14 degrees.
+The regenerated-boundary regression now uses an absolute 1e-10 degree tolerance
+(approximately 0.01 mm), with independent site/partition coverage checks retained.
+No acquisition, stored coordinates or planning behavior changed.

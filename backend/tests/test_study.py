@@ -94,7 +94,11 @@ def test_hannover_region_covers_every_site_and_chunks_partition_it():
     assert area.area_km2 > 400
     with pytest.raises(ValueError, match="25"):
         BoundingBox(**config["bounds"])
-    assert asdict(study.region_for_locations(config["locations"], 5000)) == config["bounds"]
+    # PROJ/libm may differ by a few ULPs between Windows and Linux. This absolute
+    # tolerance is approximately 0.01 mm; coverage checks below remain independent.
+    assert asdict(study.region_for_locations(config["locations"], 5000)) == pytest.approx(
+        config["bounds"], rel=0, abs=1e-10
+    )
     chunks = study.query_chunks(area)
     region = box(*area.as_tuple())
     union = unary_union([box(*chunk.as_tuple()) for chunk in chunks])
