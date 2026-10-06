@@ -2,6 +2,18 @@
 
 ## Current status
 
+### Iteration 008 Part 2 feature integration delivery (2026-10-06)
+
+- PR #70 merged Part 2 into iteration/008 at `05c0db5` after all Windows/Linux
+  backend and frontend jobs passed in Actions run `37465730389`. Reviewed local
+  regression: 209 passed / one existing Windows permission skip; 22 Part 2 cases.
+- Issue #69 is closed. Merged `feature/69-regional-constraints` was deleted locally
+  and remotely; fetch/prune, branch -a and ls-remote confirmed cleanup. Keep iteration/008.
+- Main delivery is tracked by PR #71 and requires all integration checks to pass.
+  Its final main merge commit and CI results are reported in the final chat response.
+- Part 2 is complete; Parts 3–5 remain deferred. Native terrain/source snapshots
+  remain unchanged and excluded from Git. Earlier publication/pending notes are history.
+
 ### Iteration 008 Part 2 integration authorized (2026-10-06)
 
 - User accepted Part 2 and authorized final review, commit/push and integration

@@ -146,3 +146,12 @@ Final reviewed backend regression: **209 passed / one existing Windows permissio
 skip** (63.38 s); Ruff lint/format checks passed.
 The user authorized commit, push and both PR merges after successful CI. Parts 3–5
 remain deferred; the iteration is not complete after this Part 2 delivery.
+
+## Integration record, 2026-10-06
+
+Feature PR #70 merged into iteration/008 at `05c0db5` after all three CI jobs passed
+in GitHub Actions run `37465730389`. Issue #69 is closed; the merged feature branch
+was removed locally/remotely, followed by fetch/prune and local/remote ref checks.
+Main delivery is tracked by PR #71 with its own successful-CI gate. Retain the
+iteration branch and original local snapshots. Final main merge/CI results are
+reported in the final delivery response; Parts 3–5 remain deferred.
