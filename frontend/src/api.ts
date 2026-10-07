@@ -1,9 +1,9 @@
-async function request(url: string, signal?: AbortSignal): Promise<Response> {
+async function request(url: string, signal?: AbortSignal, init?: RequestInit): Promise<Response> {
   // Part 1's 31k-feature analysis response is about 85 MB and can take
   // longer than 30 seconds to generate and transfer on a local Windows setup.
   const timeout = AbortSignal.timeout(120_000)
   try {
-    return await fetch(url, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout })
+    return await fetch(url, { ...init, signal: signal ? AbortSignal.any([signal, timeout]) : timeout })
   } catch (error) {
     if (signal?.aborted) throw error
     if (timeout.aborted)
@@ -15,6 +15,14 @@ async function request(url: string, signal?: AbortSignal): Promise<Response> {
       { cause: error },
     )
   }
+}
+
+export async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  const response = await request(url, signal, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  })
+  await checkResponse(response)
+  return response.json()
 }
 
 async function checkResponse(response: Response) {

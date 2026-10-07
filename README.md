@@ -404,6 +404,13 @@ This is a local small-area prototype that loads datasets into memory and revalid
 
 ## Explorer panel controls
 
+Iteration 008 Part 3 adds `study-route` and regional planning controls using the
+same offline constraints in A*, Dijkstra and native ABIT*. Weighted building risk
+defaults to 0.9/0.1; distance-only remains a baseline. Real Hannover source
+uncertainty still prevents validated routes. See the
+[Part 3 delivery](doc/iteration/iteration-008/part3.md) and
+[operating guide](doc/experiments/iteration-008/README.md).
+
 Use **Collapse / Expand** on the cost analysis, independent source layers, route
 planning, location/source inspection, feature browser and feature details panels.
 The map stays visible and folding preserves planner inputs and results. Feature

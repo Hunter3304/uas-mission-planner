@@ -1,0 +1,214 @@
+{
+  "date": "2026-10-06",
+  "scope": "Part 3 integration preflight; no flight experiment or successful real route claimed",
+  "offline": true,
+  "full_local_report_sha256": "982c25092f64f322814990885348cf95a2d1bcb9ea48dec75b56ff9416af639d",
+  "runs": [
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "astar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "astar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "dijkstra",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "dijkstra",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "abitstar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "strict",
+      "algorithm": "abitstar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "astar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "astar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "dijkstra",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "dijkstra",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "abitstar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 100,
+      "mode": "research",
+      "algorithm": "abitstar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37461.125800036825
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "astar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "astar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "dijkstra",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "dijkstra",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "abitstar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "strict",
+      "algorithm": "abitstar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "astar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "astar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "dijkstra",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "dijkstra",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "abitstar",
+      "objective": "risk",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    },
+    {
+      "altitude_m": 120,
+      "mode": "research",
+      "algorithm": "abitstar",
+      "objective": "distance",
+      "status": "unresolved_input",
+      "source_preparation_ms": 37602.15339995921
+    }
+  ],
+  "provenance_by_altitude": {
+    "100": {
+      "model_signature": "2f4100dd28e6ed4ad657272410b07b4f132f5c3b3ac7b8b00aa94d9a4b8db8e3",
+      "study_signature": "eb4c5e9238d085ffcc55bcade380d3918b6335471231f1f39b0cb3b6955b72d0",
+      "terrain_signature": "613b4ca4562ab7e47b6cf548717d2407af0f544b52aa2ac8cd590db86802bf7c",
+      "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0"
+    },
+    "120": {
+      "model_signature": "b47983fd02f76b3387e81dd408d4c9c19216de2122b59c35fa10bc59516494ee",
+      "study_signature": "eb4c5e9238d085ffcc55bcade380d3918b6335471231f1f39b0cb3b6955b72d0",
+      "terrain_signature": "613b4ca4562ab7e47b6cf548717d2407af0f544b52aa2ac8cd590db86802bf7c",
+      "classification_sha256": "cdcffd89860eea74ad81161f1474fd2929f3accc07e054adbcddfe63ca0e17e0"
+    }
+  }
+}

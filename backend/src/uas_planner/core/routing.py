@@ -18,6 +18,10 @@ GEOMETRY_TOLERANCE_M = 1e-7
 
 def constraint_checker(grid, safety_distance_m=0):
     """Recheck full geometry in metres; boundary contact with obstacles is blocked."""
+    if "_constraint_check" in grid:
+        if safety_distance_m != grid["assumptions"]["clearance_m"]:
+            raise ValueError("Regional clearance must match the prepared scenario.")
+        return grid["_constraint_check"]
     forward = Transformer.from_crs(4326, grid["analysis_crs"], always_xy=True).transform
     model = grid["validation"]
     boundary = transform(forward, shape(model["boundary"]))
