@@ -9,7 +9,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, Response
 
 from uas_planner import __version__
@@ -100,6 +100,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "sha256": metadata["sha256"],
             "verified": True,
             "has_experiment": (dataset_path(dataset_id) / "experiment.json").is_file(),
+            "has_study": (dataset_path(dataset_id) / "study.json").is_file(),
         }
 
     def external(dataset_id):
@@ -137,6 +138,47 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             return inspect_study(dataset_path(dataset_id))
         except (ValueError, KeyError, OSError) as exc:
             raise HTTPException(422, "Cannot verify regional source study.") from exc
+
+    @api.post("/api/datasets/{dataset_id}/study/route")
+    def regional_route(dataset_id: str, request: dict = Body(...)):
+        from uas_planner.core.regional_routing import plan_regional_route
+
+        allowed = {
+            "scenario",
+            "start_id",
+            "end_id",
+            "terrain_id",
+            "export",
+            "cell_m",
+            "algorithm",
+            "objective",
+            "planning_mode",
+            "background_cost",
+            "risk_weight",
+            "distance_weight",
+            "time_budget_s",
+        }
+        try:
+            if set(request) - allowed:
+                raise ValueError("Unknown regional route controls.")
+            terrain_id = request.get("terrain_id")
+            if terrain_id is not None and not isinstance(terrain_id, str):
+                raise ValueError("terrain_id must be a dataset identifier.")
+            result = plan_regional_route(
+                dataset_path(dataset_id),
+                request["scenario"],
+                request["start_id"],
+                request["end_id"],
+                terrain_directory=dataset_path(terrain_id) if terrain_id else None,
+                **{
+                    k: v
+                    for k, v in request.items()
+                    if k not in {"scenario", "start_id", "end_id", "terrain_id", "export"}
+                },
+            )
+            return route_geojson(result) if request.get("export", False) else result
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     @api.get("/api/datasets/{dataset_id}/study/population")
     def regional_population(

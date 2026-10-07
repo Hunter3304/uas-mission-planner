@@ -2,6 +2,42 @@
 
 ## Current status
 
+### Iteration 008 Part 3 integration authorized (2026-10-07)
+
+- User authorized final review, commit/push and feature -> iteration/008 -> main
+  integration after successful checks. Deliver Part 3 only; Parts 4/5 remain deferred.
+- Final backend regression: 221 passed / one existing Windows permission skip
+  (83.40 s); Ruff lint/format and frontend lint/build pass. Native routing and
+  all browser checks are reverified before publication; remote CI gates each PR.
+- Windows Playwright uses taskkill for process-tree cleanup and waits for child
+  pipe closure. Restricted-process execution can stall teardown after every
+  assertion passes; normal Windows process-permission verification is recorded
+  in part3.md. This concerns the test harness, not application request execution.
+- Retain source/terrain snapshots locally and outside Git. Retain iteration/008;
+  delete only the merged Part 3 feature branch after integration is confirmed.
+  Earlier local-only records below are historical.
+
+### Iteration 008 Part 3 local implementation (2026-10-06)
+
+- User authorized Part 3 implementation. Milestone 7 / Issue #72 created and
+  assigned before `feature/72-regional-routing`. iteration/008 fast-forwarded
+  to main Part 2 merge `848763a`; Parts 1/2 are delivered to main.
+- Shared regional routing uses catalog endpoints and Part 2 full-motion checks
+  for A*, Dijkstra and native ABIT*, weighted building costs and distance baseline.
+  Bounded graph/motion preparation, explicit preflight, independent final validation,
+  source/mission/cost/timing exports and CLI/API/basic frontend controls implemented.
+- Full regression initially 219 passed / one existing Windows permission skip;
+  final 12-case regional suite passes, including preparation deadlines and native
+  failure contracts. Frontend lint/build and 10 mocked browser tests pass; all 12
+  real API/browser checks pass individually with one worker, but Windows auxiliary
+  server teardown stalled and the runner was interrupted. Do not claim clean
+  smoke-runner exit. Mobile panel rendered/inspected with no horizontal overflow.
+  Offline 24-combination Hannover verification retains unresolved inputs and does
+  not search. Native synthetic integration demonstrates weighted graph agreement
+  and successful ABIT*. See doc/iteration/iteration-008/part3.md and evidence.
+- Changes remain local/uncommitted; no push, PR or merge. Keep source/terrain
+  snapshots unchanged and excluded from Git. Parts 4/5 remain deferred.
+
 ### Iteration 008 Part 2 feature integration delivery (2026-10-06)
 
 - PR #70 merged Part 2 into iteration/008 at `05c0db5` after all Windows/Linux

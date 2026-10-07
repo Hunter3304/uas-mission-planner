@@ -5,6 +5,11 @@ Status: Part 1 delivered to main through PR #68 (`cea5b0e`) on 2026-10-06. Part 
 
 ## Objective and confirmed scope
 
+Progress update, 2026-10-06: Parts 1/2 delivered to main (Part 2 merge `848763a`).
+Part 3 implementation authorized and prepared locally under Milestone 7 / Issue #72;
+see `doc/iteration/iteration-008/part3.md`. Parts 4/5 remain deferred. The status
+paragraph above records the earlier Part 2 publication state.
+
 Transfer the Braunschweig demonstration to a predefined Hannover/Lehrte study region. Deliver reproducible acquisition and cached loading, explicit hard constraints, existing weighted routing algorithms, map visualization and static experiments.
 
 - Initially select both endpoints from all eight locations in the supplied attachment.
