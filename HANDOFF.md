@@ -2,6 +2,18 @@
 
 ## Current status
 
+### Iteration 008 Part 3 feature integration delivery (2026-10-07)
+
+- PR #73 merged Part 3 into iteration/008 at `e7544d5` after all Windows/Linux
+  backend and frontend jobs passed in Actions run `37663352235`.
+- Final local backend: 221 passed / one existing Windows permission skip;
+  Ruff and frontend lint/build pass. With normal Windows process permissions,
+  all 10 mocked browser tests exit cleanly (6.2 s) and all 12 real-stack smoke
+  tests exit cleanly (31.5 s). Earlier teardown notes describe sandbox limits.
+- User authorized final main integration; its PR has a separate successful-CI
+  gate. Final main merge facts are reported in the delivery response. Keep
+  iteration/008 and local source snapshots; Parts 4/5 remain deferred.
+
 ### Iteration 008 Part 3 integration authorized (2026-10-07)
 
 - User authorized final review, commit/push and feature -> iteration/008 -> main

@@ -1,6 +1,13 @@
 # Iteration 008 Part 3 — Regional weighted algorithm integration
 
 Date: 2026-10-06 (Europe/Berlin).
+
+Integration update, 2026-10-07: PR #73 merged into iteration/008 at `e7544d5`
+after Windows/Linux backend and frontend CI passed in run `37663352235`.
+All 10 mocked browser tests also passed with clean Windows exit (6.2 s).
+Main integration is authorized and has its own successful-CI gate; final main
+merge facts are reported in the delivery response. Earlier local-only status
+records the implementation stage. Parts 4/5 remain deferred.
 Tracking: Milestone 7 / [Issue #72](https://github.com/Hunter3304/uas-mission-planner/issues/72).
 Branch: `feature/72-regional-routing`, based on `iteration/008` fast-forwarded to
 main's Part 2 merge `848763a`. Implementation authorized; no publication or merge
