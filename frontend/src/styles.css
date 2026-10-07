@@ -991,3 +991,6 @@ td {
 }
 .panel-heading button:focus-visible { outline: 2px solid #26866c; outline-offset: 2px; }
 [hidden] { display: none !important; }
+.regional-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 16px 0; }
+.regional-controls label { display: flex; flex-direction: column; gap: 6px; }
+.regional-controls input, .regional-controls select { min-width: 0; width: 100%; }

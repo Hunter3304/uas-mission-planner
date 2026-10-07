@@ -2,6 +2,7 @@ import CollapsiblePanel from './CollapsiblePanel'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { downloadDataset, getJson } from './api'
 import ExperimentMap from './ExperimentMap'
+import RegionalRouting from './RegionalRouting'
 import { CostDetails, CostOverview, costText } from './BuildingCosts'
 import {
   featureKey,
@@ -310,6 +311,7 @@ export default function App() {
           )}
           {dataset && data && !loading && !catalogLoading && !catalogError && (
             <>
+              {dataset.has_study && <RegionalRouting key={`${id}-${revision}`} datasetId={id} />}
               <div className="stats-grid">
                 <article className="stat">
                   <span>Total features</span>

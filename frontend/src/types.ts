@@ -71,6 +71,7 @@ export type MapData = Omit<FeatureCollection<Geometry, Record<string, unknown>>,
 }
 export interface Dataset {
   has_experiment?: boolean
+  has_study?: boolean
   id: string
   verified: boolean
   synthetic?: boolean

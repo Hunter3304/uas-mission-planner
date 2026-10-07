@@ -253,3 +253,46 @@ The script explicitly forbids HTTP requests, verifies both snapshots and records
 motions with independent 100 m-wide population corridors. Its motion checks are
 inspection evidence, not searched routes or Part 5 flight experiments. Pixel-budget
 failures, unknown applicability and address conflicts are retained in the output.
+# Part 3 regional routing
+
+From the repository root, using the existing backend environment:
+
+```powershell
+backend/.venv/Scripts/python.exe -m uas_planner.cli study-route data/hannover-part1-v4 --scenario doc/experiments/iteration-008/hannover-scenario.json --terrain data/hannover-part2-terrain-v1 --start-id rheuma-podbi --end-id mhh --algorithm astar --objective risk --cell-m 250 --output .cache/hannover-route.geojson
+backend/.venv/Scripts/python.exe doc/experiments/iteration-008/verify-part3.py --output .cache/hannover-part3-new-evidence.json
+```
+
+Use `--algorithm dijkstra` or `abitstar`, `--objective distance`, and explicit
+`--planning-mode research` to compare contracts. Background remains unassessed
+unless `--background-cost` is explicitly supplied. The example scenario is dated
+engineering evidence, not a flight schedule. Real retained inputs remain unresolved.
+
+API: POST `/api/datasets/hannover-part1-v4/study/route`, JSON:
+
+```json
+{
+  "start_id": "rheuma-podbi",
+  "end_id": "mhh",
+  "terrain_id": "hannover-part2-terrain-v1",
+  "algorithm": "astar",
+  "objective": "risk",
+  "cell_m": 250,
+  "scenario": {
+    "agl_m": 100,
+    "speed_m_s": 30,
+    "scenario": "civil",
+    "mission_start": "2026-10-07T10:00:00+02:00",
+    "mission_end": "2026-10-07T10:15:00+02:00",
+    "clearance_m": 0,
+    "vertical_clearance_m": 0,
+    "building_unknown_height": "unresolved"
+  }
+}
+```
+
+Other shared controls: `planning_mode`, `background_cost`, `risk_weight`,
+`distance_weight`, `time_budget_s` (0–60). `export: true` returns GeoJSON.
+Refresh/restart the explorer and select the regional dataset to see the basic
+regional controls. Enter explicit offset-aware scenario times. Changing a control
+clears old results; export saves the displayed result including failure diagnostics.
+Named selectors and map layers are Part 4. See the Part 3 delivery for limits.

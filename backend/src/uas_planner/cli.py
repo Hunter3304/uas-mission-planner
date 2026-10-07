@@ -24,6 +24,25 @@ def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
+    regional_route = commands.add_parser(
+        "study-route", help="Plan a weighted regional route offline"
+    )
+    regional_route.add_argument("directory", type=Path)
+    regional_route.add_argument("--scenario", type=Path, required=True)
+    regional_route.add_argument("--terrain", type=Path)
+    regional_route.add_argument("--start-id", required=True)
+    regional_route.add_argument("--end-id", required=True)
+    regional_route.add_argument("--cell-m", type=float, default=250)
+    regional_route.add_argument(
+        "--algorithm", choices=("astar", "dijkstra", "abitstar"), default="astar"
+    )
+    regional_route.add_argument("--objective", choices=("risk", "distance"), default="risk")
+    regional_route.add_argument("--planning-mode", choices=("strict", "research"), default="strict")
+    regional_route.add_argument("--background-cost", type=float)
+    regional_route.add_argument("--risk-weight", type=float, default=0.9)
+    regional_route.add_argument("--distance-weight", type=float, default=0.1)
+    regional_route.add_argument("--time-budget-s", type=float, default=3)
+    regional_route.add_argument("--output", type=Path)
     terrain = commands.add_parser("terrain-fetch", help="Acquire bounded native DGM1 tiles")
     terrain.add_argument(
         "--bounds", type=float, nargs=4, required=True, metavar=("WEST", "SOUTH", "EAST", "NORTH")
@@ -144,6 +163,38 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command == "study-route":
+            from uas_planner.core.experiment import read_json
+            from uas_planner.core.regional_routing import plan_regional_route
+            from uas_planner.core.routing import route_geojson
+
+            _quiet_native_logs()
+            result = plan_regional_route(
+                args.directory,
+                read_json(args.scenario),
+                args.start_id,
+                args.end_id,
+                terrain_directory=args.terrain,
+                **{
+                    name: getattr(args, name)
+                    for name in (
+                        "cell_m",
+                        "algorithm",
+                        "objective",
+                        "planning_mode",
+                        "background_cost",
+                        "risk_weight",
+                        "distance_weight",
+                        "time_budget_s",
+                    )
+                },
+            )
+            if args.output:
+                with args.output.open("x", encoding="utf-8") as stream:
+                    json.dump(route_geojson(result), stream, indent=2, allow_nan=False)
+                    stream.write("\n")
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
         if args.command == "terrain-fetch":
             from uas_planner.acquisition.terrain import acquire_terrain
 

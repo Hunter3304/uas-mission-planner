@@ -628,7 +628,9 @@ class RegionalConstraints:
             "model_signature": self.provenance["model_signature"],
         }
 
-    def risk_model(self, *, background_cost=None, mode="strict"):
+    def risk_model(
+        self, *, background_cost=None, mode="strict", risk_weight=0.9, distance_weight=0.1
+    ):
         """Reuse approved soft semantics; unsafe source support remains explicit."""
         if mode not in ("strict", "research"):
             raise ValueError("Unknown planning mode.")
@@ -655,8 +657,9 @@ class RegionalConstraints:
             mapping(transform(reverse, self.boundary)),
             background_cost=background_cost,
             source=self.provenance,
-            risk_weight=0.9,
-            distance_weight=0.1,
+            risk_weight=risk_weight,
+            distance_weight=distance_weight,
+            safety_distance_m=self.scenario.get("clearance_m", 0),
         )
 
     def summary(self):
