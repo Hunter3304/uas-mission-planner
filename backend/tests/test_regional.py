@@ -439,3 +439,47 @@ def test_terrain_interruption_preserves_bytes_and_explicit_resume(tmp_path, monk
     assert len(archived) == 1
     assert archived[0].read_bytes() == b"partial source bytes"
     assert (root / "terrain.json").exists()
+
+
+def test_constraint_layers_keep_obstacles_separate_from_region_uncertainty():
+    from types import SimpleNamespace
+
+    geometry = box(500000, 5800000, 500010, 5800010)
+    model = SimpleNamespace(
+        records=[
+            {
+                "source": "way/1",
+                "category": "building_obstacle",
+                "state": "blocked",
+                "basis": "reported height",
+                "geometry": geometry,
+            }
+        ],
+        terrain=SimpleNamespace(tiles=[]),
+        scenario={"agl_m": 100, "clearance_m": 5},
+        boundary=geometry.buffer(100),
+        diagnostics=[{"status": "invalid_geometry"}],
+        provenance={"model_signature": "fixture"},
+    )
+    layers = regional.constraint_layers(model)
+    obstacle = layers["blocked"]["features"][0]
+    assert obstacle["properties"]["source"] == "way/1"
+    projected = regional.metric_geometry(__import__("shapely").geometry.shape(obstacle["geometry"]))
+    assert projected.area > geometry.area
+    assert layers["unknown"]["features"][0]["properties"]["state"] == "unresolved"
+    assert layers["provenance"]["model_signature"] == "fixture"
+    assert any(item.get("source") == "terrain" for item in layers["diagnostics"])
+
+
+def test_constraint_layer_api_rejects_path_and_unknown_controls(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from uas_planner.api.app import create_app
+
+    (tmp_path / "case").mkdir()
+    with TestClient(create_app(tmp_path)) as client:
+        url = "/api/datasets/case/study/layers/constraints"
+        assert (
+            client.post(url, json={"scenario": {}, "terrain_id": "../outside"}).status_code == 404
+        )
+        assert client.post(url, json={"scenario": {}, "unexpected": True}).status_code == 422

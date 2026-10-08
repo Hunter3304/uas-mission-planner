@@ -994,3 +994,9 @@ td {
 .regional-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 16px 0; }
 .regional-controls label { display: flex; flex-direction: column; gap: 6px; }
 .regional-controls input, .regional-controls select { min-width: 0; width: 100%; }
+.regional-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin: 16px 0; }
+.regional-controls label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.regional-controls input, .regional-controls select { width: 100%; min-width: 0; padding: 9px; border: 1px solid #cbd8d5; border-radius: 6px; background: white; }
+#regional-map fieldset { border: 1px solid #cbd8d5; border-radius: 8px; margin-bottom: 14px; padding: 12px; }
+#regional-map fieldset label { padding: 4px 0; font-size: 13px; }
+#regional-map pre { max-height: 280px; overflow: auto; }

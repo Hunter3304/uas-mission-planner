@@ -121,6 +121,10 @@ Acceptance: all three algorithms use Hannover inputs and the same constraint/ris
 
 ## Part 4 — Endpoint selection and visualization
 
+Implementation authorized on 2026-10-07; local delivery tracked by Milestone 7 /
+Issue #75 on `feature/75-regional-visualization`. See
+`doc/iteration/iteration-008/part4.md`. Part 5 remains deferred.
+
 - Add Hannover as a new dataset while preserving historical Braunschweig evidence.
 - Provide origin and destination selectors containing all eight sites. Explain same-site selections.
 - Display boundary, locations, OSM, original DIPUL zones, effective constraints, unknown areas, GHSL and route with independent layer switches and clear legends.
