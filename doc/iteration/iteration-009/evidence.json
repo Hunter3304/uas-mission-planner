@@ -1,0 +1,904 @@
+{
+  "source_preparation_s": 43.25111900000002,
+  "scenario": {
+    "scenario": "civil",
+    "timezone": "Europe/Berlin",
+    "mission_start": "2026-10-07T10:00:00+02:00",
+    "mission_end": "2026-10-07T10:15:00+02:00",
+    "agl_m": 100,
+    "speed_m_s": 30,
+    "clearance_m": 0,
+    "vertical_clearance_m": 0,
+    "building_unknown_height": "unresolved",
+    "zone_assessments": {},
+    "description": "Engineering inspection scenario only; not a user flight schedule or verified flight permission.",
+    "research_geometry": "derived",
+    "research_height_m": 30,
+    "research_geometry_buffer_m": 20
+  },
+  "source_identity": "1649d7617f4de3ccbfdcdc408b120142a2b98c8c7aab8ea7e8707c88f96ccbe6",
+  "derived_geometry": [
+    {
+      "source": "node/248824420",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/311828267",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/345392191",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/387220049",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/966142452",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1205493655",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1416036707",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1684049384",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1684053102",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1851631753",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1852201016",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/1980799992",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443471",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443492",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443511",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443533",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443555",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443595",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443617",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443639",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443677",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443700",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443730",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021443939",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2021444024",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2132011113",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2468983951",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/2584921154",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/3813567072",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/4167249009",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/4167249040",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/4167249043",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/5010122788",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/5010122805",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/5508071651",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6043561848",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6935969507",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6939456210",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6939456211",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6948282310",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6948282311",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/6952710937",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/8221837974",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/8228332417",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/9533286982",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/10140139203",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/10140344047",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/10269333797",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/10923866337",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/11410602602",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/11704110529",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439032092",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439032093",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439032094",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439043275",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439052129",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12439470126",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12819787855",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/12946696006",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13176497851",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13232392632",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13239024698",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13520243315",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13615358591",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13637605238",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13637646912",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "node/13641447648",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "Point",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "relation/2473404",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    },
+    {
+      "source": "relation/4282895",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/4283065",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/10979299",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/11539600",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/11539601",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/11539602",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/13877027",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "make_valid_polygon_parts",
+      "buffer_m": 0,
+      "located": true
+    },
+    {
+      "source": "relation/17296064",
+      "reason": "Derived geometry; original snapshot retained.",
+      "original_type": "GeometryCollection",
+      "original_valid": true,
+      "policy": "buffered_uncertain_extent",
+      "buffer_m": 20,
+      "located": true
+    }
+  ],
+  "runs": [
+    {
+      "file": "rheuma-podbi-astar-risk-500-research.geojson",
+      "sha256": "60b7a8dc459ae7346f1e0fe85a7a8b6cc89b871192e4ca8229348c642f10d0e3",
+      "status": "success",
+      "length_m": 4747.2488305877205,
+      "objective_cost": 1920.6825682623767,
+      "preparation_ms": 6270.964800000002,
+      "planner_ms": 487.34790000025896,
+      "runtime_ms": 6952.748400000019,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 4747.2488305877205,
+        "risk_length_cost": 1606.6196502262273,
+        "objective_cost": 1920.6825682623767
+      }
+    },
+    {
+      "file": "amedes-georg-astar-risk-500-research.geojson",
+      "sha256": "64fc23e1bd163eb368b15ad01ffb1083365828d28c01a3723a37bb01accad2d3",
+      "status": "success",
+      "length_m": 8431.167954216884,
+      "objective_cost": 3843.1128622757315,
+      "preparation_ms": 9988.428699999986,
+      "planner_ms": 622.7539000001343,
+      "runtime_ms": 10932.843300000059,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 8431.167954216886,
+        "risk_length_cost": 3333.328963171158,
+        "objective_cost": 3843.112862275731
+      }
+    },
+    {
+      "file": "limbach-lehrte-astar-risk-500-research.geojson",
+      "sha256": "501c73e01dfc1b03176b529eecb6ad332653e4b4ca59fa7291d23ad433bd60b0",
+      "status": "success",
+      "length_m": 18096.339880411437,
+      "objective_cost": 2703.6080528388875,
+      "preparation_ms": 22669.31650000015,
+      "planner_ms": 1144.7739999998703,
+      "runtime_ms": 25061.24260000024,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 18096.339880411437,
+        "risk_length_cost": 993.3045164419375,
+        "objective_cost": 2703.6080528388875
+      }
+    },
+    {
+      "file": "rheuma-podbi-astar-risk-250-research.geojson",
+      "sha256": "90d614420edf7e2249a919c1c4da68362e354b662bf7325c4ae699d86e4bd975",
+      "status": "success",
+      "length_m": 3715.5915279316932,
+      "objective_cost": 1453.493018380447,
+      "preparation_ms": 10361.032100000102,
+      "planner_ms": 707.6084000000264,
+      "runtime_ms": 11272.1947,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 3715.5915279316932,
+        "risk_length_cost": 1202.1487395414197,
+        "objective_cost": 1453.4930183804472
+      }
+    },
+    {
+      "file": "rheuma-podbi-dijkstra-risk-250-research.geojson",
+      "sha256": "43c41fffa44e5cbb4bafea031d47b0ef8b51cdc15e945a25e57397bf69d90ccc",
+      "status": "success",
+      "length_m": 3715.5915279316932,
+      "objective_cost": 1453.493018380447,
+      "preparation_ms": 9980.478700000276,
+      "planner_ms": 732.4751000001015,
+      "runtime_ms": 10913.211600000068,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 3715.5915279316932,
+        "risk_length_cost": 1202.1487395414197,
+        "objective_cost": 1453.4930183804472
+      }
+    },
+    {
+      "file": "rheuma-podbi-astar-distance-250-research.geojson",
+      "sha256": "51c8c1722406e307d0b2bae613c3b663e2c10fdd476189aef611c65549a88d64",
+      "status": "success",
+      "length_m": 2840.8780998623924,
+      "objective_cost": 2840.8780998623924,
+      "preparation_ms": 6289.972099999886,
+      "planner_ms": 76.87549999991461,
+      "runtime_ms": 6525.90760000021,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 2840.8780998617985,
+        "risk_length_cost": null,
+        "objective_cost": 2840.8780998617985
+      }
+    },
+    {
+      "file": "rheuma-podbi-abitstar-risk-250-research.geojson",
+      "sha256": "09d265d823000283a3f99a63fef54fc0b3c7202e93f826125c766e619eefc461",
+      "status": "success",
+      "length_m": 3453.389278570354,
+      "objective_cost": 1776.2938592287812,
+      "preparation_ms": 3792.3070000001644,
+      "planner_ms": 3050.162900000032,
+      "runtime_ms": 7023.282200000267,
+      "external_validation": {
+        "accepted": true,
+        "checks": {
+          "endpoints": true,
+          "boundary": true,
+          "known_obstacles": true,
+          "terrain": true,
+          "scored_support": true,
+          "length": true,
+          "cost": true,
+          "cruise": true
+        },
+        "length_m": 3453.389278570354,
+        "risk_length_cost": 1589.9499237463845,
+        "objective_cost": 1776.2938592287815
+      }
+    },
+    {
+      "file": "rheuma-podbi-astar-risk-250-strict.geojson",
+      "sha256": "eef8059e57a52c33b2da680f6ea314c4223cf6c571fc7711598ed230c8a41f87",
+      "status": "unresolved_input",
+      "length_m": null,
+      "objective_cost": null,
+      "preparation_ms": 9.671200000411773,
+      "planner_ms": 0.0,
+      "runtime_ms": 9.880000000066502,
+      "external_validation": {
+        "accepted": false,
+        "reason": "Regional endpoint or source support remains unresolved; search was not started."
+      }
+    }
+  ]
+}
