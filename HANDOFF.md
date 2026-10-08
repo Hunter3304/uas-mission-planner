@@ -2,6 +2,18 @@
 
 ## Current status
 
+### Iteration 008 Part 4 integration authorized (2026-10-08)
+
+- User authorized remote publication and integration through feature ->
+  iteration/008 -> main, with successful CI required before each merge.
+- Reviewed implementation commit: c574a57. Local validation: 223 backend passes /
+  one existing Windows permission skip, 11 mocked browser and 12 real API/browser
+  smoke passes. Ruff and frontend lint/build rechecked successfully before commit.
+- Include Part 4 only; Part 5 remains deferred. Preserve source snapshots and
+  iteration/008. Verify merged PR and remote synchronization before removing
+  feature/75-regional-visualization locally/remotely.
+
+
 ### Iteration 008 Part 4 commit authorized (2026-10-08)
 
 - User authorized committing Part 4 after review. Reviewed implementation and

@@ -9,6 +9,12 @@ Commit authorization, 2026-10-08: user requested committing after final review.
 No blocking finding identified; backend Ruff lint/format and frontend lint/build
 rechecked successfully. Publication and integration are not included in this request.
 
+Integration authorization, 2026-10-08: user authorized remote push and integration
+through feature -> iteration/008 -> main, gated by successful CI on each PR.
+Implementation commit: `c574a57`. Retain source snapshots and iteration/008;
+clean the feature branch only after its merge is verified. Earlier local-only
+publication statements describe the preceding implementation stage.
+
 ## Behavior and operation
 
 Select the retained `hannover-part1-v4` dataset in the explorer. Historical
