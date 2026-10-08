@@ -2,6 +2,19 @@
 
 ## Current status
 
+### Iteration 008 Part 4 feature delivery (2026-10-08)
+
+- PR #76 merged Part 4 into iteration/008 at 8eaee93 after Windows/Linux backend
+  and frontend CI all passed in run 37798466570. Issue #75 closed as completed.
+- Main integration is authorized with its own successful-CI gate. Final main
+  merge facts are reported in the delivery response. Part 5 remains deferred.
+- Automatic approval review rejected the command containing remote/local feature
+  branch deletion because deletion was not explicitly approved. The branch is
+  retained pending explicit user approval; no cleanup is claimed.
+- Keep iteration/008 and all local source/terrain snapshots. Earlier local-only
+  and authorization records below describe prior stages.
+
+
 ### Iteration 008 Part 4 integration authorized (2026-10-08)
 
 - User authorized remote publication and integration through feature ->

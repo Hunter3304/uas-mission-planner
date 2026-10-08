@@ -15,6 +15,12 @@ Implementation commit: `c574a57`. Retain source snapshots and iteration/008;
 clean the feature branch only after its merge is verified. Earlier local-only
 publication statements describe the preceding implementation stage.
 
+Feature delivery, 2026-10-08: PR #76 merged into iteration/008 at `8eaee93`
+after all three CI jobs passed in run `37798466570`. Issue #75 is closed.
+Main integration remains separately gated by successful CI. Automatic approval
+review rejected branch deletion without explicit user approval; retain the merged
+feature branch pending approval. Final main merge facts are reported in chat.
+
 ## Behavior and operation
 
 Select the retained `hannover-part1-v4` dataset in the explorer. Historical
