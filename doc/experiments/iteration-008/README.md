@@ -1,5 +1,13 @@
 # Hannover regional source workflow — Iteration 008 Part 1
 
+Part 5 now provides offline multi-pair experiments. Run
+`backend/.venv/Scripts/python.exe doc/experiments/iteration-008/run-part5.py --output .cache/part5-new`
+then
+`backend/.venv/Scripts/python.exe doc/experiments/iteration-008/report-part5.py --input .cache/part5-new --output .cache/part5-new-evidence.json`.
+Use new outputs; add `--synthetic-only` to the first command when real snapshots
+are unavailable. See [Part 5 results](../../iteration/iteration-008/part5.md) for
+the matrix, metadata, cache interpretation and unresolved real/expanded inputs.
+
 This delivery prepares OSM, DIPUL and GHSL sources. Constraint interpretation,
 planner preparation and the endpoint-selection UI belong to later parts of
 [the plan](../../plan/iteration-008.md). A complete source snapshot is not a

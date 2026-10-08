@@ -1,14 +1,20 @@
 # Iteration 008 — Hannover fixed-altitude 2D routing
 
 Date: 2026-10-05 (Europe/Berlin).
-Status: Part 1 delivered to main through PR #68 (`cea5b0e`) on 2026-10-06. Part 2 implemented and validated locally on 2026-10-06, tracked by Milestone 7 / Issue #69 on `feature/69-regional-constraints`, based on `iteration/008`; see doc/iteration/iteration-008/part2.md. User authorized Part 2 publication/integration after final review and successful CI on 2026-10-06. Parts 3–5 remain deferred.
+Status, 2026-10-08: Parts 1–4 delivered to main, most recently through PR #77
+(`17d9b27`). Part 5 is implemented and validated locally on
+`feature/iteration008-part5-experiments`. Original study/terrain snapshots remain
+immutable. Milestone 7 / Issue #78 tracks Part 5; issue creation and assignment
+were explicitly authorized on 2026-10-08 after the earlier automatic approval rejection.
+See `doc/iteration/iteration-008/part5.md` for the 600-record matrix, six research
+checks, successful synthetic comparisons and explicit real/expanded coverage limits.
 
 ## Objective and confirmed scope
 
-Progress update, 2026-10-06: Parts 1/2 delivered to main (Part 2 merge `848763a`).
-Part 3 implementation authorized and prepared locally under Milestone 7 / Issue #72;
-see `doc/iteration/iteration-008/part3.md`. Parts 4/5 remain deferred. The status
-paragraph above records the earlier Part 2 publication state.
+Parts 1/2/3 reached main at `cea5b0e`, `848763a` and `77cb64b`; Part 4 reached
+main at `17d9b27`. Part 5 adds multi-pair real outcome evidence and separately
+labelled successful synthetic comparisons. Unresolved real-source support and
+missing expanded-region snapshots must remain explicit.
 
 Transfer the Braunschweig demonstration to a predefined Hannover/Lehrte study region. Deliver reproducible acquisition and cached loading, explicit hard constraints, existing weighted routing algorithms, map visualization and static experiments.
 
@@ -123,7 +129,8 @@ Acceptance: all three algorithms use Hannover inputs and the same constraint/ris
 
 Implementation authorized on 2026-10-07; local delivery tracked by Milestone 7 /
 Issue #75 on `feature/75-regional-visualization`. See
-`doc/iteration/iteration-008/part4.md`. Part 5 remains deferred.
+`doc/iteration/iteration-008/part4.md`. Delivered to main through PR #77 on
+2026-10-08; Part 5 implementation was subsequently authorized.
 
 - Add Hannover as a new dataset while preserving historical Braunschweig evidence.
 - Provide origin and destination selectors containing all eight sites. Explain same-site selections.

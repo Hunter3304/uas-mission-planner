@@ -2,6 +2,33 @@
 
 ## Current status
 
+### Iteration 008 Part 5 local delivery (2026-10-08)
+
+- Parts 1–4 are integrated into main, latest PR #77 / `17d9b27`. User authorized
+  Part 5 implementation; branch `feature/iteration008-part5-experiments` is based
+  on iteration/008 fast-forwarded to that main commit. The user subsequently
+  authorized committing and pushing Part 5 on 2026-10-08. Publication targets the
+  feature branch; PR integration into iteration/008 or main remains pending.
+- User explicitly authorized issue creation on 2026-10-08; Milestone 7 / Issue #78
+  now tracks Part 5 and is assigned to Hunter3304. The earlier automatic approval
+  rejection was resolved by this authorization. Feature publication is authorized;
+  integration remains pending.
+- Offline experiment runner and checksummed reporter deliver 600 matrix records:
+  360 real `unresolved_input`, 170 independently checked synthetic successes,
+  28 graph no-path outcomes and 42 native timeouts. Six separate research-mode
+  real checks also remain unresolved. Three real catalog pairs, two objectives,
+  three algorithms, three native repeats, altitude/grid/speed sweeps and fresh/
+  reused preparation are recorded. Exact endpoints and all original sources remain.
+- Expanded real-region coverage is missing and explicitly reported; synthetic
+  boundary expansion demonstrates a validated detour with unchanged endpoints.
+  No successful real regional route, expanded real route or full-region successful
+  search benchmark is claimed. Preserve `.cache/part5-full-v2/` outside Git.
+- Full backend regression: 228 passed / one existing Windows permission skip
+  (100.85 s); final focused experiment suite: 6 passed (1.86 s). Ruff lint/format
+  and saved-report integrity/invariance checks pass. Frontend unchanged.
+- Read `doc/iteration/iteration-008/part5.md` and `part5-evidence.json` for results,
+  limitations and offline commands. Earlier deferred/local records below are history.
+
 ### Iteration 008 Part 4 feature delivery (2026-10-08)
 
 - PR #76 merged Part 4 into iteration/008 at 8eaee93 after Windows/Linux backend
