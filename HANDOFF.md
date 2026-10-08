@@ -2,6 +2,23 @@
 
 ## Current status
 
+### Iteration 009 feature delivery and main integration (2026-10-08)
+
+- Feature PR #80 merged into `iteration/009` at `4b3c278` after all three checks
+  passed in run `37809752912` (Linux Python, Windows Python, frontend). Reviewed
+  implementation commit: `8b87d38`. Issue #79 is explicitly closed in Milestone 8.
+- The merged feature branch was deleted remotely and locally after verified PR
+  merge and target synchronization. Existing local map/test edits were preserved
+  through a scoped stash and restored. Keep `iteration/009`, other iteration
+  history, the separate Part 5 feature and all original snapshots/evidence.
+- Main integration is PR #81 and has its own successful-CI gate. The user's
+  request to complete the HANDOFF workflow authorizes this delivery. Final main
+  merge commit and CI results are reported in the final chat response.
+- Required local checks and seven independently accepted real research routes
+  are recorded below and in `doc/iteration/iteration-009/outcome.md`. Strict
+  preflight remains unresolved. Only isolated verification services were stopped;
+  user-owned services remain running and require backend restart/UI refresh.
+
 ### Iteration 009 route recovery local acceptance (2026-10-08)
 
 - User approved the Chinese review plan and requested its English plan plus the

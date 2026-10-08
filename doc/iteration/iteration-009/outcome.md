@@ -2,7 +2,11 @@
 
 Date: 2026-10-08 (Europe/Berlin). Milestone 8 / Issue #79.
 Approved plan: `doc/plan/iteration-009.md`. Local implementation and acceptance
-complete; feature and integration PR checks/merges are recorded in HANDOFF.
+complete. Feature PR #80 merged into `iteration/009` at `4b3c278` after Linux,
+Windows and frontend CI passed in run `37809752912`. Issue #79 is closed and its
+verified merged feature branch was deleted locally/remotely. Main integration is
+PR #81 with a separate successful-CI gate; final merge facts appear in the delivery
+response. `iteration/009` and all historical source/experiment work are retained.
 
 ## Problem and resulting behavior
 
