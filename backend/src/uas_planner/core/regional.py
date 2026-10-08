@@ -709,3 +709,74 @@ def prepare_regional(directory, scenario, output, *, terrain_directory=None):
         json.dump(result, stream, indent=2, allow_nan=False)
         stream.write("\n")
     return result
+
+
+def constraint_layers(model):
+    """Scenario-specific footprints; never infer terrain support from a zone outline."""
+    reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
+    blocked, unknown = [], []
+    for record in model.records:
+        state, reason = record["state"], record["basis"]
+        if record["category"] != "building_obstacle":
+            # A complete native terrain window may exceed its resource bound.
+            # Preserve that uncertainty instead of classifying the whole zone as clear.
+            terrain = model.terrain.bounds(record["geometry"])
+            state, reason = vertical_state(record["properties"], model.scenario["agl_m"], terrain)
+            if state != "outside_vertical":
+                assessed, assessment_reason = assessed_zone(record, model.scenario)
+                if assessed != "unresolved":
+                    state, reason = assessed, assessment_reason
+        if state in {"clear", "outside_vertical", "conditional_allowed"}:
+            continue
+        geometry = record["geometry"]
+        clearance = model.scenario.get("clearance_m", 0)
+        if clearance:
+            geometry = geometry.buffer(clearance / math.cos(math.pi / 64))
+        feature = {
+            "type": "Feature",
+            "geometry": mapping(transform(reverse, geometry)),
+            "properties": {
+                "source": record["source"],
+                "category": record["category"],
+                "state": state,
+                "reason": reason,
+                "clearance_m": clearance,
+            },
+        }
+        (blocked if state == "blocked" else unknown).append(feature)
+    diagnostics = list(model.diagnostics)
+    diagnostics.append(
+        {
+            "source": "DIPUL",
+            "status": "unresolved",
+            "reason": "Temporary/NOTAM completeness is unverified across the region.",
+        }
+    )
+    if not model.terrain.tiles:
+        diagnostics.append(
+            {
+                "source": "terrain",
+                "status": "unresolved",
+                "reason": "No verified terrain support; footprints do not establish coverage.",
+            }
+        )
+    unknown.insert(
+        0,
+        {
+            "type": "Feature",
+            "geometry": mapping(transform(reverse, model.boundary)),
+            "properties": {
+                "source": "regional coverage",
+                "state": "unresolved",
+                "scope": "region-wide applicability uncertainty",
+                "reason": "Temporary/NOTAM completeness remains unverified. See geometry and terrain diagnostics; this area is not a confirmed prohibition.",
+            },
+        },
+    )
+    return {
+        "blocked": {"type": "FeatureCollection", "features": blocked},
+        "unknown": {"type": "FeatureCollection", "features": unknown},
+        "diagnostics": diagnostics,
+        "provenance": model.provenance,
+        "interpretation": "Scenario-specific buffered footprints. Unknown geometry and coverage are reported separately; empty layers do not establish permission.",
+    }

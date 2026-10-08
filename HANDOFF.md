@@ -2,6 +2,63 @@
 
 ## Current status
 
+### Iteration 008 Part 4 feature delivery (2026-10-08)
+
+- PR #76 merged Part 4 into iteration/008 at 8eaee93 after Windows/Linux backend
+  and frontend CI all passed in run 37798466570. Issue #75 closed as completed.
+- Main integration is authorized with its own successful-CI gate. Final main
+  merge facts are reported in the delivery response. Part 5 remains deferred.
+- Automatic approval review rejected the command containing remote/local feature
+  branch deletion because deletion was not explicitly approved. The branch is
+  retained pending explicit user approval; no cleanup is claimed.
+- Keep iteration/008 and all local source/terrain snapshots. Earlier local-only
+  and authorization records below describe prior stages.
+
+
+### Iteration 008 Part 4 integration authorized (2026-10-08)
+
+- User authorized remote publication and integration through feature ->
+  iteration/008 -> main, with successful CI required before each merge.
+- Reviewed implementation commit: c574a57. Local validation: 223 backend passes /
+  one existing Windows permission skip, 11 mocked browser and 12 real API/browser
+  smoke passes. Ruff and frontend lint/build rechecked successfully before commit.
+- Include Part 4 only; Part 5 remains deferred. Preserve source snapshots and
+  iteration/008. Verify merged PR and remote synchronization before removing
+  feature/75-regional-visualization locally/remotely.
+
+
+### Iteration 008 Part 4 commit authorized (2026-10-08)
+
+- User authorized committing Part 4 after review. Reviewed implementation and
+  retained validation evidence; backend Ruff lint/format and frontend lint/build
+  rechecked successfully. No blocking finding identified.
+- Commit on feature/75-regional-visualization includes implementation, tests and
+  English delivery/operation documentation. Source datasets and local evidence
+  caches remain outside Git. No remote push, PR or integration merge requested.
+- Prior full validation: 223 backend passes / one existing permission skip,
+  11 mocked browser passes and 12 real API/browser smoke passes with clean exit.
+  Real Hannover layers preserve unresolved applicability; Part 5 remains deferred.
+
+
+### Iteration 008 Part 4 local implementation (2026-10-07)
+
+- User authorized Part 4. Milestone 7 / Issue #75 created and assigned before
+  feature/75-regional-visualization; iteration/008 fast-forwarded to main 77cb64b.
+- Eight-site selectors, regional map with independent source/constraint/unknown/
+  population/route layers, legends, complete mission/cost/timing display and
+  displayed-result exports implemented. Input changes invalidate results; scenario
+  changes invalidate constraint layers. Historical Braunschweig behavior retained.
+- Initial regional load avoids full tag-cost analysis; large source overlays load
+  on demand. Layer API preserves original DIPUL and shared scenario uncertainty.
+- Backend: 223 passed / one existing Windows permission skip. Frontend lint/build
+  and all 11 mocked browser checks pass; all 12 real API/browser smoke tests pass
+  with clean exit (30.5 s); mobile rendering inspected. Offline real
+  layer preparation: 8 sites, 1 blocked / 162,335 unknown features, 91 diagnostics,
+  74.77 s; finite JSON. No feasible real route or flight permission is claimed.
+- See doc/iteration/iteration-008/part4.md. Work remains local/uncommitted;
+  no push/PR/merge. Preserve source/terrain snapshots. Part 5 remains deferred.
+
+
 ### Iteration 008 Part 3 feature integration delivery (2026-10-07)
 
 - PR #73 merged Part 3 into iteration/008 at `e7544d5` after all Windows/Linux

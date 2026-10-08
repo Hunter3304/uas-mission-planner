@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { postJson } from './api'
+import { createPortal } from 'react-dom'
+import type { Geometry } from 'geojson'
+import RegionalMap, { type Study, type ConstraintLayers } from './RegionalMap'
+import { getJson, postJson } from './api'
 import CollapsiblePanel from './CollapsiblePanel'
 
 interface RegionalResult {
@@ -14,7 +17,12 @@ interface RegionalResult {
   planner_ms: number
   endpoint_diagnostics: unknown
   research_assumptions: unknown[]
-  geometry: unknown
+  geometry: Geometry | null
+  runtime_ms?: number
+  source_preparation_ms?: number
+  mission?: Record<string, unknown>
+  provenance?: unknown
+  controls?: unknown
 }
 
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
@@ -23,6 +31,33 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     risk_weight: 0.9, distance_weight: 0.1, agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
     mission_start: '', mission_end: '' })
   const [result, setResult] = useState<RegionalResult | null>(null)
+  const [study, setStudy] = useState<Study | null>(null)
+  const [studyError, setStudyError] = useState('')
+  const [constraints, setConstraints] = useState<ConstraintLayers | null>(null)
+  const [layerBusy, setLayerBusy] = useState(false)
+  const layerController = useRef<AbortController | null>(null)
+  useEffect(() => {
+    const active = new AbortController()
+    getJson<Study>(`/api/datasets/${encodeURIComponent(datasetId)}/study`, active.signal)
+      .then(value => { if (!active.signal.aborted) setStudy(value) })
+      .catch(error => { if (!active.signal.aborted) setStudyError(error.message) })
+    return () => { active.abort(); layerController.current?.abort() }
+  }, [datasetId])
+  function scenario() {
+    const { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end } = controls
+    return { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end, scenario: 'civil', building_unknown_height: 'unresolved', zone_assessments: {} }
+  }
+  async function loadConstraints() {
+    layerController.current?.abort()
+    const active = new AbortController()
+    layerController.current = active
+    setLayerBusy(true); setError('')
+    try {
+      const response = await postJson<ConstraintLayers>(`/api/datasets/${encodeURIComponent(datasetId)}/study/layers/constraints`, { scenario: scenario(), terrain_id: controls.terrain_id }, active.signal)
+      if (!active.signal.aborted) setConstraints(response)
+    } catch (error) { if (!active.signal.aborted) setError(error instanceof Error ? error.message : 'Cannot load constraints.') }
+    finally { if (!active.signal.aborted) setLayerBusy(false) }
+  }
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const controller = useRef<AbortController | null>(null)
@@ -31,6 +66,9 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     controller.current?.abort()
     setBusy(false)
     setResult(null)
+    if (['agl_m', 'clearance_m', 'vertical_clearance_m', 'mission_start', 'mission_end', 'terrain_id'].includes(name)) {
+      layerController.current?.abort(); setConstraints(null); setLayerBusy(false)
+    }
     setError('')
     setControls(current => ({ ...current, [name]: value }))
   }
@@ -57,7 +95,8 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   }
   function download() {
     if (!result) return
-    const { geometry, ...metadata } = result
+    const { geometry, ...resultMetadata } = result
+    const metadata = { ...resultMetadata, displayed_controls: controls, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
       features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: { length_m: result.length_m } }] : [] }, null, 2)], { type: 'application/geo+json' })
     const url = URL.createObjectURL(blob)
@@ -67,11 +106,15 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
+  const mapTarget = document.getElementById('regional-map')
   return <CollapsiblePanel title="Regional route planning">
-    <p>Use catalog location IDs. Enter scenario times with a UTC offset, for example 2026-10-07T10:00:00+02:00. These inputs do not establish flight permission.</p>
+    {mapTarget && createPortal(<RegionalMap datasetId={datasetId} study={study} startId={controls.start_id} endId={controls.end_id} geometry={result?.status === 'success' ? result.geometry : null} constraints={constraints} />, mapTarget)}
+    {studyError && <p role="alert">Location catalog: {studyError}</p>}
+    <p>Select verified catalog addresses. Addresses are not verified launch or landing sites. Enter scenario times with a UTC offset, for example 2026-10-07T10:00:00+02:00. These inputs do not establish flight permission.</p>
     <form onSubmit={event => { event.preventDefault(); void solve() }}>
       <div className="regional-controls">
-        {(['start_id', 'end_id', 'terrain_id', 'mission_start', 'mission_end'] as const).map(name =>
+        {(['start_id', 'end_id'] as const).map(name => <label key={name}>{name === 'start_id' ? 'Origin' : 'Destination'}<select aria-label={name === 'start_id' ? 'Origin' : 'Destination'} required value={controls[name]} disabled={!study} onChange={event => update(name, event.target.value)}>{study?.config.locations.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>)}
+        {(['terrain_id', 'mission_start', 'mission_end'] as const).map(name =>
           <label key={name}>{({ start_id: 'Origin ID', end_id: 'Destination ID', terrain_id: 'Terrain dataset', mission_start: 'Scenario start', mission_end: 'Scenario end' })[name]}
             <input required value={controls[name]} onChange={event => update(name, event.target.value)} /></label>)}
         {(['algorithm', 'objective', 'planning_mode'] as const).map(name =>
@@ -87,13 +130,17 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={controls[field.name]} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
         {controls.objective === 'risk' && <label>Background score assumption<input type="number" min="0" step="any" value={controls.background} placeholder="Unassessed" onChange={event => update('background', event.target.value)} /></label>}
       </div>
-      <button disabled={busy}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
+      {controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
+      <button type="button" disabled={layerBusy || !controls.mission_start || !controls.mission_end} onClick={() => void loadConstraints()}>{layerBusy ? 'Preparing scenario layers…' : 'Load scenario layers'}</button>
+      <button disabled={busy || !study}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
     </form>
     {error && <p role="alert">{error}</p>}
     {result && <div role="status">
       <p>{result.status}: {result.message}</p>
       {result.length_m !== null && <p>Length {result.length_m.toFixed(1)} m · Risk {result.risk_length_cost?.toFixed(2) ?? '—'} · Objective {result.objective_cost?.toFixed(2)} · Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>}
-      <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s</p>
+      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {controls.objective} ({controls.objective === 'risk' ? `${controls.risk_weight}/${controls.distance_weight}` : 'distance only'}) · {controls.planning_mode}</p>
+      <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>
+      <p>Time estimates cover constant cruise only; takeoff, landing, wind and dynamics are excluded.</p>
       <details><summary>Constraint findings and assumptions</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify({ endpoints: result.endpoint_diagnostics, assumptions: result.research_assumptions }, null, 2)}</pre></details>
       <button onClick={download}>Export displayed result</button>
     </div>}
