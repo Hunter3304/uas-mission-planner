@@ -483,3 +483,109 @@ def test_constraint_layer_api_rejects_path_and_unknown_controls(tmp_path):
             client.post(url, json={"scenario": {}, "terrain_id": "../outside"}).status_code == 404
         )
         assert client.post(url, json={"scenario": {}, "unexpected": True}).status_code == 422
+
+
+def test_research_height_requires_explicit_estimate_and_preserves_known_obstacles(
+    regional_case, scenario
+):
+    from types import SimpleNamespace
+
+    root, _, _ = regional_case
+    model = regional.RegionalConstraints(root, {**scenario, "research_height_m": 30})
+    model.terrain = SimpleNamespace(bounds=lambda _: {"status": "known"})
+    point = [[10.5211, 52.2711]]
+    assert model.check(point)["state"] == "unresolved"
+    report = model.check(point, mode="research")
+    assert report["state"] == "permitted"
+    assert any(r.get("assumed_height_m") == 30 for r in report["assumptions"])
+    assert model.check([[10.5205, 52.2705]], mode="research")["state"] == "blocked"
+    model.scenario["research_height_m"] = 100
+    assert model.check(point, mode="research")["state"] == "blocked"
+
+
+def test_derived_geometry_localizes_points_and_keeps_original_strict_gate(regional_case, scenario):
+    from types import SimpleNamespace
+
+    root, _, _ = regional_case
+    other = root / "derived"
+    other.mkdir()
+    frame = gpd.GeoDataFrame(
+        {"element_type": ["node"], "osm_id": [7], "building": ["yes"]},
+        geometry=[Point(10.5205, 52.2705)],
+        crs=4326,
+    )
+    save_dataset(
+        frame,
+        other / "osm",
+        BoundingBox(10.519, 52.269, 10.522, 52.272),
+        {"building": True},
+        synthetic=True,
+    )
+    (other / "population.tif").write_bytes(b"unused")
+    model = regional.RegionalConstraints(
+        other, {**scenario, "research_geometry": "derived", "research_height_m": 30}
+    )
+    model.terrain = SimpleNamespace(bounds=lambda _: {"status": "known"})
+    far = [[10.5215, 52.2715]]
+    assert model.check(far)["state"] == "unresolved"
+    assert model.check(far, mode="research")["state"] == "permitted"
+    assert model.check([[10.5205, 52.2705]], mode="research")["state"] == "blocked"
+    assert model.geometry_assumptions[0]["buffer_m"] == 20
+    assert (
+        model.risk_model(mode="research", background_cost=0).evaluate(far)["assessment"]
+        == "assessed"
+    )
+    with pytest.raises(ValueError, match="unresolved"):
+        model.risk_model(mode="strict", background_cost=0)
+
+
+def test_repaired_polygon_retains_known_height_and_source_receipt(regional_case, scenario):
+    from types import SimpleNamespace
+
+    root, _, _ = regional_case
+    other = root / "repair"
+    other.mkdir()
+    invalid = Polygon(
+        [(10.520, 52.270), (10.521, 52.271), (10.520, 52.271), (10.521, 52.270), (10.520, 52.270)]
+    )
+    frame = gpd.GeoDataFrame(
+        {"element_type": ["way"], "osm_id": [9], "building": ["yes"], "height": ["110"]},
+        geometry=[invalid],
+        crs=4326,
+    )
+    save_dataset(
+        frame,
+        other / "osm",
+        BoundingBox(10.519, 52.269, 10.522, 52.272),
+        {"building": True},
+        synthetic=True,
+    )
+    (other / "population.tif").write_bytes(b"unused")
+    before = checksum(other / "osm/features.gpkg")
+    model = regional.RegionalConstraints(
+        other, {**scenario, "research_geometry": "derived", "research_height_m": 30}
+    )
+    model.terrain = SimpleNamespace(bounds=lambda _: {"status": "known"})
+    assert model.check([[10.5205, 52.2702]], mode="research")["state"] == "blocked"
+    assert model.geometry_assumptions[0]["policy"] == "make_valid_polygon_parts"
+    assert checksum(other / "osm/features.gpkg") == before
+
+
+def test_terrain_catalog_does_not_advertise_incomplete_or_unsafe_sources(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from uas_planner.api.app import create_app
+
+    good = tmp_path / "terrain"
+    good.mkdir()
+    write_json(
+        good / "terrain.json",
+        {"kind": "bounded-native-terrain", "schema_version": 1, "tiles": [{}]},
+    )
+    incomplete = tmp_path / "partial"
+    incomplete.mkdir()
+    write_json(incomplete / "terrain-progress.json", {"kind": "bounded-native-terrain"})
+    with TestClient(create_app(tmp_path)) as client:
+        assert client.get("/api/terrain-datasets").json()["datasets"] == [
+            {"id": "terrain", "tiles": 1}
+        ]

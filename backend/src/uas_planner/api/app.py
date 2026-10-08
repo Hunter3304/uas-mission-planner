@@ -201,6 +201,9 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "risk_weight",
             "distance_weight",
             "time_budget_s",
+            "corridor_margin_m",
+            "start_coordinate",
+            "end_coordinate",
         }
         try:
             if set(request) - allowed:
@@ -381,6 +384,26 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     @api.get("/api/health")
     def health():
         return {"status": "ok"}
+
+    @api.get("/api/terrain-datasets")
+    def terrain_datasets():
+        items = []
+        for path in sorted(root.iterdir()) if root.is_dir() else []:
+            if not path.is_dir() or not DATASET_ID.fullmatch(path.name):
+                continue
+            try:
+                manifest = read_json(safe_file(dataset_path(path.name), "terrain.json"))
+                if (
+                    manifest.get("kind") == "bounded-native-terrain"
+                    and manifest.get("schema_version") == 1
+                ):
+                    items.append({"id": path.name, "tiles": len(manifest.get("tiles", []))})
+            except (ValueError, KeyError, OSError, TypeError):
+                continue
+        return {
+            "datasets": items,
+            "verification": "Catalog only; selected terrain is verified during preparation.",
+        }
 
     @api.get("/api/datasets")
     def datasets():
