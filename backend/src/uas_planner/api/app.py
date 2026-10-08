@@ -139,6 +139,50 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         except (ValueError, KeyError, OSError) as exc:
             raise HTTPException(422, "Cannot verify regional source study.") from exc
 
+    @api.get("/api/datasets/{dataset_id}/study/layers/zones")
+    def regional_zones(dataset_id: str):
+        from uas_planner.acquisition.study import inspect_study
+
+        path = dataset_path(dataset_id)
+        try:
+            manifest = inspect_study(path)
+            features = []
+            for response in manifest["sources"]["dipul"]["responses"]:
+                for page in response["pages"]:
+                    for feature in read_json(safe_file(path, page))["features"]:
+                        features.append(
+                            {
+                                **feature,
+                                "properties": {
+                                    **feature["properties"],
+                                    "source_layer": response["type_name"],
+                                    "source_id": f"{response['type_name']}/{feature['id']}",
+                                },
+                            }
+                        )
+            return {"type": "FeatureCollection", "features": features}
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(422, "Cannot verify original regional zones.") from exc
+
+    @api.post("/api/datasets/{dataset_id}/study/layers/constraints")
+    def regional_constraint_layers(dataset_id: str, request: dict = Body(...)):
+        from uas_planner.core.regional import RegionalConstraints, constraint_layers
+
+        try:
+            if set(request) - {"scenario", "terrain_id"}:
+                raise ValueError("Unknown constraint layer controls.")
+            terrain_id = request.get("terrain_id")
+            if terrain_id is not None and not isinstance(terrain_id, str):
+                raise ValueError("terrain_id must be a dataset identifier.")
+            model = RegionalConstraints(
+                dataset_path(dataset_id),
+                request["scenario"],
+                terrain_directory=dataset_path(terrain_id) if terrain_id else None,
+            )
+            return constraint_layers(model)
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
     @api.post("/api/datasets/{dataset_id}/study/route")
     def regional_route(dataset_id: str, request: dict = Body(...)):
         from uas_planner.core.regional_routing import plan_regional_route

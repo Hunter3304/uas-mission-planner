@@ -107,7 +107,7 @@ export default function App() {
     setLoading(true)
     Promise.all([
       getJson<Dataset>(`/api/datasets/${encodeURIComponent(id)}`, controller.signal),
-      getJson<MapData>(
+      catalog.find(item => item.id === id)?.has_study ? Promise.resolve<MapData>({ type: 'FeatureCollection', features: [] }) : getJson<MapData>(
         `/api/datasets/${encodeURIComponent(id)}/features?analysis=tag-costs`,
         controller.signal,
       ),
@@ -124,7 +124,7 @@ export default function App() {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
-  }, [id, revision])
+  }, [id, revision, catalog])
 
   const visible = useMemo(
     () => data?.features.filter((feature) => isVisible(feature, visibility, costMode)) ?? [],
@@ -215,7 +215,7 @@ export default function App() {
               {catalog.length} saved dataset{catalog.length === 1 ? '' : 's'} · stored locally
             </p>
           </section>
-          <section className="side-section">
+          {!dataset?.has_study && <section className="side-section">
             <div className="section-row">
               <h2>Map layers</h2>
               <span className="micro-label">
@@ -244,7 +244,7 @@ export default function App() {
               ))}
             </div>
             <p className="subtle">Layers may overlap. Totals count each feature once.</p>
-          </section>
+          </section>}
           <section className="side-section export-section">
             <h2>Take your data further</h2>
             <p className="subtle">Download the complete dataset, including hidden layers.</p>
@@ -312,7 +312,7 @@ export default function App() {
           {dataset && data && !loading && !catalogLoading && !catalogError && (
             <>
               {dataset.has_study && <RegionalRouting key={`${id}-${revision}`} datasetId={id} />}
-              <div className="stats-grid">
+              {!dataset.has_study && <><div className="stats-grid">
                 <article className="stat">
                   <span>Total features</span>
                   <strong data-testid="total-count">
@@ -370,20 +370,21 @@ export default function App() {
                   setSelected(null)
                 }}
               />
+              </>}
               <div className="map-title">
                 <h3>Geographic overview</h3>
                 <span>
                   <i /> Saved source data
                 </span>
               </div>
-              <ExperimentMap
+              {dataset.has_study ? <div id="regional-map" /> : <ExperimentMap
                 dataset={dataset}
                 data={data}
                 visibility={visibility}
                 onSelect={onSelect}
                 costMode={costMode}
-              />
-              {!data.features.length && (
+              />}
+              {!dataset.has_study && !data.features.length && (
                 <p className="empty-note" role="status">
                   No matching features in this dataset. The query boundary is shown for reference.
                 </p>
@@ -395,7 +396,7 @@ export default function App() {
                     : 'All layers are hidden. Enable a layer to show features.'}
                 </p>
               )}
-              <div className="detail-grid" key={selected ? featureKey(selected) : 'unselected'}>
+              {!dataset.has_study && <div className="detail-grid" key={selected ? featureKey(selected) : 'unselected'}>
                 <CollapsiblePanel className="feature-panel" title="Feature browser" badge={<span className="count-pill">{filtered.length}</span>} defaultExpanded={Boolean(selected)}>
                   <div className="section-row">
                     <input
@@ -513,7 +514,7 @@ export default function App() {
                     </div>
                   )}
                 </CollapsiblePanel>
-              </div>
+              </div>}
               <footer className="data-footer">
                 <span>
                   Source:{' '}

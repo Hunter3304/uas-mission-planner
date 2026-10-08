@@ -428,3 +428,19 @@ See [UI validation](doc/iteration/iteration-006/ui-panels.md).
 Iteration 006 Part 2/3 and explorer panel controls were accepted on 2026-10-03.
 Delivered to main through [PR #64](https://github.com/Hunter3304/uas-mission-planner/pull/64)
 after successful Windows/Linux Python and frontend CI. See HANDOFF for integration records.
+
+
+### Hannover regional interface (Iteration 008 Part 4)
+
+Select `hannover-part1-v4` in the dataset explorer. Choose origin/destination from
+all eight verified catalog addresses, enter explicit offset-aware scenario times
+and use `hannover-part2-terrain-v1` for retained full-region terrain. **Load scenario
+layers** prepares altitude/time/clearance-dependent constraint and unknown overlays;
+**Plan regional route** uses the shared weighted or distance planner. Independent
+map switches show boundary, sites, OSM, original DIPUL, effective constraints,
+unknown areas, native GHSL and successful route geometry. Large overlays load on
+demand. Results report mission parameters, costs and separate calculation/cruise
+times; **Export displayed result** preserves the current result and provenance
+without solving again. Changed inputs invalidate results; scenario changes also
+invalidate constraint layers. Retained source uncertainties are shown explicitly.
+See [Part 4 operation and validation](doc/iteration/iteration-008/part4.md).
