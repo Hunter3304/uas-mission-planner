@@ -1,5 +1,15 @@
 # UAS Mission Planner
 
+Iteration 009 enables **real Hannover research routes** with explicit derived
+geometry and missing-height assumptions, bounded corridor search, checked exact
+endpoint connectors and Berlin date/time selectors. See
+[operation and independently checked real results](doc/iteration/iteration-009/outcome.md).
+Select `hannover-part1-v4`, terrain `hannover-part2-terrain-v1`, planning mode
+`research`, background score assumption `0`, missing-height estimate `30` m and
+A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-lehrte
+→ mhh. Enter the intended scenario times in the date selectors. Strict mode retains
+its unresolved-source checks; research routes do not establish flight permission.
+
 A local Python geospatial research prototype for an internship and subsequent bachelor's thesis. Acquire a small area, save and verify its data, explore layers and statistics, and download results.
 
 **Stage version: [v0.3.0](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0).** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.

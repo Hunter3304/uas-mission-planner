@@ -2,6 +2,36 @@
 
 ## Current status
 
+### Iteration 009 route recovery local acceptance (2026-10-08)
+
+- User approved the Chinese review plan and requested its English plan plus the
+  HANDOFF delivery workflow. Plan: `doc/plan/iteration-009.md`; Milestone 8 /
+  assigned Issue #79 precede `feature/iteration009-route-recovery`, based on
+  `iteration/009` from main `17d9b27`. Initial local preparation preceded tracking
+  while normal CLI login was being completed. Automatic review rejected reading
+  Git credential tokens; normal `gh auth login` resolved access, without that action.
+- Real Hannover research routing succeeds for all three exact catalog pairs.
+  Primary weighted A*/Dijkstra: 3,715.59 m / objective 1,453.49 (250 m graph).
+  Other pairs: 8,431.17 and 18,096.34 m at 500 m. All seven successful final
+  cases, including native ABIT*, pass independent metric/obstacle/terrain/cost
+  checks; strict preflight remains `unresolved_input`.
+- Explicit derived geometry/30 m missing-height assumptions, 20 m uncertain
+  extent exclusion, bounded expanding corridors, checked nearby connectors,
+  explicit endpoint overrides, request-scoped terrain readers, Berlin date/time
+  inputs and terrain selector implemented. Original snapshots are untouched.
+- Local validation: 229 backend passes / one existing Windows permission skip;
+  13 mocked browser and 12 real-stack smoke passes, clean exits; Ruff and frontend
+  lint/build pass. Real Hannover browser planning/export/mobile checked with no
+  page errors (53.15 s). Evidence: `.cache/iteration009-final-v2/` and
+  `.cache/iteration009-ui-v1/`; see `doc/iteration/iteration-009/outcome.md`.
+- Preserve pre-existing local street-basemap edits in `RegionalMap.tsx` and its
+  browser-test hunk; they are excluded from this iteration's commits. The local
+  canvas assertion was corrected to reflect Leaflet's existing canvas renderer.
+  Part 5's separate feature branch/evidence remain untouched.
+- Feature/integration PR publication and CI-gated merges follow next. Do not stop
+  user-owned development services. Only isolated 8012/5176 verification servers
+  were started for this task; restart the user backend and refresh the UI after delivery.
+
 ### Iteration 008 Part 4 feature delivery (2026-10-08)
 
 - PR #76 merged Part 4 into iteration/008 at 8eaee93 after Windows/Linux backend
