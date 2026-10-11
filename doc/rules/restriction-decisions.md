@@ -50,6 +50,9 @@ the same engine; touching an excluded footprint is blocked.
 
 ## Policies and coverage
 
+See [the three planning modes](planning-modes.md) for the comparison table,
+defaults, shared checks, real-data behavior and current verification limits.
+
 `strict` stops for unresolved zones and region-wide coverage. `conservative`
 excludes unresolved footprints as engineering policy, with separate counts from
 confirmed prohibitions. `research` explicitly bypasses unknown zone applicability.

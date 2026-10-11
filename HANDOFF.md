@@ -2,6 +2,28 @@
 
 ## Current status
 
+### Iteration 010 mode documentation and status clarification (2026-10-11)
+
+- User asked for remaining work/next steps and explicit documentation of the three
+  modes. Added `doc/rules/planning-modes.md`, including the requested comparison,
+  UI/CLI versus API defaults, shared checks and real Hannover failure interpretation.
+  Linked it from the rule and outcome documents.
+- Added `doc/iteration/iteration-010/status.md` mapping the approved plan to actual
+  delivery and gaps. The current engine checks supported time/height and supplied
+  evidence; the 31-layer review-topic table is not full legal-rule automation.
+  No real permission profiles or exhaustive NOTAM source have been supplied, and
+  no real conservative target route has been established. Independent takeoff/
+  landing phase modeling is not implemented; stored phase scope never grants transit.
+- Recommended next work: finish local mode acceptance, audit the primary pair's
+  four endpoint-related zones and enter genuine reviewed evidence where available,
+  then inspect remaining corridor restrictions. Additional automatic rules/source/
+  phase modeling needs an agreed scope. Existing performance/time-feasibility
+  deferrals remain unchanged.
+- Documentation-only changes; implementation remains at local `e2813fa`. Verify
+  document links and diff; no repeated runtime tests required. The earlier automatic
+  publication rejection still applies: no remote code push/PR/merge is authorized
+  by this documentation request. Continue local documentation only.
+
 ### Iteration 010 local restriction delivery (2026-10-11)
 
 - User approved the Chinese plan and authorized implementation. Approved English

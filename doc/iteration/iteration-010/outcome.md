@@ -13,6 +13,10 @@ zone footprints are excluded without being called confirmed legal prohibitions.
 A*, Dijkstra and native ABIT* share full-motion checks. Strict and explicit research
 policies remain available. See [decision rules](../../rules/restriction-decisions.md).
 
+The [three-mode contract](../../rules/planning-modes.md) and
+[status/next steps](status.md) distinguish implemented functionality from remaining
+source/permission evidence and pending remote delivery.
+
 ## Operation
 
 Restart the backend and refresh the frontend after loading this implementation.
