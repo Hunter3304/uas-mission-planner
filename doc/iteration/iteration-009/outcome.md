@@ -4,9 +4,52 @@ Date: 2026-10-08 (Europe/Berlin). Milestone 8 / Issue #79.
 Approved plan: `doc/plan/iteration-009.md`. Local implementation and acceptance
 complete. Feature PR #80 merged into `iteration/009` at `4b3c278` after Linux,
 Windows and frontend CI passed in run `37809752912`. Issue #79 is closed and its
-verified merged feature branch was deleted locally/remotely. Main integration is
-PR #81 with a separate successful-CI gate; final merge facts appear in the delivery
-response. `iteration/009` and all historical source/experiment work are retained.
+verified merged feature branch was deleted locally/remotely. Main PR #81 merged
+at `329ca6c` after its separate CI gate passed. Merged-main run `37810854105` also
+passed Linux Python, Windows Python and frontend. `iteration/009` and all
+historical source/experiment work are retained.
+
+## Supplemental closeout and known limitations (2026-10-11)
+
+The user authorized publishing the previously retained local street-basemap
+change and updated diagnostics through the same milestone/iteration workflow.
+Assigned Issue #82 precedes `feature/iteration009-basemap-handoff`, based on
+`iteration/009` fast-forwarded to main `329ca6c`. The regional map now supports
+optional online OpenStreetMap street tiles, a tile-failure explanation and an
+offline display of retained boundaries/locations/loaded overlays. The browser
+test checks tile requests, toggling, errors and the existing canvas renderer.
+No backend or original source data is changed by this supplemental delivery.
+Fresh local validation passes frontend lint/build, 13 mocked browser cases
+(8.8 s) and 12 isolated real-stack smoke cases (30.4 s), with clean runner exits.
+Supplemental feature and main PRs require successful Linux/Windows/frontend CI.
+Feature PR #83 merged at `4192b9d` after run `38141503242` passed all three jobs.
+Issue #82 is closed and its verified merged branch was removed locally/remotely.
+Final main integration uses a separate successful-CI gate and is reported in the
+delivery response; iteration history and all source snapshots remain retained.
+
+User inspection found a large-layer problem not covered by the earlier real-route
+browser acceptance. Regional `/features` still fills all 1,481 tag keys for each
+of 326,334 objects: 483,300,654 property positions. A read-only 256-object sample
+estimates about 11 GiB of properties JSON alone, before geometry. A running user
+backend occupied about 18 GiB working-set memory while the OSM overlay was loading,
+and route requests reached the frontend's 120-second timeout. The sample is not a
+completed full-response benchmark. Sparse regional serialization, viewport-based
+payloads/rendering, preparation reuse and cooperative request cancellation remain
+follow-up work. Avoid the full OSM overlay when reproducing route acceptance.
+
+OSM/DIPUL/GHSL study files (0.674 decimal GB) and complete native terrain
+(1.315 GB) are already local, totaling about 1.99 GB. DIPUL is integrated, with
+31 saved layers and 324 original features; applicability/completeness remain
+explicitly uncertain. Online street tiles are independent of these local sources.
+Terrain-only directories are incorrectly marked `needs attention` by the generic
+OSM dataset catalog; select `hannover-part1-v4` in Saved dataset and the complete
+terrain in the dedicated Terrain dataset selector.
+
+The user explicitly deferred mission-end automation and duration feasibility
+enforcement. Current interval validation only requires positive duration, at most
+24 hours, and a valid Berlin offset. Cruise duration is computed separately and
+is not compared with the selected interval. A successful route may exceed that
+window; takeoff/landing/waiting are also outside the cruise-only estimate.
 
 ## Problem and resulting behavior
 

@@ -2,6 +2,72 @@
 
 ## Current status
 
+### Iteration 009 supplemental feature delivery (2026-10-11)
+
+- PR #83 merged the retained basemap and closeout documentation into `iteration/009`
+  at `4192b9d`. Reviewed feature commit: `1572f94`; run `38141503242` passed Linux
+  Python, Windows Python and frontend before merge. Issue #82 is explicitly closed.
+- The verified merged `feature/iteration009-basemap-handoff` was deleted remotely
+  and locally after switching/synchronizing the target; fetch/prune and local/remote
+  branch checks confirmed cleanup. Keep `iteration/009` and historical branches.
+- README, the approved plan and outcome include current behavior and deferred
+  issues. No backend/source changes or additional time-feasibility optimization
+  were introduced. Main publication uses its own CI gate; final PR/merge facts
+  are reported in the delivery response. Earlier authorization notes are history.
+
+### Iteration 009 supplemental delivery authorized (2026-10-11)
+
+- User accepted the iteration as substantially complete and authorized publishing
+  remaining local changes, CI-gated integration to main and handoff/documentation
+  updates. Scope is the retained regional street-basemap toggle, tile-failure
+  feedback, offline-overlay browser coverage and the diagnostic record below.
+- Milestone 8 / assigned Issue #82 precede `feature/iteration009-basemap-handoff`,
+  created from `iteration/009` fast-forwarded to verified main `329ca6c`.
+  No backend or source-snapshot change is included in this supplemental delivery.
+- Main route recovery is already delivered through PR #81 at `329ca6c`; its
+  merged-main run `37810854105` passed Linux Python, Windows Python and frontend.
+  Earlier descriptions of pending main integration below are historical records.
+- Full-region OSM payload expansion, bounded layer rendering, request cancellation
+  and terrain-only entries marked `needs attention` remain follow-up issues.
+  User explicitly deferred automatic mission-end calculation and mission-duration
+  feasibility enforcement. A route can succeed with cruise time exceeding the
+  entered scenario interval; current `success` does not certify deadline feasibility.
+- Original snapshots, `.cache/iteration009-*`, historical iteration branches and
+  the separate Iteration 008 Part 5 branch/evidence remain intact. User-owned
+  development services are not stopped for publication or validation.
+- Local validation: frontend ESLint/TypeScript/production build pass; 13 mocked
+  browser tests (8.8 s) and 12 real-stack smoke tests (30.4 s) pass with clean
+  runner exits. Remote Linux/Windows/frontend CI gates each integration PR.
+  Final supplemental PR/merge facts are recorded in the delivery response.
+
+### Route timeout and regional overlay diagnostic (2026-10-11)
+
+- User reported the frontend's 120-second timeout for primary-pair A* research
+  planning at 120 m AGL, 250 m grid and 2026-10-07 17:20–17:25 Berlin time, then
+  persistent OSM overlay loading and asked about local data storage.
+- Confirmed a regional display defect: `/features` uses sparse output only for
+  `experiment.json`, not `study.json`. Hannover's 326,334 objects are expanded
+  to all 1,481 tag keys: 483,300,654 property positions. A read-only 256-row
+  sample estimates about 11 GiB of properties JSON alone, excluding geometry.
+  This is an estimate, not a completed full-response measurement.
+- The running user backend reached approximately 18 GiB working-set memory and
+  its health request did not respond within five seconds. Full source validation
+  and model preparation are repeated per route request. Client aborts do not
+  cooperatively stop the synchronous backend calculation. A layer completion or
+  visibility change also aborts/restarts other in-flight layer requests through
+  the shared map effect/controller. These can amplify concurrent backend load.
+- All retained planning sources are already local. Actual storage: source study
+  0.674 decimal GB; complete 120-tile terrain 1.315 GB; together about 1.99 GB.
+  All 31 saved DIPUL pages are readable and contain 324 features. Street basemap
+  tiles alone use the online OSM tile service.
+- No application code, original data, remote objects or user-owned services were
+  changed. Avoid issuing another full OSM request while that work occupies RAM.
+  An isolated 120 m route timing and end-to-end layer timings remain unmeasured
+  under a cleared backend; the previous verified 100 m route took about 53 s.
+  Recovery for testing is to disable the OSM overlay, restart the user backend
+  in its own terminal and test only the route. Permanent fixes require sparse
+  regional serialization, bounded map payloads and request/cancellation management.
+
 ### Iteration 009 feature delivery and main integration (2026-10-08)
 
 - Feature PR #80 merged into `iteration/009` at `4b3c278` after all three checks
@@ -701,7 +767,7 @@ only. See `backend/src/uas_planner/route_demo.py` and `sample.py`.
 - Command help: `uv run --project backend --locked uas-planner --help`.
 - Reload live sample: `uv run --project backend --locked uas-planner inspect data/braunschweig-demo`.
 - Sample files: `data/braunschweig-demo/features.gpkg` and `metadata.json` (excluded from Git).
-- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0, not logged in directly. Git's credential provider supplies authenticated access when required; never print or persist credential values. No global PATH change was made.
+- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0. Normal `gh auth login` was completed by the user; use normal CLI authentication and never print or persist credential values. No global PATH change was made.
 - See README and `doc/iteration/iteration-001/feedback.md` for commands and limitations.
 
 ## Agreed architecture

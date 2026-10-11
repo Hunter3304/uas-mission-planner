@@ -15,6 +15,8 @@ export default function RegionalMap({ datasetId, study, startId, endId, geometry
   const [visible, setVisible] = useState({ boundary: true, locations: true, osm: false, zones: false, blocked: true, unknown: false, population: false, route: true })
   const [layers, setLayers] = useState<Partial<Record<'osm' | 'zones' | 'population', FeatureCollection>>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [basemap, setBasemap] = useState(true)
+  const [tileError, setTileError] = useState(false)
   useEffect(() => {
     if (!container.current) return
     const instance = L.map(container.current, { preferCanvas: true, zoomAnimation: false }).setView([52.38, 9.9], 11)
@@ -24,6 +26,15 @@ export default function RegionalMap({ datasetId, study, startId, endId, geometry
     observer.observe(container.current)
     return () => { observer.disconnect(); instance.remove(); map.current = null }
   }, [])
+  useEffect(() => {
+    if (!map.current || !basemap) return
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map.current)
+    tiles.on('tileerror', () => setTileError(true))
+    return () => { tiles.off(); tiles.remove() }
+  }, [basemap])
   useEffect(() => {
     if (!study || !map.current) return
     const b = study.config.bounds
@@ -68,6 +79,8 @@ export default function RegionalMap({ datasetId, study, startId, endId, geometry
     return () => { group.remove() }
   }, [study, startId, endId, geometry, constraints, layers, visible])
   return <>
+    <label><input type="checkbox" checked={basemap} onChange={event => { setBasemap(event.target.checked); setTileError(false) }} /> Street basemap — online OpenStreetMap tiles</label>
+    {basemap && tileError && <p role="alert">Street basemap tiles could not load. Check your internet connection; saved locations and data layers remain available.</p>}
     <fieldset><legend>Regional map layers</legend>{(Object.keys(legend) as (keyof typeof legend)[]).map(key => <label key={key} style={{ display: 'block' }}><input type="checkbox" checked={visible[key]} onChange={event => setVisible(current => ({ ...current, [key]: event.target.checked }))} /> {legend[key]}{visible[key] && ['osm', 'zones', 'population'].includes(key) && !layers[key as keyof typeof layers] && ' · loading or unavailable'}</label>)}</fieldset>
     <div className="map-shell"><div className="map" style={{ minHeight: 480 }} ref={container} role="region" aria-label="Hannover regional map" /></div>
     <p>Saved source data: {study ? Object.values(study.sources).map(source => source.attribution).filter(Boolean).join(' · ') : 'Loading verified study…'}. GHSL is inspection only.</p>
