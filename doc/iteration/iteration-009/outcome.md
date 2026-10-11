@@ -22,6 +22,10 @@ No backend or original source data is changed by this supplemental delivery.
 Fresh local validation passes frontend lint/build, 13 mocked browser cases
 (8.8 s) and 12 isolated real-stack smoke cases (30.4 s), with clean runner exits.
 Supplemental feature and main PRs require successful Linux/Windows/frontend CI.
+Feature PR #83 merged at `4192b9d` after run `38141503242` passed all three jobs.
+Issue #82 is closed and its verified merged branch was removed locally/remotely.
+Final main integration uses a separate successful-CI gate and is reported in the
+delivery response; iteration history and all source snapshots remain retained.
 
 User inspection found a large-layer problem not covered by the earlier real-route
 browser acceptance. Regional `/features` still fills all 1,481 tag keys for each

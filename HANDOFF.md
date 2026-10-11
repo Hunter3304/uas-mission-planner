@@ -2,6 +2,19 @@
 
 ## Current status
 
+### Iteration 009 supplemental feature delivery (2026-10-11)
+
+- PR #83 merged the retained basemap and closeout documentation into `iteration/009`
+  at `4192b9d`. Reviewed feature commit: `1572f94`; run `38141503242` passed Linux
+  Python, Windows Python and frontend before merge. Issue #82 is explicitly closed.
+- The verified merged `feature/iteration009-basemap-handoff` was deleted remotely
+  and locally after switching/synchronizing the target; fetch/prune and local/remote
+  branch checks confirmed cleanup. Keep `iteration/009` and historical branches.
+- README, the approved plan and outcome include current behavior and deferred
+  issues. No backend/source changes or additional time-feasibility optimization
+  were introduced. Main publication uses its own CI gate; final PR/merge facts
+  are reported in the delivery response. Earlier authorization notes are history.
+
 ### Iteration 009 supplemental delivery authorized (2026-10-11)
 
 - User accepted the iteration as substantially complete and authorized publishing
