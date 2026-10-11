@@ -16,7 +16,7 @@ from shapely.geometry import shape
 
 from uas_planner.core.risk import signature
 
-RULES_VERSION = "regional-restrictions-v2"
+RULES_VERSION = "regional-restrictions-v3"
 REVIEW_GROUPS = {
     "airspace": {"kontrollzonen", "flughaefen", "flugplaetze", "flugbeschraenkungsgebiete"},
     "infrastructure": {
@@ -199,7 +199,33 @@ def load_profile(directory, ident):
     return validate_profile(result)
 
 
-def decision(record, scenario, terrain, vertical_check, evidence_check):
+def comparison_terrain(terrain, scenario, mode):
+    """Return an explicitly assumed comparison frame without changing source data."""
+    if (
+        mode == "strict"
+        or scenario.get("vertical_reference_policy", "source") != "nhn_as_msl_assumption"
+        or terrain.get("status") != "known"
+        or terrain.get("vertical_datum") != "DHHN2016_NHN"
+    ):
+        return terrain, None
+    offset = scenario.get("nhn_msl_offset_m", 0)
+    uncertainty = scenario.get("nhn_msl_uncertainty_m", 0)
+    lower = terrain["minimum_m"] + offset - uncertainty
+    upper = terrain["maximum_m"] + offset + uncertainty
+    assumption = {
+        "policy": "nhn_as_msl_assumption",
+        "source_vertical_datum": "DHHN2016_NHN",
+        "comparison_reference": "MSL",
+        "offset_m": offset,
+        "uncertainty_m": uncertainty,
+        "ground_nhn_bounds_m": [terrain["minimum_m"], terrain["maximum_m"]],
+        "ground_comparison_bounds_m": [lower, upper],
+        "reason": "Explicit engineering NHN/MSL approximation, not a verified datum transformation.",
+    }
+    return {**terrain, "vertical_datum": "MSL", "minimum_m": lower, "maximum_m": upper}, assumption
+
+
+def decision(record, scenario, terrain, vertical_check, evidence_check, *, mode="strict"):
     """Nonintersection proves only this zone inapplicable to this scenario/query."""
     props = record["properties"]
     source = record["source"]
@@ -211,6 +237,7 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
         "required_review": review_requirement(record["layer"]),
         "legal_reference": props.get("legal_ref"),
         "state": "unresolved",
+        "vertical_relation": "unknown",
         "reason": "No evidence-backed scenario assessment.",
     }
     # Only normalized, reviewed notices use canonical time fields.
@@ -222,9 +249,58 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
                 "state": "not_applicable",
                 "reason": "Outside reviewed validity interval.",
             }
-    state, reason = vertical_check(props, scenario["agl_m"], terrain)
+    comparison, assumption = comparison_terrain(terrain, scenario, mode)
+    uses_msl = any(
+        props.get(f"{p}_limit_alt_ref") == "MSL" and props.get(f"{p}_limit_altitude") is not None
+        for p in ("lower", "upper")
+    )
+    if assumption and uses_msl:
+        result["vertical_reference_assumption"] = assumption
+        result["aircraft_comparison_bounds_m"] = [
+            comparison["minimum_m"] + scenario["agl_m"],
+            comparison["maximum_m"] + scenario["agl_m"],
+        ]
+        result["vertical_comparison_quality"] = "engineering_assumption"
+    state, reason = vertical_check(props, scenario["agl_m"], comparison)
+    result["vertical_state"] = state
+    if (
+        uses_msl
+        and comparison.get("status") == "known"
+        and comparison.get("vertical_datum") == "MSL"
+    ):
+        result["zone_msl_bounds_m"] = {
+            p: props[f"{p}_limit_altitude"]
+            * (0.3048 if props.get(f"{p}_limit_unit") == "ft" else 1)
+            for p in ("lower", "upper")
+            if isinstance(props.get(f"{p}_limit_altitude"), (int, float))
+            and not isinstance(props.get(f"{p}_limit_altitude"), bool)
+            and math.isfinite(props[f"{p}_limit_altitude"])
+            and props.get(f"{p}_limit_unit") in {"m", "ft"}
+            and props.get(f"{p}_limit_alt_ref") == "MSL"
+        }
+        bounds = [
+            comparison["minimum_m"] + scenario["agl_m"],
+            comparison["maximum_m"] + scenario["agl_m"],
+        ]
+        result["aircraft_comparison_bounds_m"] = bounds
+        reason += f" Aircraft comparison interval {bounds[0]:.3f}–{bounds[1]:.3f} m MSL; zone limits {result['zone_msl_bounds_m']}."
+        if assumption:
+            reason += " NHN + AGL engineering approximation."
     if state == "outside_vertical":
-        return {**result, "state": "not_applicable", "reason": reason}
+        return {
+            **result,
+            "state": "not_applicable",
+            "vertical_relation": "outside",
+            "reason": reason,
+        }
+    limits = result.get("zone_msl_bounds_m", {})
+    if (
+        limits
+        and state == "unresolved"
+        and all(props.get(f"{p}_limit_altitude") is None or p in limits for p in ("lower", "upper"))
+        and (len(limits) < 2 or limits["lower"] <= limits["upper"])
+    ):
+        result["vertical_relation"] = "overlap" if len(limits) == 2 else "potential_overlap"
     # An imported prohibition must be reviewed and have compatible vertical overlap.
     # A stale or generic allowance must not downgrade this independent prohibition.
     if record.get("reviewed_notice") and record.get("notice_state") == "prohibited":
@@ -236,10 +312,21 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
                 and not isinstance(v, bool)
                 and math.isfinite(v)
                 and props.get(f"{p}_limit_unit") in {"m", "ft"}
-                and props.get(f"{p}_limit_alt_ref") == "AGL"
+                and (
+                    props.get(f"{p}_limit_alt_ref") == "AGL"
+                    or props.get(f"{p}_limit_alt_ref") == "MSL"
+                    and comparison.get("status") == "known"
+                    and comparison.get("vertical_datum") == "MSL"
+                )
             )
             for p, v in zip(("lower", "upper"), limits)
         )
+        references = {
+            props.get(f"{p}_limit_alt_ref")
+            for p, value in zip(("lower", "upper"), limits)
+            if value is not None
+        }
+        compatible = compatible and len(references) == 1
         if all(v is not None for v in limits):
             values = (
                 [
@@ -259,7 +346,7 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
             return {
                 **result,
                 "state": "prohibited",
-                "reason": "Reviewed active prohibition at compatible AGL altitude.",
+                "reason": "Reviewed active prohibition overlaps the compatible comparison interval.",
                 "evidence": record["evidence"],
             }
     assessment = scenario.get("zone_assessments", {}).get(source)

@@ -14,6 +14,10 @@ and reproducible real three-mode acceptance. Independently active reviewed
 prohibitions take precedence over generic or stale allowances; permission-profile
 expiry/source changes restore conservative exclusions.
 
+The user-authorized [NHN + AGL height comparison](doc/rules/vertical-references.md)
+adds explicit offset/uncertainty and endpoint MSL comparison diagnostics. It is an
+engineering assumption in conservative/research mode; strict datum checks remain.
+
 Iteration 009 enables **real Hannover research routes** with explicit derived
 geometry and missing-height assumptions, bounded corridor search, checked exact
 endpoint connectors and Berlin date/time selectors. See

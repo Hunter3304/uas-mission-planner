@@ -51,6 +51,10 @@ def validate_scenario(config):
     finite_number(config["speed_m_s"], 25, 35, "Cruise speed")
     finite_number(config.get("clearance_m", 0), 0, 1000, "Safety clearance")
     finite_number(config.get("vertical_clearance_m", 0), 0, 1000, "Vertical clearance")
+    if config.get("vertical_reference_policy", "source") not in {"source", "nhn_as_msl_assumption"}:
+        raise ValueError("Unknown vertical reference policy.")
+    finite_number(config.get("nhn_msl_offset_m", 0), -1000, 1000, "NHN/MSL offset")
+    finite_number(config.get("nhn_msl_uncertainty_m", 0), 0, 1000, "NHN/MSL uncertainty")
     if config.get("scenario") not in ("civil", "BOS"):
         raise ValueError("Scenario must be civil or BOS; neither implies an exemption.")
     if config.get("building_unknown_height", "unresolved") not in ("unresolved", "exclude"):
@@ -809,8 +813,18 @@ class RegionalConstraints:
                         )
             else:
                 evaluated = zone_decision(
-                    record, self.scenario, terrain, vertical_state, assessed_zone
+                    record, self.scenario, terrain, vertical_state, assessed_zone, mode=mode
                 )
+                if evaluated.get("vertical_reference_assumption"):
+                    assumptions.append(
+                        {
+                            "source": record["source"],
+                            **evaluated["vertical_reference_assumption"],
+                            "aircraft_comparison_bounds_m": evaluated[
+                                "aircraft_comparison_bounds_m"
+                            ],
+                        }
+                    )
                 state, reason = evaluated["state"], evaluated["reason"]
                 zones.append(
                     {
@@ -913,7 +927,7 @@ class RegionalConstraints:
             safety_distance_m=self.scenario.get("clearance_m", 0),
         )
 
-    def restriction_report(self):
+    def restriction_report(self, mode="strict"):
         decisions = []
         for record in self.records:
             if record["category"] != "building_obstacle":
@@ -921,9 +935,10 @@ class RegionalConstraints:
                     zone_decision(
                         record,
                         self.scenario,
-                        self.zone_terrain(record),
+                        self.zone_terrain(record, mode),
                         vertical_state,
                         assessed_zone,
+                        mode=mode,
                     )
                 )
         return {
@@ -935,14 +950,20 @@ class RegionalConstraints:
             ),
         }
 
-    def zone_terrain(self, record):
+    def zone_terrain(self, record, mode="strict"):
         # AGL checks do not need raster reads. NHN cannot resolve MSL comparisons.
         props = record["properties"]
         manifest = getattr(self.terrain, "manifest", None) or {}
-        if manifest.get("vertical_datum") == "MSL" and any(
-            props.get(f"{p}_limit_alt_ref") == "MSL" for p in ("lower", "upper")
-        ):
-            return self.terrain.bounds(record["geometry"])
+        supported = manifest.get("vertical_datum") == "MSL" or (
+            manifest.get("vertical_datum") == "DHHN2016_NHN"
+            and mode != "strict"
+            and self.scenario.get("vertical_reference_policy") == "nhn_as_msl_assumption"
+        )
+        if supported and any(props.get(f"{p}_limit_alt_ref") == "MSL" for p in ("lower", "upper")):
+            scope = record["geometry"].intersection(self.boundary)
+            if scope.is_empty:
+                return {"status": "unknown", "reason": "Zone outside retained terrain scope."}
+            return self.terrain.bounds(scope)
         return {"status": "unknown"}
 
     def summary(self):
@@ -1006,9 +1027,9 @@ def constraint_layers(model, mode="strict"):
         if record["category"] != "building_obstacle":
             # A complete native terrain window may exceed its resource bound.
             # Preserve that uncertainty instead of classifying the whole zone as clear.
-            terrain = model.zone_terrain(record)
+            terrain = model.zone_terrain(record, mode)
             evaluated = zone_decision(
-                record, model.scenario, terrain, vertical_state, assessed_zone
+                record, model.scenario, terrain, vertical_state, assessed_zone, mode=mode
             )
             decisions.append(evaluated)
             state, reason = evaluated["state"], evaluated["reason"]

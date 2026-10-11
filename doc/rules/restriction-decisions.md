@@ -1,6 +1,6 @@
 # Regional restriction decisions
 
-Rules version `regional-restrictions-v2`; constraint model `regional-constraints-v3`.
+Rules version `regional-restrictions-v3`; constraint model `regional-constraints-v3`.
 The module evaluates a specified interval, AGL altitude and civil/BOS scenario.
 It does not infer consent from a layer name, score or task category.
 
@@ -50,10 +50,15 @@ reviewed assessment. A hospital/laboratory address never supplies that evidence.
   allowance, unknown datum, absent evidence or unsupported schedule.
 
 Intervals are offset-aware and use half-open time boundaries. Altitude equality
-counts as overlap. AGL and MSL are not directly compared; NHN is not treated as MSL.
+counts as overlap. AGL and MSL are not directly compared; NHN is not silently equated with MSL.
 Mixed units are converted only when documented. No known obstacle is downgraded by
 changing planning mode. All point, motion, connector and final polyline checks use
 the same engine; touching an excluded footprint is blocked.
+
+The user authorized an explicit [NHN + AGL engineering comparison](vertical-references.md)
+for conservative/research mode. Source datums remain unchanged; offset/uncertainty
+and comparison quality are retained in results. Strict mode never adopts the
+approximation. Numeric overlap does not resolve zone conditions or grant permission.
 
 ## Policies and coverage
 

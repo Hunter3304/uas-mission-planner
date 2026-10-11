@@ -2,6 +2,34 @@
 
 ## Current status
 
+### Iteration 010 NHN + AGL supplement (2026-10-11)
+
+- User explicitly requested NHN terrain + AGL comparison with MSL limits during
+  remote delivery. Issue #88 was assigned to Milestone 9 before creating
+  `feature/88-nhn-agl-comparison` from verified iteration merge `e4889f8`.
+- Explicit engineering policy, offset/uncertainty, full-motion native terrain
+  bounds, original datum preservation, endpoint numerical diagnostics/export and
+  UI result invalidation implemented. Regional conservative/research UI enables
+  the requested zero-offset approximation; strict and API/core defaults retain
+  source-reference verification. Rules version `regional-restrictions-v3`.
+- Real origin/destination: 56.747/57.035 m NHN ground + 100 m AGL = 156.747/157.035 m
+  comparison heights. Full direct-motion interval 152.899–160.694 m. All overlap
+  control-zone limits 155.700–762 m MSL under the declared assumption. This does
+  not satisfy zone applicability/permission. Original data remain unchanged.
+- Nine real mode/query checks saved in `.cache/iteration010-nhn-real-evidence.json`.
+  Reproduction and rules: `doc/experiments/iteration-010/verify-nhn-agl.py` and
+  `doc/rules/vertical-references.md`. Local backend full: 255 passed / one existing
+  Windows permission skip; 14 mocked browser and 12 real-stack smoke pass cleanly.
+  Final numerical-display scoped checks pass: 26 restriction cases, all 14 browser
+  cases and frontend lint/build. Supplemental publication follows.
+- Base feature PR #87 merged at `e4889f8` after run `38155429114` passed all three
+  Linux/Windows/frontend jobs at reviewed `efbd279`. Issues #85/#86 are closed.
+  Verified merged feature was removed locally/remotely; fetch/prune, branch -a and
+  ls-remote confirmed cleanup. Historical branches and source/profile data retained.
+- Main integration was deferred for this user-requested supplement; do not merge
+  main until its feature and integration CI gates pass. User-owned services remain
+  untouched. Earlier no-publication/height-comparison limitations below are history.
+
 ### Iteration 010 completion and remote delivery authorized (2026-10-11)
 
 - User explicitly requested completion of Iteration 010 and outstanding remote

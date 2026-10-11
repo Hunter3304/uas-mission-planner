@@ -30,6 +30,13 @@ cases and three independently verified primary research routes. Read
 [the acceptance evidence](outcome.md#validation). Final delivery follows the newly
 authorized remote CI workflow.
 
+The user subsequently authorized the Issue #88 NHN + AGL engineering comparison
+before main integration. It supplies explicit offset/uncertainty and numerical
+endpoint/whole-motion diagnostics; strict reference verification remains intact.
+At zero offset and 100 m AGL, both primary endpoints overlap the control-zone
+MSL band. See [height comparison](../../rules/vertical-references.md). Supplemental
+feature CI and separate main integration gates are required before delivery.
+
 The following operational evidence work remains, and does not prevent delivery of
 the planned evidence/import/avoidance functionality:
 

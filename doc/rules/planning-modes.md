@@ -32,6 +32,10 @@ behavior must not be inferred for those endpoints.
   uncertainty buffer. Strict mode retains original geometry/height uncertainty gates.
 - Cost assessment is separate from zone permission. Unknown risk support may still
   prevent weighted routing; `distance` does not bypass hard constraints.
+- The user-authorized NHN + AGL engineering comparison is enabled by default in
+  the regional conservative/research UI, with explicit offset/uncertainty controls.
+  Strict mode does not adopt this assumption; API/core source-reference defaults
+  remain unchanged. See [height comparison rules](vertical-references.md).
 - Time selectors validate a positive Berlin interval of at most 24 hours. They do
   not certify that cruise duration fits that interval; duration feasibility is deferred.
 

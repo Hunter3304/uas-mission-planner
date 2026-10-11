@@ -423,6 +423,132 @@ def test_saved_profile_is_applied_to_real_api_routing_and_expires(model, tmp_pat
         assert client.post(endpoint, json=request).status_code == 422
 
 
+@pytest.mark.parametrize(
+    "ground,relation", [(40, "outside"), (55.7, "overlap"), (60, "overlap"), (700, "outside")]
+)
+def test_explicit_nhn_agl_comparison_uses_aircraft_height_and_keeps_source(
+    scenario, ground, relation
+):
+    item = record()
+    item["properties"].update(
+        lower_limit_altitude=155.7,
+        lower_limit_unit="m",
+        lower_limit_alt_ref="MSL",
+        upper_limit_altitude=762,
+        upper_limit_unit="m",
+        upper_limit_alt_ref="MSL",
+    )
+    terrain = {
+        "status": "known",
+        "minimum_m": ground,
+        "maximum_m": ground,
+        "vertical_datum": "DHHN2016_NHN",
+    }
+    scenario["vertical_reference_policy"] = "nhn_as_msl_assumption"
+    result = decision(item, scenario, terrain, vertical_state, assessed_zone, mode="conservative")
+    assert result["vertical_relation"] == relation
+    assert result["aircraft_comparison_bounds_m"] == pytest.approx([ground + 100, ground + 100])
+    assert result["state"] == ("not_applicable" if relation == "outside" else "unresolved")
+    assert terrain["vertical_datum"] == "DHHN2016_NHN" and terrain["minimum_m"] == ground
+    assert result["vertical_reference_assumption"]["offset_m"] == 0
+    strict = decision(item, scenario, terrain, vertical_state, assessed_zone, mode="strict")
+    assert strict["state"] == "unresolved" and "vertical_reference_assumption" not in strict
+    scenario["vertical_reference_policy"] = "source"
+    assert (
+        decision(item, scenario, terrain, vertical_state, assessed_zone, mode="conservative")[
+            "vertical_relation"
+        ]
+        == "unknown"
+    )
+
+
+def test_nhn_uncertainty_full_motion_and_unknown_support_are_not_bypassed(model):
+    props = model.records[0]["properties"]
+    props.update(
+        lower_limit_altitude=155.7,
+        lower_limit_unit="m",
+        lower_limit_alt_ref="MSL",
+        upper_limit_altitude=762,
+        upper_limit_unit="m",
+        upper_limit_alt_ref="MSL",
+    )
+    model.scenario["vertical_reference_policy"] = "nhn_as_msl_assumption"
+    reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
+    points = [reverse(500190, 5800200), reverse(500210, 5800200)]
+    model.terrain.bounds = lambda query: {
+        "status": "known",
+        "minimum_m": 50,
+        "maximum_m": 50 if query.geom_type == "Point" else 70,
+        "vertical_datum": "DHHN2016_NHN",
+    }
+    assert all(model.check([p], mode="conservative")["state"] == "permitted" for p in points)
+    motion = model.check(points, mode="conservative")
+    assert motion["state"] == "blocked"
+    assert motion["zones"][0]["aircraft_comparison_bounds_m"] == [150, 170]
+    assert any(a.get("policy") == "nhn_as_msl_assumption" for a in motion["assumptions"])
+    model.scenario.update(nhn_msl_offset_m=3, nhn_msl_uncertainty_m=4)
+    assert model.check([points[0]], mode="conservative")["zones"][0][
+        "aircraft_comparison_bounds_m"
+    ] == [149, 157]
+    assert model.check([points[0]], mode="conservative")["state"] == "blocked"
+    model.terrain.bounds = lambda query: {"status": "unknown", "reason": "NoData"}
+    assert model.check(points, mode="research")["state"] == "unresolved"
+    model.terrain.bounds = lambda query: {
+        "status": "known",
+        "minimum_m": 50,
+        "maximum_m": 50,
+        "vertical_datum": "unknown",
+    }
+    result = model.check(points, mode="conservative")
+    assert result["state"] == "blocked" and "aircraft_comparison_bounds_m" not in result["zones"][0]
+
+
+def test_reviewed_msl_notice_blocks_with_nhn_assumption(scenario):
+    item = {
+        **record(),
+        "reviewed_notice": True,
+        "notice_state": "prohibited",
+        "evidence": "Fixture reviewed notice",
+    }
+    item["properties"].update(
+        lower_limit_altitude=150,
+        lower_limit_unit="m",
+        lower_limit_alt_ref="MSL",
+        upper_limit_altitude=200,
+        upper_limit_unit="m",
+        upper_limit_alt_ref="MSL",
+        valid_from="2026-10-07T08:00:00Z",
+        valid_until="2026-10-07T09:00:00Z",
+    )
+    scenario["vertical_reference_policy"] = "nhn_as_msl_assumption"
+    terrain = {
+        "status": "known",
+        "minimum_m": 60,
+        "maximum_m": 60,
+        "vertical_datum": "DHHN2016_NHN",
+    }
+    result = decision(item, scenario, terrain, vertical_state, assessed_zone, mode="research")
+    assert result["state"] == "prohibited"
+    assert result["vertical_comparison_quality"] == "engineering_assumption"
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("vertical_reference_policy", "automatic"),
+        ("nhn_msl_offset_m", float("nan")),
+        ("nhn_msl_offset_m", True),
+        ("nhn_msl_uncertainty_m", -1),
+    ],
+)
+def test_invalid_nhn_reference_controls_are_rejected(scenario, field, value):
+    from uas_planner.core.regional import validate_scenario
+
+    scenario[field] = value
+    with pytest.raises(ValueError):
+        validate_scenario(scenario)
+
+
 @pytest.mark.parametrize("algorithm", ["astar", "dijkstra", "abitstar"])
 def test_three_algorithms_avoid_zone_with_independent_geometry(model, monkeypatch, algorithm):
     if algorithm == "abitstar" and find_spec("ompl") is None:
