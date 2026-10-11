@@ -2,6 +2,24 @@
 
 ## Current status
 
+### Iteration 010 post-merge smoke deadline correction (2026-10-11)
+
+- Main push run `38158032394` and documentation push run `38158287944` exposed
+  the existing comparison smoke test's five-second DOM deadline while four real
+  solves were still running. Both backend jobs and mocked browser checks passed.
+- Issue #93 was assigned to Milestone 9 before `fix/93-comparison-smoke-wait`.
+  Await the real comparison API response, check successful HTTP status, then
+  assert the rendered costs and exact displayed/exported report. Production
+  algorithms, constraints and UI behavior remain unchanged.
+- A six-worker local stress run passed the corrected comparison case but exposed
+  the same short deadline in two unrelated readiness checks. Real-stack smoke
+  acceptance now uses one worker for its shared CPU-bound backend; mocked browser
+  concurrency is unchanged. Frontend lint and all 12 real-stack smoke cases pass
+  with clean exits locally (34.1 s) before publication.
+- Keep PR #92 pending until the correction passes its feature and main gates.
+  Final merged-main success and verified correction-branch cleanup are required
+  before closing Issues #91/#93 and the milestone. No user service was stopped.
+
 ### Iteration 010 verified main delivery (2026-10-11)
 
 - Complete functional delivery, including the user-requested NHN + AGL supplement,
