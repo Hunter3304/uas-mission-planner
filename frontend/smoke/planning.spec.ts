@@ -67,7 +67,12 @@ test('comparison recomputes comparable costs and supports mobile and report expo
   await page.getByLabel('ABIT* search budget (s)').fill('0.5')
   const compare = page.getByRole('button', { name: 'Compare algorithms', exact: true })
   await expect(compare).toBeEnabled()
+  // Four real solves can outlast the default five-second DOM assertion deadline.
+  const response = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/compare'))
   await compare.click()
+  const comparisonResponse = await response
+  expect(comparisonResponse.ok()).toBe(true)
+  const shown = await comparisonResponse.json()
   const table = page.getByTestId('comparison-result')
   await expect(table).toContainText('distance A*')
   await expect(table).toContainText('weighted Dijkstra')
@@ -78,6 +83,7 @@ test('comparison recomputes comparable costs and supports mobile and report expo
   const chunks = []
   for await (const chunk of stream!) chunks.push(chunk)
   const report = JSON.parse(Buffer.concat(chunks).toString())
+  expect(report).toEqual(shown)
   expect(report.runs).toHaveLength(4)
   expect(report.runs[0].comparison_costs.objective_cost).toBeGreaterThan(report.runs[1].comparison_costs.objective_cost)
   expect(report.runs[1].comparison_costs.status).toBe('verified')
