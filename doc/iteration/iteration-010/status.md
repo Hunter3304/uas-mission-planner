@@ -14,8 +14,8 @@ its successful-CI gate.
 | Persistent assessment/permission workflow | Local immutable profiles, UI review/import/save/export, expiry/signature/phase checks implemented | No real permission profiles supplied; launch/landing records are stored but not a separate flight-phase model |
 | Temporary restrictions and coverage | Bounded official WFS/notice originals, receipts, reviewed import and unverified coverage/freshness reports implemented | No exhaustive authenticated NOTAM feed or automated interpretation of all notices/schedules |
 | Algorithms, map and exports | Shared full-motion checks, distinct decisions/policy exclusions/buildings, result invalidation and exports implemented | A valid conservative route on the real target missions has not been established |
-| Acceptance | Final 255 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; profile/active-notice/15 mode/9 NHN comparison acceptance | Completed local and independent feature/integration CI; retain operational limitations |
-| Publication/integration | #87/#89 feature gates and #90 main gate passed; functional main merge `2163974`; #85/#86/#88 closed and feature cleanup verified | Issue #91 documentation-only closeout and merged-main state checked before final delivery |
+| Acceptance | Final 255 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; profile/active-notice/15 mode/9 NHN comparison acceptance; shared-backend smoke deadline corrected in #94 | Feature correction CI passed; final #92 integration and merged-main gates checked before response |
+| Publication/integration | #87/#89/#94 feature gates and #90 main gate passed; functional main merge `2163974`; #85/#86/#88/#93 closed and feature cleanup verified | Issue #91 final record and acceptance correction in #92; verify final main state before closure |
 
 Feature integration is complete: #87 at `e4889f8`, #89 at `d453961`, with successful
 Linux/Windows/frontend runs `38155429114` and `38157301971`. Issues #85/#86/#88 are
@@ -25,7 +25,10 @@ smoke cases. Main delivery retains its own separate gate.
 
 Main delivery is now verified: PR #90 at `2163974`, independent main-PR run
 `38157731109` and iteration push run `38157643292` successful. The final
-documentation record is tracked by #91. Remaining source/permission evidence is
+documentation record is tracked by #91. Post-merge comparison smoke timing was
+corrected by #94 at `3eca995`, after independent run `38158666846` passed all
+three jobs. Final PR #92 includes that correction and has its own main gate.
+Remaining source/permission evidence is
 operational follow-up, not unfinished implementation or remote functional delivery.
 
 The delivered result is a usable conservative-avoidance and evidence workflow.
@@ -51,10 +54,11 @@ feature CI and separate main integration gates passed before delivery.
 The following operational evidence work remains, and does not prevent delivery of
 the planned evidence/import/avoidance functionality:
 
-1. Complete local acceptance of the three documented modes. Use synthetic fixtures
-   for all-three-algorithm detours and prohibited-wall rejection; retain the real
-   conservative endpoint failures. Research results remain explicitly assumed.
-2. Audit the primary pair's four unique endpoint-related source features first:
+1. Local acceptance of the three documented modes is complete. Retain synthetic
+   all-three-algorithm detours/prohibited-wall rejection and real conservative
+   endpoint failures as regressions. Research results remain explicitly assumed.
+2. The primary pair's four-feature source audit is complete. Begin substantive
+   condition/permission review with those retained source records:
    `dipul:wohngrundstuecke/wohngrundstuecke.1398`,
    `dipul:kontrollzonen/kontrollzonen.57`,
    `dipul:krankenhaeuser/krankenhaeuser.2275`, and

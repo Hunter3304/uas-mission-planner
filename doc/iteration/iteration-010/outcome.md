@@ -13,8 +13,17 @@ PR #89 at `d453961` after run `38157301971`, each passed Linux/Windows/frontend.
 Issues #85/#86/#88 are closed and merged feature cleanup is verified. Main
 integration PR #90 merged at `2163974` after independent run `38157731109` passed
 all three jobs; iteration push run `38157643292` also passed. Issue #91 records
-the documentation-only closeout, with a separate CI gate. Functional delivery is
+the final closeout, with a separate CI gate. Functional delivery is
 complete; operational permission/reference/coverage limitations remain explicit.
+
+Post-merge run `38158032394` and documentation push `38158287944` exposed an
+existing five-second comparison smoke deadline while four real solves were still
+running. Issue #93 / PR #94 now await the successful comparison response, verify
+exact response/export equality and serialize cases sharing the CPU-bound backend.
+Frontend lint and all 12 smoke cases pass locally (34.1 s); independent feature
+run `38158666846` passed all three jobs before merge `3eca995`. Issue #93 is
+closed and its merged fix branch cleanup verified. Final integration PR #92
+includes this correction and requires its own final-head and merged-main gates.
 
 The UI previously sent empty zone assessments and research routing bypassed all
 unknown zone applicability. It now defaults to conservative avoidance: unresolved

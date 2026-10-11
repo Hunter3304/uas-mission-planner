@@ -2,6 +2,21 @@
 
 ## Current status
 
+### Iteration 010 final delivery gate (2026-10-11)
+
+- Comparison smoke correction PR #94 merged into iteration/010 at `3eca995`
+  after run `38158666846` passed frontend and Linux/Windows backend on reviewed
+  `350e02a`. Issue #93 is closed. Verified merged fix branch was removed locally
+  and remotely, followed by fetch/prune, branch -a and ls-remote checks.
+- PR #92 now contains final delivery records plus this acceptance correction;
+  it requires a fresh independent main-PR gate on its final head. The earlier
+  functional main merge is PR #90 at `2163974`; NHN + AGL is already delivered.
+  Check the final merged-main push before closing Issue #91 and Milestone 9.
+- Production source/algorithms and original/private data are unchanged by the
+  smoke correction. The 255 backend / one permission skip, 14 mocked browser
+  and 12 real-stack local acceptance results remain retained. User services
+  were not stopped; restart backend and refresh frontend to load merged code.
+
 ### Iteration 010 post-merge smoke deadline correction (2026-10-11)
 
 - Main push run `38158032394` and documentation push run `38158287944` exposed
@@ -38,9 +53,9 @@
   156.747/157.035 m and direct-motion 152.899–160.694 m overlap the control-zone
   band 155.700–762 m. Overlap does not establish prohibition or permission; strict
   reference/coverage gates and operational evidence limitations remain intact.
-- Issue #91 tracks this documentation-only final record and its own successful-CI
-  gate. Merged-main push run `38158032394` and final documentation/main state are
-  checked before the delivery response. This does not reopen implementation scope.
+- Issue #91 tracks the final delivery record. Merged-main push run `38158032394`
+  exposed the old comparison smoke deadline, corrected through Issue #93 / PR #94
+  as recorded above. Final PR #92 and merged-main checks gate the delivery response.
 - Restart the user backend and refresh the frontend to load merged code. No
   user-owned service was stopped. Keep the problematic full OSM overlay off;
   unrelated performance/time-feasibility and full legal/NOTAM/flight-phase work
