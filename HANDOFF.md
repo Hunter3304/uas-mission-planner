@@ -2,6 +2,142 @@
 
 ## Current status
 
+### Iteration 010 feature gates complete; main integration (2026-10-11)
+
+- Base PR #87 merged at `e4889f8`; NHN supplement PR #89 merged at `d453961` after
+  run `38157301971` passed Linux Python, Windows Python and frontend on reviewed
+  `8d0de63`. Both features have independent successful-CI gates.
+- Issues #85/#86/#88 are closed. Both corresponding merged feature branches were
+  verified, removed locally/remotely and checked with fetch/prune, branch -a and
+  ls-remote. Keep iteration/010, history, original sources and private profiles.
+- Local final acceptance: 255 backend passes / one existing permission skip;
+  Ruff, frontend lint/build, all 14 mocked browser and 12 real-stack smoke pass.
+  Final numerical-display tests pass. No user-owned service was stopped.
+- Three-mode and reference-policy contracts are in `doc/rules/planning-modes.md`
+  and `doc/rules/vertical-references.md`; source/permission/coverage limitations
+  remain explicit. NHN + AGL is an engineering policy, not verified datum equivalence.
+- Main integration follows with its own successful-CI gate. Record final main
+  delivery facts only after verification; earlier pending publication text is history.
+
+### Iteration 010 NHN + AGL supplement (2026-10-11)
+
+- User explicitly requested NHN terrain + AGL comparison with MSL limits during
+  remote delivery. Issue #88 was assigned to Milestone 9 before creating
+  `feature/88-nhn-agl-comparison` from verified iteration merge `e4889f8`.
+- Explicit engineering policy, offset/uncertainty, full-motion native terrain
+  bounds, original datum preservation, endpoint numerical diagnostics/export and
+  UI result invalidation implemented. Regional conservative/research UI enables
+  the requested zero-offset approximation; strict and API/core defaults retain
+  source-reference verification. Rules version `regional-restrictions-v3`.
+- Real origin/destination: 56.747/57.035 m NHN ground + 100 m AGL = 156.747/157.035 m
+  comparison heights. Full direct-motion interval 152.899–160.694 m. All overlap
+  control-zone limits 155.700–762 m MSL under the declared assumption. This does
+  not satisfy zone applicability/permission. Original data remain unchanged.
+- Nine real mode/query checks saved in `.cache/iteration010-nhn-real-evidence.json`.
+  Reproduction and rules: `doc/experiments/iteration-010/verify-nhn-agl.py` and
+  `doc/rules/vertical-references.md`. Local backend full: 255 passed / one existing
+  Windows permission skip; 14 mocked browser and 12 real-stack smoke pass cleanly.
+  Final numerical-display scoped checks pass: 26 restriction cases, all 14 browser
+  cases and frontend lint/build. Supplemental publication follows.
+- Base feature PR #87 merged at `e4889f8` after run `38155429114` passed all three
+  Linux/Windows/frontend jobs at reviewed `efbd279`. Issues #85/#86 are closed.
+  Verified merged feature was removed locally/remotely; fetch/prune, branch -a and
+  ls-remote confirmed cleanup. Historical branches and source/profile data retained.
+- Main integration was deferred for this user-requested supplement; do not merge
+  main until its feature and integration CI gates pass. User-owned services remain
+  untouched. Earlier no-publication/height-comparison limitations below are history.
+
+### Iteration 010 completion and remote delivery authorized (2026-10-11)
+
+- User explicitly requested completion of Iteration 010 and outstanding remote
+  delivery. This authorizes code push, PR creation, CI-gated feature -> iteration/010
+  -> main integration, required documentation and verified merged-feature cleanup.
+  Earlier publication rejection/local-only statements below are historical.
+- Completed the 31-layer/324-feature and four-endpoint source audit with 63 original
+  DIPUL checksum checks: `doc/data-sources/iteration-010-dipul-audit.md`. Reproduction
+  scripts are under `doc/experiments/iteration-010/`; original geometries are not
+  exported and all original data/profile files remain outside Git.
+- Fixed active reviewed-notice precedence: a generic/expired/changed-source/launch
+  allowance cannot downgrade an independently applicable prohibition. Added four
+  regressions and real API saved-profile routing/expiration/source-change checks.
+  Rules version `regional-restrictions-v2`; no real permissions were invented.
+- Local backend: 245 passed / one existing Windows permission skip. Ruff passes.
+  Final frontend lint/build, all 14 mocked browser and 12 real-stack smoke cases
+  pass with clean exits before publication.
+  No unrelated performance/time feasibility or flight-phase scope was added.
+- Final real mode verification: nine conservative `invalid_endpoint`, three strict
+  `unresolved_input`, three accepted primary research routes. A*/Dijkstra distance
+  2,840.88 m; native ABIT* 2,394.49 m on this finite-budget run. Independent checks
+  pass. Evidence: `.cache/iteration010-closeout-modes/` and source audit JSON.
+- Complete NOTAM access, substantive legal condition automation, real permit
+  evidence and independent takeoff/landing modeling remain explicit limitations
+  of the scoped delivery, not claims of completed operational clearance.
+- Feature publication and separate integration/main CI gates follow. Do not stop
+  user-owned services. Record verified PR/merge/check/issue/cleanup facts afterwards.
+
+### Iteration 010 mode documentation and status clarification (2026-10-11)
+
+- User asked for remaining work/next steps and explicit documentation of the three
+  modes. Added `doc/rules/planning-modes.md`, including the requested comparison,
+  UI/CLI versus API defaults, shared checks and real Hannover failure interpretation.
+  Linked it from the rule and outcome documents.
+- Added `doc/iteration/iteration-010/status.md` mapping the approved plan to actual
+  delivery and gaps. The current engine checks supported time/height and supplied
+  evidence; the 31-layer review-topic table is not full legal-rule automation.
+  No real permission profiles or exhaustive NOTAM source have been supplied, and
+  no real conservative target route has been established. Independent takeoff/
+  landing phase modeling is not implemented; stored phase scope never grants transit.
+- Recommended next work: finish local mode acceptance, audit the primary pair's
+  four endpoint-related zones and enter genuine reviewed evidence where available,
+  then inspect remaining corridor restrictions. Additional automatic rules/source/
+  phase modeling needs an agreed scope. Existing performance/time-feasibility
+  deferrals remain unchanged.
+- Documentation-only changes; implementation remains at local `e2813fa`. Verify
+  document links and diff; no repeated runtime tests required. The earlier automatic
+  publication rejection still applies: no remote code push/PR/merge is authorized
+  by this documentation request. Continue local documentation only.
+
+### Iteration 010 local restriction delivery (2026-10-11)
+
+- User approved the Chinese plan and authorized implementation. Approved English
+  plan: `doc/plan/iteration-010.md`. Milestone 9 / assigned Issues #85 and #86 were
+  created before `feature/85-regional-restrictions`, from `iteration/010` at main
+  `89afe54`. Original snapshots and historical branches remain intact.
+- Default conservative regional avoidance excludes unresolved DIPUL footprints;
+  strict/research remain explicit alternatives. All three planners use shared
+  full-motion/connector/final-path checks. Prohibited, conditional, inapplicable,
+  unresolved and engineering exclusions are separately counted from buildings.
+- Immutable local evidence profiles, UI review/import/save/export, phase/time/AGL
+  scoping, expiration/source-change invalidation, reviewed official notices and
+  coverage/freshness diagnostics implemented. See `doc/rules/restriction-decisions.md`
+  and `doc/iteration/iteration-010/outcome.md`. Source rules are review topics;
+  substantive permission conditions still need evidence, not automatic legal approval.
+- `restrictions-fetch` preserves bounded official WFS temporary responses and
+  requested notice originals/receipts, with an unreviewed profile template. Fresh
+  Hannover acquisition returned zero features; NOTAM completeness remains unverified.
+  New evidence: `.cache/iteration010-temporary-snapshot/`; originals unchanged.
+- Final real 100 m historical scenario: 0 prohibited / 0 conditional / 0 inactive /
+  324 unresolved DIPUL features. Seven of eight exact sites are conservatively
+  blocked; limbach-lehrte passes its point check. Nine real representative-pair/
+  algorithm cases report `invalid_endpoint`, including MHH conflicts. No sites
+  were moved or restrictions removed. Evidence: `.cache/iteration010-real-evidence.json`.
+- Local validation: 240 backend passes / one existing Windows permission skip;
+  Ruff and frontend ESLint/TypeScript/build pass. All 14 mocked browser cases and
+  12 real-stack smoke cases pass with clean exits. Independent synthetic geometry
+  verifies A*/Dijkstra/native ABIT* detours and rejection of a prohibited wall.
+  Mobile profile rendering inspected; final scoped popup/layout checks pass.
+- No real permission profiles or authenticated exhaustive NOTAM feed are supplied.
+  Strict global coverage remains unresolved; conservative successes are engineering
+  candidates. OSM payload performance and mission-duration feasibility remain
+  deferred. Do not stop user-owned services; restart backend/refresh UI for use.
+- Work is on the local feature branch. Automatic approval rejected the combined
+  commit/push command before execution because the user's implementation approval
+  did not explicitly authorize this specific remote source publication. No code
+  push, remote iteration/feature branch, PR or merge occurred. Local-only commit
+  preparation is the safe continuation; remote publication requires user approval.
+  Milestone 9 and Issues #85/#86 were already created successfully. Keep iteration
+  history and the separate Part 5 evidence; do not bypass the publication rejection.
+
 ### Iteration 009 supplemental feature delivery (2026-10-11)
 
 - PR #83 merged the retained basemap and closeout documentation into `iteration/009`

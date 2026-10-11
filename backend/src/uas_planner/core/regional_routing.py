@@ -63,6 +63,12 @@ class RegionalPlanner:
             if result["unresolved"]
             else "permitted"
         )
+        result["vertical_comparisons"] = [
+            zone
+            for report in reports
+            for zone in report.get("zones", [])
+            if "aircraft_comparison_bounds_m" in zone
+        ]
         return result
 
     def grid(self, endpoints, cell_m, mode, check, boundary=None):
@@ -213,7 +219,7 @@ class RegionalPlanner:
         if (
             algorithm not in ("astar", "dijkstra", "abitstar")
             or objective not in ("risk", "distance")
-            or planning_mode not in ("strict", "research")
+            or planning_mode not in ("strict", "research", "conservative")
         ):
             raise ValueError("Unknown regional planner controls.")
         for value, label in (
@@ -266,7 +272,7 @@ class RegionalPlanner:
         result = {
             "algorithm": algorithm,
             "objective": objective,
-            "rules_version": "regional-routing-v2",
+            "rules_version": "regional-routing-v3",
             "start": endpoints["start"],
             "end": endpoints["end"],
             "geometry": None,
@@ -507,8 +513,20 @@ class RegionalPlanner:
             "Constant cruise only; excludes takeoff, landing, wind and dynamics."
         )
         result["constraint_validation"] = (
-            "research_assumptions" if planning_mode == "research" else "strict_model"
+            "research_assumptions"
+            if planning_mode == "research"
+            else "conservative_candidate_unverified_coverage"
+            if planning_mode == "conservative"
+            else "strict_model"
         )
+        if hasattr(self.constraints, "restriction_report"):
+            result["restriction_report"] = self.constraints.restriction_report(planning_mode)
+            result["restriction_report"]["planning_mode"] = planning_mode
+            result["restriction_report"]["policy_exclusions"] = (
+                result["restriction_report"]["counts"]["unresolved"]
+                if planning_mode == "conservative"
+                else 0
+            )
         result["runtime_ms"] = (perf_counter() - started) * 1000
         return result
 
