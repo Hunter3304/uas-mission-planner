@@ -460,6 +460,7 @@ def test_constraint_layers_keep_obstacles_separate_from_region_uncertainty():
         boundary=geometry.buffer(100),
         diagnostics=[{"status": "invalid_geometry"}],
         provenance={"model_signature": "fixture"},
+        restriction_coverage={"status": "unverified"},
     )
     layers = regional.constraint_layers(model)
     obstacle = layers["blocked"]["features"][0]

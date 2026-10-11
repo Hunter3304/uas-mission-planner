@@ -1,5 +1,14 @@
 # UAS Mission Planner
 
+Iteration 010 adds **default conservative regional avoidance**: unresolved DIPUL
+footprints are excluded separately from confirmed prohibitions. Saved evidence
+profiles, phase/time/height scope, reviewed temporary notices and coverage reports
+are shared by A*, Dijkstra and native ABIT*. See the
+[operation guide and real endpoint conflicts](doc/iteration/iteration-010/outcome.md)
+and [decision rules](doc/rules/restriction-decisions.md). The historical research
+examples below require explicitly selecting `research`; no real permission profiles
+are supplied. Strict mode still retains unverified coverage gates.
+
 Iteration 009 enables **real Hannover research routes** with explicit derived
 geometry and missing-height assumptions, bounded corridor search, checked exact
 endpoint connectors and Berlin date/time selectors. See

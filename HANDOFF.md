@@ -2,6 +2,47 @@
 
 ## Current status
 
+### Iteration 010 local restriction delivery (2026-10-11)
+
+- User approved the Chinese plan and authorized implementation. Approved English
+  plan: `doc/plan/iteration-010.md`. Milestone 9 / assigned Issues #85 and #86 were
+  created before `feature/85-regional-restrictions`, from `iteration/010` at main
+  `89afe54`. Original snapshots and historical branches remain intact.
+- Default conservative regional avoidance excludes unresolved DIPUL footprints;
+  strict/research remain explicit alternatives. All three planners use shared
+  full-motion/connector/final-path checks. Prohibited, conditional, inapplicable,
+  unresolved and engineering exclusions are separately counted from buildings.
+- Immutable local evidence profiles, UI review/import/save/export, phase/time/AGL
+  scoping, expiration/source-change invalidation, reviewed official notices and
+  coverage/freshness diagnostics implemented. See `doc/rules/restriction-decisions.md`
+  and `doc/iteration/iteration-010/outcome.md`. Source rules are review topics;
+  substantive permission conditions still need evidence, not automatic legal approval.
+- `restrictions-fetch` preserves bounded official WFS temporary responses and
+  requested notice originals/receipts, with an unreviewed profile template. Fresh
+  Hannover acquisition returned zero features; NOTAM completeness remains unverified.
+  New evidence: `.cache/iteration010-temporary-snapshot/`; originals unchanged.
+- Final real 100 m historical scenario: 0 prohibited / 0 conditional / 0 inactive /
+  324 unresolved DIPUL features. Seven of eight exact sites are conservatively
+  blocked; limbach-lehrte passes its point check. Nine real representative-pair/
+  algorithm cases report `invalid_endpoint`, including MHH conflicts. No sites
+  were moved or restrictions removed. Evidence: `.cache/iteration010-real-evidence.json`.
+- Local validation: 240 backend passes / one existing Windows permission skip;
+  Ruff and frontend ESLint/TypeScript/build pass. All 14 mocked browser cases and
+  12 real-stack smoke cases pass with clean exits. Independent synthetic geometry
+  verifies A*/Dijkstra/native ABIT* detours and rejection of a prohibited wall.
+  Mobile profile rendering inspected; final scoped popup/layout checks pass.
+- No real permission profiles or authenticated exhaustive NOTAM feed are supplied.
+  Strict global coverage remains unresolved; conservative successes are engineering
+  candidates. OSM payload performance and mission-duration feasibility remain
+  deferred. Do not stop user-owned services; restart backend/refresh UI for use.
+- Work is on the local feature branch. Automatic approval rejected the combined
+  commit/push command before execution because the user's implementation approval
+  did not explicitly authorize this specific remote source publication. No code
+  push, remote iteration/feature branch, PR or merge occurred. Local-only commit
+  preparation is the safe continuation; remote publication requires user approval.
+  Milestone 9 and Issues #85/#86 were already created successfully. Keep iteration
+  history and the separate Part 5 evidence; do not bypass the publication rejection.
+
 ### Iteration 009 supplemental feature delivery (2026-10-11)
 
 - PR #83 merged the retained basemap and closeout documentation into `iteration/009`

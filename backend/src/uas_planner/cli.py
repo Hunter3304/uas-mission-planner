@@ -37,12 +37,20 @@ def parser():
         "--algorithm", choices=("astar", "dijkstra", "abitstar"), default="astar"
     )
     regional_route.add_argument("--objective", choices=("risk", "distance"), default="risk")
-    regional_route.add_argument("--planning-mode", choices=("strict", "research"), default="strict")
+    regional_route.add_argument(
+        "--planning-mode", choices=("strict", "conservative", "research"), default="conservative"
+    )
     regional_route.add_argument("--background-cost", type=float)
     regional_route.add_argument("--risk-weight", type=float, default=0.9)
     regional_route.add_argument("--distance-weight", type=float, default=0.1)
     regional_route.add_argument("--time-budget-s", type=float, default=3)
     regional_route.add_argument("--output", type=Path)
+    restriction_fetch = commands.add_parser(
+        "restrictions-fetch", help="Preserve official temporary restrictions and notice receipts"
+    )
+    restriction_fetch.add_argument("--bounds", type=float, nargs=4, required=True)
+    restriction_fetch.add_argument("--output", type=Path, required=True)
+    restriction_fetch.add_argument("--notice-url", action="append", default=[])
     terrain = commands.add_parser("terrain-fetch", help="Acquire bounded native DGM1 tiles")
     terrain.add_argument(
         "--bounds", type=float, nargs=4, required=True, metavar=("WEST", "SOUTH", "EAST", "NORTH")
@@ -66,7 +74,7 @@ def parser():
     check.add_argument(
         "--query", type=Path, required=True, help="WGS84 GeoJSON Point or LineString geometry"
     )
-    check.add_argument("--mode", choices=("strict", "research"), default="strict")
+    check.add_argument("--mode", choices=("strict", "conservative", "research"), default="strict")
     check.add_argument("--output", type=Path)
     population = commands.add_parser(
         "study-population", help="Inspect native GHSL region or corridor offline"
@@ -193,6 +201,12 @@ def main(argv=None):
                 with args.output.open("x", encoding="utf-8") as stream:
                     json.dump(route_geojson(result), stream, indent=2, allow_nan=False)
                     stream.write("\n")
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
+        if args.command == "restrictions-fetch":
+            from uas_planner.acquisition.restrictions import acquire_restrictions
+
+            result = acquire_restrictions(args.bounds, args.output, args.notice_url)
             print(json.dumps(result, indent=2, allow_nan=False))
             return 0
         if args.command == "terrain-fetch":

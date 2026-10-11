@@ -1,4 +1,4 @@
-"""Read-only dataset explorer API for local demonstrations."""
+"""Local explorer, planning and immutable restriction-evidence API."""
 
 import json
 import logging
@@ -164,22 +164,70 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         except (ValueError, KeyError, OSError, TypeError) as exc:
             raise HTTPException(422, "Cannot verify original regional zones.") from exc
 
+    def restriction_scenario(dataset_id, request):
+        from uas_planner.core.restrictions import load_profile
+
+        scenario = dict(request["scenario"])
+        if request.get("profile_id"):
+            if scenario.get("zone_assessments") or scenario.get("restriction_notices"):
+                raise ValueError("Use a saved profile or inline evidence, not both.")
+            profile = load_profile(dataset_path(dataset_id), request["profile_id"])
+            scenario.update(
+                zone_assessments=profile.get("zone_assessments", {}),
+                restriction_notices=profile.get("notices", []),
+                max_source_age_days=profile.get("max_source_age_days", 7),
+                restriction_profile={
+                    k: profile[k] for k in ("id", "name", "profile_signature", "saved_at")
+                },
+            )
+        return scenario
+
+    @api.get("/api/datasets/{dataset_id}/study/restriction-profiles")
+    def restriction_profiles(dataset_id: str):
+        from uas_planner.core.restrictions import load_profile
+
+        path = dataset_path(dataset_id)
+        folder = path / "restriction-profiles"
+        if not folder.resolve().is_relative_to(path):
+            raise HTTPException(422, "Profile folder escapes dataset.")
+        profiles, errors = [], []
+        for entry in sorted(folder.glob("*.json")):
+            try:
+                profiles.append(load_profile(path, entry.stem))
+            except (ValueError, OSError, KeyError, TypeError) as exc:
+                errors.append({"id": entry.stem, "reason": str(exc)})
+        return {"profiles": profiles, "errors": errors}
+
+    @api.post("/api/datasets/{dataset_id}/study/restriction-profiles", status_code=201)
+    def create_restriction_profile(dataset_id: str, request: dict = Body(...)):
+        from uas_planner.core.restrictions import save_profile
+
+        try:
+            if len(json.dumps(request)) > 2_000_000:
+                raise ValueError("Restriction profile exceeds 2 MB.")
+            return save_profile(dataset_path(dataset_id), request)
+        except (ValueError, KeyError, OSError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
     @api.post("/api/datasets/{dataset_id}/study/layers/constraints")
     def regional_constraint_layers(dataset_id: str, request: dict = Body(...)):
         from uas_planner.core.regional import RegionalConstraints, constraint_layers
 
         try:
-            if set(request) - {"scenario", "terrain_id"}:
+            if set(request) - {"scenario", "terrain_id", "profile_id", "planning_mode"}:
                 raise ValueError("Unknown constraint layer controls.")
             terrain_id = request.get("terrain_id")
             if terrain_id is not None and not isinstance(terrain_id, str):
                 raise ValueError("terrain_id must be a dataset identifier.")
             model = RegionalConstraints(
                 dataset_path(dataset_id),
-                request["scenario"],
+                restriction_scenario(dataset_id, request),
                 terrain_directory=dataset_path(terrain_id) if terrain_id else None,
             )
-            return constraint_layers(model)
+            try:
+                return constraint_layers(model, request.get("planning_mode", "strict"))
+            finally:
+                model.terrain.close()
         except (ValueError, KeyError, OSError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
@@ -204,6 +252,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "corridor_margin_m",
             "start_coordinate",
             "end_coordinate",
+            "profile_id",
         }
         try:
             if set(request) - allowed:
@@ -213,14 +262,15 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 raise ValueError("terrain_id must be a dataset identifier.")
             result = plan_regional_route(
                 dataset_path(dataset_id),
-                request["scenario"],
+                restriction_scenario(dataset_id, request),
                 request["start_id"],
                 request["end_id"],
                 terrain_directory=dataset_path(terrain_id) if terrain_id else None,
                 **{
                     k: v
                     for k, v in request.items()
-                    if k not in {"scenario", "start_id", "end_id", "terrain_id", "export"}
+                    if k
+                    not in {"scenario", "start_id", "end_id", "terrain_id", "export", "profile_id"}
                 },
             )
             return route_geojson(result) if request.get("export", False) else result
