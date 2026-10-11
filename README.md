@@ -10,6 +10,13 @@ A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-
 → mhh. Enter the intended scenario times in the date selectors. Strict mode retains
 its unresolved-source checks; research routes do not establish flight permission.
 
+The regional map includes an optional online OpenStreetMap street basemap with
+explicit tile-failure feedback. Retained source data remain local. Full-region
+OSM overlay serialization/rendering currently has a known memory/timeout defect;
+keep that overlay off when reproducing route tests. Mission duration is not checked
+against the entered scenario end time. See the operation guide's supplemental
+closeout section for diagnosed limitations and deferred work.
+
 A local Python geospatial research prototype for an internship and subsequent bachelor's thesis. Acquire a small area, save and verify its data, explore layers and statistics, and download results.
 
 **Stage version: [v0.3.0](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0).** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.

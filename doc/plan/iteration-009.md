@@ -8,6 +8,13 @@ Initial local implementation preceded tracking while normal CLI authentication
 was being completed. Issue assignment preceded feature branch creation.
 Part 5's separate branch and evidence are preserved; no Part 5 integration is included.
 
+Supplemental closeout authorized on 2026-10-11: publish the retained regional
+street-basemap toggle, tile-failure feedback and browser coverage, plus updated
+handoff and known-limitations documentation. Assigned Issue #82 belongs to
+Milestone 8 and precedes `feature/iteration009-basemap-handoff` from `iteration/009`
+fast-forwarded to main `329ca6c`. Full-region OSM display optimization remains
+follow-up work; mission-end automation and duration enforcement are explicitly deferred.
+
 ## Goal
 
 Produce and display a real Hannover research route under explicit, traceable
