@@ -2,6 +2,32 @@
 
 ## Current status
 
+### Iteration 010 verified main delivery (2026-10-11)
+
+- Complete functional delivery, including the user-requested NHN + AGL supplement,
+  merged to main through PR #90 at `2163974`. Independent main-PR run `38157731109`
+  passed Linux Python, Windows Python and frontend before merge; iteration push
+  run `38157643292` also passed. Local main was fast-forwarded to the verified merge.
+- Feature PR #87 / run `38155429114` and supplement PR #89 / run `38157301971`
+  each passed their own gates. Issues #85/#86/#88 are closed; both merged feature
+  branches were verified and removed locally/remotely with prune/branch/remote
+  checks. Historical iteration/feature branches and all original/private data remain.
+- Final local acceptance: 255 backend passes / one existing permission skip;
+  Ruff/frontend lint/build, 14 mocked browser and 12 real-stack smoke pass. Real
+  three-mode and NHN comparison evidence remains local with reproducible scripts.
+- Default regional conservative/research UI can compare NHN ground + AGL under an
+  explicit offset/uncertainty policy. At 100 m AGL/zero offset, primary endpoints
+  156.747/157.035 m and direct-motion 152.899–160.694 m overlap the control-zone
+  band 155.700–762 m. Overlap does not establish prohibition or permission; strict
+  reference/coverage gates and operational evidence limitations remain intact.
+- Issue #91 tracks this documentation-only final record and its own successful-CI
+  gate. Merged-main push run `38158032394` and final documentation/main state are
+  checked before the delivery response. This does not reopen implementation scope.
+- Restart the user backend and refresh the frontend to load merged code. No
+  user-owned service was stopped. Keep the problematic full OSM overlay off;
+  unrelated performance/time-feasibility and full legal/NOTAM/flight-phase work
+  remain outside this completed functional iteration.
+
 ### Iteration 010 feature gates complete; main integration (2026-10-11)
 
 - Base PR #87 merged at `e4889f8`; NHN supplement PR #89 merged at `d453961` after

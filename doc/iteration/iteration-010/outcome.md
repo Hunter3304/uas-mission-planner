@@ -11,7 +11,10 @@ are recorded only after verified execution.
 Feature delivery: PR #87 at `e4889f8` after run `38155429114`, and supplemental
 PR #89 at `d453961` after run `38157301971`, each passed Linux/Windows/frontend.
 Issues #85/#86/#88 are closed and merged feature cleanup is verified. Main
-integration has its separate successful-CI gate; final facts follow verified merge.
+integration PR #90 merged at `2163974` after independent run `38157731109` passed
+all three jobs; iteration push run `38157643292` also passed. Issue #91 records
+the documentation-only closeout, with a separate CI gate. Functional delivery is
+complete; operational permission/reference/coverage limitations remain explicit.
 
 The UI previously sent empty zone assessments and research routing bypassed all
 unknown zone applicability. It now defaults to conservative avoidance: unresolved

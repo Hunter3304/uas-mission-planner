@@ -14,14 +14,19 @@ its successful-CI gate.
 | Persistent assessment/permission workflow | Local immutable profiles, UI review/import/save/export, expiry/signature/phase checks implemented | No real permission profiles supplied; launch/landing records are stored but not a separate flight-phase model |
 | Temporary restrictions and coverage | Bounded official WFS/notice originals, receipts, reviewed import and unverified coverage/freshness reports implemented | No exhaustive authenticated NOTAM feed or automated interpretation of all notices/schedules |
 | Algorithms, map and exports | Shared full-motion checks, distinct decisions/policy exclusions/buildings, result invalidation and exports implemented | A valid conservative route on the real target missions has not been established |
-| Acceptance | 245 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; real API profile routing, active-notice precedence and 15 real mode cases | Remote Linux/Windows/frontend gates recorded after successful completion |
-| Publication/integration | User explicitly authorized delivery; Milestone 9 and Issues #85/#86 exist | Publish and integrate through separate CI-gated feature/iteration/main steps; record final facts in HANDOFF |
+| Acceptance | Final 255 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; profile/active-notice/15 mode/9 NHN comparison acceptance | Completed local and independent feature/integration CI; retain operational limitations |
+| Publication/integration | #87/#89 feature gates and #90 main gate passed; functional main merge `2163974`; #85/#86/#88 closed and feature cleanup verified | Issue #91 documentation-only closeout and merged-main state checked before final delivery |
 
 Feature integration is complete: #87 at `e4889f8`, #89 at `d453961`, with successful
 Linux/Windows/frontend runs `38155429114` and `38157301971`. Issues #85/#86/#88 are
 closed and merged feature cleanup verified. The final supplemental implementation
 passes 255 backend tests / one existing skip, 14 mocked browser and 12 real-stack
 smoke cases. Main delivery retains its own separate gate.
+
+Main delivery is now verified: PR #90 at `2163974`, independent main-PR run
+`38157731109` and iteration push run `38157643292` successful. The final
+documentation record is tracked by #91. Remaining source/permission evidence is
+operational follow-up, not unfinished implementation or remote functional delivery.
 
 The delivered result is a usable conservative-avoidance and evidence workflow.
 It must not be described as completed legal verification of all DIPUL areas or
@@ -41,7 +46,7 @@ before main integration. It supplies explicit offset/uncertainty and numerical
 endpoint/whole-motion diagnostics; strict reference verification remains intact.
 At zero offset and 100 m AGL, both primary endpoints overlap the control-zone
 MSL band. See [height comparison](../../rules/vertical-references.md). Supplemental
-feature CI and separate main integration gates are required before delivery.
+feature CI and separate main integration gates passed before delivery.
 
 The following operational evidence work remains, and does not prevent delivery of
 the planned evidence/import/avoidance functionality:
