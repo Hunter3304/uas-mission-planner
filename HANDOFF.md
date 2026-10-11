@@ -2,6 +2,34 @@
 
 ## Current status
 
+### Iteration 010 completion and remote delivery authorized (2026-10-11)
+
+- User explicitly requested completion of Iteration 010 and outstanding remote
+  delivery. This authorizes code push, PR creation, CI-gated feature -> iteration/010
+  -> main integration, required documentation and verified merged-feature cleanup.
+  Earlier publication rejection/local-only statements below are historical.
+- Completed the 31-layer/324-feature and four-endpoint source audit with 63 original
+  DIPUL checksum checks: `doc/data-sources/iteration-010-dipul-audit.md`. Reproduction
+  scripts are under `doc/experiments/iteration-010/`; original geometries are not
+  exported and all original data/profile files remain outside Git.
+- Fixed active reviewed-notice precedence: a generic/expired/changed-source/launch
+  allowance cannot downgrade an independently applicable prohibition. Added four
+  regressions and real API saved-profile routing/expiration/source-change checks.
+  Rules version `regional-restrictions-v2`; no real permissions were invented.
+- Local backend: 245 passed / one existing Windows permission skip. Ruff passes.
+  Final frontend lint/build, all 14 mocked browser and 12 real-stack smoke cases
+  pass with clean exits before publication.
+  No unrelated performance/time feasibility or flight-phase scope was added.
+- Final real mode verification: nine conservative `invalid_endpoint`, three strict
+  `unresolved_input`, three accepted primary research routes. A*/Dijkstra distance
+  2,840.88 m; native ABIT* 2,394.49 m on this finite-budget run. Independent checks
+  pass. Evidence: `.cache/iteration010-closeout-modes/` and source audit JSON.
+- Complete NOTAM access, substantive legal condition automation, real permit
+  evidence and independent takeoff/landing modeling remain explicit limitations
+  of the scoped delivery, not claims of completed operational clearance.
+- Feature publication and separate integration/main CI gates follow. Do not stop
+  user-owned services. Record verified PR/merge/check/issue/cleanup facts afterwards.
+
 ### Iteration 010 mode documentation and status clarification (2026-10-11)
 
 - User asked for remaining work/next steps and explicit documentation of the three

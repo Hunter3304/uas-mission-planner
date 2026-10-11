@@ -124,6 +124,26 @@ def test_reviewed_notice_time_height_boundaries_and_unsupported_schedule(scenari
     assert evaluate(item, scenario)["state"] == "not_applicable"  # interval ends at departure
 
 
+@pytest.mark.parametrize("allowance_kind", ["valid", "expired", "changed_source", "launch_only"])
+def test_active_notice_prohibition_cannot_be_downgraded_by_an_allowance(scenario, allowance_kind):
+    item = {
+        **record(),
+        "reviewed_notice": True,
+        "notice_state": "prohibited",
+        "evidence": "Fixture active notice",
+    }
+    item["properties"].update(valid_from="2026-10-07T08:00:00Z", valid_until="2026-10-07T09:00:00Z")
+    allowance = assessment()
+    if allowance_kind == "expired":
+        allowance["valid_until"] = "2026-10-07T09:30:00+02:00"
+    elif allowance_kind == "changed_source":
+        allowance["source_signature"] = "old"
+    elif allowance_kind == "launch_only":
+        allowance["phase"] = "launch"
+    scenario["zone_assessments"] = {item["source"]: allowance}
+    assert evaluate(item, scenario)["state"] == "prohibited"
+
+
 def test_profiles_are_immutable_and_integrity_checked(tmp_path):
     profile = {
         "schema_version": 1,
@@ -340,6 +360,67 @@ def test_full_motion_and_map_policy_separate_from_prohibition(model):
     model.scenario["zone_assessments"] = {record()["source"]: assessment("prohibited")}
     assert model.check(path, mode="research")["state"] == "blocked"
     assert constraint_layers(model)["restriction_report"]["counts"]["prohibited"] == 1
+
+
+def test_saved_profile_is_applied_to_real_api_routing_and_expires(model, tmp_path, monkeypatch):
+    from uas_planner.core import regional_routing
+    from uas_planner.core.regional import validate_scenario
+
+    def prepared(directory, scenario, **kwargs):
+        model.scenario = validate_scenario(deepcopy(scenario))
+        return model
+
+    monkeypatch.setattr(regional_routing, "RegionalConstraints", prepared)
+    (tmp_path / "case").mkdir()
+    request = {
+        "scenario": deepcopy(model.scenario),
+        "start_id": "a",
+        "end_id": "b",
+        "planning_mode": "conservative",
+        "algorithm": "astar",
+        "objective": "distance",
+        "cell_m": 50,
+    }
+    with TestClient(create_app(tmp_path)) as client:
+        endpoint = "/api/datasets/case/study/route"
+        excluded = client.post(endpoint, json=request)
+        assert excluded.status_code == 200 and excluded.json()["status"] == "success"
+        assert excluded.json()["length_m"] > 350
+        saved = client.post(
+            "/api/datasets/case/study/restriction-profiles",
+            json={
+                "schema_version": 1,
+                "name": "Synthetic transit consent",
+                "notices": [],
+                "zone_assessments": {record()["source"]: assessment()},
+            },
+        )
+        assert saved.status_code == 201
+        request["profile_id"] = saved.json()["id"]
+        allowed = client.post(endpoint, json=request).json()
+        assert allowed["status"] == "success"
+        assert allowed["restriction_report"]["counts"]["conditional_allowed"] == 1
+        assert allowed["length_m"] == pytest.approx(350)
+        assert allowed["mission"]["restriction_profile"]["id"] == saved.json()["id"]
+        forward = Transformer.from_crs(4326, 25832, always_xy=True).transform
+        assert transform(forward, LineString(allowed["geometry"]["coordinates"])).intersects(
+            model.records[0]["geometry"]
+        )
+        request["scenario"].update(
+            mission_start="2026-10-07T11:30:00+02:00", mission_end="2026-10-07T11:45:00+02:00"
+        )
+        expired = client.post(endpoint, json=request).json()
+        assert expired["restriction_report"]["counts"]["unresolved"] == 1
+        assert expired["length_m"] > 350
+        model.records[0]["source_signature"] = "new-source"
+        request["scenario"].update(
+            mission_start="2026-10-07T10:00:00+02:00", mission_end="2026-10-07T10:15:00+02:00"
+        )
+        changed = client.post(endpoint, json=request).json()
+        assert changed["restriction_report"]["counts"]["unresolved"] == 1
+        assert changed["length_m"] > 350
+        request["scenario"]["zone_assessments"] = {record()["source"]: assessment()}
+        assert client.post(endpoint, json=request).status_code == 422
 
 
 @pytest.mark.parametrize("algorithm", ["astar", "dijkstra", "abitstar"])

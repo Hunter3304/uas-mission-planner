@@ -1,6 +1,6 @@
 # Regional restriction decisions
 
-Rules version `regional-restrictions-v1`; constraint model `regional-constraints-v3`.
+Rules version `regional-restrictions-v2`; constraint model `regional-constraints-v3`.
 The module evaluates a specified interval, AGL altitude and civil/BOS scenario.
 It does not infer consent from a layer name, score or task category.
 
@@ -12,6 +12,10 @@ value/unit/reference; only four have upper limits. The retained nonempty
 properties contain no validity interval. Raw fields and original geometry remain
 unchanged. Source geometry is used as delivered, with only the common configured
 engineering clearance; an unverified second statutory buffer is never applied.
+
+The [complete 31-layer and four-endpoint audit](../data-sources/iteration-010-dipul-audit.md)
+is reproduced from 63 checksummed original DIPUL files. It distinguishes a zero
+classifier prohibition count from an absence of actual restrictions.
 
 | Review topic | Layers | Decision input still required |
 |---|---|---|
@@ -34,6 +38,9 @@ reviewed assessment. A hospital/laboratory address never supplies that evidence.
 - `prohibited`: a matching evidence-backed prohibition overlaps the mission, or
   a reviewed official notice has overlapping explicit validity and compatible
   noninverted AGL limits, with no unsupported schedule.
+  Such an independently active notice cannot be downgraded by a generic, expired,
+  changed-source or launch-only allowance. Notice-specific exception authorization
+  is not inferred by the current engine.
 - `conditional_allowed`: supplied evidence matches source signature, complete
   mission interval, scenario and AGL interval, with listed satisfied conditions.
   Launch/landing-only evidence never permits transit.

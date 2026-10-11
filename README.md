@@ -9,6 +9,11 @@ and [decision rules](doc/rules/restriction-decisions.md). The historical researc
 examples below require explicitly selecting `research`; no real permission profiles
 are supplied. Strict mode still retains unverified coverage gates.
 
+Iteration 010 closeout includes a [complete DIPUL source/endpoint audit](doc/data-sources/iteration-010-dipul-audit.md)
+and reproducible real three-mode acceptance. Independently active reviewed
+prohibitions take precedence over generic or stale allowances; permission-profile
+expiry/source changes restore conservative exclusions.
+
 Iteration 009 enables **real Hannover research routes** with explicit derived
 geometry and missing-height assumptions, bounded corridor search, checked exact
 endpoint connectors and Berlin date/time selectors. See

@@ -16,7 +16,7 @@ from shapely.geometry import shape
 
 from uas_planner.core.risk import signature
 
-RULES_VERSION = "regional-restrictions-v1"
+RULES_VERSION = "regional-restrictions-v2"
 REVIEW_GROUPS = {
     "airspace": {"kontrollzonen", "flughaefen", "flugplaetze", "flugbeschraenkungsgebiete"},
     "infrastructure": {
@@ -225,27 +225,8 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
     state, reason = vertical_check(props, scenario["agl_m"], terrain)
     if state == "outside_vertical":
         return {**result, "state": "not_applicable", "reason": reason}
-    assessment = scenario.get("zone_assessments", {}).get(source)
-    if assessment is not None:
-        if assessment.get("source_signature") != record["source_signature"]:
-            return {**result, "reason": "Source changed; assessment requires renewed review."}
-        if assessment.get("state") == "conditional_allowed" and assessment.get(
-            "phase", "transit"
-        ) not in {"all", "transit"}:
-            return {
-                **result,
-                "reason": "Launch/landing permission cannot grant transit permission.",
-            }
-        state, reason = evidence_check(record, scenario)
-        if state != "unresolved":
-            return {
-                **result,
-                "state": "prohibited" if state == "blocked" else state,
-                "reason": reason,
-                "evidence": assessment["evidence"],
-            }
-        return {**result, "reason": reason}
     # An imported prohibition must be reviewed and have compatible vertical overlap.
+    # A stale or generic allowance must not downgrade this independent prohibition.
     if record.get("reviewed_notice") and record.get("notice_state") == "prohibited":
         limits = [props.get(f"{p}_limit_altitude") for p in ("lower", "upper")]
         compatible = any(v is not None for v in limits) and all(
@@ -281,6 +262,26 @@ def decision(record, scenario, terrain, vertical_check, evidence_check):
                 "reason": "Reviewed active prohibition at compatible AGL altitude.",
                 "evidence": record["evidence"],
             }
+    assessment = scenario.get("zone_assessments", {}).get(source)
+    if assessment is not None:
+        if assessment.get("source_signature") != record["source_signature"]:
+            return {**result, "reason": "Source changed; assessment requires renewed review."}
+        if assessment.get("state") == "conditional_allowed" and assessment.get(
+            "phase", "transit"
+        ) not in {"all", "transit"}:
+            return {
+                **result,
+                "reason": "Launch/landing permission cannot grant transit permission.",
+            }
+        state, reason = evidence_check(record, scenario)
+        if state != "unresolved":
+            return {
+                **result,
+                "state": "prohibited" if state == "blocked" else state,
+                "reason": reason,
+                "evidence": assessment["evidence"],
+            }
+        return {**result, "reason": reason}
     return {**result, "reason": reason}
 
 

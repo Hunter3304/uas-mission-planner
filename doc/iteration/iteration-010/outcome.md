@@ -3,9 +3,10 @@
 Approved 2026-10-11. Milestone 9, Issues #85/#86; integration branch `iteration/010`
 from `89afe54`; feature `feature/85-regional-restrictions`.
 
-Implementation and acceptance are local. Automatic approval rejected remote source
-publication before the combined commit/push command ran; no code PR or merge is
-claimed. Remote publication and CI-gated integration await explicit user approval.
+The user explicitly authorized completion and remote delivery on 2026-10-11,
+including feature -> iteration/010 -> main integration after successful CI.
+The earlier automatic publication rejection is historical; publication/merge facts
+are recorded only after verified execution.
 
 The UI previously sent empty zone assessments and research routing bypassed all
 unknown zone applicability. It now defaults to conservative avoidance: unresolved
@@ -95,7 +96,7 @@ temporary restrictions or complete NOTAM coverage.
 
 ## Validation
 
-Final local regression: 240 backend passes / one existing Windows permission skip;
+Final closeout regression: 245 backend passes / one existing Windows permission skip;
 14 mocked browser and 12 real-stack smoke passes with clean exits. Ruff and
 frontend lint/TypeScript/production build pass. Final scoped popup/profile checks
 also pass, with mobile rendering inspected. Added tests cover evidence expiry,
@@ -103,6 +104,36 @@ partial validity, changed source, launch-only scope, time/height equality,
 unsupported schedules, unreviewed imports, immutable profile revisions and all
 three algorithms. Independent Shapely intersections verify successful synthetic
 detours; a full-height prohibited wall never produces successful geometry.
+
+Closeout also adds real API profile-routing acceptance: a saved valid transit
+assessment changes the synthetic path from a detour to an independently verified
+crossing; expiration and source changes restore exclusion. Conflicting inline/profile
+evidence is rejected. Four regressions ensure independently active reviewed notice
+prohibitions cannot be downgraded by valid generic, expired, changed-source or
+launch-only allowance records. Rules version is `regional-restrictions-v2`.
+
+Final real mode acceptance retains 15 cases: nine conservative `invalid_endpoint`,
+three strict `unresolved_input`, and three independently accepted primary-pair
+research successes. Distance A*/Dijkstra agree at 2,840.88 m; native ABIT* returned
+2,394.49 m on this run (finite-budget stochastic success is not guaranteed). All
+three research paths passed endpoint, boundary, known obstacle, terrain, length,
+cost and cruise checks. No real permission is inferred from these successes.
+Evidence: `.cache/iteration010-closeout-modes/evidence.json` and 15 checksummed
+GeoJSON outputs. Original data and evidence remain local and outside Git.
+
+Reproduce final audit and mode acceptance in fresh outputs:
+
+```powershell
+backend/.venv/Scripts/python.exe doc/experiments/iteration-010/audit-dipul.py data/hannover-part1-v4 --output .cache/restriction-audit-new.json
+backend/.venv/Scripts/python.exe doc/experiments/iteration-010/verify-real-modes.py --output .cache/restriction-modes-new
+```
+
+The [complete source audit](../../data-sources/iteration-010-dipul-audit.md) records
+all 31 layers and four endpoint-related source features with original references,
+vertical limits and missing evidence. Supported automated checks and reviewed
+import fulfill this iteration's scoped workflow; full substantive legal automation,
+independent flight phases and authenticated complete NOTAM access remain outside
+that delivered scope. Missing real permits remain an operational evidence need.
 
 ## Limits
 
