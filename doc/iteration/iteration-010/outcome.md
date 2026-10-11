@@ -135,7 +135,23 @@ import fulfill this iteration's scoped workflow; full substantive legal automati
 independent flight phases and authenticated complete NOTAM access remain outside
 that delivered scope. Missing real permits remain an operational evidence need.
 
-## Limits
+## Authorized NHN + AGL supplement
+
+Issue #88 adds explicit NHN terrain + AGL + offset, with symmetric uncertainty,
+to compare MSL limits in conservative/research modes. The UI enables the requested
+engineering approximation and displays numeric endpoint comparisons; API/core
+source-reference defaults and strict gates remain unchanged. Known missing support
+is never filled by the assumption and original source datums remain intact.
+See [height rules](../../rules/vertical-references.md) and reproducible nine-case
+real evidence at `.cache/iteration010-nhn-real-evidence.json`.
+
+At 100 m AGL/zero offset: origin 156.747 m, destination 157.035 m comparison heights;
+direct-motion interval 152.899–160.694 m. All overlap the control-zone range
+155.700–762.000 m MSL, so conservative applicability exclusions remain.
+Local full backend: 255 passes / one existing Windows permission skip; browser,
+smoke, lint/build and final supplemental CI gates are recorded in HANDOFF.
+
+## Remaining limits
 
 Substantive conditions still require reviewed evidence. No real permits are supplied
 with this iteration; no authenticated exhaustive NOTAM source is configured.

@@ -63,6 +63,12 @@ class RegionalPlanner:
             if result["unresolved"]
             else "permitted"
         )
+        result["vertical_comparisons"] = [
+            zone
+            for report in reports
+            for zone in report.get("zones", [])
+            if "aircraft_comparison_bounds_m" in zone
+        ]
         return result
 
     def grid(self, endpoints, cell_m, mode, check, boundary=None):
@@ -514,7 +520,7 @@ class RegionalPlanner:
             else "strict_model"
         )
         if hasattr(self.constraints, "restriction_report"):
-            result["restriction_report"] = self.constraints.restriction_report()
+            result["restriction_report"] = self.constraints.restriction_report(planning_mode)
             result["restriction_report"]["planning_mode"] = planning_mode
             result["restriction_report"]["policy_exclusions"] = (
                 result["restriction_report"]["counts"]["unresolved"]

@@ -60,6 +60,18 @@ External feeds requiring unavailable access are reported with a concrete gap and
 reviewed-import path, never fabricated coverage. Operational permission remains
 separate from an engineering candidate route.
 
+## Authorized height-comparison supplement (2026-10-11)
+
+User requested the NHN ground + AGL comparison with MSL limits before main delivery.
+Issue #88 / `feature/88-nhn-agl-comparison` from verified iteration merge `e4889f8`.
+Add an explicit engineering policy and configurable offset/uncertainty, full-query
+ground bounds, source-datum preservation, numeric endpoint/export diagnostics,
+UI invalidation and boundary/unknown-support/prohibition regressions. The regional
+conservative/research UI enables the requested zero-offset approximation; strict
+and API/core source-reference defaults remain intact. This supplies comparison
+capability, not a verified datum transformation or inferred permission. See
+[height rules and real results](../rules/vertical-references.md).
+
 Official references checked 2026-10-11:
 - https://www.dfs.de/homepage/de/drohnenflug/faq-zum-drohnenflug/
 - https://www.dipul.de/homepage/de/temporaere-betriebseinschraenkungen/
