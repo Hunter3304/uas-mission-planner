@@ -2,6 +2,23 @@
 
 ## Current status
 
+### Iteration 010 feature gates complete; main integration (2026-10-11)
+
+- Base PR #87 merged at `e4889f8`; NHN supplement PR #89 merged at `d453961` after
+  run `38157301971` passed Linux Python, Windows Python and frontend on reviewed
+  `8d0de63`. Both features have independent successful-CI gates.
+- Issues #85/#86/#88 are closed. Both corresponding merged feature branches were
+  verified, removed locally/remotely and checked with fetch/prune, branch -a and
+  ls-remote. Keep iteration/010, history, original sources and private profiles.
+- Local final acceptance: 255 backend passes / one existing permission skip;
+  Ruff, frontend lint/build, all 14 mocked browser and 12 real-stack smoke pass.
+  Final numerical-display tests pass. No user-owned service was stopped.
+- Three-mode and reference-policy contracts are in `doc/rules/planning-modes.md`
+  and `doc/rules/vertical-references.md`; source/permission/coverage limitations
+  remain explicit. NHN + AGL is an engineering policy, not verified datum equivalence.
+- Main integration follows with its own successful-CI gate. Record final main
+  delivery facts only after verification; earlier pending publication text is history.
+
 ### Iteration 010 NHN + AGL supplement (2026-10-11)
 
 - User explicitly requested NHN terrain + AGL comparison with MSL limits during

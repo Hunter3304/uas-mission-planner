@@ -17,6 +17,12 @@ its successful-CI gate.
 | Acceptance | 245 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; real API profile routing, active-notice precedence and 15 real mode cases | Remote Linux/Windows/frontend gates recorded after successful completion |
 | Publication/integration | User explicitly authorized delivery; Milestone 9 and Issues #85/#86 exist | Publish and integrate through separate CI-gated feature/iteration/main steps; record final facts in HANDOFF |
 
+Feature integration is complete: #87 at `e4889f8`, #89 at `d453961`, with successful
+Linux/Windows/frontend runs `38155429114` and `38157301971`. Issues #85/#86/#88 are
+closed and merged feature cleanup verified. The final supplemental implementation
+passes 255 backend tests / one existing skip, 14 mocked browser and 12 real-stack
+smoke cases. Main delivery retains its own separate gate.
+
 The delivered result is a usable conservative-avoidance and evidence workflow.
 It must not be described as completed legal verification of all DIPUL areas or
 completed operational authorization for the intended missions.

@@ -8,6 +8,11 @@ including feature -> iteration/010 -> main integration after successful CI.
 The earlier automatic publication rejection is historical; publication/merge facts
 are recorded only after verified execution.
 
+Feature delivery: PR #87 at `e4889f8` after run `38155429114`, and supplemental
+PR #89 at `d453961` after run `38157301971`, each passed Linux/Windows/frontend.
+Issues #85/#86/#88 are closed and merged feature cleanup is verified. Main
+integration has its separate successful-CI gate; final facts follow verified merge.
+
 The UI previously sent empty zone assessments and research routing bypassed all
 unknown zone applicability. It now defaults to conservative avoidance: unresolved
 zone footprints are excluded without being called confirmed legal prohibitions.
