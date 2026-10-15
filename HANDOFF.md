@@ -2,11 +2,11 @@
 
 ## Current status
 
-### Iteration 008 Part 5 current integration (2026-10-15)
+### Iteration 008 Part 5 verified main delivery (2026-10-15)
 
 - User authorized merging Part 5, updating README/HANDOFF and matching the latest
   engine. Issue #78 was explicitly closed at the user's request on 2026-10-15;
-  its body records that final PR gates were still pending at closure.
+  its final body now links the verified main delivery and current acceptance.
 - Original feature `51e1508` is reconciled with main `633b16e`. Adapted synthetic
   risk support to the current bounded-search interface; runner closes terrain
   readers. Iterations 009/010 production planners and private/source data remain.
@@ -24,7 +24,9 @@
   `doc/iteration/iteration-008/part5.md`. Feature PR #95 merged at `785f7b9`
   after run `38758844339` passed Linux/Windows/frontend on `621d996`. Its merged
   feature branch was removed locally/remotely, with fetch/prune and local/remote
-  branch verification. Main integration retains an independent successful-CI gate.
+  branch verification. Main PR #96 merged at `1feff34` after independent
+  run `38759403011` passed all three jobs on reviewed `59f2987`. Issue #78 and
+  Milestone 7 are closed; no Part 5 feature work remains pending.
 - Iteration 010 is fully delivered: #92 merged at `633b16e`, merged-main run
   `38159165262` passed, Issue #91 and Milestone 9 closed (reverified 2026-10-15).
 - No user-owned service was stopped. Original data, permission profiles and

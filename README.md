@@ -1,6 +1,7 @@
 # UAS Mission Planner
 
-Iteration 008 Part 5 is verified against the current engine on **2026-10-15**:
+Iteration 008 Part 5 is delivered to main through [PR #96](https://github.com/Hunter3304/uas-mission-planner/pull/96)
+and verified against the current engine on **2026-10-15**:
 600 offline records across three real Hannover pairs and synthetic fixtures,
 weighted/distance objectives, A*/Dijkstra/native ABIT*, altitude/grid/speed and
 boundary comparisons. Real default-input preflights remain unresolved; 170
@@ -87,8 +88,8 @@ OSM, all advertised DIPUL layers and native GHSL population are separate sources
 See [Part 1 evidence](doc/iteration/iteration-008/part1.md).
 
 This source snapshot is separate from the small-area flight experiment schema.
-Regional constraint preparation and planner/UI integration remain later parts;
-the existing building-risk/distance objective retains weights 0.9/0.1.
+Regional constraints, planner/UI integration and offline experiments are delivered
+in Parts 2-5; the building-risk/distance objective retains weights 0.9/0.1.
 Mission defaults are 100 m AGL and 30 m/s (ranges 100–120 m and 25–35 m/s).
 A complete source snapshot does not establish flight permission or route readiness.
 
@@ -104,9 +105,9 @@ core. GHSL does not change the building-only 0.9/0.1 routing objective.
 See the [Part 2 operating guide](doc/experiments/iteration-008/README.md#part-2-regional-constraints-and-native-population-inspection)
 and [traceable rules](doc/rules/regional-constraints.md). Unknown height, geometry,
 time, vertical reference and coverage remain explicit; regional route/selector/UI
-integration belongs to Parts 3/4.
+integration is delivered in Parts 3/4, with current-engine experiments in Part 5.
 
-## Iteration 007: real-area research routing (local implementation)
+## Iteration 007: real-area research routing
 
 The default **Planning mode: Strict constraints** now reports unresolved source
 coverage before native search, including with an ABIT* zero-second budget.
@@ -180,8 +181,8 @@ Iteration 006 Part 1 adds **building-risk weighted A*/Dijkstra in the Python
 core**, with metric centreline length times score, overlap maximum, explicit
 background assumptions and risk/length weights 0.9/0.1. See the
 [calculation rules and offline example](doc/rules/risk-weighted-routing.md) and
-[Part 1 feedback](doc/iteration/iteration-006/part1.md). Current route controls
-continue to optimize distance; OMPL and weighted route controls are later parts.
+[Part 1 feedback](doc/iteration/iteration-006/part1.md). Native OMPL and weighted
+CLI/API/UI controls were subsequently delivered in Parts 2/3.
 Real unresolved constraints retain their existing behavior.
 Feature [PR #57](https://github.com/Hunter3304/uas-mission-planner/pull/57) passed
 Windows/Linux Python and frontend CI and merged into `iteration/006`;
@@ -398,7 +399,8 @@ Paper obstruction flags do not establish current flight restrictions.
 
 Restart the backend after updating rules/code, then Refresh the dataset.
 Original datasets and downloads are unchanged; analysis is calculated on read.
-This feature does not yet create a fused cost grid or plan a flight route.
+Independent tag analysis remains separate from building-risk route optimization;
+population and cross-layer cost fusion are still deferred.
 
 One public monorepo, separately running frontend/backend. React communicates through HTTP. **The Python core must never depend on React or FastAPI**; CLI, API and future experiments reuse the core. Code, UI and project documentation default to English.
 
@@ -444,14 +446,21 @@ reviews Droniq/TraX, OpenFlightMaps, GHSL, DIPUL, SORA 2.5 and EGRED 2 as of
 GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for local independent
 inspection in Part 1. The other assessed sources remain documentation-only.
 
-This is a local small-area prototype that loads datasets into memory and revalidates API reads. Building tag costs are ordinal research classifications. Browser-triggered acquisition, background jobs, large-area performance, population/cost fusion, mission routing and public deployment require future planned work. No next sprint is approved automatically by this release.
+The local prototype supports small-area and Hannover regional mission research
+and loads source data into memory for verification. Building tag costs are ordinal
+research classifications. Browser-triggered acquisition, background jobs, regional
+OSM payload/rendering/cancellation performance, population/cost fusion and public
+deployment remain future work. Mission-end feasibility, full flight phases, real
+permission evidence and complete NOTAM coverage remain unresolved. No next sprint
+is approved automatically by a stage release.
 
 ## Explorer panel controls
 
 Iteration 008 Part 3 adds `study-route` and regional planning controls using the
 same offline constraints in A*, Dijkstra and native ABIT*. Weighted building risk
-defaults to 0.9/0.1; distance-only remains a baseline. Real Hannover source
-uncertainty still prevents validated routes. See the
+defaults to 0.9/0.1; distance-only remains a baseline. Strict Hannover source
+checks remain unresolved; Iterations 009/010 add explicit research routes and
+conservative avoidance, as described above. See the
 [Part 3 delivery](doc/iteration/iteration-008/part3.md) and
 [operating guide](doc/experiments/iteration-008/README.md).
 

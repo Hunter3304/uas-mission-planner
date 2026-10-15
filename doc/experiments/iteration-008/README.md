@@ -8,10 +8,10 @@ Use new outputs; add `--synthetic-only` to the first command when real snapshots
 are unavailable. See [Part 5 results](../../iteration/iteration-008/part5.md) for
 the matrix, metadata, cache interpretation and unresolved real/expanded inputs.
 
-This delivery prepares OSM, DIPUL and GHSL sources. Constraint interpretation,
-planner preparation and the endpoint-selection UI belong to later parts of
-[the plan](../../plan/iteration-008.md). A complete source snapshot is not a
-validated route or flight authorization.
+Part 1 prepares OSM, DIPUL and GHSL sources. Parts 2-5 now deliver constraint
+interpretation, planning, endpoint selection and static experiments under
+[the plan](../../plan/iteration-008.md). A complete source snapshot alone does
+not establish route validity or flight authorization.
 
 ## Sites and region
 
