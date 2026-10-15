@@ -2,6 +2,41 @@
 
 ## Current status
 
+### Iteration 008 Part 5 current integration (2026-10-15)
+
+- User authorized merging Part 5, updating README/HANDOFF and matching the latest
+  engine. Issue #78 was explicitly closed at the user's request on 2026-10-15;
+  its body records that final PR gates were still pending at closure.
+- Original feature `51e1508` is reconciled with main `633b16e`. Adapted synthetic
+  risk support to the current bounded-search interface; runner closes terrain
+  readers. Iterations 009/010 production planners and private/source data remain.
+- Fresh offline acceptance at `.cache/part5-current-20261015/`: 600 matrix records,
+  360 real unresolved preflights, 170 independently checked synthetic successes,
+  28 graph no-path results and 42 native timeouts; six real research preflights
+  unresolved. Twelve deterministic invariance groups and input hashes verified.
+- Primary `part5-evidence.json` now reflects 2026-10-15 on the current engine.
+  Original `part5-evidence-20261008.json` and `.cache/part5-full-v2/` are retained
+  unchanged and reverified. Default strict inputs do not enable Iteration 009's
+  geometry/height/background research assumptions; its successful routes remain valid.
+- Current checks: 261 backend passes / one existing permission skip (100.12 s),
+  six focused experiment passes, Ruff, frontend lint/build, 14 mocked browser and
+  12 real-stack smoke passes with clean exits. Outcome/reproduction:
+  `doc/iteration/iteration-008/part5.md`. Feature PR #95 merged at `785f7b9`
+  after run `38758844339` passed Linux/Windows/frontend on `621d996`. Its merged
+  feature branch was removed locally/remotely, with fetch/prune and local/remote
+  branch verification. Main integration retains an independent successful-CI gate.
+- Iteration 010 is fully delivered: #92 merged at `633b16e`, merged-main run
+  `38159165262` passed, Issue #91 and Milestone 9 closed (reverified 2026-10-15).
+- No user-owned service was stopped. Original data, permission profiles and
+  iteration history remain. OSM performance, mission-duration feasibility,
+  complete NOTAM/permissions and 3D/phase modeling remain follow-up work.
+
+## Historical handoff records
+
+The dated entries below preserve earlier decisions and intermediate states.
+Pending-delivery and deferred-Part-5 statements are superseded by the current
+status above; they are not instructions to repeat already completed work.
+
 ### Iteration 010 final delivery gate (2026-10-11)
 
 - Comparison smoke correction PR #94 merged into iteration/010 at `3eca995`

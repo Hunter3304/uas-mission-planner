@@ -1,5 +1,14 @@
 # UAS Mission Planner
 
+Iteration 008 Part 5 is verified against the current engine on **2026-10-15**:
+600 offline records across three real Hannover pairs and synthetic fixtures,
+weighted/distance objectives, A*/Dijkstra/native ABIT*, altitude/grid/speed and
+boundary comparisons. Real default-input preflights remain unresolved; 170
+synthetic successes pass independent checks. See [current Part 5 results and
+reproduction](doc/iteration/iteration-008/part5.md); the original 2026-10-08 evidence
+is retained separately. The default matrix does not enable Iteration 009's
+additional research assumptions or invent permission profiles.
+
 Iteration 010 adds **default conservative regional avoidance**: unresolved DIPUL
 footprints are excluded separately from confirmed prohibitions. Saved evidence
 profiles, phase/time/height scope, reviewed temporary notices and coverage reports
