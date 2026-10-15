@@ -1,13 +1,13 @@
 # Iteration 008 — Hannover fixed-altitude 2D routing
 
 Date: 2026-10-05 (Europe/Berlin).
-Status, 2026-10-08: Parts 1–4 delivered to main, most recently through PR #77
-(`17d9b27`). Part 5 is implemented and validated locally on
-`feature/iteration008-part5-experiments`. Original study/terrain snapshots remain
-immutable. Milestone 7 / Issue #78 tracks Part 5; issue creation and assignment
-were explicitly authorized on 2026-10-08 after the earlier automatic approval rejection.
-See `doc/iteration/iteration-008/part5.md` for the 600-record matrix, six research
-checks, successful synthetic comparisons and explicit real/expanded coverage limits.
+Status, 2026-10-15: Parts 1–4 are on main. Part 5 has been reconciled with main
+`633b16e` and freshly verified on the current engine: 600 records, six research
+preflights, independent synthetic comparisons and unchanged manifests. Issue #78
+is closed at the user's request. Separate feature -> iteration/008 -> main CI
+gates complete the authorized integration. Original 2026-10-08 evidence and source
+snapshots are preserved. See `doc/iteration/iteration-008/part5.md` and HANDOFF
+for current results and final publication facts.
 
 ## Objective and confirmed scope
 

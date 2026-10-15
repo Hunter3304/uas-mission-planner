@@ -1,10 +1,48 @@
 # UAS Mission Planner
 
-Iteration 008 Parts 1–4 are integrated into main. Part 5 provides an offline
-three-pair Hannover experiment matrix and separately labelled synthetic algorithm,
-objective, boundary, grid and speed comparisons. See
-[Part 5 results and reproduction](doc/iteration/iteration-008/part5.md).
-Real retained inputs remain unresolved; synthetic routes are not real flight evidence.
+Iteration 008 Part 5 is verified against the current engine on **2026-10-15**:
+600 offline records across three real Hannover pairs and synthetic fixtures,
+weighted/distance objectives, A*/Dijkstra/native ABIT*, altitude/grid/speed and
+boundary comparisons. Real default-input preflights remain unresolved; 170
+synthetic successes pass independent checks. See [current Part 5 results and
+reproduction](doc/iteration/iteration-008/part5.md); the original 2026-10-08 evidence
+is retained separately. The default matrix does not enable Iteration 009's
+additional research assumptions or invent permission profiles.
+
+Iteration 010 adds **default conservative regional avoidance**: unresolved DIPUL
+footprints are excluded separately from confirmed prohibitions. Saved evidence
+profiles, phase/time/height scope, reviewed temporary notices and coverage reports
+are shared by A*, Dijkstra and native ABIT*. See the
+[operation guide and real endpoint conflicts](doc/iteration/iteration-010/outcome.md)
+and [decision rules](doc/rules/restriction-decisions.md). The historical research
+examples below require explicitly selecting `research`; no real permission profiles
+are supplied. Strict mode still retains unverified coverage gates.
+
+Iteration 010 closeout includes a [complete DIPUL source/endpoint audit](doc/data-sources/iteration-010-dipul-audit.md)
+and reproducible real three-mode acceptance. Independently active reviewed
+prohibitions take precedence over generic or stale allowances; permission-profile
+expiry/source changes restore conservative exclusions.
+
+The user-authorized [NHN + AGL height comparison](doc/rules/vertical-references.md)
+adds explicit offset/uncertainty and endpoint MSL comparison diagnostics. It is an
+engineering assumption in conservative/research mode; strict datum checks remain.
+
+Iteration 009 enables **real Hannover research routes** with explicit derived
+geometry and missing-height assumptions, bounded corridor search, checked exact
+endpoint connectors and Berlin date/time selectors. See
+[operation and independently checked real results](doc/iteration/iteration-009/outcome.md).
+Select `hannover-part1-v4`, terrain `hannover-part2-terrain-v1`, planning mode
+`research`, background score assumption `0`, missing-height estimate `30` m and
+A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-lehrte
+→ mhh. Enter the intended scenario times in the date selectors. Strict mode retains
+its unresolved-source checks; research routes do not establish flight permission.
+
+The regional map includes an optional online OpenStreetMap street basemap with
+explicit tile-failure feedback. Retained source data remain local. Full-region
+OSM overlay serialization/rendering currently has a known memory/timeout defect;
+keep that overlay off when reproducing route tests. Mission duration is not checked
+against the entered scenario end time. See the operation guide's supplemental
+closeout section for diagnosed limitations and deferred work.
 
 A local Python geospatial research prototype for an internship and subsequent bachelor's thesis. Acquire a small area, save and verify its data, explore layers and statistics, and download results.
 

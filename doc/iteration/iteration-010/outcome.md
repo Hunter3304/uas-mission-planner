@@ -1,0 +1,179 @@
+# Regional restrictions and conservative avoidance
+
+Approved 2026-10-11. Milestone 9, Issues #85/#86; integration branch `iteration/010`
+from `89afe54`; feature `feature/85-regional-restrictions`.
+
+The user explicitly authorized completion and remote delivery on 2026-10-11,
+including feature -> iteration/010 -> main integration after successful CI.
+The earlier automatic publication rejection is historical; publication/merge facts
+are recorded only after verified execution.
+
+Feature delivery: PR #87 at `e4889f8` after run `38155429114`, and supplemental
+PR #89 at `d453961` after run `38157301971`, each passed Linux/Windows/frontend.
+Issues #85/#86/#88 are closed and merged feature cleanup is verified. Main
+integration PR #90 merged at `2163974` after independent run `38157731109` passed
+all three jobs; iteration push run `38157643292` also passed. Issue #91 records
+the final closeout, with a separate CI gate. Functional delivery is
+complete; operational permission/reference/coverage limitations remain explicit.
+
+Post-merge run `38158032394` and documentation push `38158287944` exposed an
+existing five-second comparison smoke deadline while four real solves were still
+running. Issue #93 / PR #94 now await the successful comparison response, verify
+exact response/export equality and serialize cases sharing the CPU-bound backend.
+Frontend lint and all 12 smoke cases pass locally (34.1 s); independent feature
+run `38158666846` passed all three jobs before merge `3eca995`. Issue #93 is
+closed and its merged fix branch cleanup verified. Final integration PR #92 includes this correction and merged at `633b16e` after
+successful CI. Merged-main run `38159165262` passed; Issue #91 and Milestone 9
+are closed (reverified 2026-10-15).
+
+The UI previously sent empty zone assessments and research routing bypassed all
+unknown zone applicability. It now defaults to conservative avoidance: unresolved
+zone footprints are excluded without being called confirmed legal prohibitions.
+A*, Dijkstra and native ABIT* share full-motion checks. Strict and explicit research
+policies remain available. See [decision rules](../../rules/restriction-decisions.md).
+
+The [three-mode contract](../../rules/planning-modes.md) and
+[status/next steps](status.md) distinguish implemented functionality from remaining
+source/permission evidence and completed remote delivery.
+
+## Operation
+
+Restart the backend and refresh the frontend after loading this implementation.
+Select `hannover-part1-v4` and complete terrain `hannover-part2-terrain-v1`. Enter
+scenario times in Europe/Berlin and select the intended planning policy. Load
+scenario layers to inspect separate prohibited, policy-excluded, conditional and
+not-applicable footprints, counts and coverage. Building records are counted
+separately. Keep the known problematic full-region OSM overlay off.
+
+Open **Restriction assessments and reviewed notices**. Select an assessed zone,
+decision, phase, evidence, AGL interval and validity interval. Blank validity inputs
+use the entered scenario interval. Conditional allowance requires explicit satisfied
+conditions. Add it to the draft, name the profile and **Save and use profile revision**.
+Only saved profiles affect planning; edits to an active saved profile deselect it.
+Source/time/height/profile changes invalidate the displayed route and scenario layers.
+Review profile evidence before use. A launch-only consent does not permit transit;
+complete path checks remain conservative, including at exact catalog endpoints.
+
+Profile export/import uses JSON schema version 1 with `name`, `zone_assessments`
+and `notices`. Re-importing a saved profile creates a new checked revision. Source
+signatures are supplied by scenario layer reports; do not invent or reuse a signature
+from another source feature. `civil`/`BOS` does not itself grant any exemption.
+
+API additions:
+
+- GET/POST `/api/datasets/{id}/study/restriction-profiles`: list/save immutable local
+  profiles (POST is a local write, not an external application for permission).
+- Existing route/layer POSTs accept `profile_id`. Inline evidence and a saved
+  profile cannot be combined. Layer requests accept `planning_mode`.
+- Results and displayed exports contain `restriction_report`, coverage, policy
+  exclusions, model/rule versions and profile identity. API/core defaults remain
+  strict for compatibility; the regional UI/CLI default is conservative.
+
+## Temporary restrictions
+
+Acquire a separate bounded snapshot, without overwriting study originals:
+
+```powershell
+backend/.venv/Scripts/python.exe -m uas_planner.cli restrictions-fetch --bounds 9.650495867959657 52.32042221571155 10.068841103123809 52.45032927853548 --output .cache/restrictions-new --notice-url https://www.dipul.de/homepage/de/temporaere-betriebseinschraenkungen/
+```
+
+This retains capabilities, schema, WFS pages and requested official notice bytes,
+with request/timestamp/checksum receipts and `restrictions.json`. It also generates
+`profile-template.json`; any acquired features start **unreviewed** and cannot be
+used until their normalization is reviewed. Additional individual official notice
+URLs can be supplied (maximum ten). The listing is not an exhaustive NOTAM feed.
+
+Reviewed notice entries need a unique `id`, official HTTPS `official_url`, evidence,
+offset-aware `checked_at`, `reviewed: true`, valid WGS84 polygon `geometry` and
+`properties`. Canonical `valid_from`/`valid_until` mean reviewed explicit intervals;
+altitude uses `lower/upper_limit_altitude`, `_unit` (m/ft), `_alt_ref` (AGL/MSL).
+Unsupported schedules remain unresolved. `state: prohibited` can be used only with
+reviewed prohibition evidence; the importer cannot grant permission. Preserve
+original raw fields in addition to reviewed normalization. Import the reviewed
+profile through the UI and save it before planning. New snapshots are not applied
+silently, and missing feed access never becomes a coverage certificate.
+
+## Real Hannover findings
+
+The retained 100 m scenario, 2026-10-07 10:00–10:15 +02:00, is reproducible
+engineering evidence rather than a current flight schedule. With no permission
+profiles, all 324 DIPUL features remain unresolved; confirmed prohibitions and
+conditional allowances each count zero. Conservative mode excludes those features.
+
+Seven of eight exact sites are blocked: mhh, henriettenstift, rheuma-lister,
+rheuma-podbi, amedes-georg, amedes-schiffgraben and friederikenstift. limbach-lehrte
+passes the local point check, while global coverage remains unverified. All three
+representative pairs to MHH return `invalid_endpoint` under all three algorithms
+(nine cases), with no fabricated path. No address was moved and no research bypass
+was applied. Local evidence: `.cache/iteration010-real-evidence.json`.
+
+Fresh official acquisition on 2026-10-11 returned zero temporary features in the
+Hannover bounds. Original responses and the listing are retained separately at
+`.cache/iteration010-temporary-snapshot/`. This does not establish an absence of
+temporary restrictions or complete NOTAM coverage.
+
+## Validation
+
+Final closeout regression: 245 backend passes / one existing Windows permission skip;
+14 mocked browser and 12 real-stack smoke passes with clean exits. Ruff and
+frontend lint/TypeScript/production build pass. Final scoped popup/profile checks
+also pass, with mobile rendering inspected. Added tests cover evidence expiry,
+partial validity, changed source, launch-only scope, time/height equality,
+unsupported schedules, unreviewed imports, immutable profile revisions and all
+three algorithms. Independent Shapely intersections verify successful synthetic
+detours; a full-height prohibited wall never produces successful geometry.
+
+Closeout also adds real API profile-routing acceptance: a saved valid transit
+assessment changes the synthetic path from a detour to an independently verified
+crossing; expiration and source changes restore exclusion. Conflicting inline/profile
+evidence is rejected. Four regressions ensure independently active reviewed notice
+prohibitions cannot be downgraded by valid generic, expired, changed-source or
+launch-only allowance records. Rules version is `regional-restrictions-v2`.
+
+Final real mode acceptance retains 15 cases: nine conservative `invalid_endpoint`,
+three strict `unresolved_input`, and three independently accepted primary-pair
+research successes. Distance A*/Dijkstra agree at 2,840.88 m; native ABIT* returned
+2,394.49 m on this run (finite-budget stochastic success is not guaranteed). All
+three research paths passed endpoint, boundary, known obstacle, terrain, length,
+cost and cruise checks. No real permission is inferred from these successes.
+Evidence: `.cache/iteration010-closeout-modes/evidence.json` and 15 checksummed
+GeoJSON outputs. Original data and evidence remain local and outside Git.
+
+Reproduce final audit and mode acceptance in fresh outputs:
+
+```powershell
+backend/.venv/Scripts/python.exe doc/experiments/iteration-010/audit-dipul.py data/hannover-part1-v4 --output .cache/restriction-audit-new.json
+backend/.venv/Scripts/python.exe doc/experiments/iteration-010/verify-real-modes.py --output .cache/restriction-modes-new
+```
+
+The [complete source audit](../../data-sources/iteration-010-dipul-audit.md) records
+all 31 layers and four endpoint-related source features with original references,
+vertical limits and missing evidence. Supported automated checks and reviewed
+import fulfill this iteration's scoped workflow; full substantive legal automation,
+independent flight phases and authenticated complete NOTAM access remain outside
+that delivered scope. Missing real permits remain an operational evidence need.
+
+## Authorized NHN + AGL supplement
+
+Issue #88 adds explicit NHN terrain + AGL + offset, with symmetric uncertainty,
+to compare MSL limits in conservative/research modes. The UI enables the requested
+engineering approximation and displays numeric endpoint comparisons; API/core
+source-reference defaults and strict gates remain unchanged. Known missing support
+is never filled by the assumption and original source datums remain intact.
+See [height rules](../../rules/vertical-references.md) and reproducible nine-case
+real evidence at `.cache/iteration010-nhn-real-evidence.json`.
+
+At 100 m AGL/zero offset: origin 156.747 m, destination 157.035 m comparison heights;
+direct-motion interval 152.899–160.694 m. All overlap the control-zone range
+155.700–762.000 m MSL, so conservative applicability exclusions remain.
+Local full backend: 255 passes / one existing Windows permission skip; browser,
+smoke, lint/build and final supplemental CI gates are recorded in HANDOFF.
+
+## Remaining limits
+
+Substantive conditions still require reviewed evidence. No real permits are supplied
+with this iteration; no authenticated exhaustive NOTAM source is configured.
+Strict planning still fails regional completeness checks and may also fail on
+building/terrain support. This is a functioning conservative avoidance and evidence
+workflow, not automatic flight authorization. Fixed-AGL 2D, NHN/MSL uncertainty,
+existing source snapshots and deferred mission-duration/OSM performance work remain.

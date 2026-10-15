@@ -173,6 +173,7 @@ def main():
                 f"Real {altitude} m: {len(records)} records; preparation {source_ms:.0f} ms",
                 flush=True,
             )
+            planner.constraints.terrain.close()
             del planner
     for fixture in ("risk-detour", "diagonal", "boundary-detour"):
         variants = [

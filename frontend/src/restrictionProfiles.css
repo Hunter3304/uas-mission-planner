@@ -1,0 +1,26 @@
+.restriction-profile label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.65rem 0;
+}
+
+.restriction-profile input,
+.restriction-profile select,
+.restriction-profile textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.restriction-profile textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.restriction-profile fieldset {
+  min-width: 0;
+  margin: 0.8rem 0;
+}

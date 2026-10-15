@@ -2,32 +2,345 @@
 
 ## Current status
 
-### Iteration 008 Part 5 local delivery (2026-10-08)
+### Iteration 008 Part 5 current integration (2026-10-15)
 
-- Parts 1–4 are integrated into main, latest PR #77 / `17d9b27`. User authorized
-  Part 5 implementation; branch `feature/iteration008-part5-experiments` is based
-  on iteration/008 fast-forwarded to that main commit. The user subsequently
-  authorized committing and pushing Part 5 on 2026-10-08. Publication targets the
-  feature branch; PR integration into iteration/008 or main remains pending.
-- User explicitly authorized issue creation on 2026-10-08; Milestone 7 / Issue #78
-  now tracks Part 5 and is assigned to Hunter3304. The earlier automatic approval
-  rejection was resolved by this authorization. Feature publication is authorized;
-  integration remains pending.
-- Offline experiment runner and checksummed reporter deliver 600 matrix records:
-  360 real `unresolved_input`, 170 independently checked synthetic successes,
-  28 graph no-path outcomes and 42 native timeouts. Six separate research-mode
-  real checks also remain unresolved. Three real catalog pairs, two objectives,
-  three algorithms, three native repeats, altitude/grid/speed sweeps and fresh/
-  reused preparation are recorded. Exact endpoints and all original sources remain.
-- Expanded real-region coverage is missing and explicitly reported; synthetic
-  boundary expansion demonstrates a validated detour with unchanged endpoints.
-  No successful real regional route, expanded real route or full-region successful
-  search benchmark is claimed. Preserve `.cache/part5-full-v2/` outside Git.
-- Full backend regression: 228 passed / one existing Windows permission skip
-  (100.85 s); final focused experiment suite: 6 passed (1.86 s). Ruff lint/format
-  and saved-report integrity/invariance checks pass. Frontend unchanged.
-- Read `doc/iteration/iteration-008/part5.md` and `part5-evidence.json` for results,
-  limitations and offline commands. Earlier deferred/local records below are history.
+- User authorized merging Part 5, updating README/HANDOFF and matching the latest
+  engine. Issue #78 was explicitly closed at the user's request on 2026-10-15;
+  its body records that final PR gates were still pending at closure.
+- Original feature `51e1508` is reconciled with main `633b16e`. Adapted synthetic
+  risk support to the current bounded-search interface; runner closes terrain
+  readers. Iterations 009/010 production planners and private/source data remain.
+- Fresh offline acceptance at `.cache/part5-current-20261015/`: 600 matrix records,
+  360 real unresolved preflights, 170 independently checked synthetic successes,
+  28 graph no-path results and 42 native timeouts; six real research preflights
+  unresolved. Twelve deterministic invariance groups and input hashes verified.
+- Primary `part5-evidence.json` now reflects 2026-10-15 on the current engine.
+  Original `part5-evidence-20261008.json` and `.cache/part5-full-v2/` are retained
+  unchanged and reverified. Default strict inputs do not enable Iteration 009's
+  geometry/height/background research assumptions; its successful routes remain valid.
+- Current checks: 261 backend passes / one existing permission skip (100.12 s),
+  six focused experiment passes, Ruff, frontend lint/build, 14 mocked browser and
+  12 real-stack smoke passes with clean exits. Outcome/reproduction:
+  `doc/iteration/iteration-008/part5.md`. Final feature/main PR gates follow.
+- Iteration 010 is fully delivered: #92 merged at `633b16e`, merged-main run
+  `38159165262` passed, Issue #91 and Milestone 9 closed (reverified 2026-10-15).
+- No user-owned service was stopped. Original data, permission profiles and
+  iteration history remain. OSM performance, mission-duration feasibility,
+  complete NOTAM/permissions and 3D/phase modeling remain follow-up work.
+
+## Historical handoff records
+
+The dated entries below preserve earlier decisions and intermediate states.
+Pending-delivery and deferred-Part-5 statements are superseded by the current
+status above; they are not instructions to repeat already completed work.
+
+### Iteration 010 final delivery gate (2026-10-11)
+
+- Comparison smoke correction PR #94 merged into iteration/010 at `3eca995`
+  after run `38158666846` passed frontend and Linux/Windows backend on reviewed
+  `350e02a`. Issue #93 is closed. Verified merged fix branch was removed locally
+  and remotely, followed by fetch/prune, branch -a and ls-remote checks.
+- PR #92 now contains final delivery records plus this acceptance correction;
+  it requires a fresh independent main-PR gate on its final head. The earlier
+  functional main merge is PR #90 at `2163974`; NHN + AGL is already delivered.
+  Check the final merged-main push before closing Issue #91 and Milestone 9.
+- Production source/algorithms and original/private data are unchanged by the
+  smoke correction. The 255 backend / one permission skip, 14 mocked browser
+  and 12 real-stack local acceptance results remain retained. User services
+  were not stopped; restart backend and refresh frontend to load merged code.
+
+### Iteration 010 post-merge smoke deadline correction (2026-10-11)
+
+- Main push run `38158032394` and documentation push run `38158287944` exposed
+  the existing comparison smoke test's five-second DOM deadline while four real
+  solves were still running. Both backend jobs and mocked browser checks passed.
+- Issue #93 was assigned to Milestone 9 before `fix/93-comparison-smoke-wait`.
+  Await the real comparison API response, check successful HTTP status, then
+  assert the rendered costs and exact displayed/exported report. Production
+  algorithms, constraints and UI behavior remain unchanged.
+- A six-worker local stress run passed the corrected comparison case but exposed
+  the same short deadline in two unrelated readiness checks. Real-stack smoke
+  acceptance now uses one worker for its shared CPU-bound backend; mocked browser
+  concurrency is unchanged. Frontend lint and all 12 real-stack smoke cases pass
+  with clean exits locally (34.1 s) before publication.
+- Keep PR #92 pending until the correction passes its feature and main gates.
+  Final merged-main success and verified correction-branch cleanup are required
+  before closing Issues #91/#93 and the milestone. No user service was stopped.
+
+### Iteration 010 verified main delivery (2026-10-11)
+
+- Complete functional delivery, including the user-requested NHN + AGL supplement,
+  merged to main through PR #90 at `2163974`. Independent main-PR run `38157731109`
+  passed Linux Python, Windows Python and frontend before merge; iteration push
+  run `38157643292` also passed. Local main was fast-forwarded to the verified merge.
+- Feature PR #87 / run `38155429114` and supplement PR #89 / run `38157301971`
+  each passed their own gates. Issues #85/#86/#88 are closed; both merged feature
+  branches were verified and removed locally/remotely with prune/branch/remote
+  checks. Historical iteration/feature branches and all original/private data remain.
+- Final local acceptance: 255 backend passes / one existing permission skip;
+  Ruff/frontend lint/build, 14 mocked browser and 12 real-stack smoke pass. Real
+  three-mode and NHN comparison evidence remains local with reproducible scripts.
+- Default regional conservative/research UI can compare NHN ground + AGL under an
+  explicit offset/uncertainty policy. At 100 m AGL/zero offset, primary endpoints
+  156.747/157.035 m and direct-motion 152.899–160.694 m overlap the control-zone
+  band 155.700–762 m. Overlap does not establish prohibition or permission; strict
+  reference/coverage gates and operational evidence limitations remain intact.
+- Issue #91 tracks the final delivery record. Merged-main push run `38158032394`
+  exposed the old comparison smoke deadline, corrected through Issue #93 / PR #94
+  as recorded above. Final PR #92 and merged-main checks gate the delivery response.
+- Restart the user backend and refresh the frontend to load merged code. No
+  user-owned service was stopped. Keep the problematic full OSM overlay off;
+  unrelated performance/time-feasibility and full legal/NOTAM/flight-phase work
+  remain outside this completed functional iteration.
+
+### Iteration 010 feature gates complete; main integration (2026-10-11)
+
+- Base PR #87 merged at `e4889f8`; NHN supplement PR #89 merged at `d453961` after
+  run `38157301971` passed Linux Python, Windows Python and frontend on reviewed
+  `8d0de63`. Both features have independent successful-CI gates.
+- Issues #85/#86/#88 are closed. Both corresponding merged feature branches were
+  verified, removed locally/remotely and checked with fetch/prune, branch -a and
+  ls-remote. Keep iteration/010, history, original sources and private profiles.
+- Local final acceptance: 255 backend passes / one existing permission skip;
+  Ruff, frontend lint/build, all 14 mocked browser and 12 real-stack smoke pass.
+  Final numerical-display tests pass. No user-owned service was stopped.
+- Three-mode and reference-policy contracts are in `doc/rules/planning-modes.md`
+  and `doc/rules/vertical-references.md`; source/permission/coverage limitations
+  remain explicit. NHN + AGL is an engineering policy, not verified datum equivalence.
+- Main integration follows with its own successful-CI gate. Record final main
+  delivery facts only after verification; earlier pending publication text is history.
+
+### Iteration 010 NHN + AGL supplement (2026-10-11)
+
+- User explicitly requested NHN terrain + AGL comparison with MSL limits during
+  remote delivery. Issue #88 was assigned to Milestone 9 before creating
+  `feature/88-nhn-agl-comparison` from verified iteration merge `e4889f8`.
+- Explicit engineering policy, offset/uncertainty, full-motion native terrain
+  bounds, original datum preservation, endpoint numerical diagnostics/export and
+  UI result invalidation implemented. Regional conservative/research UI enables
+  the requested zero-offset approximation; strict and API/core defaults retain
+  source-reference verification. Rules version `regional-restrictions-v3`.
+- Real origin/destination: 56.747/57.035 m NHN ground + 100 m AGL = 156.747/157.035 m
+  comparison heights. Full direct-motion interval 152.899–160.694 m. All overlap
+  control-zone limits 155.700–762 m MSL under the declared assumption. This does
+  not satisfy zone applicability/permission. Original data remain unchanged.
+- Nine real mode/query checks saved in `.cache/iteration010-nhn-real-evidence.json`.
+  Reproduction and rules: `doc/experiments/iteration-010/verify-nhn-agl.py` and
+  `doc/rules/vertical-references.md`. Local backend full: 255 passed / one existing
+  Windows permission skip; 14 mocked browser and 12 real-stack smoke pass cleanly.
+  Final numerical-display scoped checks pass: 26 restriction cases, all 14 browser
+  cases and frontend lint/build. Supplemental publication follows.
+- Base feature PR #87 merged at `e4889f8` after run `38155429114` passed all three
+  Linux/Windows/frontend jobs at reviewed `efbd279`. Issues #85/#86 are closed.
+  Verified merged feature was removed locally/remotely; fetch/prune, branch -a and
+  ls-remote confirmed cleanup. Historical branches and source/profile data retained.
+- Main integration was deferred for this user-requested supplement; do not merge
+  main until its feature and integration CI gates pass. User-owned services remain
+  untouched. Earlier no-publication/height-comparison limitations below are history.
+
+### Iteration 010 completion and remote delivery authorized (2026-10-11)
+
+- User explicitly requested completion of Iteration 010 and outstanding remote
+  delivery. This authorizes code push, PR creation, CI-gated feature -> iteration/010
+  -> main integration, required documentation and verified merged-feature cleanup.
+  Earlier publication rejection/local-only statements below are historical.
+- Completed the 31-layer/324-feature and four-endpoint source audit with 63 original
+  DIPUL checksum checks: `doc/data-sources/iteration-010-dipul-audit.md`. Reproduction
+  scripts are under `doc/experiments/iteration-010/`; original geometries are not
+  exported and all original data/profile files remain outside Git.
+- Fixed active reviewed-notice precedence: a generic/expired/changed-source/launch
+  allowance cannot downgrade an independently applicable prohibition. Added four
+  regressions and real API saved-profile routing/expiration/source-change checks.
+  Rules version `regional-restrictions-v2`; no real permissions were invented.
+- Local backend: 245 passed / one existing Windows permission skip. Ruff passes.
+  Final frontend lint/build, all 14 mocked browser and 12 real-stack smoke cases
+  pass with clean exits before publication.
+  No unrelated performance/time feasibility or flight-phase scope was added.
+- Final real mode verification: nine conservative `invalid_endpoint`, three strict
+  `unresolved_input`, three accepted primary research routes. A*/Dijkstra distance
+  2,840.88 m; native ABIT* 2,394.49 m on this finite-budget run. Independent checks
+  pass. Evidence: `.cache/iteration010-closeout-modes/` and source audit JSON.
+- Complete NOTAM access, substantive legal condition automation, real permit
+  evidence and independent takeoff/landing modeling remain explicit limitations
+  of the scoped delivery, not claims of completed operational clearance.
+- Feature publication and separate integration/main CI gates follow. Do not stop
+  user-owned services. Record verified PR/merge/check/issue/cleanup facts afterwards.
+
+### Iteration 010 mode documentation and status clarification (2026-10-11)
+
+- User asked for remaining work/next steps and explicit documentation of the three
+  modes. Added `doc/rules/planning-modes.md`, including the requested comparison,
+  UI/CLI versus API defaults, shared checks and real Hannover failure interpretation.
+  Linked it from the rule and outcome documents.
+- Added `doc/iteration/iteration-010/status.md` mapping the approved plan to actual
+  delivery and gaps. The current engine checks supported time/height and supplied
+  evidence; the 31-layer review-topic table is not full legal-rule automation.
+  No real permission profiles or exhaustive NOTAM source have been supplied, and
+  no real conservative target route has been established. Independent takeoff/
+  landing phase modeling is not implemented; stored phase scope never grants transit.
+- Recommended next work: finish local mode acceptance, audit the primary pair's
+  four endpoint-related zones and enter genuine reviewed evidence where available,
+  then inspect remaining corridor restrictions. Additional automatic rules/source/
+  phase modeling needs an agreed scope. Existing performance/time-feasibility
+  deferrals remain unchanged.
+- Documentation-only changes; implementation remains at local `e2813fa`. Verify
+  document links and diff; no repeated runtime tests required. The earlier automatic
+  publication rejection still applies: no remote code push/PR/merge is authorized
+  by this documentation request. Continue local documentation only.
+
+### Iteration 010 local restriction delivery (2026-10-11)
+
+- User approved the Chinese plan and authorized implementation. Approved English
+  plan: `doc/plan/iteration-010.md`. Milestone 9 / assigned Issues #85 and #86 were
+  created before `feature/85-regional-restrictions`, from `iteration/010` at main
+  `89afe54`. Original snapshots and historical branches remain intact.
+- Default conservative regional avoidance excludes unresolved DIPUL footprints;
+  strict/research remain explicit alternatives. All three planners use shared
+  full-motion/connector/final-path checks. Prohibited, conditional, inapplicable,
+  unresolved and engineering exclusions are separately counted from buildings.
+- Immutable local evidence profiles, UI review/import/save/export, phase/time/AGL
+  scoping, expiration/source-change invalidation, reviewed official notices and
+  coverage/freshness diagnostics implemented. See `doc/rules/restriction-decisions.md`
+  and `doc/iteration/iteration-010/outcome.md`. Source rules are review topics;
+  substantive permission conditions still need evidence, not automatic legal approval.
+- `restrictions-fetch` preserves bounded official WFS temporary responses and
+  requested notice originals/receipts, with an unreviewed profile template. Fresh
+  Hannover acquisition returned zero features; NOTAM completeness remains unverified.
+  New evidence: `.cache/iteration010-temporary-snapshot/`; originals unchanged.
+- Final real 100 m historical scenario: 0 prohibited / 0 conditional / 0 inactive /
+  324 unresolved DIPUL features. Seven of eight exact sites are conservatively
+  blocked; limbach-lehrte passes its point check. Nine real representative-pair/
+  algorithm cases report `invalid_endpoint`, including MHH conflicts. No sites
+  were moved or restrictions removed. Evidence: `.cache/iteration010-real-evidence.json`.
+- Local validation: 240 backend passes / one existing Windows permission skip;
+  Ruff and frontend ESLint/TypeScript/build pass. All 14 mocked browser cases and
+  12 real-stack smoke cases pass with clean exits. Independent synthetic geometry
+  verifies A*/Dijkstra/native ABIT* detours and rejection of a prohibited wall.
+  Mobile profile rendering inspected; final scoped popup/layout checks pass.
+- No real permission profiles or authenticated exhaustive NOTAM feed are supplied.
+  Strict global coverage remains unresolved; conservative successes are engineering
+  candidates. OSM payload performance and mission-duration feasibility remain
+  deferred. Do not stop user-owned services; restart backend/refresh UI for use.
+- Work is on the local feature branch. Automatic approval rejected the combined
+  commit/push command before execution because the user's implementation approval
+  did not explicitly authorize this specific remote source publication. No code
+  push, remote iteration/feature branch, PR or merge occurred. Local-only commit
+  preparation is the safe continuation; remote publication requires user approval.
+  Milestone 9 and Issues #85/#86 were already created successfully. Keep iteration
+  history and the separate Part 5 evidence; do not bypass the publication rejection.
+
+### Iteration 009 supplemental feature delivery (2026-10-11)
+
+- PR #83 merged the retained basemap and closeout documentation into `iteration/009`
+  at `4192b9d`. Reviewed feature commit: `1572f94`; run `38141503242` passed Linux
+  Python, Windows Python and frontend before merge. Issue #82 is explicitly closed.
+- The verified merged `feature/iteration009-basemap-handoff` was deleted remotely
+  and locally after switching/synchronizing the target; fetch/prune and local/remote
+  branch checks confirmed cleanup. Keep `iteration/009` and historical branches.
+- README, the approved plan and outcome include current behavior and deferred
+  issues. No backend/source changes or additional time-feasibility optimization
+  were introduced. Main publication uses its own CI gate; final PR/merge facts
+  are reported in the delivery response. Earlier authorization notes are history.
+
+### Iteration 009 supplemental delivery authorized (2026-10-11)
+
+- User accepted the iteration as substantially complete and authorized publishing
+  remaining local changes, CI-gated integration to main and handoff/documentation
+  updates. Scope is the retained regional street-basemap toggle, tile-failure
+  feedback, offline-overlay browser coverage and the diagnostic record below.
+- Milestone 8 / assigned Issue #82 precede `feature/iteration009-basemap-handoff`,
+  created from `iteration/009` fast-forwarded to verified main `329ca6c`.
+  No backend or source-snapshot change is included in this supplemental delivery.
+- Main route recovery is already delivered through PR #81 at `329ca6c`; its
+  merged-main run `37810854105` passed Linux Python, Windows Python and frontend.
+  Earlier descriptions of pending main integration below are historical records.
+- Full-region OSM payload expansion, bounded layer rendering, request cancellation
+  and terrain-only entries marked `needs attention` remain follow-up issues.
+  User explicitly deferred automatic mission-end calculation and mission-duration
+  feasibility enforcement. A route can succeed with cruise time exceeding the
+  entered scenario interval; current `success` does not certify deadline feasibility.
+- Original snapshots, `.cache/iteration009-*`, historical iteration branches and
+  the separate Iteration 008 Part 5 branch/evidence remain intact. User-owned
+  development services are not stopped for publication or validation.
+- Local validation: frontend ESLint/TypeScript/production build pass; 13 mocked
+  browser tests (8.8 s) and 12 real-stack smoke tests (30.4 s) pass with clean
+  runner exits. Remote Linux/Windows/frontend CI gates each integration PR.
+  Final supplemental PR/merge facts are recorded in the delivery response.
+
+### Route timeout and regional overlay diagnostic (2026-10-11)
+
+- User reported the frontend's 120-second timeout for primary-pair A* research
+  planning at 120 m AGL, 250 m grid and 2026-10-07 17:20–17:25 Berlin time, then
+  persistent OSM overlay loading and asked about local data storage.
+- Confirmed a regional display defect: `/features` uses sparse output only for
+  `experiment.json`, not `study.json`. Hannover's 326,334 objects are expanded
+  to all 1,481 tag keys: 483,300,654 property positions. A read-only 256-row
+  sample estimates about 11 GiB of properties JSON alone, excluding geometry.
+  This is an estimate, not a completed full-response measurement.
+- The running user backend reached approximately 18 GiB working-set memory and
+  its health request did not respond within five seconds. Full source validation
+  and model preparation are repeated per route request. Client aborts do not
+  cooperatively stop the synchronous backend calculation. A layer completion or
+  visibility change also aborts/restarts other in-flight layer requests through
+  the shared map effect/controller. These can amplify concurrent backend load.
+- All retained planning sources are already local. Actual storage: source study
+  0.674 decimal GB; complete 120-tile terrain 1.315 GB; together about 1.99 GB.
+  All 31 saved DIPUL pages are readable and contain 324 features. Street basemap
+  tiles alone use the online OSM tile service.
+- No application code, original data, remote objects or user-owned services were
+  changed. Avoid issuing another full OSM request while that work occupies RAM.
+  An isolated 120 m route timing and end-to-end layer timings remain unmeasured
+  under a cleared backend; the previous verified 100 m route took about 53 s.
+  Recovery for testing is to disable the OSM overlay, restart the user backend
+  in its own terminal and test only the route. Permanent fixes require sparse
+  regional serialization, bounded map payloads and request/cancellation management.
+
+### Iteration 009 feature delivery and main integration (2026-10-08)
+
+- Feature PR #80 merged into `iteration/009` at `4b3c278` after all three checks
+  passed in run `37809752912` (Linux Python, Windows Python, frontend). Reviewed
+  implementation commit: `8b87d38`. Issue #79 is explicitly closed in Milestone 8.
+- The merged feature branch was deleted remotely and locally after verified PR
+  merge and target synchronization. Existing local map/test edits were preserved
+  through a scoped stash and restored. Keep `iteration/009`, other iteration
+  history, the separate Part 5 feature and all original snapshots/evidence.
+- Main integration is PR #81 and has its own successful-CI gate. The user's
+  request to complete the HANDOFF workflow authorizes this delivery. Final main
+  merge commit and CI results are reported in the final chat response.
+- Required local checks and seven independently accepted real research routes
+  are recorded below and in `doc/iteration/iteration-009/outcome.md`. Strict
+  preflight remains unresolved. Only isolated verification services were stopped;
+  user-owned services remain running and require backend restart/UI refresh.
+
+### Iteration 009 route recovery local acceptance (2026-10-08)
+
+- User approved the Chinese review plan and requested its English plan plus the
+  HANDOFF delivery workflow. Plan: `doc/plan/iteration-009.md`; Milestone 8 /
+  assigned Issue #79 precede `feature/iteration009-route-recovery`, based on
+  `iteration/009` from main `17d9b27`. Initial local preparation preceded tracking
+  while normal CLI login was being completed. Automatic review rejected reading
+  Git credential tokens; normal `gh auth login` resolved access, without that action.
+- Real Hannover research routing succeeds for all three exact catalog pairs.
+  Primary weighted A*/Dijkstra: 3,715.59 m / objective 1,453.49 (250 m graph).
+  Other pairs: 8,431.17 and 18,096.34 m at 500 m. All seven successful final
+  cases, including native ABIT*, pass independent metric/obstacle/terrain/cost
+  checks; strict preflight remains `unresolved_input`.
+- Explicit derived geometry/30 m missing-height assumptions, 20 m uncertain
+  extent exclusion, bounded expanding corridors, checked nearby connectors,
+  explicit endpoint overrides, request-scoped terrain readers, Berlin date/time
+  inputs and terrain selector implemented. Original snapshots are untouched.
+- Local validation: 229 backend passes / one existing Windows permission skip;
+  13 mocked browser and 12 real-stack smoke passes, clean exits; Ruff and frontend
+  lint/build pass. Real Hannover browser planning/export/mobile checked with no
+  page errors (53.15 s). Evidence: `.cache/iteration009-final-v2/` and
+  `.cache/iteration009-ui-v1/`; see `doc/iteration/iteration-009/outcome.md`.
+- Preserve pre-existing local street-basemap edits in `RegionalMap.tsx` and its
+  browser-test hunk; they are excluded from this iteration's commits. The local
+  canvas assertion was corrected to reflect Leaflet's existing canvas renderer.
+  Part 5's separate feature branch/evidence remain untouched.
+- Feature/integration PR publication and CI-gated merges follow next. Do not stop
+  user-owned development services. Only isolated 8012/5176 verification servers
+  were started for this task; restart the user backend and refresh the UI after delivery.
 
 ### Iteration 008 Part 4 feature delivery (2026-10-08)
 
@@ -681,7 +994,7 @@ only. See `backend/src/uas_planner/route_demo.py` and `sample.py`.
 - Command help: `uv run --project backend --locked uas-planner --help`.
 - Reload live sample: `uv run --project backend --locked uas-planner inspect data/braunschweig-demo`.
 - Sample files: `data/braunschweig-demo/features.gpkg` and `metadata.json` (excluded from Git).
-- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0, not logged in directly. Git's credential provider supplies authenticated access when required; never print or persist credential values. No global PATH change was made.
+- GitHub CLI: `D:\Aostfalia\app\GitHubCLI\bin\gh.exe`, version 2.101.0. Normal `gh auth login` was completed by the user; use normal CLI authentication and never print or persist credential values. No global PATH change was made.
 - See README and `doc/iteration/iteration-001/feedback.md` for commands and limitations.
 
 ## Agreed architecture

@@ -3,6 +3,7 @@
 import json
 from copy import deepcopy
 from importlib.util import find_spec
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -21,6 +22,7 @@ def planner(monkeypatch):
 
     class FixtureConstraints:
         def __init__(self, directory, scenario, **kwargs):
+            self.terrain = SimpleNamespace(close=lambda: None)
             self.scenario = deepcopy(scenario)
             self.boundary = box(500000, 5800000, 500400, 5800400)
             self.manifest = {
@@ -57,6 +59,7 @@ def planner(monkeypatch):
 
         def risk_model(self, **kwargs):
             kwargs.pop("mode", None)
+            kwargs.pop("search_boundary", None)
             return RiskModel(
                 {
                     "type": "FeatureCollection",
@@ -231,3 +234,42 @@ def test_native_unavailability_and_zero_budget(planner, monkeypatch):
         ]
         == "timeout"
     )
+
+
+def test_explicit_endpoint_override_is_validated_and_exported(planner):
+    original = planner.constraints.manifest["config"]["locations"][0]
+    override = list(planner.reverse(500040, 5800200))
+    result = planner.plan("a", "b", objective="distance", cell_m=50, start_coordinate=override)
+    assert result["status"] == "success"
+    assert result["geometry"]["coordinates"][0] == override
+    assert result["endpoint_overrides"]["start"] == override
+    assert result["catalog_endpoints"]["start"] == [original["longitude"], original["latitude"]]
+    with pytest.raises(ValueError):
+        planner.plan("a", "b", start_coordinate=[190, 52])
+    assert planner.plan("a", "b", start_coordinate=[9, 52])["status"] == "invalid_endpoint"
+
+
+def test_corridor_expands_after_no_path_and_reports_attempts(planner, monkeypatch):
+    original = routing.plan_route
+    calls = 0
+
+    def first_failure(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return {
+                "status": "no_path_on_grid",
+                "message": "Initial corridor has no path.",
+                "geometry": None,
+                "length_m": None,
+                "objective_cost": None,
+                "risk_length_cost": None,
+            }
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(routing, "plan_route", first_failure)
+    result = planner.plan("a", "b", objective="distance", cell_m=50, corridor_margin_m=100)
+    assert result["status"] == "success"
+    assert len(result["search_attempts"]) == 2
+    assert result["independent_validation"]
+    assert "message" not in result

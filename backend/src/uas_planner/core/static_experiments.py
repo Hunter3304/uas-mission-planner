@@ -88,6 +88,8 @@ class SyntheticConstraints:
 
     def risk_model(self, **controls):
         controls.pop("mode", None)
+        search_boundary = controls.pop("search_boundary", None)
+        boundary = self.boundary if search_boundary is None else search_boundary
         return RiskModel(
             {
                 "type": "FeatureCollection",
@@ -99,7 +101,7 @@ class SyntheticConstraints:
                     }
                 ],
             },
-            mapping(transform(self.reverse, self.boundary)),
+            mapping(transform(self.reverse, boundary)),
             safety_distance_m=self.scenario.get("clearance_m", 0),
             **controls,
         )

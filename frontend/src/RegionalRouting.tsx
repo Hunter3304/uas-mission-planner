@@ -4,7 +4,16 @@ import type { Geometry } from 'geojson'
 import RegionalMap, { type Study, type ConstraintLayers } from './RegionalMap'
 import { getJson, postJson } from './api'
 import CollapsiblePanel from './CollapsiblePanel'
+import { scenarioInterval } from './scenarioTime'
+import RestrictionProfiles, { type RestrictionReport } from './RestrictionProfiles'
 
+interface VerticalComparison {
+  source: string
+  aircraft_comparison_bounds_m: number[]
+  zone_msl_bounds_m: { lower?: number; upper?: number }
+  vertical_relation: string
+  vertical_reference_assumption?: unknown
+}
 interface RegionalResult {
   status: string
   message?: string
@@ -15,7 +24,7 @@ interface RegionalResult {
   cruise_time_range_s: [number, number] | null
   preparation_ms: number
   planner_ms: number
-  endpoint_diagnostics: unknown
+  endpoint_diagnostics: Record<string, { vertical_comparisons?: VerticalComparison[] }>
   research_assumptions: unknown[]
   geometry: Geometry | null
   runtime_ms?: number
@@ -23,13 +32,18 @@ interface RegionalResult {
   mission?: Record<string, unknown>
   provenance?: unknown
   controls?: unknown
+  restriction_report?: RestrictionReport
 }
 
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const [controls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
-    algorithm: 'astar', objective: 'risk', planning_mode: 'strict', cell_m: 250, background: '', time_budget_s: 3,
+    algorithm: 'astar', objective: 'risk', planning_mode: 'conservative', profile_id: '', cell_m: 250, background: '', time_budget_s: 3,
     risk_weight: 0.9, distance_weight: 0.1, agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
-    mission_start: '', mission_end: '' })
+    mission_start: '', mission_end: '', research_height_m: 30, corridor_margin_m: 1000,
+    vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
+  const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
+  const [terrainError, setTerrainError] = useState('')
+  const [override, setOverride] = useState({ enabled: false, start_lon: '', start_lat: '', end_lon: '', end_lat: '' })
   const [result, setResult] = useState<RegionalResult | null>(null)
   const [study, setStudy] = useState<Study | null>(null)
   const [studyError, setStudyError] = useState('')
@@ -38,6 +52,9 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const layerController = useRef<AbortController | null>(null)
   useEffect(() => {
     const active = new AbortController()
+    getJson<{ datasets: { id: string; tiles: number }[] }>('/api/terrain-datasets', active.signal)
+      .then(value => { if (!active.signal.aborted) setTerrains(value.datasets ?? []) })
+      .catch(error => { if (!active.signal.aborted) setTerrainError(error.message) })
     getJson<Study>(`/api/datasets/${encodeURIComponent(datasetId)}/study`, active.signal)
       .then(value => { if (!active.signal.aborted) setStudy(value) })
       .catch(error => { if (!active.signal.aborted) setStudyError(error.message) })
@@ -45,7 +62,9 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   }, [datasetId])
   function scenario() {
     const { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end } = controls
-    return { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end, scenario: 'civil', building_unknown_height: 'unresolved', zone_assessments: {} }
+    return { agl_m, speed_m_s, clearance_m, vertical_clearance_m, ...scenarioInterval(mission_start, mission_end), scenario: 'civil', timezone: 'Europe/Berlin', building_unknown_height: 'unresolved', zone_assessments: {},
+      ...(controls.planning_mode !== 'strict' ? { research_geometry: 'derived', research_height_m: controls.research_height_m, research_geometry_buffer_m: 20,
+        vertical_reference_policy: controls.vertical_reference_policy, nhn_msl_offset_m: controls.nhn_msl_offset_m, nhn_msl_uncertainty_m: controls.nhn_msl_uncertainty_m } : {}) }
   }
   async function loadConstraints() {
     layerController.current?.abort()
@@ -53,7 +72,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     layerController.current = active
     setLayerBusy(true); setError('')
     try {
-      const response = await postJson<ConstraintLayers>(`/api/datasets/${encodeURIComponent(datasetId)}/study/layers/constraints`, { scenario: scenario(), terrain_id: controls.terrain_id }, active.signal)
+      const response = await postJson<ConstraintLayers>(`/api/datasets/${encodeURIComponent(datasetId)}/study/layers/constraints`, { scenario: scenario(), terrain_id: controls.terrain_id, profile_id: controls.profile_id || undefined, planning_mode: controls.planning_mode }, active.signal)
       if (!active.signal.aborted) setConstraints(response)
     } catch (error) { if (!active.signal.aborted) setError(error instanceof Error ? error.message : 'Cannot load constraints.') }
     finally { if (!active.signal.aborted) setLayerBusy(false) }
@@ -66,7 +85,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     controller.current?.abort()
     setBusy(false)
     setResult(null)
-    if (['agl_m', 'clearance_m', 'vertical_clearance_m', 'mission_start', 'mission_end', 'terrain_id'].includes(name)) {
+    if (['agl_m', 'clearance_m', 'vertical_clearance_m', 'mission_start', 'mission_end', 'terrain_id', 'planning_mode', 'research_height_m', 'profile_id', 'vertical_reference_policy', 'nhn_msl_offset_m', 'nhn_msl_uncertainty_m'].includes(name)) {
       layerController.current?.abort(); setConstraints(null); setLayerBusy(false)
     }
     setError('')
@@ -79,12 +98,20 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setBusy(true)
     setResult(null)
     setError('')
-    const { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end, background, ...planner } = controls
     try {
+      const coordinate = (name: 'start' | 'end') => {
+        const lon = override[`${name}_lon`], lat = override[`${name}_lat`]
+        if (!lon.trim() || !lat.trim() || !Number.isFinite(Number(lon)) || !Number.isFinite(Number(lat))) throw new Error('Enter longitude and latitude for both selected launch/landing points.')
+        return [Number(lon), Number(lat)]
+      }
       const response = await postJson<RegionalResult>(`/api/datasets/${encodeURIComponent(datasetId)}/study/route`, {
-        ...planner, background_cost: background === '' ? null : Number(background),
-        scenario: { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end,
-          scenario: 'civil', building_unknown_height: 'unresolved', zone_assessments: {} },
+        start_id: controls.start_id, end_id: controls.end_id, terrain_id: controls.terrain_id,
+        algorithm: controls.algorithm, objective: controls.objective, planning_mode: controls.planning_mode,
+        profile_id: controls.profile_id || undefined,
+        cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
+        risk_weight: controls.risk_weight, distance_weight: controls.distance_weight,
+        background_cost: controls.background === '' ? null : Number(controls.background), scenario: scenario(),
+        ...(override.enabled ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
       }, active.signal)
       if (!active.signal.aborted) setResult(response)
     } catch (err) {
@@ -96,7 +123,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   function download() {
     if (!result) return
     const { geometry, ...resultMetadata } = result
-    const metadata = { ...resultMetadata, displayed_controls: controls, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
+    const metadata = { ...resultMetadata, displayed_controls: controls, displayed_endpoint_selection: override, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
       features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: { length_m: result.length_m } }] : [] }, null, 2)], { type: 'application/geo+json' })
     const url = URL.createObjectURL(blob)
@@ -110,38 +137,62 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   return <CollapsiblePanel title="Regional route planning">
     {mapTarget && createPortal(<RegionalMap datasetId={datasetId} study={study} startId={controls.start_id} endId={controls.end_id} geometry={result?.status === 'success' ? result.geometry : null} constraints={constraints} />, mapTarget)}
     {studyError && <p role="alert">Location catalog: {studyError}</p>}
-    <p>Select verified catalog addresses. Addresses are not verified launch or landing sites. Enter scenario times with a UTC offset, for example 2026-10-07T10:00:00+02:00. These inputs do not establish flight permission.</p>
+    <p>Select catalog addresses and scenario times in Europe/Berlin. The UTC offset is added automatically. End must be after start, within 24 hours. Addresses are not verified launch or landing sites.</p>
+    {terrainError && <p role="alert">Terrain catalog: {terrainError}</p>}
     <form onSubmit={event => { event.preventDefault(); void solve() }}>
       <div className="regional-controls">
         {(['start_id', 'end_id'] as const).map(name => <label key={name}>{name === 'start_id' ? 'Origin' : 'Destination'}<select aria-label={name === 'start_id' ? 'Origin' : 'Destination'} required value={controls[name]} disabled={!study} onChange={event => update(name, event.target.value)}>{study?.config.locations.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>)}
-        {(['terrain_id', 'mission_start', 'mission_end'] as const).map(name =>
-          <label key={name}>{({ start_id: 'Origin ID', end_id: 'Destination ID', terrain_id: 'Terrain dataset', mission_start: 'Scenario start', mission_end: 'Scenario end' })[name]}
-            <input required value={controls[name]} onChange={event => update(name, event.target.value)} /></label>)}
+        <label>Terrain dataset<select required value={controls.terrain_id} onChange={event => update('terrain_id', event.target.value)}>
+          {!terrains.some(t => t.id === controls.terrain_id) && <option value={controls.terrain_id}>{controls.terrain_id} — awaiting catalog</option>}
+          {terrains.map(t => <option key={t.id} value={t.id}>{t.id} ({t.tiles} tiles)</option>)}
+        </select></label>
+        {(['mission_start', 'mission_end'] as const).map(name =>
+          <label key={name}>{name === 'mission_start' ? 'Scenario start' : 'Scenario end'}
+            <input type="datetime-local" required step="60" value={controls[name]} onChange={event => update(name, event.target.value)} /></label>)}
         {(['algorithm', 'objective', 'planning_mode'] as const).map(name =>
           <label key={name}>{name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'}
             <select aria-label={name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'} value={controls[name]} onChange={event => update(name, event.target.value)}>
-              {(name === 'algorithm' ? ['astar', 'dijkstra', 'abitstar'] : name === 'objective' ? ['risk', 'distance'] : ['strict', 'research']).map(value => <option key={value} value={value}>{value}</option>)}
+              {(name === 'algorithm' ? ['astar', 'dijkstra', 'abitstar'] : name === 'objective' ? ['risk', 'distance'] : ['conservative', 'strict', 'research']).map(value => <option key={value} value={value}>{value}</option>)}
             </select></label>)}
         {([{ name: 'agl_m', label: 'Altitude AGL (m)', min: 100, max: 120 }, { name: 'speed_m_s', label: 'Cruise speed (m/s)', min: 25, max: 35 },
           { name: 'cell_m', label: 'Grid spacing (m)', min: 1 }, { name: 'clearance_m', label: 'Horizontal clearance (m)', min: 0, max: 1000 },
           { name: 'vertical_clearance_m', label: 'Vertical clearance (m)', min: 0, max: 1000 }, { name: 'time_budget_s', label: 'ABIT* budget (s)', min: 0, max: 60 },
+          { name: 'corridor_margin_m', label: 'Initial corridor margin (m)', min: 100, max: 10000 },
+          ...(controls.planning_mode !== 'strict' ? [{ name: 'research_height_m', label: 'Missing building height estimate (m)', min: 0, max: 1000 }] : []),
+          ...(controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' ? [
+            { name: 'nhn_msl_offset_m', label: 'NHN to MSL offset (m)', min: -1000, max: 1000 },
+            { name: 'nhn_msl_uncertainty_m', label: 'NHN to MSL uncertainty (m)', min: 0, max: 1000 }] : []),
           ...(controls.objective === 'risk' ? [{ name: 'risk_weight', label: 'Risk weight', min: 0 }, { name: 'distance_weight', label: 'Distance weight', min: 0 }] : [])
         ] as { name: keyof typeof controls; label: string; min: number; max?: number }[]).map(field =>
           <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={controls[field.name]} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
         {controls.objective === 'risk' && <label>Background score assumption<input type="number" min="0" step="any" value={controls.background} placeholder="Unassessed" onChange={event => update('background', event.target.value)} /></label>}
       </div>
+      <label><input type="checkbox" checked={controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption'} disabled={controls.planning_mode === 'strict'} onChange={event => update('vertical_reference_policy', event.target.checked ? 'nhn_as_msl_assumption' : 'source')} />Compare MSL zones using NHN + AGL (engineering assumption)</label>
+      {controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' && <p>Comparison height = NHN ground height + AGL + offset. Uncertainty expands both bounds; default offset/uncertainty 0 m is an explicit approximation. Original datums remain unchanged. Whole-motion terrain bounds are checked; overlap still requires zone conditions or permission. Strict mode requires verified reference compatibility.</p>}
+      {controls.planning_mode === 'research' && <p>Research route: derived polygon repairs; uncertain non-polygon extents excluded with a 20 m buffer; missing heights use the explicit estimate above. Zone applicability, NHN/MSL compatibility and temporary restrictions remain assumptions. Known obstacles and missing terrain remain excluded. For the weighted objective, enter an explicit background score assumption, such as 0.</p>}
+      {controls.planning_mode === 'conservative' && <p>Conservative avoidance excludes unresolved zone footprints and confirmed prohibitions. Building geometry repairs and missing-height estimates remain explicit engineering assumptions. Temporary/NOTAM coverage is unverified; a successful candidate is not flight permission.</p>}
+      <label><input type="checkbox" checked={override.enabled} onChange={event => { update('start_id', controls.start_id); setOverride(current => ({ ...current, enabled: event.target.checked })) }} />Use explicitly selected launch/landing coordinates</label>
+      {override.enabled && <div className="regional-controls">{(['start_lon', 'start_lat', 'end_lon', 'end_lat'] as const).map(name => <label key={name}>{({ start_lon: 'Launch longitude', start_lat: 'Launch latitude', end_lon: 'Landing longitude', end_lat: 'Landing latitude' })[name]}<input required type="number" step="any" min={name.endsWith('lon') ? -180 : -90} max={name.endsWith('lon') ? 180 : 90} value={override[name]} onChange={event => { update('start_id', controls.start_id); setOverride(current => ({ ...current, [name]: event.target.value })) }} /></label>)}</div>}
       {controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
       <button type="button" disabled={layerBusy || !controls.mission_start || !controls.mission_end} onClick={() => void loadConstraints()}>{layerBusy ? 'Preparing scenario layers…' : 'Load scenario layers'}</button>
       <button disabled={busy || !study}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
     </form>
+    <RestrictionProfiles datasetId={datasetId} report={constraints?.restriction_report ?? result?.restriction_report} start={controls.mission_start} end={controls.mission_end} onSelect={id => update('profile_id', id)} />
     {error && <p role="alert">{error}</p>}
     {result && <div role="status">
       <p>{result.status}: {result.message}</p>
+      {Object.entries(result.endpoint_diagnostics ?? {}).flatMap(([endpoint, diagnostics]) => (diagnostics.vertical_comparisons ?? []).map((comparison, index) =>
+        <p key={`${endpoint}-${comparison.source}-${index}`} style={{ overflowWrap: 'anywhere' }}>
+          {endpoint} · {comparison.source}: aircraft {comparison.aircraft_comparison_bounds_m.map(v => v.toFixed(3)).join('–')} m MSL comparison · zone {comparison.zone_msl_bounds_m.lower?.toFixed(3) ?? 'unbounded'}–{comparison.zone_msl_bounds_m.upper?.toFixed(3) ?? 'unbounded'} m MSL · {comparison.vertical_relation} {comparison.vertical_reference_assumption ? '(NHN + AGL engineering assumption)' : '(source reference)'}.
+        </p>))}
+      {result.restriction_report && <p>Zone decisions: {Object.entries(result.restriction_report.counts).map(([key, count]) => `${key}: ${count}`).join(' · ')}. Coverage: {result.restriction_report.coverage.status} — {result.restriction_report.coverage.reason}</p>}
+      {result.status === 'unresolved_input' && <p>Review the findings below. Research mode requires explicit geometry and height assumptions; weighted routing also needs an assessed background score. Missing terrain cannot be bypassed.</p>}
+      {result.status === 'invalid_endpoint' && <p>The selected point conflicts with a constraint. Review its source below and explicitly choose another launch/landing point if appropriate.</p>}
       {result.length_m !== null && <p>Length {result.length_m.toFixed(1)} m · Risk {result.risk_length_cost?.toFixed(2) ?? '—'} · Objective {result.objective_cost?.toFixed(2)} · Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>}
       <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {controls.objective} ({controls.objective === 'risk' ? `${controls.risk_weight}/${controls.distance_weight}` : 'distance only'}) · {controls.planning_mode}</p>
       <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>
       <p>Time estimates cover constant cruise only; takeoff, landing, wind and dynamics are excluded.</p>
-      <details><summary>Constraint findings and assumptions</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify({ endpoints: result.endpoint_diagnostics, assumptions: result.research_assumptions }, null, 2)}</pre></details>
+      <details open><summary>Constraint findings and assumptions</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: '22rem', overflow: 'auto' }}>{JSON.stringify({ endpoints: result.endpoint_diagnostics, assumptions: result.research_assumptions }, null, 2)}</pre></details>
       <button onClick={download}>Export displayed result</button>
     </div>}
   </CollapsiblePanel>

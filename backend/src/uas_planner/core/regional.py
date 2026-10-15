@@ -3,7 +3,8 @@
 import json
 import math
 import re
-from collections import Counter
+from collections import Counter, OrderedDict
+from contextlib import nullcontext
 from copy import deepcopy
 from datetime import datetime
 from html import escape
@@ -14,6 +15,7 @@ import numpy as np
 import rasterio
 from pyproj import Transformer
 from rasterio.windows import Window
+from shapely import make_valid
 from shapely.geometry import LineString, Point, box, mapping, shape
 from shapely.ops import transform, unary_union
 from shapely.strtree import STRtree
@@ -21,10 +23,22 @@ from shapely.strtree import STRtree
 from uas_planner.acquisition.study import finite_number, inspect_study
 from uas_planner.core.costs import RULES, analyze_feature
 from uas_planner.core.experiment import checksum, read_json, safe_file
+from uas_planner.core.restrictions import (
+    RULES_VERSION,
+    coverage_report,
+    validate_assessments,
+    validate_notices,
+)
+from uas_planner.core.restrictions import (
+    counts as zone_counts,
+)
+from uas_planner.core.restrictions import (
+    decision as zone_decision,
+)
 from uas_planner.core.risk import RiskModel, signature
 from uas_planner.storage.dataset import load_dataset
 
-VERSION = "regional-constraints-v1"
+VERSION = "regional-constraints-v3"
 LEGAL_SOURCE = "https://www.gesetze-im-internet.de/luftvo_2015/__21h.html"
 MAX_QUERY_CELLS = 100000
 MAX_TERRAIN_PIXELS = 4000000
@@ -37,10 +51,21 @@ def validate_scenario(config):
     finite_number(config["speed_m_s"], 25, 35, "Cruise speed")
     finite_number(config.get("clearance_m", 0), 0, 1000, "Safety clearance")
     finite_number(config.get("vertical_clearance_m", 0), 0, 1000, "Vertical clearance")
+    if config.get("vertical_reference_policy", "source") not in {"source", "nhn_as_msl_assumption"}:
+        raise ValueError("Unknown vertical reference policy.")
+    finite_number(config.get("nhn_msl_offset_m", 0), -1000, 1000, "NHN/MSL offset")
+    finite_number(config.get("nhn_msl_uncertainty_m", 0), 0, 1000, "NHN/MSL uncertainty")
     if config.get("scenario") not in ("civil", "BOS"):
         raise ValueError("Scenario must be civil or BOS; neither implies an exemption.")
     if config.get("building_unknown_height", "unresolved") not in ("unresolved", "exclude"):
         raise ValueError("Unknown building-height policy.")
+    if config.get("research_geometry", "original") not in ("original", "derived"):
+        raise ValueError("Unknown research geometry policy.")
+    if "research_height_m" in config:
+        finite_number(config["research_height_m"], 0, 1000, "Research height estimate")
+    finite_number(
+        config.get("research_geometry_buffer_m", 20), 1, 1000, "Geometry uncertainty buffer"
+    )
     start, end = [datetime.fromisoformat(config[k]) for k in ("mission_start", "mission_end")]
     if start.tzinfo is None or end.tzinfo is None or not 0 < (end - start).total_seconds() <= 86400:
         raise ValueError(
@@ -51,6 +76,11 @@ def validate_scenario(config):
         raise ValueError("Scenario offsets must match the declared timezone.")
     if not isinstance(config.get("zone_assessments", {}), dict):
         raise ValueError("Zone assessments must be an object keyed by source ID.")
+    validate_assessments(config.get("zone_assessments", {}))
+    validate_notices(config.get("restriction_notices", []))
+    age = config.get("max_source_age_days", 7)
+    if isinstance(age, bool) or not isinstance(age, int) or not 1 <= age <= 365:
+        raise ValueError("Source freshness must be 1–365 days.")
     return config
 
 
@@ -220,6 +250,7 @@ class TerrainSupport:
         self.root = Path(directory) if directory else None
         self.manifest = read_json(safe_file(directory, "terrain.json")) if directory else None
         self.tiles = []
+        self.readers = OrderedDict()
         if self.manifest:
             if (
                 self.manifest.get("kind") != "bounded-native-terrain"
@@ -270,6 +301,24 @@ class TerrainSupport:
                             )
                     self.tiles.append((path, box(*src.bounds)))
 
+    def close(self):
+        for reader in self.readers.values():
+            reader.close()
+        self.readers.clear()
+
+    def __del__(self):
+        if hasattr(self, "readers"):
+            self.close()
+
+    def reader(self, path):
+        if path not in self.readers:
+            if len(self.readers) >= 8:
+                _, reader = self.readers.popitem(last=False)
+                reader.close()
+            self.readers[path] = rasterio.open(path)
+        self.readers.move_to_end(path)
+        return self.readers[path]
+
     def bounds(self, geometry):
         selected = [
             (path, footprint) for path, footprint in self.tiles if footprint.intersects(geometry)
@@ -278,7 +327,7 @@ class TerrainSupport:
         complete = covered.covers(geometry)
         low, high, pixels = None, None, 0
         for path, footprint in selected:
-            with rasterio.open(path) as src:
+            with nullcontext(self.reader(path)) as src:
                 intersection = geometry.intersection(footprint)
                 if intersection.is_empty:
                     continue
@@ -301,7 +350,16 @@ class TerrainSupport:
                         "maximum_m": None,
                         "pixels": pixels,
                     }
-                values = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0), masked=True)
+                try:
+                    values = src.read(1, window=Window(c0, r0, c1 - c0, r1 - r0), masked=True)
+                except rasterio.errors.RasterioIOError:
+                    return {
+                        "status": "unknown",
+                        "minimum_m": None,
+                        "maximum_m": None,
+                        "reason": "Native terrain pixels could not be decoded.",
+                        "tile": path.name,
+                    }
                 missing = (
                     np.ma.getmaskarray(values) | ~np.isfinite(values.data) | (values.data == -9999)
                 )
@@ -443,6 +501,7 @@ class RegionalConstraints:
         )
         self.terrain = TerrainSupport(terrain_directory)
         self.records, self.diagnostics, self.risk_records = [], [], []
+        self.derived_risk_records, self.derived_obstacles, self.geometry_assumptions = [], [], []
         frame, metadata = load_dataset(self.root / "osm", compact=True)
         projected_geometries = frame.to_crs(25832).geometry
         for row, tags, projected in zip(
@@ -453,6 +512,73 @@ class RegionalConstraints:
         ):
             geometry = row.geometry
             ident = f"{row.element_type}/{row.osm_id}"
+            if analyze_feature(tags, "building") is not None and (
+                not geometry.is_valid
+                or geometry.geom_type not in ("Polygon", "MultiPolygon")
+                or projected.is_empty
+                or not projected.is_valid
+            ):
+                repaired = make_valid(projected) if not projected.is_valid else projected
+
+                def polygons(g):
+                    if g.geom_type in ("Polygon", "MultiPolygon"):
+                        return [g]
+                    return [p for part in getattr(g, "geoms", []) for p in polygons(part)]
+
+                parts = polygons(repaired)
+                footprint = unary_union(parts) if parts else None
+                self.geometry_assumptions.append(
+                    {
+                        "source": ident,
+                        "reason": "Derived geometry; original snapshot retained.",
+                        "original_type": geometry.geom_type,
+                        "original_valid": geometry.is_valid,
+                        "policy": "make_valid_polygon_parts"
+                        if parts
+                        else "buffered_uncertain_extent",
+                        "buffer_m": scenario.get("research_geometry_buffer_m", 20)
+                        if not parts
+                        else 0,
+                        "located": not repaired.is_empty,
+                    }
+                )
+                reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
+                if footprint is not None and not footprint.is_empty:
+                    self.derived_risk_records.append(
+                        (transform(reverse, footprint), tags, row.element_type, str(row.osm_id))
+                    )
+                    height = building_height(tags)
+                    self.derived_obstacles.append(
+                        {
+                            "source": ident,
+                            "geometry": footprint,
+                            "height_m": height,
+                            "uncertain_geometry": False,
+                        }
+                    )
+                    remainder = repaired.difference(footprint)
+                    if not remainder.is_empty:
+                        self.derived_obstacles.append(
+                            {
+                                "source": ident,
+                                "geometry": remainder.buffer(
+                                    scenario.get("research_geometry_buffer_m", 20)
+                                ),
+                                "height_m": None,
+                                "uncertain_geometry": True,
+                            }
+                        )
+                elif not repaired.is_empty:
+                    self.derived_obstacles.append(
+                        {
+                            "source": ident,
+                            "geometry": repaired.buffer(
+                                scenario.get("research_geometry_buffer_m", 20)
+                            ),
+                            "height_m": None,
+                            "uncertain_geometry": True,
+                        }
+                    )
             if not geometry.is_valid or geometry.geom_type == "GeometryCollection":
                 self.diagnostics.append(
                     {
@@ -522,13 +648,42 @@ class RegionalConstraints:
                             "buffer_basis": "use delivered DIPUL zone footprint; no unverified second legal buffer",
                         }
                     )
+        for notice in scenario.get("restriction_notices", []):
+            self.records.append(
+                {
+                    "source": f"notice/{notice['id']}",
+                    "source_signature": signature(notice),
+                    "category": "reviewed_notice",
+                    "layer": "reviewed_notice",
+                    "state": "unresolved",
+                    "geometry": metric_geometry(shape(notice["geometry"])),
+                    "properties": notice.get("properties", {}),
+                    "basis": notice["official_url"],
+                    "buffer_m": 0,
+                    "buffer_basis": "reviewed delivered notice footprint",
+                    "reviewed_notice": True,
+                    "notice_state": notice.get("state", "unresolved"),
+                    "evidence": notice["evidence"],
+                }
+            )
         self.tree = STRtree([r["geometry"] for r in self.records])
+        self.derived_tree = STRtree([r["geometry"] for r in self.derived_obstacles])
+        self.research_risk_records = self.risk_records + self.derived_risk_records
+        self.risk_tree = STRtree([r[0] for r in self.research_risk_records])
         available = {r["source"] for r in self.records if r["category"] != "building_obstacle"}
         if not set(scenario.get("zone_assessments", {})).issubset(available):
             raise ValueError("Zone assessment references a missing source ID.")
         for record in self.records:
             if record["category"] != "building_obstacle":
-                record["state"] = assessed_zone(record, scenario)[0]
+                evaluated = zone_decision(
+                    record, scenario, self.zone_terrain(record), vertical_state, assessed_zone
+                )
+                record["state"] = (
+                    "blocked" if evaluated["state"] == "prohibited" else evaluated["state"]
+                )
+        self.restriction_coverage = coverage_report(
+            self.manifest, scenario.get("restriction_notices", []), scenario
+        )
         self.provenance = {
             "version": VERSION,
             "study_signature": signature(self.manifest),
@@ -539,13 +694,16 @@ class RegionalConstraints:
             "risk_overlap": "maximum_building_score",
             "ghsl_routing_cost": False,
             "diagnostics": self.diagnostics,
+            "derived_geometry": self.geometry_assumptions,
             "osm_sha256": metadata["sha256"],
+            "restriction_coverage": self.restriction_coverage,
+            "restrictions_rules_version": RULES_VERSION,
         }
         self.provenance["model_signature"] = signature(self.provenance)
         self.population = PopulationInspector(directory, self.manifest)
 
     def check(self, coordinates, *, mode="strict"):
-        if mode not in ("strict", "research"):
+        if mode not in ("strict", "research", "conservative"):
             raise ValueError("Unknown planning mode.")
         query = query_geometry(coordinates, self.scenario.get("clearance_m", 0))
         terrain = self.terrain.bounds(query)
@@ -562,10 +720,15 @@ class RegionalConstraints:
                 {
                     "source": "terrain",
                     "reason": "Complete motion has unknown or resource-limited terrain support.",
+                    "details": terrain,
                 }
             )
         unknown_building_geometry = [d for d in self.diagnostics if d["building"]]
-        if unknown_building_geometry:
+        derived = (
+            mode in {"research", "conservative"}
+            and self.scenario.get("research_geometry") == "derived"
+        )
+        if unknown_building_geometry and not derived:
             unresolved.append(
                 {
                     "source": "OSM geometry",
@@ -573,6 +736,45 @@ class RegionalConstraints:
                     "count": len(unknown_building_geometry),
                 }
             )
+        if derived:
+            assumptions.extend(self.geometry_assumptions)
+            for index in self.derived_tree.query(query, predicate="intersects"):
+                record = self.derived_obstacles[int(index)]
+                height = record["height_m"]
+                if record["uncertain_geometry"]:
+                    blocked.append(
+                        {
+                            "source": record["source"],
+                            "reason": "Localized uncertain building extent is excluded.",
+                        }
+                    )
+                elif height is None:
+                    estimate = self.scenario.get("research_height_m")
+                    target = (
+                        unresolved
+                        if estimate is None
+                        else blocked
+                        if estimate
+                        >= self.scenario["agl_m"] - self.scenario.get("vertical_clearance_m", 0)
+                        else assumptions
+                    )
+                    target.append(
+                        {
+                            "source": record["source"],
+                            "reason": "Derived building height estimate.",
+                            "height_m": estimate,
+                        }
+                    )
+                elif height >= self.scenario["agl_m"] - self.scenario.get(
+                    "vertical_clearance_m", 0
+                ):
+                    blocked.append(
+                        {
+                            "source": record["source"],
+                            "reason": "Known tall derived building.",
+                            "height_m": height,
+                        }
+                    )
         for index in self.tree.query(query, predicate="intersects"):
             record = self.records[int(index)]
             if record["category"] == "building_obstacle":
@@ -584,19 +786,51 @@ class RegionalConstraints:
                 if record["state"] == "blocked":
                     blocked.append(reason)
                 elif record["state"] == "unresolved":
-                    unresolved.append(reason)
+                    estimate = (
+                        self.scenario.get("research_height_m")
+                        if mode in {"research", "conservative"}
+                        else None
+                    )
+                    if estimate is None:
+                        unresolved.append(reason)
+                    elif estimate >= self.scenario["agl_m"] - self.scenario.get(
+                        "vertical_clearance_m", 0
+                    ):
+                        blocked.append(
+                            {
+                                **reason,
+                                "reason": "Research height estimate reaches flight altitude.",
+                                "assumed_height_m": estimate,
+                            }
+                        )
+                    else:
+                        assumptions.append(
+                            {
+                                **reason,
+                                "reason": "Explicit research estimate for missing building height.",
+                                "assumed_height_m": estimate,
+                            }
+                        )
             else:
-                state, reason = vertical_state(
-                    record["properties"], self.scenario["agl_m"], terrain
+                evaluated = zone_decision(
+                    record, self.scenario, terrain, vertical_state, assessed_zone, mode=mode
                 )
-                if state != "outside_vertical":
-                    assessed, assessment_reason = assessed_zone(record, self.scenario)
-                    if assessed != "unresolved":
-                        state, reason = assessed, assessment_reason
+                if evaluated.get("vertical_reference_assumption"):
+                    assumptions.append(
+                        {
+                            "source": record["source"],
+                            **evaluated["vertical_reference_assumption"],
+                            "aircraft_comparison_bounds_m": evaluated[
+                                "aircraft_comparison_bounds_m"
+                            ],
+                        }
+                    )
+                state, reason = evaluated["state"], evaluated["reason"]
                 zones.append(
                     {
+                        **evaluated,
                         "source": record["source"],
-                        "category": "prohibited" if state == "blocked" else record["category"],
+                        "category": "prohibited" if state == "prohibited" else record["category"],
                         "state": state,
                         "reason": reason,
                         "source_signature": record["source_signature"],
@@ -605,13 +839,25 @@ class RegionalConstraints:
                         "buffer_basis": record["buffer_basis"],
                     }
                 )
-                if state == "blocked":
+                if state == "prohibited":
                     blocked.append({"source": record["source"], "reason": reason})
                 elif state == "conditional_allowed":
                     assumptions.append({"source": record["source"], "reason": reason})
-                elif state != "outside_vertical":
-                    target = unresolved if mode == "strict" else assumptions
-                    target.append({"source": record["source"], "reason": reason})
+                elif state != "not_applicable":
+                    target = (
+                        blocked
+                        if mode == "conservative"
+                        else unresolved
+                        if mode == "strict"
+                        else assumptions
+                    )
+                    target.append(
+                        {
+                            "source": record["source"],
+                            "reason": reason,
+                            "policy_exclusion": mode == "conservative",
+                        }
+                    )
         temporary = {
             "source": "DIPUL",
             "reason": "Temporary/NOTAM completeness and scenario applicability unverified; acquisition dates are not validity.",
@@ -626,15 +872,26 @@ class RegionalConstraints:
             "terrain": terrain,
             "zones": zones,
             "model_signature": self.provenance["model_signature"],
+            "restriction_coverage": self.restriction_coverage,
         }
 
     def risk_model(
-        self, *, background_cost=None, mode="strict", risk_weight=0.9, distance_weight=0.1
+        self,
+        *,
+        background_cost=None,
+        mode="strict",
+        risk_weight=0.9,
+        distance_weight=0.1,
+        search_boundary=None,
     ):
         """Reuse approved soft semantics; unsafe source support remains explicit."""
-        if mode not in ("strict", "research"):
+        if mode not in ("strict", "research", "conservative"):
             raise ValueError("Unknown planning mode.")
-        if any(
+        derived = (
+            mode in {"research", "conservative"}
+            and self.scenario.get("research_geometry") == "derived"
+        )
+        if not derived and any(
             d["building"] and (mode == "strict" or d["status"] != "non_polygon_building")
             for d in self.diagnostics
         ):
@@ -642,6 +899,14 @@ class RegionalConstraints:
                 "Building risk support unresolved; invalid buildings cannot be omitted."
             )
         reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
+        boundary = transform(reverse, self.boundary if search_boundary is None else search_boundary)
+        selected = [
+            self.research_risk_records[int(i)]
+            for i in self.risk_tree.query(boundary, predicate="intersects")
+        ]
+        if not derived:
+            original_ids = {(r[2], r[3]) for r in self.risk_records}
+            selected = [r for r in selected if (r[2], r[3]) in original_ids]
         return RiskModel(
             {
                 "type": "FeatureCollection",
@@ -651,16 +916,55 @@ class RegionalConstraints:
                         "geometry": mapping(g),
                         "properties": {**tags, "element_type": element, "osm_id": ident},
                     }
-                    for g, tags, element, ident in self.risk_records
+                    for g, tags, element, ident in selected
                 ],
             },
-            mapping(transform(reverse, self.boundary)),
+            mapping(boundary),
             background_cost=background_cost,
             source=self.provenance,
             risk_weight=risk_weight,
             distance_weight=distance_weight,
             safety_distance_m=self.scenario.get("clearance_m", 0),
         )
+
+    def restriction_report(self, mode="strict"):
+        decisions = []
+        for record in self.records:
+            if record["category"] != "building_obstacle":
+                decisions.append(
+                    zone_decision(
+                        record,
+                        self.scenario,
+                        self.zone_terrain(record, mode),
+                        vertical_state,
+                        assessed_zone,
+                        mode=mode,
+                    )
+                )
+        return {
+            "counts": zone_counts(decisions),
+            "decisions": decisions,
+            "coverage": self.restriction_coverage,
+            "building_counts": dict(
+                Counter(r["state"] for r in self.records if r["category"] == "building_obstacle")
+            ),
+        }
+
+    def zone_terrain(self, record, mode="strict"):
+        # AGL checks do not need raster reads. NHN cannot resolve MSL comparisons.
+        props = record["properties"]
+        manifest = getattr(self.terrain, "manifest", None) or {}
+        supported = manifest.get("vertical_datum") == "MSL" or (
+            manifest.get("vertical_datum") == "DHHN2016_NHN"
+            and mode != "strict"
+            and self.scenario.get("vertical_reference_policy") == "nhn_as_msl_assumption"
+        )
+        if supported and any(props.get(f"{p}_limit_alt_ref") == "MSL" for p in ("lower", "upper")):
+            scope = record["geometry"].intersection(self.boundary)
+            if scope.is_empty:
+                return {"status": "unknown", "reason": "Zone outside retained terrain scope."}
+            return self.terrain.bounds(scope)
+        return {"status": "unknown"}
 
     def summary(self):
         endpoints = [
@@ -711,22 +1015,25 @@ def prepare_regional(directory, scenario, output, *, terrain_directory=None):
     return result
 
 
-def constraint_layers(model):
+def constraint_layers(model, mode="strict"):
     """Scenario-specific footprints; never infer terrain support from a zone outline."""
     reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
-    blocked, unknown = [], []
+    if mode not in {"strict", "conservative", "research"}:
+        raise ValueError("Unknown constraint layer mode.")
+    blocked, unknown, excluded, allowed, inactive = [], [], [], [], []
+    decisions = []
     for record in model.records:
         state, reason = record["state"], record["basis"]
         if record["category"] != "building_obstacle":
             # A complete native terrain window may exceed its resource bound.
             # Preserve that uncertainty instead of classifying the whole zone as clear.
-            terrain = model.terrain.bounds(record["geometry"])
-            state, reason = vertical_state(record["properties"], model.scenario["agl_m"], terrain)
-            if state != "outside_vertical":
-                assessed, assessment_reason = assessed_zone(record, model.scenario)
-                if assessed != "unresolved":
-                    state, reason = assessed, assessment_reason
-        if state in {"clear", "outside_vertical", "conditional_allowed"}:
+            terrain = model.zone_terrain(record, mode)
+            evaluated = zone_decision(
+                record, model.scenario, terrain, vertical_state, assessed_zone, mode=mode
+            )
+            decisions.append(evaluated)
+            state, reason = evaluated["state"], evaluated["reason"]
+        if state == "clear":
             continue
         geometry = record["geometry"]
         clearance = model.scenario.get("clearance_m", 0)
@@ -736,14 +1043,30 @@ def constraint_layers(model):
             "type": "Feature",
             "geometry": mapping(transform(reverse, geometry)),
             "properties": {
+                **(evaluated if record["category"] != "building_obstacle" else {}),
                 "source": record["source"],
                 "category": record["category"],
                 "state": state,
                 "reason": reason,
                 "clearance_m": clearance,
+                "source_signature": record.get("source_signature"),
+                "policy_exclusion": record["category"] != "building_obstacle"
+                and state == "unresolved"
+                and mode == "conservative",
             },
         }
-        (blocked if state == "blocked" else unknown).append(feature)
+        target = (
+            blocked
+            if state in {"blocked", "prohibited"}
+            else allowed
+            if state == "conditional_allowed"
+            else inactive
+            if state == "not_applicable"
+            else excluded
+            if mode == "conservative" and record["category"] != "building_obstacle"
+            else unknown
+        )
+        target.append(feature)
     diagnostics = list(model.diagnostics)
     diagnostics.append(
         {
@@ -776,6 +1099,19 @@ def constraint_layers(model):
     return {
         "blocked": {"type": "FeatureCollection", "features": blocked},
         "unknown": {"type": "FeatureCollection", "features": unknown},
+        "excluded": {"type": "FeatureCollection", "features": excluded},
+        "allowed": {"type": "FeatureCollection", "features": allowed},
+        "inactive": {"type": "FeatureCollection", "features": inactive},
+        "restriction_report": {
+            "counts": zone_counts(decisions),
+            "decisions": decisions,
+            "coverage": model.restriction_coverage,
+            "policy_exclusions": len(excluded),
+            "planning_mode": mode,
+            "building_counts": dict(
+                Counter(r["state"] for r in model.records if r["category"] == "building_obstacle")
+            ),
+        },
         "diagnostics": diagnostics,
         "provenance": model.provenance,
         "interpretation": "Scenario-specific buffered footprints. Unknown geometry and coverage are reported separately; empty layers do not establish permission.",
