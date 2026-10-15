@@ -21,7 +21,10 @@
 - Current checks: 261 backend passes / one existing permission skip (100.12 s),
   six focused experiment passes, Ruff, frontend lint/build, 14 mocked browser and
   12 real-stack smoke passes with clean exits. Outcome/reproduction:
-  `doc/iteration/iteration-008/part5.md`. Final feature/main PR gates follow.
+  `doc/iteration/iteration-008/part5.md`. Feature PR #95 merged at `785f7b9`
+  after run `38758844339` passed Linux/Windows/frontend on `621d996`. Its merged
+  feature branch was removed locally/remotely, with fetch/prune and local/remote
+  branch verification. Main integration retains an independent successful-CI gate.
 - Iteration 010 is fully delivered: #92 merged at `633b16e`, merged-main run
   `38159165262` passed, Issue #91 and Milestone 9 closed (reverified 2026-10-15).
 - No user-owned service was stopped. Original data, permission profiles and

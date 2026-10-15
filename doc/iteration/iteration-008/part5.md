@@ -134,4 +134,6 @@ end-time feasibility remain deferred.
 - Fresh 600-record report, all successful synthetic checks, twelve invariance
   groups, six research preflights and unchanged input manifests verified.
 - Historical 600-record report reverified; original data/evidence remain local.
-- Final feature/main CI and merge facts follow in HANDOFF after verification.
+- Feature PR #95 merged at `785f7b9` after Linux/Windows/frontend run
+  `38758844339` passed on reviewed `621d996`; merged-feature cleanup verified.
+  Main integration retains its independent CI gate; final facts follow in HANDOFF.
