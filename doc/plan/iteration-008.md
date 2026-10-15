@@ -1,13 +1,13 @@
 # Iteration 008 — Hannover fixed-altitude 2D routing
 
 Date: 2026-10-05 (Europe/Berlin).
-Status, 2026-10-15: Parts 1–4 are on main. Part 5 has been reconciled with main
-`633b16e` and freshly verified on the current engine: 600 records, six research
-preflights, independent synthetic comparisons and unchanged manifests. Issue #78
-is closed at the user's request. Separate feature -> iteration/008 -> main CI
-gates complete the authorized integration. Original 2026-10-08 evidence and source
-snapshots are preserved. See `doc/iteration/iteration-008/part5.md` and HANDOFF
-for current results and final publication facts.
+Status, 2026-10-15: Parts 1-5 are delivered to main. Part 5 was reconciled with
+Iterations 009/010 and freshly verified: 600 records, six research preflights,
+independent synthetic comparisons and unchanged manifests. Feature PR #95 passed
+its independent CI and merged at `785f7b9`; main PR #96 passed its own gate and
+merged at `1feff34`. Issue #78 and Milestone 7 are closed. Original 2026-10-08
+evidence and source snapshots remain preserved. See
+`doc/iteration/iteration-008/part5.md` and HANDOFF for current results and limits.
 
 ## Objective and confirmed scope
 

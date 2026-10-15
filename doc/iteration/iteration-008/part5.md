@@ -2,9 +2,10 @@
 
 Current verification: 2026-10-15 (Europe/Berlin). Tracking:
 [Issue #78](https://github.com/Hunter3304/uas-mission-planner/issues/78), closed on
-2026-10-15 at the user's explicit request. The user authorized merging the retained
-feature and updating README/HANDOFF. Feature and main integration use separate CI
-checks; final publication facts are recorded after execution.
+2026-10-15 at the user's explicit request. Delivered to main through
+[PR #96](https://github.com/Hunter3304/uas-mission-planner/pull/96) at `1feff34` after independent
+Linux/Windows/frontend run `38759403011` passed on `59f2987`. Milestone 7
+is closed. README and HANDOFF reflect this completed integration.
 
 ## Current implementation and reproduction
 
@@ -136,4 +137,5 @@ end-time feasibility remain deferred.
 - Historical 600-record report reverified; original data/evidence remain local.
 - Feature PR #95 merged at `785f7b9` after Linux/Windows/frontend run
   `38758844339` passed on reviewed `621d996`; merged-feature cleanup verified.
-  Main integration retains its independent CI gate; final facts follow in HANDOFF.
+  Main PR #96 merged at `1feff34` after its independent successful CI gate.
+  Issue #78 and Milestone 7 are closed; feature cleanup is verified.

@@ -82,8 +82,9 @@ successful code tests nor a GitHub merge fills a missing operational permission.
 ## Deferred work outside this iteration
 
 Full-region OSM payload/rendering/cancellation performance, mission-duration
-feasibility, national expansion, 3D/terrain-following planning remain deferred. Iteration 008 Part 5 integration was separately authorized
-on 2026-10-15; see its current outcome and HANDOFF. They are not prerequisites for merely
+feasibility, national expansion, 3D/terrain-following planning remain deferred. Iteration 008 Part 5 was separately delivered to main through
+PR #96 on 2026-10-15; see its current outcome and HANDOFF. These deferred items
+are not prerequisites for merely
 documenting or testing the three restriction policies.
 
 See [planning modes](../../rules/planning-modes.md),

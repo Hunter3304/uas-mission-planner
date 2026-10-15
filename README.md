@@ -1,6 +1,7 @@
 # UAS Mission Planner
 
-Iteration 008 Part 5 is verified against the current engine on **2026-10-15**:
+Iteration 008 Part 5 is delivered to main through [PR #96](https://github.com/Hunter3304/uas-mission-planner/pull/96)
+and verified against the current engine on **2026-10-15**:
 600 offline records across three real Hannover pairs and synthetic fixtures,
 weighted/distance objectives, A*/Dijkstra/native ABIT*, altitude/grid/speed and
 boundary comparisons. Real default-input preflights remain unresolved; 170
