@@ -22,8 +22,9 @@ running. Issue #93 / PR #94 now await the successful comparison response, verify
 exact response/export equality and serialize cases sharing the CPU-bound backend.
 Frontend lint and all 12 smoke cases pass locally (34.1 s); independent feature
 run `38158666846` passed all three jobs before merge `3eca995`. Issue #93 is
-closed and its merged fix branch cleanup verified. Final integration PR #92
-includes this correction and requires its own final-head and merged-main gates.
+closed and its merged fix branch cleanup verified. Final integration PR #92 includes this correction and merged at `633b16e` after
+successful CI. Merged-main run `38159165262` passed; Issue #91 and Milestone 9
+are closed (reverified 2026-10-15).
 
 The UI previously sent empty zone assessments and research routing bypassed all
 unknown zone applicability. It now defaults to conservative avoidance: unresolved
@@ -33,7 +34,7 @@ policies remain available. See [decision rules](../../rules/restriction-decision
 
 The [three-mode contract](../../rules/planning-modes.md) and
 [status/next steps](status.md) distinguish implemented functionality from remaining
-source/permission evidence and pending remote delivery.
+source/permission evidence and completed remote delivery.
 
 ## Operation
 

@@ -1,7 +1,7 @@
 # Iteration 010 status and next steps
 
-Closeout reviewed 2026-10-11 against the approved plan and final retained evidence.
-The user explicitly authorized completion and remote delivery on this date. Earlier
+Closeout reviewed 2026-10-11; remote completion reverified 2026-10-15 against GitHub.
+The user explicitly authorized completion and remote delivery on 2026-10-11. Earlier
 local-only publication restrictions are history; each remote merge still requires
 its successful-CI gate.
 
@@ -14,8 +14,8 @@ its successful-CI gate.
 | Persistent assessment/permission workflow | Local immutable profiles, UI review/import/save/export, expiry/signature/phase checks implemented | No real permission profiles supplied; launch/landing records are stored but not a separate flight-phase model |
 | Temporary restrictions and coverage | Bounded official WFS/notice originals, receipts, reviewed import and unverified coverage/freshness reports implemented | No exhaustive authenticated NOTAM feed or automated interpretation of all notices/schedules |
 | Algorithms, map and exports | Shared full-motion checks, distinct decisions/policy exclusions/buildings, result invalidation and exports implemented | A valid conservative route on the real target missions has not been established |
-| Acceptance | Final 255 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; profile/active-notice/15 mode/9 NHN comparison acceptance; shared-backend smoke deadline corrected in #94 | Feature correction CI passed; final #92 integration and merged-main gates checked before response |
-| Publication/integration | #87/#89/#94 feature gates and #90 main gate passed; functional main merge `2163974`; #85/#86/#88/#93 closed and feature cleanup verified | Issue #91 final record and acceptance correction in #92; verify final main state before closure |
+| Acceptance | Final 255 backend passes / one existing Windows permission skip; 14 mocked browser and 12 real-stack smoke passes; profile/active-notice/15 mode/9 NHN comparison acceptance; shared-backend smoke deadline corrected in #94 | Final #92 CI and merged-main run `38159165262` passed on `633b16e` |
+| Publication/integration | #87/#89/#94 feature gates and #90 main gate passed; functional main merge `2163974`; #85/#86/#88/#93 closed and feature cleanup verified | #92 merged at `633b16e`; #91 and Milestone 9 are closed |
 
 Feature integration is complete: #87 at `e4889f8`, #89 at `d453961`, with successful
 Linux/Windows/frontend runs `38155429114` and `38157301971`. Issues #85/#86/#88 are
@@ -28,7 +28,8 @@ Main delivery is now verified: PR #90 at `2163974`, independent main-PR run
 documentation record is tracked by #91. Post-merge comparison smoke timing was
 corrected by #94 at `3eca995`, after independent run `38158666846` passed all
 three jobs. Final PR #92 includes that correction and has its own main gate.
-Remaining source/permission evidence is
+PR #92 merged at `633b16e`; merged-main run `38159165262` passed. Issue #91
+and Milestone 9 are closed. Remaining source/permission evidence is
 operational follow-up, not unfinished implementation or remote functional delivery.
 
 The delivered result is a usable conservative-avoidance and evidence workflow.
@@ -41,8 +42,7 @@ The scoped functional implementation and local acceptance are complete. Final re
 mode acceptance retains nine conservative endpoint conflicts, three strict unresolved
 cases and three independently verified primary research routes. Read
 [the complete source audit](../../data-sources/iteration-010-dipul-audit.md) and
-[the acceptance evidence](outcome.md#validation). Final delivery follows the newly
-authorized remote CI workflow.
+[the acceptance evidence](outcome.md#validation). Final delivery completed through PR #92 and its successful merged-main gate.
 
 The user subsequently authorized the Issue #88 NHN + AGL engineering comparison
 before main integration. It supplies explicit offset/uncertainty and numerical
@@ -73,9 +73,8 @@ the planned evidence/import/avoidance functionality:
    semantics are established. Track unsupported schedules, datum compatibility,
    NOTAM access and phase-specific endpoint modeling as explicit work items; these
    require a further agreed implementation scope, not undocumented assumptions.
-5. Remote publication approval is now given: push the reviewed changes, create
-   PRs and run separate successful-CI gates for feature -> iteration/010 -> main.
-   Record merge/issue/cleanup facts only after verification. Keep iteration history.
+5. Remote delivery is complete through #87/#89/#94 and final main PR #92.
+   Preserve iteration history and the final successful merged-main evidence.
 
 Real permission/source evidence and release approval are independent needs. Neither
 successful code tests nor a GitHub merge fills a missing operational permission.
@@ -83,8 +82,8 @@ successful code tests nor a GitHub merge fills a missing operational permission.
 ## Deferred work outside this iteration
 
 Full-region OSM payload/rendering/cancellation performance, mission-duration
-feasibility, national expansion, 3D/terrain-following planning and the separate
-Iteration 008 Part 5 scope remain deferred. They are not prerequisites for merely
+feasibility, national expansion, 3D/terrain-following planning remain deferred. Iteration 008 Part 5 integration was separately authorized
+on 2026-10-15; see its current outcome and HANDOFF. They are not prerequisites for merely
 documenting or testing the three restriction policies.
 
 See [planning modes](../../rules/planning-modes.md),
