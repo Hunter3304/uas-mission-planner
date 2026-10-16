@@ -1,5 +1,21 @@
 # UAS Mission Planner
 
+Iteration 011 adds **independent OpenFlightMaps layers and visualization** for the
+default Hannover/Lehrte eight-site study. Acquire a pinned OFMX revision, inspect
+airspaces/aerodromes and original height references, and open the backend's
+standalone [OFM preview](http://127.0.0.1:8000/ofm). Export a self-contained HTML
+preview for offline use. See the [operation/API guide](doc/experiments/iteration-011.md)
+and [acceptance/limitations](doc/iteration/iteration-011/outcome.md). OFM remains
+separate from the main explorer map and route/permission decisions.
+
+```powershell
+uv run --project backend --locked uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
+uv run --project backend --locked uas-planner ofm-preview data/.ofm/hannover-2610-new --output .cache/ofm-preview-new.html
+```
+
+Use new outputs and the intended AIRAC cycle; `2610` is the inspected example,
+not an automatic current-cycle selection. Existing acquired originals remain local.
+
 Iteration 008 Part 5 is delivered to main through [PR #96](https://github.com/Hunter3304/uas-mission-planner/pull/96)
 and verified against the current engine on **2026-10-15**:
 600 offline records across three real Hannover pairs and synthetic fixtures,
@@ -443,8 +459,9 @@ The v0.3.0 stage release is a tagged prototype baseline. Backend, frontend, CLI 
 The [external data and methodology assessment](doc/data-sources/README.md)
 reviews Droniq/TraX, OpenFlightMaps, GHSL, DIPUL, SORA 2.5 and EGRED 2 as of
 2026-09-29, with access evidence, limitations and proposed routing uses.
-GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for local independent
-inspection in Part 1. The other assessed sources remain documentation-only.
+GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for independent
+inspection. Iteration 011 adds an independent OFM snapshot/display workflow.
+Droniq and the assessed methodology-only sources retain their documented scope.
 
 The local prototype supports small-area and Hannover regional mission research
 and loads source data into memory for verification. Building tag costs are ordinal

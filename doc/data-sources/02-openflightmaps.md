@@ -1,5 +1,12 @@
 # 2. OpenFlightMaps
 
+Implementation update, **2026-10-16**: the approved independent snapshot/layer/API
+and standalone preview have passed local acceptance under Iteration 011. See
+[operation](../experiments/iteration-011.md) and
+[current outcome](../iteration/iteration-011/outcome.md). The feasibility assessment
+below remains the dated pre-implementation research; routing/legal integration
+and full license archival remain outside the completed display functionality.
+
 Reviewed: **2026-10-15**, against current project main `16720a0`.
 Decision: **technically feasible for a bounded Hannover aviation-context layer**.
 A first weekly delivery can cover verified acquisition, offline import, separate

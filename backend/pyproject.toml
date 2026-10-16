@@ -32,7 +32,8 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"uas_planner.core" = ["cost_rules.json"]
+"uas_planner.core" = ["cost_rules.json", "ofm_region.json"]
+"uas_planner.api" = ["ofm_preview.html"]
 
 [[tool.uv.index]]
 url = "https://pypi.org/simple"

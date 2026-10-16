@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OFM · Hannover airspace explorer</title>
+<style>
+:root{font:15px/1.5 system-ui,sans-serif;color:#20323b;background:#edf1f1;--teal:#096d70;--line:#d9e2e3}
+*{box-sizing:border-box}body{margin:0}button,select,input{font:inherit}button,select{cursor:pointer}
+button,select,input{border:1px solid #c8d5d8;border-radius:7px;background:white;padding:8px 11px;color:inherit}
+button:hover{background:#e8f2f2}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f4b63f}
+header{background:#183b45;color:white;padding:22px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#9fc9cb}h1{font-size:25px;font-weight:600;margin:3px 0}header p{margin:0;color:#bdd1d5;font-size:13px}
+header select{max-width:310px;color:#20323b}header select:disabled{opacity:1;background:#e9f2f1}.layout{display:grid;grid-template-columns:minmax(0,1fr) 355px;gap:18px;max-width:1550px;margin:auto;padding:22px}
+.card{background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden}.topbar{padding:15px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h2{font-size:16px;margin:0}.muted{font-size:12px;color:#617780}.pill{font-size:11px;border-radius:20px;padding:4px 9px;background:#e2f1ec;color:#226650}.mapwrap{position:relative;background:#f6f9f8}
+svg{display:block;width:100%;height:55vh;min-height:360px;touch-action:none;cursor:grab}svg:active{cursor:grabbing}.maptools{position:absolute;top:12px;right:12px;display:flex;gap:5px}.maptools button{padding:5px 11px;box-shadow:0 1px 4px #17323b15}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);font-size:12px}.swatch{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px}
+.footer{padding:12px 18px;background:#f9fbfb;font-size:12px;color:#5b7379}.content{padding:17px}label{display:inline-flex;align-items:center;gap:6px;font-size:13px}input[type=checkbox]{accent-color:var(--teal)}
+.controls{display:flex;gap:16px;flex-wrap:wrap}.filterrow{display:flex;gap:8px;margin-top:12px}.filterrow input{min-width:0;flex:1}.filterrow select{max-width:130px}
+#features{max-height:235px;overflow:auto;margin:12px 0 0;padding:0;list-style:none}#features button{display:block;text-align:left;width:100%;border:0;border-radius:0;border-bottom:1px solid #edf1f2;padding:10px 12px}#features button[aria-pressed=true]{background:#e7f3f1;border-left:3px solid var(--teal)}
+.featuretitle{font-weight:600;font-size:13px}.small{font-size:11px;color:#657b82}.empty{padding:22px;color:#647b83}.detail{margin-top:18px}.detail h3{margin:0;font-size:18px}.detail dl{display:grid;grid-template-columns:90px 1fr;font-size:12px;gap:8px}.detail dt{color:#627981}.detail dd{margin:0;overflow-wrap:anywhere}.detail pre{font:11px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto;background:#f2f6f5;padding:10px;border-radius:6px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.metric{padding:13px;background:white;border:1px solid var(--line);border-radius:9px}.metric strong{display:block;font-size:23px;font-weight:600}.metric span{font-size:11px;color:#637981}
+.notice{padding:12px 16px;font-size:12px;background:#fff7e8;color:#7b5a29;border-top:1px solid #ecdab7}.error{background:#fbecec;color:#963737}.exports{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.exports button{font-size:12px}.diag{max-height:180px;overflow:auto}.diag button{display:block;width:100%;text-align:left;font-size:12px;margin-top:6px}details{margin-top:10px;font-size:12px}summary{cursor:pointer;font-weight:600}.site-list{display:grid;gap:5px;margin-top:10px}.site-list button{text-align:left;font-size:12px}.regionlabel{fill:#52717c;font-size:10px}.site-label{fill:#163e47;font-size:10px;paint-order:stroke;stroke:white;stroke-width:3px}
+@media(max-width:850px){.site-label{display:none}header{padding:18px;align-items:flex-start;flex-direction:column}.layout{grid-template-columns:1fr;padding:12px;gap:12px}svg{height:48vh;min-height:310px}.metrics{margin-bottom:12px}header select{max-width:100%;width:100%}}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">Independent source explorer · OpenFlightMaps</div><h1>Hannover airspace atlas</h1><p>Eight reference sites. One retained study region.</p></div><label>Snapshot <select id="snapshot" aria-label="OFM snapshot"><option>Loading…</option></select></label></header>
+<main class="layout">
+<section>
+<div class="metrics"><div class="metric"><strong id="air-count">—</strong><span>Drawable airspaces</span></div><div class="metric"><strong id="airport-count">—</strong><span>Regional aerodromes</span></div><div class="metric"><strong id="site-count">—</strong><span>Project reference sites</span></div></div>
+<div class="card"><div class="topbar"><div><h2>Independent OFM layers</h2><div class="muted" id="region-label">No snapshot loaded</div></div><span class="pill" id="cycle">Offline-capable preview</span></div>
+<div class="mapwrap"><svg id="map" viewBox="0 0 800 500" role="img" aria-label="Independent Hannover OFM layers and eight reference sites"></svg><div class="maptools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit region</button></div></div>
+<div class="legend"><span><i class="swatch" style="background:#238d98"></i>CTR</span><span><i class="swatch" style="background:#627ac2"></i>TMA</span><span><i class="swatch" style="background:#b87945"></i>Other airspace</span><span><i class="swatch" style="background:#203b45"></i>Reference site</span><span><i class="swatch" style="background:#a44362"></i>Aerodrome</span></div>
+<div class="footer" id="status" role="status">Loading local snapshots…</div><div class="notice">Display context only. Airspace applicability and flight permission are not evaluated.</div></div>
+<div class="card" style="margin-top:18px"><div class="content"><h2>Source and quality</h2><p class="muted" id="source">Select a verified snapshot.</p><details><summary id="diagnostic-title">Diagnostics</summary><div id="diagnostics" class="diag"></div></details><details><summary>Snapshot metadata and inventory</summary><pre id="metadata" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:250px;overflow:auto"></pre></details><div class="exports"><button id="export-air">Export airspaces</button><button id="export-airports">Export aerodromes</button><button id="export-meta">Export metadata</button><button id="export-preview">Download offline preview</button></div></div></div>
+</section>
+<aside><div class="card"><div class="content"><h2>Browse source objects</h2><div class="controls" style="margin-top:12px"><label><input id="airspaces" type="checkbox" checked>Airspaces</label><label><input id="aerodromes" type="checkbox" checked>Aerodromes</label><label><input id="sites" type="checkbox" checked>Reference sites</label></div><div class="filterrow"><input id="search" placeholder="Search name or source ID" aria-label="Search OFM objects"><select id="type" aria-label="Airspace type"><option value="">All types</option></select></div><div class="muted" id="object-count" style="margin-top:10px"></div><ul id="features"></ul></div></div><div class="card" style="margin-top:18px"><div class="content"><details><summary>Eight project reference sites</summary><div id="site-list" class="site-list"></div></details></div></div><div class="card detail"><div class="content" id="detail"><h2>Object details</h2><p class="muted">Select an airspace, aerodrome or diagnostic to inspect original values.</p></div></div></aside>
+</main>
+<script>
+'use strict';
+const embedded = /*OFM_EMBEDDED*/null;
+const $ = id => document.getElementById(id);
+let state=null, selected=null, epoch=0, controller=null, detailEpoch=0;
+let view=[0,0,800,500], drag=null;
+const ns='http://www.w3.org/2000/svg';
+const color=p=>p.type==='CTR'?'#238d98':p.type==='TMA'?'#627ac2':'#b87945';
+function node(tag,attrs={},text=null){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==null)e.textContent=text;return e;}
+function html(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
+function status(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',error);}
+async function get(url,signal){const response=await fetch(url,{signal});if(!response.ok)throw Error(`HTTP ${response.status}: unable to verify local OFM data`);return response.json();}
+function project(coordinate){const b=state.metadata.region.bounds;const k=Math.cos((b.north+b.south)*Math.PI/360);const scale=Math.min(720/((b.east-b.west)*k),420/(b.north-b.south));return[400+(coordinate[0]-(b.east+b.west)/2)*k*scale,250-(coordinate[1]-(b.north+b.south)/2)*scale];}
+function visible(layer){const term=$('search').value.toLowerCase(),type=$('type').value;return state.layers[layer].features.filter(f=>(!term||JSON.stringify(f.properties).toLowerCase().includes(term))&&(!type||f.properties.type===type));}
+function setView(){ $('map').setAttribute('viewBox',view.join(' ')); }
+function zoom(factor){if(view[2]*factor<20||view[2]*factor>6400)return;view=[view[0]+view[2]*(1-factor)/2,view[1]+view[3]*(1-factor)/2,view[2]*factor,view[3]*factor];setView();}
+function fit(){view=[0,0,800,500];setView();}
+function draw(){
+ const svg=$('map');svg.replaceChildren();if(!state)return;
+ for(let x=0;x<=800;x+=80)svg.append(node('line',{x1:x,y1:0,x2:x,y2:500,stroke:'#e0e9e7','stroke-width':.7}));
+ for(let y=0;y<=500;y+=50)svg.append(node('line',{x1:0,y1:y,x2:800,y2:y,stroke:'#e0e9e7','stroke-width':.7}));
+ for(const layer of ['airspaces','aerodromes'])if($(layer).checked)for(const f of visible(layer)){
+  if(!f.geometry)continue;let shape;
+  if(f.geometry.type==='Polygon'){const d=f.geometry.coordinates.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).join(',')).join(' ')+' Z').join(' ');shape=node('path',{d,fill:color(f.properties),'fill-opacity':selected===f.id ? .28 : .07,stroke:color(f.properties),'stroke-width':selected===f.id?3:1.4,'vector-effect':'non-scaling-stroke','fill-rule':'evenodd'});}
+  else if(f.geometry.type==='Point'){const[x,y]=project(f.geometry.coordinates);shape=node('circle',{cx:x,cy:y,r:5,fill:'#a44362',stroke:'white','stroke-width':1.5});}
+  if(shape){shape.style.cursor='pointer';shape.append(node('title',{},f.properties.name));shape.dataset.feature=f.id;svg.append(shape);}
+ }
+ const b=state.metadata.region.bounds;const a=project([b.west,b.north]),z=project([b.east,b.south]);svg.append(node('rect',{x:a[0],y:a[1],width:z[0]-a[0],height:z[1]-a[1],fill:'none',stroke:'#194c54','stroke-width':1.5,'stroke-dasharray':'6 4','pointer-events':'none'}));
+ svg.append(node('text',{x:a[0],y:a[1]-9,class:'regionlabel'},`${b.west.toFixed(4)}° E · ${b.north.toFixed(4)}° N`));
+ if($('sites').checked)for(const s of state.metadata.region.locations){const[x,y]=project([s.longitude,s.latitude]);const c=node('circle',{cx:x,cy:y,r:4.5,fill:'#203b45',stroke:'white','stroke-width':1.8,'data-site':s.id});c.append(node('title',{},`${s.id} · ${s.name}`));const offsets={'rheuma-lister':[-12,-38],'amedes-schiffgraben':[24,-24],'amedes-georg':[-14,29],'henriettenstift':[25,24],'friederikenstift':[-20,5]};const[dx,dy]=offsets[s.id]||[9,-13];svg.append(node('line',{x1:x,y1:y,x2:x+dx,y2:y+dy,stroke:'#68868b','stroke-width':.7,'pointer-events':'none'}),c,node('text',{x:x+dx,y:y+dy,class:'site-label','text-anchor':dx<0?'end':'start','data-site-label':s.id},s.id));}
+}
+function browse(){
+ $('features').replaceChildren();if(!state)return;let count=0;
+ for(const layer of ['airspaces','aerodromes'])if($(layer).checked)for(const f of visible(layer)){
+  count++;const li=html('li'),button=html('button');button.setAttribute('aria-pressed',String(selected===f.id));button.dataset.feature=f.id;button.append(html('div',f.properties.name,'featuretitle'),html('div',`${f.properties.type||'Unspecified type'} · ${f.properties.class?'Class '+f.properties.class+' · ':''}${f.geometry?'drawable':'geometry unavailable'}`,'small'));button.onclick=()=>select(f.id);li.append(button);$('features').append(li);
+ }
+ $('object-count').textContent=`${count} objects match the selected layers and filters`;
+ if(!count)$('features').append(html('li','No objects in the saved region match these filters.','empty'));
+ draw();
+}
+function height(v){return v&&v.value!==null?`${v.value??'unknown'} ${v.unit||'?'} · ${v.reference||'?'} (${v.interpretation||'unknown'})${v.metres!==null?' · '+v.metres.toFixed(3)+' m in the same reference':''}`:'Not supplied';}
+async function select(id){
+ if(!state)return;const token=++detailEpoch,generation=epoch;selected=id;browse();$('detail').replaceChildren(html('p','Loading source details…','muted'));
+ try{const item=embedded?state.details[id]:await get(`/api/ofm/snapshots/${encodeURIComponent(state.metadata.id)}/features/${encodeURIComponent(id)}`,controller.signal);if(token!==detailEpoch||generation!==epoch)return;
+ const p=item.feature.properties,body=$('detail');body.replaceChildren(html('div','SOURCE OBJECT','eyebrow'),html('h3',p.name));const dl=html('dl');
+ for(const[k,v]of [['Type / class',`${p.type||'unspecified'} / ${p.class||'unspecified'}`],['Source ID',p.source_id],['Lower limit',height(p.lower)],['Upper limit',height(p.upper)],['Elevation',p.elevation?JSON.stringify(p.elevation):'Not applicable'],['Geometry',p.geometry_quality],['Effective',p.snapshot_effective],['Applicability',item.legal_state]]){dl.append(html('dt',k),html('dd',v));}body.append(dl,html('p',item.geometry_note,'muted'));
+ if(item.remarks)body.append(html('h4','Operational remarks'),html('pre',item.remarks));
+ for(const[label,value]of [['Original OFMX attributes',item.attributes_xml],['Semantic variants',JSON.stringify(item.semantic_variants_xml,null,2)],['Schedules',item.schedule_xml.join('\n')||'No schedule supplied; this is not an active-state assertion.'],['Linked boundaries, runways and services',JSON.stringify(item.relationships,null,2)]]){const d=html('details');d.append(html('summary',label),html('pre',value));body.append(d);}
+ }catch(error){if(token===detailEpoch&&generation===epoch)$('detail').replaceChildren(html('p',String(error),'error'));}
+}
+function show(payload){
+ state=payload;selected=null;detailEpoch++;const m=state.metadata;
+ $('air-count').textContent=m.layers.airspaces.drawable;$('airport-count').textContent=m.layers.aerodromes.drawable;$('site-count').textContent=m.region.locations.length;
+ $('region-label').textContent=m.region.region_id+' · source extents retained';$('cycle').textContent=`${m.synthetic?'Synthetic fixture · ':''}AIRAC ${m.publication.cycle}`;
+ $('source').textContent=`${m.license.attribution}. Cycle ${m.publication.validity.startValidity} to ${m.publication.validity.endValidity}; XML effective ${m.source_xml.effective}; saved ${m.saved_at}. ${m.license.status}.`;
+ $('metadata').textContent=JSON.stringify(m,null,2);$('site-list').replaceChildren();for(const site of m.region.locations){const b=html('button',site.id+' · '+site.name);b.onclick=()=>{const[x,y]=project([site.longitude,site.latitude]);view=[x-120,y-75,240,150];setView();};$('site-list').append(b);}$('type').replaceChildren(new Option('All types',''));
+ const types=[...new Set(Object.values(state.layers).flatMap(l=>l.features.map(f=>f.properties.type)).filter(Boolean))].sort();for(const type of types)$('type').append(new Option(type,type));
+ $('search').value='';$('detail').replaceChildren(html('h2','Object details'),html('p','Select a source object to inspect original values.','muted'));
+ $('diagnostic-title').textContent=`${state.diagnostics.length} quality diagnostics · coverage remains qualified`;$('diagnostics').replaceChildren();
+ for(const d of state.diagnostics){const button=html('button',`${d.name}: ${d.reason} (${d.region_relation})`);button.onclick=()=>select(d.feature_id);$('diagnostics').append(button);}
+ if(!state.diagnostics.length)$('diagnostics').append(html('p','No parser diagnostics in this snapshot; this is not a coverage certificate.'));
+ status(`Local snapshot verified · ${m.region.locations.length} reference sites · ${m.layers.aerodromes.count} aerodromes in the saved region · ${m.coverage}`);fit();browse();
+}
+async function load(id){
+ const generation=++epoch;detailEpoch++;if(controller)controller.abort();controller=new AbortController();const signal=controller.signal;state=null;$('features').replaceChildren();$('diagnostics').replaceChildren();$('detail').replaceChildren(html('p','Loading verified snapshot…'));$('metadata').textContent='';$('source').textContent='Verifying selected snapshot…';$('region-label').textContent='No verified snapshot loaded';$('cycle').textContent='Verifying…';$('site-list').replaceChildren();for(const k of ['air-count','airport-count','site-count'])$(k).textContent='—';draw();status('Verifying local snapshot…');
+ const requestController=controller;const timer=setTimeout(()=>requestController.abort(),20000);
+ try{const base=`/api/ofm/snapshots/${encodeURIComponent(id)}`;const[m,a,p,d]=await Promise.all([get(base,signal),get(base+'/features?layer=airspaces',signal),get(base+'/features?layer=aerodromes',signal),get(base+'/diagnostics',signal)]);if(generation===epoch)show({metadata:m,layers:{airspaces:a,aerodromes:p},diagnostics:d.diagnostics});}
+ catch(error){if(generation===epoch){state=null;draw();status(`${error.name==='AbortError'?'Snapshot request cancelled or timed out':error}. Check OFM files and retry selecting the snapshot.`,true);}}
+ finally{clearTimeout(timer);}
+}
+function save(value,name){const u=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=html('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function exportLayer(name){if(!state)return;save({...state.layers[name],provenance:{source:'OpenFlightMaps',snapshot_id:state.metadata.id,source_sha256:state.metadata.files['source.zip'],region:state.metadata.region,publication:state.metadata.publication,source_xml:state.metadata.source_xml,license:state.metadata.license}},`${state.metadata.id}-${name}.geojson`);}
+for(const id of ['airspaces','aerodromes','sites','search','type'])$(id).addEventListener(id==='search'?'input':'change',browse);
+$('zoom-in').onclick=()=>zoom(.75);$('zoom-out').onclick=()=>zoom(1.3);$('fit').onclick=fit;$('export-air').onclick=()=>exportLayer('airspaces');$('export-airports').onclick=()=>exportLayer('aerodromes');$('export-meta').onclick=()=>{if(state)save(state.metadata,state.metadata.id+'-metadata.json');};
+$('map').addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY<0?.9:1.1);},{passive:false});
+$('map').addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,view:[...view],feature:e.target.dataset.feature};$('map').setPointerCapture(e.pointerId);});
+$('map').addEventListener('pointermove',e=>{if(!drag)return;const r=$('map').getBoundingClientRect();view=[drag.view[0]-(e.clientX-drag.x)*drag.view[2]/r.width,drag.view[1]-(e.clientY-drag.y)*drag.view[3]/r.height,...drag.view.slice(2)];setView();});
+$('map').addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<4&&drag.feature)select(drag.feature);drag=null;});$('map').addEventListener('pointercancel',()=>{drag=null;});
+
+$('export-preview').onclick=()=>{if(!state)return;if(!embedded){const a=html('a');a.href=`/api/ofm/snapshots/${encodeURIComponent(state.metadata.id)}/preview`;a.download=state.metadata.id+'-preview.html';a.click();return;}const url=URL.createObjectURL(new Blob(['<!doctype html>\n'+document.documentElement.outerHTML],{type:'text/html'}));const a=html('a');a.href=url;a.download=state.metadata.id+'-preview.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('snapshot').onchange=()=>load($('snapshot').value);
+(async()=>{try{if(embedded){$('snapshot').replaceChildren(new Option(embedded.metadata.id,embedded.metadata.id));$('snapshot').disabled=true;show(embedded);return;}const listing=await get('/api/ofm/snapshots');$('snapshot').replaceChildren();for(const m of listing.snapshots){const o=new Option(m.id+(m.verified?'':' · needs attention'),m.id);$('snapshot').append(o);}if(listing.snapshots.length)await load(listing.snapshots[0].id);else{$('snapshot').append(new Option('No local OFM snapshots',''));status('No local OFM snapshots. Use ofm-fetch or ofm-import to create a snapshot under data/.ofm/.');}}catch(error){status(String(error),true);}})();
+</script>
+</body></html>

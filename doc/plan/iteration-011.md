@@ -2,6 +2,10 @@
 
 Date: 2026-10-15 (Europe/Berlin).
 Status: **approved for implementation on 2026-10-16**.
+Local implementation/acceptance completed 2026-10-16; feature/main publication
+retains separate CI gates. Actual behavior and evidence are in
+[the outcome](../iteration/iteration-011/outcome.md) and
+[operation guide](../experiments/iteration-011.md).
 The user requested implementation under the standard project workflow, authorizing
 tracking, feature development, validation and CI-gated integration to main.
 The earlier documentation-only authorization is superseded. The six steps below
@@ -105,11 +109,11 @@ must not be sent to the preview as though it were the selected local layer.
 | `GET /api/ofm/snapshots/{id}/features?layer=airspaces` | Bounded GeoJSON for the saved default region; allow the aerodrome layer when available |
 | `GET /api/ofm/snapshots/{id}/features/{feature_id}` | Complete selected-object attributes, relationships, provenance and geometry quality |
 | `GET /api/ofm/snapshots/{id}/diagnostics` | Invalid/missing/unsupported geometry, missing fields, snapshot/reference/coverage diagnostics |
+| `GET /api/ofm/snapshots/{id}/preview` | Downloadable self-contained offline HTML |
 
-These names describe the planned contract and can be aligned with existing API
-conventions during implementation. No browser-triggered acquisition or external
-write is included. A proposed CLI supplies fetch/import/inspect/preview operations;
-exact command names follow the approved implementation design.
+These read-only interfaces are implemented; see the operation guide for current
+behavior. No browser-triggered acquisition or external write is included. CLI:
+`ofm-fetch`, `ofm-import`, `ofm-inspect`, `ofm-rebuild` and `ofm-preview`.
 
 ## Implementation sequence
 
