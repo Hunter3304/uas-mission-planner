@@ -7,6 +7,10 @@ The planning baseline passed Linux/Windows/frontend run `38889659526` and merged
 through #99 at `fcae27c`. Its previously published documentation branch was removed
 locally/remotely, followed by fetch/prune and local/remote branch verification.
 
+Feature PR #101 passed Linux/Windows/frontend run `38891678564` on `7c172ed`
+and merged at `4338849`. Issues #98/#100 are closed and merged-feature cleanup
+is verified locally/remotely. Main integration retains an independent CI gate.
+
 ## Result
 
 Independent OFM snapshot acquisition/import/rebuild/inspection, regional display
@@ -57,15 +61,16 @@ conflicting semantics, linked data, deterministic offline rebuilding, corruption
 file-inventory containment, malformed/entity XML, schema rejection, download size/
 redirect restrictions, empty aerodromes, read-only API and escaped offline export.
 
-Ruff lint/format, frontend lint/TypeScript/production build pass. All **14 mocked
+Ruff lint/format, frontend lint/TypeScript/production build pass. An offline Python
+wheel build succeeds and includes the preview HTML and default-region resource. All **14 mocked
 browser** and **14 real-stack smoke** tests pass with clean exits. New browser tests
 check references, original text/XSS handling, filters, layer switches, zoom/fit,
 source-provenance export, mobile layout and offline HTML with no HTTP requests.
 
 Application code does not stop/reuse user-owned services. Test servers are isolated
 and stopped by their own runners. Original regional data and private profiles remain.
-Feature publication and independent main integration must pass their separate CI
-gates; verified final merge/cleanup facts are recorded afterwards.
+Feature publication has passed its CI gate and cleanup is verified above. Main
+integration retains an independent gate; verified final facts follow afterwards.
 
 ## Limits retained
 

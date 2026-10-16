@@ -2,9 +2,13 @@
 
 ## Current status
 
-### Iteration 011 implementation authorized (2026-10-16)
+### Iteration 011 feature integrated; main delivery (2026-10-16)
 
-- Local implementation/acceptance is complete on `feature/100-ofm-visualization`,
+- Feature PR #101 merged at `4338849` after Linux/Windows/frontend run
+  `38891678564` passed on reviewed `7c172ed`. Issue #100 is explicitly closed.
+  Merged feature cleanup was verified locally/remotely with fetch/prune and
+  branch/remote checks. Issue #98 is also closed; iteration history remains.
+- Local implementation/acceptance was completed on `feature/100-ofm-visualization`,
   created after Issue #100 in Milestone 10. Planning Issue #98 / PR #99 passed
   run `38889659526` and merged at `fcae27c`; the merged documentation branch was
   removed locally/remotely with fetch/prune and branch/remote verification.
@@ -22,9 +26,10 @@
   or horizontal overflow. Outcome: `doc/iteration/iteration-011/outcome.md`;
   operation/API guide: `doc/experiments/iteration-011.md`.
 - Source/derived real data, screenshots and raw receipt evidence remain local.
+  Offline wheel build also passes and includes the HTML/default-region resources.
   Full license archival, unsupported raw/derived geometry and OFM legal decisions
   remain explicit limitations. No user-owned services were stopped. Feature/main
-  publication requires independent successful CI; record actual merge facts later.
+  integration retains an independent successful-CI gate; record main facts later.
 - User explicitly requested starting the approved OFM visualization plan under
   the standard workflow. This supersedes prior draft/documentation-only notes.
 - Implement the independent snapshot/import layer, bounded read-only API and
