@@ -4,6 +4,27 @@
 
 ### Iteration 011 implementation authorized (2026-10-16)
 
+- Local implementation/acceptance is complete on `feature/100-ofm-visualization`,
+  created after Issue #100 in Milestone 10. Planning Issue #98 / PR #99 passed
+  run `38889659526` and merged at `fcae27c`; the merged documentation branch was
+  removed locally/remotely with fetch/prune and branch/remote verification.
+- New CLI: `ofm-fetch/import/inspect/rebuild/preview`; storage `data/.ofm/{id}`;
+  read-only `/api/ofm/snapshots...`; standalone backend `/ofm` and downloadable
+  self-contained HTML. No main-map or planner integration. The eight-site default
+  is packaged and regression-checked against the saved study configuration.
+- Real official acquisition `data/.ofm/hannover-2610-v2`: five drawable airspaces,
+  five invalid regional bbox candidates, four OFM aerodrome/helipad points and
+  eight project reference sites. Twenty-two diagnostics retain invalid/unknown
+  records and duplicate/variant issues. Offline rebuild file hashes match exactly.
+- Current checks: 274 backend passes / one existing Windows permission skip;
+  13 OFM checks, Ruff, frontend lint/build, 14 mocked browser and 14 real-stack
+  smoke passes with clean exits. Real desktop/mobile preview has no page errors
+  or horizontal overflow. Outcome: `doc/iteration/iteration-011/outcome.md`;
+  operation/API guide: `doc/experiments/iteration-011.md`.
+- Source/derived real data, screenshots and raw receipt evidence remain local.
+  Full license archival, unsupported raw/derived geometry and OFM legal decisions
+  remain explicit limitations. No user-owned services were stopped. Feature/main
+  publication requires independent successful CI; record actual merge facts later.
 - User explicitly requested starting the approved OFM visualization plan under
   the standard workflow. This supersedes prior draft/documentation-only notes.
 - Implement the independent snapshot/import layer, bounded read-only API and

@@ -1,0 +1,117 @@
+{
+  "reviewed_on": "2026-10-16",
+  "scope": "Independent display only; raw real data retained locally",
+  "cycle": {
+    "cycle": "2610",
+    "validity": {
+      "id": "2610",
+      "string": "01.10.2026",
+      "startValidity": "2026-10-01T00:00:00Z",
+      "endValidity": "2026-10-29T00:00:00Z"
+    },
+    "product": {
+      "id": "8",
+      "name": "OFMX ED",
+      "timestamp": "2026-10-12T12:07:00Z",
+      "inProgress": "False",
+      "details_english": "Germany snapshot",
+      "details_local": "Deutschland komplett",
+      "query": "OFMX ED;Deutschland komplett;Germany snapshot",
+      "URL": "https://snapshots.openflightmaps.org/live/2610/ofmx/ed/latest/ofmx_ed.zip"
+    }
+  },
+  "source_xml": {
+    "version": "0.1",
+    "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation": "https://schema.openflightmaps.org/0.1/OFMX-Snapshot.xsd",
+    "effective": "2026-10-12T12:02:34Z",
+    "origin": "ofmx editor v1.0.62",
+    "created": "2026-10-12T12:02:34Z",
+    "namespace": "210444d1-4576-e92d-0983-4669182a8c04"
+  },
+  "region_id": "hannover-lehrte-5km",
+  "bounds": {
+    "west": 9.650495867959657,
+    "south": 52.32042221571155,
+    "east": 10.068841103123809,
+    "north": 52.45032927853548
+  },
+  "reference_site_ids": [
+    "mhh",
+    "henriettenstift",
+    "rheuma-lister",
+    "rheuma-podbi",
+    "limbach-lehrte",
+    "amedes-georg",
+    "amedes-schiffgraben",
+    "friederikenstift"
+  ],
+  "inventory": {
+    "Ase": 1056,
+    "Abd": 1048,
+    "Sae": 514,
+    "Adg": 8,
+    "Ahp": 1360,
+    "Fto": 517,
+    "Fdn": 1056,
+    "Tla": 509,
+    "Ahu": 1360,
+    "Rwy": 968,
+    "Rdn": 1936,
+    "Rdd": 2517,
+    "Ful": 732,
+    "Aha": 1412,
+    "Uni": 607,
+    "Ser": 607,
+    "Fqy": 672,
+    "Dpn": 376,
+    "Tcn": 17,
+    "Rls": 234,
+    "Ndb": 30,
+    "Lbm": 76,
+    "Vor": 41,
+    "Dme": 49,
+    "Tls": 7,
+    "Fdd": 60,
+    "Org": 1,
+    "Gbr": 32
+  },
+  "layers": {
+    "airspaces": {
+      "count": 10,
+      "drawable": 5
+    },
+    "aerodromes": {
+      "count": 4,
+      "drawable": 4
+    }
+  },
+  "diagnostic_quality_counts": {
+    "invalid": 5,
+    "unsupported": 17
+  },
+  "diagnostic_region_counts": {
+    "candidate": 5,
+    "unknown": 17
+  },
+  "duplicate_semantic_groups": 9,
+  "conflicting_semantic_groups": 1,
+  "files_sha256": {
+    "source.zip": "e87c100883ea10dd196fb5a8ce200d8dbf6644ec5857f57f310ce57dd40280e1",
+    "publication.xml": "c297b6ee2f3e835d7dc20f20727bde8c0493640e7b786c564badac2868c73a12",
+    "region.json": "0597d36769a3b671ac7446b0c74cb9124e3b02e0c81fa0565b56786e39cdbe81",
+    "airspaces.geojson": "c853a323c394bdbc6be2172b61862bfc5d2a8cc95dd211fbd86059e3e36e3e29",
+    "aerodromes.geojson": "6c794a6aad4eb8ec7f7f1affd8f3cb17c9953073cc4ea40fe63de334ef7252c0",
+    "details.json": "c3db609f122d455435a5327b30616044583f77815aee3f8c586231aaf9a517ff",
+    "diagnostics.json": "921b1497b025876b110c08706f09f0e42f7ed3749e7c588428dbaf03472c8b20"
+  },
+  "offline_rebuild_checksums": "identical",
+  "local_validation": {
+    "backend_passed": 274,
+    "backend_permission_skipped": 1,
+    "mocked_browser_passed": 14,
+    "real_stack_smoke_passed": 14,
+    "real_preview_errors": 0,
+    "mobile_page_width_px": 390,
+    "reference_sites_visible": 8
+  }
+}

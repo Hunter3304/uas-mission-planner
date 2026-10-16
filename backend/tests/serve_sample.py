@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 import geopandas as gpd
 import uvicorn
 from experiment_fixture import create_experiment_fixture
+from ofm_fixture import create_ofm_fixture
 from shapely.geometry import box
 
 from uas_planner.api.app import create_app
@@ -19,6 +20,7 @@ if __name__ == "__main__":
     cache.mkdir(exist_ok=True)
     with TemporaryDirectory(prefix="smoke-", dir=cache) as directory:
         root = Path(directory)
+        create_ofm_fixture(root)
         if main(["sample", "--output", str(root / "offline-sample")]) != 0:
             raise SystemExit("Could not prepare the smoke sample")
         frame = gpd.GeoDataFrame(
