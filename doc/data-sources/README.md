@@ -4,6 +4,12 @@ Assessment date: **2026-09-29**. Scope: the six sources requested by Yao,
 evaluated against the existing UAS Mission Planner at local commit `84cf8a3`.
 This is a documentation assessment, not an implemented integration or an approved sprint.
 
+Update, **2026-10-15**: the [OpenFlightMaps note](02-openflightmaps.md) now includes
+a live German AIRAC 2610 download, actual OFMX object/height/geometry inspection,
+Hannover intersection probes and a bounded implementation proposal against current
+main. The assessment below otherwise remains dated 2026-09-29; it is historical
+context, not a current statement that the project lacks routing or source adapters.
+
 ## Reading order
 
 | Source | Access and format | Update frequency | Spatial resolution | Automation assessment |
