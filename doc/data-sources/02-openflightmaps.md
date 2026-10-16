@@ -1,7 +1,8 @@
 # 2. OpenFlightMaps
 
 Implementation update, **2026-10-16**: the approved independent snapshot/layer/API
-and standalone preview have passed local acceptance under Iteration 011. See
+and standalone preview are delivered to main through PR #102 with independent
+feature/main CI gates under Iteration 011. See
 [operation](../experiments/iteration-011.md) and
 [current outcome](../iteration/iteration-011/outcome.md). The feasibility assessment
 below remains the dated pre-implementation research; routing/legal integration

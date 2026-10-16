@@ -2,8 +2,11 @@
 
 ## Current status
 
-### Iteration 011 feature integrated; main delivery (2026-10-16)
+### Iteration 011 verified main delivery (2026-10-16)
 
+- Main PR #102 merged at `0c29142` after independent Linux/Windows/frontend run `38892111216` passed on reviewed `388bb05`.
+  Issues #98/#100 and Milestone 10 are closed. The approved display scope is
+  delivered; prior draft/implementation-only limits below are historical.
 - Feature PR #101 merged at `4338849` after Linux/Windows/frontend run
   `38891678564` passed on reviewed `7c172ed`. Issue #100 is explicitly closed.
   Merged feature cleanup was verified locally/remotely with fetch/prune and
@@ -28,8 +31,8 @@
 - Source/derived real data, screenshots and raw receipt evidence remain local.
   Offline wheel build also passes and includes the HTML/default-region resources.
   Full license archival, unsupported raw/derived geometry and OFM legal decisions
-  remain explicit limitations. No user-owned services were stopped. Feature/main
-  integration retains an independent successful-CI gate; record main facts later.
+  remain explicit limitations. No user-owned services were stopped. Feature and
+  independent main gates passed; implementation/cleanup is complete.
 - User explicitly requested starting the approved OFM visualization plan under
   the standard workflow. This supersedes prior draft/documentation-only notes.
 - Implement the independent snapshot/import layer, bounded read-only API and
