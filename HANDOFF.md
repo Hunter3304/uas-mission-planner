@@ -2,6 +2,20 @@
 
 ## Current status
 
+### Iteration 011 implementation authorized (2026-10-16)
+
+- User explicitly requested starting the approved OFM visualization plan under
+  the standard workflow. This supersedes prior draft/documentation-only notes.
+- Implement the independent snapshot/import layer, bounded read-only API and
+  standalone offline preview for the saved Hannover eight-site region. Retain
+  existing main explorer and planner contracts; no OFM route/legal integration.
+- Follow milestone -> iteration/011 -> issue-before-feature -> successful feature
+  CI/merge/cleanup -> independent main PR gate and final documentation workflow.
+- The previously published `docs/iteration011-plan` branch predates implementation
+  authorization. Integrate its approved documentation with separate tracking/CI;
+  preserve raw data, private profiles and user-owned development services.
+
+
 ### Iteration 011 documentation publication authorized (2026-10-16)
 
 - User explicitly requested committing and pushing the existing OFM documentation.

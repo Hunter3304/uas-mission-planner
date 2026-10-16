@@ -1,13 +1,11 @@
 # Iteration 011 - Independent OpenFlightMaps layer and visualization
 
 Date: 2026-10-15 (Europe/Berlin).
-Status: **draft plan for user review; implementation has not started**.
-The user requested a plan and Chinese explanation before starting the task.
-On 2026-10-16 the user authorized committing and pushing the planning documents.
-Publication uses `docs/iteration011-plan`; implementation remains unstarted.
-No implementation milestone, issue or feature branch is initiated by this request.
-The implementation sequence below has six steps; it is not a formal split into
-five independently scoped Parts.
+Status: **approved for implementation on 2026-10-16**.
+The user requested implementation under the standard project workflow, authorizing
+tracking, feature development, validation and CI-gated integration to main.
+The earlier documentation-only authorization is superseded. The six steps below
+form one visualization delivery; no five-Part split has been agreed.
 
 ## Objective and scope interpretation
 
@@ -98,7 +96,7 @@ checksums, original metadata and available license evidence. Refresh creates a n
 snapshot. Regional selection happens locally; full Germany may be downloaded but
 must not be sent to the preview as though it were the selected local layer.
 
-### Proposed local interfaces (not implemented)
+### Local interface contract
 
 | Proposed endpoint | Response |
 |---|---|
@@ -113,7 +111,7 @@ conventions during implementation. No browser-triggered acquisition or external
 write is included. A proposed CLI supplies fetch/import/inspect/preview operations;
 exact command names follow the approved implementation design.
 
-## Implementation sequence after authorization
+## Implementation sequence
 
 1. **Define the layer contract and snapshot storage.** Separate OFM identity from
    OSM and DIPUL IDs. Preserve semantic records, original geometry/attributes,
@@ -137,7 +135,7 @@ exact command names follow the approved implementation design.
 6. **Verify and document.** Record reproducible commands, layer counts, known
    failures, preview evidence, operating instructions and README/HANDOFF status.
    Run relevant parser/storage/API checks and preview smoke checks; run repository
-   integration gates if publication is subsequently authorized.
+   integration gates before publication and main integration.
 
 ## Data interpretation and known research findings
 
@@ -188,7 +186,7 @@ rendering and region expansion are outside this visualization delivery.
 On explicit implementation authorization, follow the current HANDOFF workflow:
 create the iteration milestone/issues before feature branches, implement and
 validate, then perform any separately authorized CI-gated remote integration.
-This draft does not initiate those actions.
+Implementation is authorized on 2026-10-16; record verified tracking and delivery facts in HANDOFF.
 
 See [feasibility research](../data-sources/02-openflightmaps.md) and the existing
 [eight-site catalog](../experiments/iteration-008/locations.json). Existing raw
