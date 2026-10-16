@@ -1,9 +1,10 @@
 # Iteration 011 - Independent OpenFlightMaps layer and visualization
 
 Date: 2026-10-15 (Europe/Berlin).
-Status: **approved for implementation on 2026-10-16**.
-Local implementation/acceptance completed 2026-10-16; feature/main publication
-retains separate CI gates. Actual behavior and evidence are in
+Status: **delivered to main on 2026-10-16**.
+Implementation, acceptance and separate feature/main CI gates completed
+2026-10-16. Main delivery: PR #102 at `0c29142`; Issues #98/#100 and Milestone
+10 are closed. Actual behavior and evidence are in
 [the outcome](../iteration/iteration-011/outcome.md) and
 [operation guide](../experiments/iteration-011.md).
 The user requested implementation under the standard project workflow, authorizing

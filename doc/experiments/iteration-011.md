@@ -82,9 +82,11 @@ to free the port; reuse/restart the confirmed project backend through its termin
   it locally without a server. The offline file contains retained source information,
   so keep it local unless redistribution rights have been reviewed.
 
-The same offline file can be generated through the CLI:
+The same offline file can be generated through the CLI. The output parent
+directory must exist, and the file itself must be new:
 
 ```powershell
+New-Item -ItemType Directory -Force .cache | Out-Null
 uv run --project backend --locked uas-planner ofm-preview data/.ofm/hannover-2610-new --output .cache/ofm-preview-new.html
 ```
 

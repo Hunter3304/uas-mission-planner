@@ -9,7 +9,7 @@ locally/remotely, followed by fetch/prune and local/remote branch verification.
 
 Feature PR #101 passed Linux/Windows/frontend run `38891678564` on `7c172ed`
 and merged at `4338849`. Issues #98/#100 are closed and merged-feature cleanup
-is verified locally/remotely. Main integration retains an independent CI gate.
+is verified locally/remotely. Main PR #102 merged at `0c29142` after independent Linux/Windows/frontend run `38892111216` passed on reviewed `388bb05`. Issues #98/#100 and Milestone 10 are closed.
 
 ## Result
 
@@ -70,7 +70,7 @@ source-provenance export, mobile layout and offline HTML with no HTTP requests.
 Application code does not stop/reuse user-owned services. Test servers are isolated
 and stopped by their own runners. Original regional data and private profiles remain.
 Feature publication has passed its CI gate and cleanup is verified above. Main
-integration retains an independent gate; verified final facts follow afterwards.
+integration passed its independent gate and is recorded above.
 
 ## Limits retained
 

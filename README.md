@@ -1,6 +1,7 @@
 # UAS Mission Planner
 
-Iteration 011 adds **independent OpenFlightMaps layers and visualization** for the
+Iteration 011, delivered through [PR #102](https://github.com/Hunter3304/uas-mission-planner/pull/102),
+adds **independent OpenFlightMaps layers and visualization** for the
 default Hannover/Lehrte eight-site study. Acquire a pinned OFMX revision, inspect
 airspaces/aerodromes and original height references, and open the backend's
 standalone [OFM preview](http://127.0.0.1:8000/ofm). Export a self-contained HTML
@@ -10,6 +11,7 @@ separate from the main explorer map and route/permission decisions.
 
 ```powershell
 uv run --project backend --locked uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
+New-Item -ItemType Directory -Force .cache | Out-Null
 uv run --project backend --locked uas-planner ofm-preview data/.ofm/hannover-2610-new --output .cache/ofm-preview-new.html
 ```
 
