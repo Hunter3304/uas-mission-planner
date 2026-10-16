@@ -24,6 +24,18 @@ def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
+    for name in ("ofm-fetch", "ofm-import", "ofm-inspect", "ofm-rebuild", "ofm-preview"):
+        command = commands.add_parser(name, help="Independent OFM snapshot/display workflow")
+        if name in ("ofm-fetch", "ofm-import"):
+            command.add_argument("--cycle", required=True)
+            command.add_argument("--region", type=Path)
+        if name == "ofm-import":
+            command.add_argument("--archive", type=Path, required=True)
+            command.add_argument("--publication", type=Path, required=True)
+        if name not in ("ofm-fetch", "ofm-import"):
+            command.add_argument("directory", type=Path)
+        if name != "ofm-inspect":
+            command.add_argument("--output", type=Path, required=True)
     regional_route = commands.add_parser(
         "study-route", help="Plan a weighted regional route offline"
     )
@@ -171,6 +183,32 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command.startswith("ofm-"):
+            from uas_planner.acquisition.ofm import acquire_ofm, rebuild_ofm
+            from uas_planner.core.ofm import import_snapshot, load_snapshot, read
+            from uas_planner.core.ofm_preview import export_preview
+
+            if args.command == "ofm-fetch":
+                result = acquire_ofm(
+                    args.cycle, args.output, region=read(args.region) if args.region else None
+                )
+            elif args.command == "ofm-import":
+                result = import_snapshot(
+                    args.archive,
+                    args.publication,
+                    args.output,
+                    cycle=args.cycle,
+                    region=read(args.region) if args.region else None,
+                )
+            elif args.command == "ofm-rebuild":
+                result = rebuild_ofm(args.directory, args.output)
+            elif args.command == "ofm-preview":
+                export_preview(args.directory, args.output)
+                result = {"preview": str(args.output), "offline": True}
+            else:
+                result = load_snapshot(args.directory)
+            print(json.dumps(result, indent=2, allow_nan=False))
+            return 0
         if args.command == "study-route":
             from uas_planner.core.experiment import read_json
             from uas_planner.core.regional_routing import plan_regional_route

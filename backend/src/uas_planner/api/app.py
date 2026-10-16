@@ -44,6 +44,9 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     default = Path(__file__).resolve().parents[4] / "data"
     root = Path(data_dir or os.environ.get("UAS_DATA_DIR", default)).resolve()
     api = FastAPI(title="UAS Mission Planner", version=__version__)
+    from uas_planner.api.ofm import router as ofm_router
+
+    api.include_router(ofm_router(root))
 
     def dataset_path(dataset_id: str) -> Path:
         if not DATASET_ID.fullmatch(dataset_id):

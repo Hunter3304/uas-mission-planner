@@ -1,0 +1,60 @@
+{
+  "region_id": "hannover-lehrte-5km",
+  "bounds": {
+    "west": 9.650495867959657,
+    "south": 52.32042221571155,
+    "east": 10.068841103123809,
+    "north": 52.45032927853548
+  },
+  "detour_margin_m": 5000,
+  "locations": [
+    {
+      "id": "mhh",
+      "name": "Medizinische Hochschule Hannover",
+      "longitude": 9.8044306,
+      "latitude": 52.3834796
+    },
+    {
+      "id": "henriettenstift",
+      "name": "DIAKOVERE Henriettenstift",
+      "longitude": 9.7549621,
+      "latitude": 52.3693498
+    },
+    {
+      "id": "rheuma-lister",
+      "name": "Rheumapraxis Hannover – Lister Meile",
+      "longitude": 9.7454914,
+      "latitude": 52.3830161
+    },
+    {
+      "id": "rheuma-podbi",
+      "name": "Rheumapraxis Hannover – Podbielskistraße",
+      "longitude": 9.7967855,
+      "latitude": 52.4044919
+    },
+    {
+      "id": "limbach-lehrte",
+      "name": "MVZ Labor Limbach Lehrte",
+      "longitude": 9.9934419,
+      "latitude": 52.3660066
+    },
+    {
+      "id": "amedes-georg",
+      "name": "amedes MVZ wagnerstibbe",
+      "longitude": 9.7404959,
+      "latitude": 52.3718267
+    },
+    {
+      "id": "amedes-schiffgraben",
+      "name": "amedes MVZ genetics",
+      "longitude": 9.7513771,
+      "latitude": 52.3753923
+    },
+    {
+      "id": "friederikenstift",
+      "name": "DIAKOVERE Friederikenstift",
+      "longitude": 9.7246387,
+      "latitude": 52.3711038
+    }
+  ]
+}

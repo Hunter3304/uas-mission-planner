@@ -2,6 +2,117 @@
 
 ## Current status
 
+### Iteration 011 feature integrated; main delivery (2026-10-16)
+
+- Feature PR #101 merged at `4338849` after Linux/Windows/frontend run
+  `38891678564` passed on reviewed `7c172ed`. Issue #100 is explicitly closed.
+  Merged feature cleanup was verified locally/remotely with fetch/prune and
+  branch/remote checks. Issue #98 is also closed; iteration history remains.
+- Local implementation/acceptance was completed on `feature/100-ofm-visualization`,
+  created after Issue #100 in Milestone 10. Planning Issue #98 / PR #99 passed
+  run `38889659526` and merged at `fcae27c`; the merged documentation branch was
+  removed locally/remotely with fetch/prune and branch/remote verification.
+- New CLI: `ofm-fetch/import/inspect/rebuild/preview`; storage `data/.ofm/{id}`;
+  read-only `/api/ofm/snapshots...`; standalone backend `/ofm` and downloadable
+  self-contained HTML. No main-map or planner integration. The eight-site default
+  is packaged and regression-checked against the saved study configuration.
+- Real official acquisition `data/.ofm/hannover-2610-v2`: five drawable airspaces,
+  five invalid regional bbox candidates, four OFM aerodrome/helipad points and
+  eight project reference sites. Twenty-two diagnostics retain invalid/unknown
+  records and duplicate/variant issues. Offline rebuild file hashes match exactly.
+- Current checks: 274 backend passes / one existing Windows permission skip;
+  13 OFM checks, Ruff, frontend lint/build, 14 mocked browser and 14 real-stack
+  smoke passes with clean exits. Real desktop/mobile preview has no page errors
+  or horizontal overflow. Outcome: `doc/iteration/iteration-011/outcome.md`;
+  operation/API guide: `doc/experiments/iteration-011.md`.
+- Source/derived real data, screenshots and raw receipt evidence remain local.
+  Offline wheel build also passes and includes the HTML/default-region resources.
+  Full license archival, unsupported raw/derived geometry and OFM legal decisions
+  remain explicit limitations. No user-owned services were stopped. Feature/main
+  integration retains an independent successful-CI gate; record main facts later.
+- User explicitly requested starting the approved OFM visualization plan under
+  the standard workflow. This supersedes prior draft/documentation-only notes.
+- Implement the independent snapshot/import layer, bounded read-only API and
+  standalone offline preview for the saved Hannover eight-site region. Retain
+  existing main explorer and planner contracts; no OFM route/legal integration.
+- Follow milestone -> iteration/011 -> issue-before-feature -> successful feature
+  CI/merge/cleanup -> independent main PR gate and final documentation workflow.
+- The previously published `docs/iteration011-plan` branch predates implementation
+  authorization. Integrate its approved documentation with separate tracking/CI;
+  preserve raw data, private profiles and user-owned development services.
+
+
+### Iteration 011 documentation publication authorized (2026-10-16)
+
+- User explicitly requested committing and pushing the existing OFM documentation.
+  Publish the draft plan, feasibility note, source index and handoff together on
+  `docs/iteration011-plan`; this is documentation publication only.
+- The plan contains six ordered implementation steps, not five formally scoped
+  Parts. The five items in the Chinese explanation summarized the proposed work.
+- Implementation remains unstarted. Keep the plan in draft review status and do
+  not create implementation tracking, alter application code or merge into main
+  on the strength of this documentation-push request alone.
+
+### OpenFlightMaps visualization plan requested (2026-10-15)
+
+- User requested a plan and Chinese explanation before starting implementation.
+  Draft: `doc/plan/iteration-011.md`. Only planning/documentation is authorized;
+  do not start acquisition/import/API/preview code or implementation tracking.
+  Documentation publication was subsequently authorized on 2026-10-16 above.
+- First delivery is an independent OFM layer with a standalone visualization
+  preview, source information inventory and documented interfaces. Interpret the
+  request to defer map integration as keeping the current main explorer unchanged.
+  Show the study boundary and eight reference sites without requiring a basemap.
+- Display airspace name/ID/type/class, original lower/upper units and references,
+  available schedules/remarks and snapshot/quality metadata. Aerodromes can be a
+  separate point sublayer when present; runway/frequency/navigation information
+  is inventoried with priorities in the plan. Proposed APIs are not existing ones.
+- Route-intersection analysis, automatic OFM constraints, DIPUL fusion and existing
+  main-map integration are deferred. This narrows the earlier research suggestion;
+  the visualization plan is the current intended scope.
+
+### Standing default study and map scope (user-confirmed 2026-10-15)
+
+- Unless a later user instruction selects another region, default to the existing
+  Hannover/Lehrte eight-site study `hannover-lehrte-5km`, matching saved
+  `hannover-part1-v4`. Canonical versioned configuration:
+  `doc/experiments/iteration-008/hannover-study.json`; retain its 5,000 m margin.
+- WGS84 bounds, in west/south/east/north order:
+  `9.650495867959657, 52.32042221571155, 10.068841103123809, 52.45032927853548`.
+  Reuse these exact saved bounds; do not substitute Hannover city limits, a fresh
+  point bounding box, nationwide scope or an automatically enlarged region.
+- Eight sites: `mhh`, `henriettenstift`, `rheuma-lister`, `rheuma-podbi`,
+  `limbach-lehrte`, `amedes-georg`, `amedes-schiffgraben`, `friederikenstift`.
+- Subsequent layer selection/processing and initial map/preview extent use this
+  region by default. Fit the view to the study boundary and keep all sites visible.
+  Panning/zooming does not acquire/expand data; source download extent may be
+  larger, but display responses stay region-bounded. This is not a pan/zoom lock.
+- Historical Braunschweig data and original snapshots remain unchanged and can
+  be selected explicitly. This session records the default policy only; no runtime
+  map/default-setting code is changed before implementation authorization.
+
+### OpenFlightMaps feasibility research (2026-10-15)
+
+- User requested feasibility research for this week's OFM task, before implementation.
+  Reviewed official distribution/docs and downloaded one bounded public Germany
+  AIRAC 2610 OFMX snapshot. No application code, original dataset, issue, milestone,
+  branch, commit or remote publication was changed by this research.
+- Source note: `doc/data-sources/02-openflightmaps.md`. Retained receipts/probes at
+  `.cache/ofm-feasibility-20261015/`. ZIP 7,709,535 bytes; isolated version 0.1:
+  1,056 airspaces, 1,048 boundaries, 1,360 aerodromes. XML effective 2026-10-12;
+  cycle validity alone does not cover the 2026-10-07 historical scenario.
+- Supplied isolated shape-extension probe: 1,022 valid / 26 invalid candidates,
+  five valid intersections with the retained study and five invalid overlapping
+  bounding boxes. No source-wide geometry or XSD validation is claimed.
+- Hannover CTR HEI 0 FT -> ALT 2500 FT is present; original refs, FL, schedules,
+  raw arcs/frontiers/shared geometry and duplicate DIPUL semantics need explicit
+  handling. Full historical GUL link is 404; complete license archival is outstanding.
+- Recommended first scope: pinned offline acquisition/import, separate bounded map
+  layer and property/intersection diagnostics. Shared automatic planner constraints
+  need an agreed subsequent semantic scope. No implementation sprint is approved.
+- Documentation-only research updates; no application regression rerun is needed.
+
+
 ### Iteration 008 Part 5 verified main delivery (2026-10-15)
 
 - User authorized merging Part 5, updating README/HANDOFF and matching the latest
