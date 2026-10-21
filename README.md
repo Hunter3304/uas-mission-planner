@@ -10,15 +10,15 @@ Part 2, delivered to `iteration/012` through
 adds precomputed independent category-cost styles, on-demand original-object
 details and shared demo style helpers. Re-run the prepare command for the new
 schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
-Part 3 implements the regional colored-map UI on
+Part 3 delivers the regional colored-map UI to `iteration/012` through
 [PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109)
 (Issue #108): the initial view shows a labelled
 aggregate overview, while zoom 15+ requests bounded individual objects.
 Use **Show saved OSM**, the four category switches, **OSM color view** and
 **OSM cost category**. Click an object for original tags and independent costs;
 **Focus origin/destination** opens a local detail view. Route results and map
-position survive OSM changes. Part 3 feature CI/integration and Part 4's full
-resource/performance acceptance remain separate delivery gates. See
+position survive OSM changes. Linux/Windows/frontend CI passed before integration;
+Part 4's full resource/performance acceptance and main integration remain pending. See
 [Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and
 [real-data acceptance](doc/iteration/iteration-012/part1.md).

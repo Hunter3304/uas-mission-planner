@@ -4,9 +4,20 @@ Date: 2026-10-21 (Europe/Berlin). The user requested Part 3 completion and later
 confirmed continuing the same task. Assigned Issue #108 in verified Milestone 11
 was created before `feature/108-regional-osm-map` from `iteration/012` at `d5002c3`.
 Part 3 implementation and local acceptance are complete at `b826f9d`.
-[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109) publishes
-the feature to `iteration/012`; successful remote CI/integration and Part 4
-remain separate gates at this record. Main is unchanged.
+[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109) merged
+the feature into `iteration/012` at `cf2350697352f532d5165cdf1d34c207b7869f9c`.
+Part 4 and main integration remain pending. Main is unchanged.
+
+## Verified feature delivery
+
+[Checks run 39670301509](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39670301509)
+explicitly completed Linux Python, Windows Python and frontend successfully on
+reviewed feature head `d33763a3d5363821d717f402c663b484df64c58b` before the merge.
+Issue #108 was explicitly closed as completed. Local `iteration/012` fast-forwarded
+to the merge; feature-head ancestry was verified before deleting the remote
+feature with an expected-head lease and removing it locally. Fetch/prune,
+`git branch -a` and `git ls-remote --heads origin` verified cleanup. Retain
+Milestone 11 and `iteration/012` for Part 4. Main remains `a034bc0`.
 
 ## Result
 

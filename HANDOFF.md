@@ -2,6 +2,21 @@
 
 ## Current status
 
+### Iteration 012 Part 3 verified feature delivery (2026-10-21)
+
+- PR #109 merged Part 3 into `iteration/012` at `cf23506`, after Checks run
+  `39670301509` explicitly passed Linux Python, Windows Python and frontend on
+  reviewed head `d33763a`. Issue #108 was explicitly closed as completed.
+- Local `iteration/012` fast-forwarded to the verified merge. Confirmed feature
+  ancestry before removing the remote branch with an expected-head lease and
+  deleting the local feature. Fetch/prune, branch -a and ls-remote verify cleanup.
+  Retain Milestone 11 and `iteration/012` for Part 4. Main remains `a034bc0`.
+- README, plan and Part 3 acceptance record actual delivery. Earlier Part 3
+  publication/CI/integration-pending notes below are historical and superseded.
+  Part 4's browser latency/resource campaign and off/on route comparison remain
+  pending, together with full iteration/main integration. Original data, private
+  profiles and user-owned services remain intact; isolated test services stopped.
+
 ### Iteration 012 Part 3 implementation and local acceptance (2026-10-21)
 
 - User requested Part 3 completion and confirmed continuing that task. Assigned

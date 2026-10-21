@@ -1,8 +1,8 @@
 # Iteration 012 - Hannover OSM display performance and category colors
 
 Date: 2026-10-21 (Europe/Berlin).
-Status: **Parts 1-2 delivered to iteration/012 on 2026-10-21;
-Part 3 implemented locally with acceptance; Part 4 remains planned**.
+Status: **Parts 1-3 delivered to iteration/012 on 2026-10-21;
+Part 4 remains planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
@@ -25,10 +25,13 @@ The user requested Part 3 completion on 2026-10-21. Assigned Issue #108 in
 Milestone 11 precedes `feature/108-regional-osm-map`, based on `iteration/012`
 at `d5002c3`. Regional viewport/overview integration, category/cost controls,
 original-object details and independent overlay lifecycles are implemented.
-See [Part 3 acceptance](../iteration/iteration-012/part3.md) and published
+See [Part 3 acceptance](../iteration/iteration-012/part3.md) and merged
 [PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109).
-Successful feature CI/integration and Part 4's full acceptance remain separate
-gates at this record; main is unchanged.
+PR #109 merged at `cf23506` after Checks run `39670301509` explicitly passed
+Linux Python, Windows Python and frontend on reviewed head `d33763a`. Issue #108
+is closed; its merged feature was removed locally/remotely after ancestry and
+expected-head verification, followed by fetch/prune and branch/remote checks.
+Part 4's full acceptance and main integration remain pending; main is unchanged.
 
 ## Objective
 
@@ -188,8 +191,8 @@ totals where a bounded probe only establishes that the limit was exceeded.
 ## Implementation sequence
 
 The four Parts below form one coherent display delivery. Part 1 is tracked by
-closed Issue #104 and Part 2 by closed Issue #106. Part 3 is implemented under
-Issue #108; Part 4 has not started.
+closed Issue #104 and Part 2 by closed Issue #106. Part 3 is delivered under
+closed Issue #108; Part 4 has not started.
 
 1. **Part 1 - Bounded data access and preparation.** Confirm spatial index and
    safe sample baselines; define schemas, verification lifecycle and limits;
