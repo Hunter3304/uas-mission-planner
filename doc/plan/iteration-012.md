@@ -1,11 +1,12 @@
 # Iteration 012 - Hannover OSM display performance and category colors
 
 Date: 2026-10-21 (Europe/Berlin).
-Status: **Part 1 implementation authorized on 2026-10-21; Parts 2-4 remain planned**.
+Status: **Part 1 delivered to iteration/012 on 2026-10-21; Parts 2-4 remain planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
-`feature/104-osm-display-access`. This supersedes the earlier planning-only status
-for Part 1. Complete feature delivery under the established workflow; full sprint
+`feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
+`64fff6a` after all three CI jobs passed in run `39628187365` attempt 2; Issue #104
+is closed. This supersedes the earlier planning-only status for Part 1. Full sprint
 integration to main awaits the remaining scope. See
 [Part 1 implementation and acceptance](../iteration/iteration-012/part1.md).
 

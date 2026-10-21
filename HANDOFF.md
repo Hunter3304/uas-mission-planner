@@ -2,6 +2,23 @@
 
 ## Current status
 
+### Iteration 012 Part 1 verified feature delivery (2026-10-21)
+
+- PR #105 merged Part 1 into `iteration/012` at `64fff6a`, after Checks run
+  `39628187365` attempt 2 passed Linux Python, Windows Python and frontend on
+  the reviewed feature head `0338388`. Issue #104 is explicitly closed.
+- The first attempt completed every frontend step but retained a stale running
+  frontend check despite a successful workflow conclusion. Reran that job and
+  verified all three checks explicitly completed successfully before merging.
+- Local `iteration/012` fast-forwarded to the verified merge. The merged feature
+  branch was removed remotely with an expected-head lease and locally after
+  ancestry verification; fetch/prune, branch -a and ls-remote checks confirm
+  cleanup. Keep `iteration/012` and Milestone 11 for the remaining Parts.
+- README/plan/outcome record the Part 1 integration. Main remains `a034bc0`;
+  Parts 2-4 have not started. Original data/private profiles and user services
+  remain intact. The earlier approval block and pending-publication notes below
+  are superseded by the explicit authorization and this verified delivery.
+
 ### Iteration 012 Part 1 publication authorized (2026-10-21)
 
 - User explicitly authorized pushing `iteration/012` and

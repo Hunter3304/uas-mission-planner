@@ -1,6 +1,8 @@
 # UAS Mission Planner
 
-Iteration 012 **Part 1** adds explicit OSM display preparation, bounded regional
+Iteration 012 **Part 1**, delivered to `iteration/012` through
+[PR #105](https://github.com/Hunter3304/uas-mission-planner/pull/105),
+adds explicit OSM display preparation, bounded regional
 viewport/overview APIs and a guard against the full Hannover response. Run
 `uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
 The regional colored-map UI is scheduled for Parts 2/3; its existing OSM switch

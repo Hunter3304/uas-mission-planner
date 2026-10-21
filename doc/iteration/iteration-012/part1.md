@@ -3,8 +3,9 @@
 Date: 2026-10-21 (Europe/Berlin).
 User-authorized Part 1; Milestone 11 / Issue #104. Integration branch
 `iteration/012`; feature `feature/104-osm-display-access` from main `a034bc0`.
-Local implementation and acceptance are complete at `ccfcd31`. Parts 2-4 and
-full main integration remain pending.
+Local implementation and acceptance are complete at `ccfcd31`. Feature delivery
+through PR #105 merged into `iteration/012` at `64fff6a` on 2026-10-21.
+Parts 2-4 and full main integration remain pending.
 
 ## Delivery state
 
@@ -15,11 +16,20 @@ Part 1 into `iteration/012` after successful CI. Repository identity/push permis
 and the remote main base `a034bc0` were verified before publication. This supersedes
 the earlier automatic-approval rejection; that rejected push was not executed.
 
-Implementation and local acceptance are complete. Publication and the independent
-Linux/Windows/frontend feature gate proceed under this explicit authorization;
-actual PR/run/merge and cleanup facts are recorded after verification. Issue #104
-remains open until the Part 1 merge is verified. Milestone 11 remains open for
-Parts 2-4. No main merge is included in this delivery.
+Feature [PR #105](https://github.com/Hunter3304/uas-mission-planner/pull/105) passed
+[Checks run 39628187365](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39628187365)
+attempt 2 on reviewed head `0338388690f44eb689afb32a77f3a2b5f6396041`:
+Linux Python, Windows Python and frontend each explicitly completed successfully.
+The first attempt had a stale running frontend check despite all steps and the
+workflow conclusion showing success; a frontend-job rerun resolved the status.
+No merge was performed while that check remained pending.
+
+The PR merged at `64fff6ad200dbc3c32297ce62c432c18f7601e1b`. Local `iteration/012`
+was fast-forwarded to that merge and Issue #104 was explicitly closed. Verified
+the merged source branch's ancestry, deleted it remotely with an expected-head
+lease and locally, fetched/pruned, and checked both local/remote-tracking branches
+and `ls-remote` to confirm cleanup. Milestone 11 stays open for Parts 2-4.
+Main remains at `a034bc0`; no main merge is included in this delivery.
 
 ## Result
 
