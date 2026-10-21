@@ -3,8 +3,10 @@
 Date: 2026-10-21 (Europe/Berlin). The user requested Part 3 completion and later
 confirmed continuing the same task. Assigned Issue #108 in verified Milestone 11
 was created before `feature/108-regional-osm-map` from `iteration/012` at `d5002c3`.
-Part 3 implementation and local acceptance are complete. Feature publication,
-remote CI/integration and Part 4 remain separate gates; main is unchanged.
+Part 3 implementation and local acceptance are complete at `b826f9d`.
+[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109) publishes
+the feature to `iteration/012`; successful remote CI/integration and Part 4
+remain separate gates at this record. Main is unchanged.
 
 ## Result
 

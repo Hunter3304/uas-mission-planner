@@ -25,8 +25,10 @@ The user requested Part 3 completion on 2026-10-21. Assigned Issue #108 in
 Milestone 11 precedes `feature/108-regional-osm-map`, based on `iteration/012`
 at `d5002c3`. Regional viewport/overview integration, category/cost controls,
 original-object details and independent overlay lifecycles are implemented.
-See [Part 3 acceptance](../iteration/iteration-012/part3.md). Feature publication,
-CI/integration and Part 4's full acceptance remain separate gates; main is unchanged.
+See [Part 3 acceptance](../iteration/iteration-012/part3.md) and published
+[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109).
+Successful feature CI/integration and Part 4's full acceptance remain separate
+gates at this record; main is unchanged.
 
 ## Objective
 

@@ -11,7 +11,8 @@ adds precomputed independent category-cost styles, on-demand original-object
 details and shared demo style helpers. Re-run the prepare command for the new
 schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
 Part 3 implements the regional colored-map UI on
-`feature/108-regional-osm-map` (Issue #108): the initial view shows a labelled
+[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109)
+(Issue #108): the initial view shows a labelled
 aggregate overview, while zoom 15+ requests bounded individual objects.
 Use **Show saved OSM**, the four category switches, **OSM color view** and
 **OSM cost category**. Click an object for original tags and independent costs;

@@ -22,7 +22,9 @@
   category/cost selections, original details, historical research route/export
   with OSM on, desktop/mobile and unchanged source bytes. Route updates do not
   issue OSM requests. See `doc/iteration/iteration-012/part3.md`.
-- Feature publication/remote CI/integration remains pending at this local record.
+- Feature code/local acceptance is committed at `b826f9d` and published through
+  PR #109 targeting `iteration/012`. Successful Linux/Windows/frontend CI and
+  verified feature integration/cleanup remain pending at this record.
   Part 4 still owns full browser/resource/off-on route acceptance and main
   integration. Main remains `a034bc0`. Preserve original data, private profiles,
   user services and Milestone 11. Prior Parts 3-4-unstarted notes below are history.
