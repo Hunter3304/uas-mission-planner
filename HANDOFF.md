@@ -23,9 +23,15 @@
   API/display 33 passes / one skip; Ruff, frontend lint/build, 14 mocked browser
   and 14 real-stack smoke passes. Local browser tests use `PLAYWRIGHT_CHANNEL=chrome`
   because the bundled Chromium executable is absent. No user service was stopped.
+- Code/local acceptance committed at `ccfcd31`. Automatic approval review rejected
+  pushing `iteration/012` and `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner.git`, citing lack of explicit
+  authorization to publish code to that specific remote/create two branches.
+  No push was executed or retried. User approval is needed for publication; no
+  feature PR/remote CI/merge/cleanup has occurred. Issue #104 remains open.
 - Outcome: `doc/iteration/iteration-012/part1.md`; operation/reproduction:
   `doc/experiments/iteration-012/README.md` and `verify-part1.py`. Feature CI and
-  integration facts follow after verification. Original data/cache evidence stay
+  integration are pending publication approval. Original data/cache evidence stay
   local; Part 2 classification/detail and Part 3 map integration remain pending.
 
 ### Iteration 012 OSM display plan requested (2026-10-21)
