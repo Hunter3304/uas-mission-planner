@@ -1000,3 +1000,15 @@ td {
 #regional-map fieldset { border: 1px solid #cbd8d5; border-radius: 8px; margin-bottom: 14px; padding: 12px; }
 #regional-map fieldset label { padding: 4px 0; font-size: 13px; }
 #regional-map pre { max-height: 280px; overflow: auto; }
+.regional-osm { min-width: 0; overflow-wrap: anywhere; }
+.osm-categories, .osm-selectors, .osm-object-list { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 12px 0; }
+.osm-selectors { align-items: end; }
+.osm-selectors label { display: flex; flex-direction: column; gap: 5px; max-width: 100%; }
+.osm-selectors select { min-width: 0; max-width: 100%; padding: 7px; }
+.regional-osm button { cursor: pointer; padding: 6px 10px; border: 1px solid #cbd8d5; border-radius: 5px; background: #f5f8f6; max-width: 100%; overflow-wrap: anywhere; }
+.regional-osm button:focus-visible { outline: 2px solid #26866c; outline-offset: 2px; }
+.regional-osm button:disabled { cursor: default; opacity: 0.6; }
+.osm-details { padding: 14px; border: 1px solid #cbd8d5; margin: 12px 0; border-radius: 8px; max-height: 600px; overflow: auto; }
+.osm-details dl > div { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 3fr); gap: 8px; border-bottom: 1px solid #e4ebe7; padding: 5px 0; }
+.osm-details dt { font-weight: 600; }
+.osm-details dd { margin: 0; white-space: pre-wrap; }

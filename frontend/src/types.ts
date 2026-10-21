@@ -39,11 +39,50 @@ export interface BuildingCost extends CostScore {
   label: string
   tags: TagCost[]
 }
-export type OsmDisplayFeature = Feature<Geometry | null, {
-  element_type: string
-  osm_id: number
-  categories: LayerKey[]
-}> & { cost_analysis?: CostScore | null }
+export type OsmDisplayFeature = Feature<
+  Geometry | null,
+  {
+    element_type: string
+    osm_id: number
+    categories: LayerKey[]
+  }
+> & { cost_analysis?: CostScore | null }
+export type OsmIdentity = Record<string, string | number>
+export interface OsmSummary {
+  state: string
+  verified: boolean
+  message?: string
+  identity: OsmIdentity
+  coverage_bounds: number[]
+  feature_count: number
+  drawable_count: number
+  layer_counts: Record<LayerKey, number>
+  diagnostics: {
+    counts: Record<string, number>
+    samples: { element_type: string; osm_id: number; reason: string }[]
+    samples_complete: boolean
+  }
+}
+export type OsmCollection = Omit<FeatureCollection, 'features'> & {
+  features: (OsmDisplayFeature & {
+    properties: OsmDisplayFeature['properties'] & {
+      objects?: number
+      category_counts?: Partial<Record<LayerKey, number>>
+    }
+  })[]
+  display: {
+    identity: OsmIdentity
+    representation: 'detail' | 'aggregate_overview'
+    complete: boolean
+    outside_coverage: boolean
+    returned_count: number
+    limit_reason?: string | null
+    counts_scope?: string
+    assignment?: string
+    style: 'category' | 'cost'
+    cost_category?: LayerKey | null
+  }
+}
 export interface OsmObjectDetail extends Omit<MapFeature, 'geometry'> {
   geometry: Geometry | null
   display: {
