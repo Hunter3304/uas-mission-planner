@@ -2,6 +2,73 @@
 
 ## Current status
 
+### Iteration 012 Part 1 publication authorized (2026-10-21)
+
+- User explicitly authorized pushing `iteration/012` and
+  `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating the feature PR,
+  and merging Part 1 into `iteration/012` after successful CI. This supersedes
+  the prior publication-approval block below. Main integration remains outside
+  this Part 1 delivery.
+- Verified repository identity/push permission through the GitHub connector and
+  remote main at `a034bc0`; neither new branch existed remotely before publication.
+  Publish the reviewed code/local acceptance with this authorization record,
+  verify the final feature head's Linux/Windows/frontend CI, then merge and
+  perform the mandatory verified feature-branch cleanup. Keep Milestone 11 open
+  for later Parts; close Issue #104 after Part 1 integration is verified.
+
+### Iteration 012 Part 1 implementation and local acceptance (2026-10-21)
+
+- User reviewed the plan and requested Part 1 completion. Milestone 11 / Issue
+  #104 precede `feature/104-osm-display-access` from new `iteration/012` at main
+  `a034bc0`. Part 1 authorization supersedes its earlier planning-only status.
+  Parts 2-4 remain planned; no full sprint merge to main is included yet.
+- Implemented explicit `study-osm-prepare`, a streamed checksummed SQLite/R-tree
+  display cache, readiness, category-only viewport/summary/overview APIs, bounded
+  responses/concurrency, source/rule invalidation and guarded legacy regional
+  responses. Warm regional catalog reads avoid full GeoDataFrames. The explorer
+  integrity badge respects metadata-only `verified: false` entries.
+- Real Hannover final evidence: `.cache/iteration012-part1-real-final/`.
+  326,334 original / 326,311 drawable records; 13 invalid and 10 unsupported
+  geometries remain diagnosed. All 20 viewports agree with independent original
+  source selection; API p95 0.191 s / max 0.322 s, overview 1,580 cells / 591,227
+  bytes, explicit preparation 68.90 s. Source checksums unchanged. API timings
+  exclude real TCP/browser rendering; no colored-map completion is claimed.
+- Local backend 299 passes / one existing Windows permission skip; focused
+  API/display 33 passes / one skip; Ruff, frontend lint/build, 14 mocked browser
+  and 14 real-stack smoke passes. Local browser tests use `PLAYWRIGHT_CHANNEL=chrome`
+  because the bundled Chromium executable is absent. No user service was stopped.
+- Code/local acceptance committed at `ccfcd31`. Automatic approval review rejected
+  pushing `iteration/012` and `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner.git`, citing lack of explicit
+  authorization to publish code to that specific remote/create two branches.
+  No push was executed or retried. User approval is needed for publication; no
+  feature PR/remote CI/merge/cleanup has occurred. Issue #104 remains open.
+- Outcome: `doc/iteration/iteration-012/part1.md`; operation/reproduction:
+  `doc/experiments/iteration-012/README.md` and `verify-part1.py`. Feature CI and
+  integration are pending publication approval. Original data/cache evidence stay
+  local; Part 2 classification/detail and Part 3 map integration remain pending.
+
+### Iteration 012 OSM display plan requested (2026-10-21)
+
+- User requested an Iteration 012 plan and a Chinese report for Hannover OSM
+  loading and demo-equivalent category/cost colors. Draft:
+  `doc/plan/iteration-012.md`. Current work is local planning only; implementation
+  and remote tracking/publication have not started under this request.
+- Read-only inspection confirms 326,334 Hannover objects / 1,481 tag fields.
+  The `/features` sparse branch checks only `experiment.json`; regional data
+  expands absent tags. RegionalMap also loads the whole collection, colors OSM
+  uniformly brown and rebuilds OSM layers on unrelated route/state changes.
+- Proposed four Parts: bounded spatial access/cache and overview; shared colors
+  and object details; viewport-driven regional map; real-data/performance acceptance.
+  Reuse the saved Hannover eight-site bounds and current classification rules.
+  Include source verification/cache invalidation and OSM-on route acceptance.
+- Initial full-region view gets a labelled aggregate overview; individual colored
+  objects load at detail scale with explicit response budgets. Full multizoom
+  tiles/WebGL are deferred pending measurements. All performance gates in the
+  plan are proposed targets, not results. Original sources and planner semantics
+  remain the baseline. No application code, services or source data changed.
+
 ### Iteration 011 verified main delivery (2026-10-16)
 
 - Main PR #102 merged at `0c29142` after independent Linux/Windows/frontend run `38892111216` passed on reviewed `388bb05`.
