@@ -8,18 +8,18 @@ full main integration remain pending.
 
 ## Delivery state
 
-Milestone 11 and Issue #104 exist on GitHub. The local implementation is committed
-on the feature branch; local `iteration/012` remains at the existing main base.
-Automatic approval review rejected the attempted push of `iteration/012` and
-`feature/104-osm-display-access` to
-`https://github.com/Hunter3304/uas-mission-planner.git`: it did not consider the
-Part 1 instruction explicit authorization to publish code to that specific remote
-and create two remote branches. The rejected push was not executed or retried.
-Explicit user approval is required before remote publication can proceed.
+Milestone 11 and Issue #104 exist on GitHub. On 2026-10-21 the user explicitly
+authorized pushing `iteration/012` and `feature/104-osm-display-access` to
+`https://github.com/Hunter3304/uas-mission-planner`, creating a PR, and merging
+Part 1 into `iteration/012` after successful CI. Repository identity/push permission
+and the remote main base `a034bc0` were verified before publication. This supersedes
+the earlier automatic-approval rejection; that rejected push was not executed.
 
-No Part 1 PR, remote CI, feature merge or branch cleanup is claimed. Issue #104
-remains open for that delivery gate. All implementation/local acceptance work is
-complete and reviewable; this publication gate is separate from functionality.
+Implementation and local acceptance are complete. Publication and the independent
+Linux/Windows/frontend feature gate proceed under this explicit authorization;
+actual PR/run/merge and cleanup facts are recorded after verification. Issue #104
+remains open until the Part 1 merge is verified. Milestone 11 remains open for
+Parts 2-4. No main merge is included in this delivery.
 
 ## Result
 

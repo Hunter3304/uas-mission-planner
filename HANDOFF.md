@@ -2,6 +2,21 @@
 
 ## Current status
 
+### Iteration 012 Part 1 publication authorized (2026-10-21)
+
+- User explicitly authorized pushing `iteration/012` and
+  `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating the feature PR,
+  and merging Part 1 into `iteration/012` after successful CI. This supersedes
+  the prior publication-approval block below. Main integration remains outside
+  this Part 1 delivery.
+- Verified repository identity/push permission through the GitHub connector and
+  remote main at `a034bc0`; neither new branch existed remotely before publication.
+  Publish the reviewed code/local acceptance with this authorization record,
+  verify the final feature head's Linux/Windows/frontend CI, then merge and
+  perform the mandatory verified feature-branch cleanup. Keep Milestone 11 open
+  for later Parts; close Issue #104 after Part 1 integration is verified.
+
 ### Iteration 012 Part 1 implementation and local acceptance (2026-10-21)
 
 - User reviewed the plan and requested Part 1 completion. Milestone 11 / Issue
