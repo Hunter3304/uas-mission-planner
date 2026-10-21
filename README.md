@@ -1,5 +1,13 @@
 # UAS Mission Planner
 
+Iteration 012 **Part 1** adds explicit OSM display preparation, bounded regional
+viewport/overview APIs and a guard against the full Hannover response. Run
+`uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
+The regional colored-map UI is scheduled for Parts 2/3; its existing OSM switch
+still targets the guarded legacy endpoint. See the
+[Part 1 operation guide](doc/experiments/iteration-012/README.md) and
+[real-data acceptance](doc/iteration/iteration-012/part1.md).
+
 Iteration 011, delivered through [PR #102](https://github.com/Hunter3304/uas-mission-planner/pull/102),
 adds **independent OpenFlightMaps layers and visualization** for the
 default Hannover/Lehrte eight-site study. Acquire a pinned OFMX revision, inspect

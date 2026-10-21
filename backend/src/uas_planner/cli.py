@@ -24,6 +24,14 @@ def parser():
     result = argparse.ArgumentParser(description="Small-area OSM dataset acquisition")
     result.add_argument("--version", action="version", version=f"uas-planner {__version__}")
     commands = result.add_subparsers(dest="command", required=True)
+    display = commands.add_parser(
+        "study-osm-prepare", help="Explicitly verify/build a bounded regional OSM display cache"
+    )
+    display.add_argument("directory", type=Path)
+    display.add_argument("--cache-root", type=Path)
+    display.add_argument(
+        "--refresh", action="store_true", help="Reverify sources and rebuild derived display data"
+    )
     for name in ("ofm-fetch", "ofm-import", "ofm-inspect", "ofm-rebuild", "ofm-preview"):
         command = commands.add_parser(name, help="Independent OFM snapshot/display workflow")
         if name in ("ofm-fetch", "ofm-import"):
@@ -183,6 +191,19 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command == "study-osm-prepare":
+            from uas_planner.core.osm_display import DisplayStore
+
+            store = DisplayStore(
+                args.cache_root or args.directory.resolve().parent / ".osm-display"
+            )
+            result = store.prepare(
+                args.directory,
+                refresh=args.refresh,
+                progress=lambda state: print(json.dumps(state), file=sys.stderr),
+            )
+            print(json.dumps(result, indent=2))
+            return 0
         if args.command.startswith("ofm-"):
             from uas_planner.acquisition.ofm import acquire_ofm, rebuild_ofm
             from uas_planner.core.ofm import import_snapshot, load_snapshot, read
