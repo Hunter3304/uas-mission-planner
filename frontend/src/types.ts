@@ -28,14 +28,36 @@ export interface TagCost {
   reason: string
   source: string
 }
-export interface BuildingCost {
-  rule_version: string
+export interface CostScore {
   cost: number | null
-  label: string
   status: string
   has_default: boolean
   obstruction: boolean
+}
+export interface BuildingCost extends CostScore {
+  rule_version: string
+  label: string
   tags: TagCost[]
+}
+export type OsmDisplayFeature = Feature<Geometry | null, {
+  element_type: string
+  osm_id: number
+  categories: LayerKey[]
+}> & { cost_analysis?: CostScore | null }
+export interface OsmObjectDetail extends Omit<MapFeature, 'geometry'> {
+  geometry: Geometry | null
+  display: {
+    identity: Record<string, string | number>
+    representation: 'object_detail'
+    categories: LayerKey[]
+    diagnostic: string | null
+    drawable: boolean
+    geometry_type: string | null
+    geometry_omitted: string | null
+    tags_complete: boolean
+    classification_complete: boolean
+    geometry_complete: boolean
+  }
 }
 export type MapFeature = Feature<Geometry, Record<string, unknown>> & {
   cost_analysis?: BuildingCost | null

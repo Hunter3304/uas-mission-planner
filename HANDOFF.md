@@ -2,6 +2,32 @@
 
 ## Current status
 
+### Iteration 012 Part 2 implementation and local acceptance (2026-10-21)
+
+- User requested Part 1 review, then Part 2 if no blocking issue was found.
+  Review passed 47 focused tests and 20 real independent Hannover viewports
+  (API p95 0.169 s), with unchanged source bytes and no blocking issue found.
+- Created Issue #106 in verified Milestone 11, assigned to Hunter3304, before
+  `feature/106-osm-classification-details` from `iteration/012` at `80037e6`.
+- Implemented shared primary-layer classification, streamed schema-2 cached
+  scores, compact selected-category cost queries and bounded original-object
+  details/explanations by indexed identity/source fid. Shared `osmStyles.ts`
+  now supplies demo palettes, category precedence, unknown dashes and historical
+  obstruction styling. Original rules/data/planner semantics remain intact.
+- Final real evidence: `.cache/iteration012-part2-real-final/`: 80 complete
+  category-cost queries agree with independently selected original tags/demo
+  analysis, p95 0.072 s / max 0.139 s; 221 exact original-object detail checks;
+  all 23 invalid/unsupported diagnostic objects inspectable; source unchanged.
+  These are ASGI timings, excluding TCP/browser/route-overhead acceptance.
+- Backend 313 passes / one existing Windows permission skip; final focused
+  Part 2 14 passes; Ruff, frontend lint/build, 17 frontend tests and 14 real-stack
+  smoke passes with installed Chrome. User services/private profiles intact.
+- Local implementation/acceptance complete; feature publication/CI/integration
+  pending. See `doc/iteration/iteration-012/part2.md` and the expanded API guide.
+  Re-run explicit `study-osm-prepare` for schema 2; schema-1 caches are preserved.
+  Part 3 regional viewport UI and Part 4 browser/route acceptance remain pending;
+  no full sprint integration to main is included in Part 2.
+
 ### Iteration 012 Part 1 verified feature delivery (2026-10-21)
 
 - PR #105 merged Part 1 into `iteration/012` at `64fff6a`, after Checks run

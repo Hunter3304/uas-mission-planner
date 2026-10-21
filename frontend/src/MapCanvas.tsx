@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import type { FeatureCollection } from 'geojson'
 import 'leaflet/dist/leaflet.css'
-import { buildingColor, costText } from './BuildingCosts'
+import { costText } from './BuildingCosts'
+import { osmStyle } from './osmStyles'
 import { populationColor, type ExternalOverlays, type ExternalFeature } from './external'
 import {
   featureKey,
@@ -130,20 +131,9 @@ export default function MapCanvas({
 
   useEffect(() => {
     if (!map.current) return
-    const color = (feature: MapFeature) =>
-      costMode
-        ? buildingColor(feature)
-        : (featureLayers(feature).find(({ key }) => visibility[key])?.color ?? '#7c8b91')
-    const style = (feature: MapFeature) => ({
-      color: costMode && feature.cost_analysis?.obstruction ? '#202c3b' : color(feature),
-      fillColor: color(feature),
-      weight: costMode && feature.cost_analysis?.obstruction ? 4 : 3,
-      fillOpacity: costMode ? 0.65 : 0.25,
-      dashArray:
-        costMode && (feature.cost_analysis?.has_default || feature.cost_analysis?.cost == null)
-          ? '5 4'
-          : undefined,
-    })
+    const style = (feature: MapFeature) => osmStyle(
+      featureLayers(feature).map(({ key }) => key), visibility, costMode, feature.cost_analysis,
+    )
     const overlay = L.geoJSON(data, {
       filter: (feature) => isVisible(feature as MapFeature, visibility, costMode),
       style: (feature) => style(feature as MapFeature),

@@ -1,5 +1,6 @@
 import CollapsiblePanel from './CollapsiblePanel'
 import { layers, type LayerKey, type BuildingCost, type MapData, type MapFeature } from './types'
+import { costColor, costColors, unknownCostColor } from './osmStyles'
 
 const names = {
   building: 'Building',
@@ -8,16 +9,12 @@ const names = {
   natural: 'Natural feature',
 }
 
-export const costColors = ['#26866c', '#80a944', '#d4a326', '#d77732', '#bd3849']
 const labels = ['Very low', 'Low', 'Medium', 'High', 'Very high']
 export const showValue = (value: unknown) =>
   typeof value === 'string' ? value : JSON.stringify(value)
 
 export function buildingColor(feature: MapFeature) {
-  const analysis = feature.cost_analysis
-  return !analysis || analysis.has_default || analysis.cost == null
-    ? '#78838e'
-    : costColors[analysis.cost]
+  return costColor(feature.cost_analysis)
 }
 
 export function costText(analysis?: BuildingCost | null) {
@@ -86,7 +83,7 @@ export function CostOverview({
           </span>
         ))}
         <span>
-          <i style={{ background: '#78838e' }} />
+          <i style={{ background: unknownCostColor }} />
           Unknown / no numeric cost
         </span>
       </div>
