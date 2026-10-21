@@ -97,17 +97,12 @@ def classify_tag(key, value):
     return result
 
 
-def analyze_feature(properties, layer="building", *, legacy_flags=False):
-    """Analyze a present tag layer without inferring tags from nearby features."""
+def classify_layer(properties, layer="building"):
+    """Shared primary-layer score, without copying/explaining unrelated tags."""
     value = properties.get(layer)
     if value is None or value == [] or all(token in ("", "no") for token in _tokens(value)):
         return None
-    tags = [
-        classify_tag(key, value)
-        for key, value in sorted(properties.items(), key=lambda pair: (pair[0] != layer, pair[0]))
-        if value is not None and key not in ("element_type", "osm_id")
-    ]
-    primary = next(tag for tag in tags if tag["key"] == layer)
+    primary = classify_tag(layer, value)
     cost = primary["cost"]
     return {
         "rule_version": RULES["version"],
@@ -115,9 +110,25 @@ def analyze_feature(properties, layer="building", *, legacy_flags=False):
         "label": LABELS[cost] if cost is not None else "No numeric cost",
         "has_default": primary["has_default"],
         "status": primary["status"],
+        "obstruction": primary["obstruction"],
+    }
+
+
+def analyze_feature(properties, layer="building", *, legacy_flags=False):
+    """Analyze a present tag layer without inferring tags from nearby features."""
+    analysis = classify_layer(properties, layer)
+    if analysis is None:
+        return None
+    tags = [
+        classify_tag(key, value)
+        for key, value in sorted(properties.items(), key=lambda pair: (pair[0] != layer, pair[0]))
+        if value is not None and key not in ("element_type", "osm_id")
+    ]
+    return {
+        **analysis,
         "obstruction": any(tag["obstruction"] for tag in tags)
         if legacy_flags
-        else primary["obstruction"],
+        else analysis["obstruction"],
         "tags": tags,
     }
 

@@ -5,7 +5,10 @@ Iteration 012 **Part 1**, delivered to `iteration/012` through
 adds explicit OSM display preparation, bounded regional
 viewport/overview APIs and a guard against the full Hannover response. Run
 `uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
-The regional colored-map UI is scheduled for Parts 2/3; its existing OSM switch
+Part 2 adds precomputed independent category-cost styles, on-demand original-object
+details and shared demo style helpers. Re-run the prepare command for the new
+schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
+The regional colored-map UI is scheduled for Part 3; its existing OSM switch
 still targets the guarded legacy endpoint. See the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and
 [real-data acceptance](doc/iteration/iteration-012/part1.md).

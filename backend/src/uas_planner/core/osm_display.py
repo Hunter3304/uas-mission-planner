@@ -24,11 +24,11 @@ from shapely import from_wkb, get_num_coordinates, to_wkb
 from shapely.geometry import box, mapping
 
 from uas_planner.core.area import dataset_area
-from uas_planner.core.costs import RULES
+from uas_planner.core.costs import RULES, analyze_feature, classify_layer
 from uas_planner.storage.dataset import _validate_metadata, checksum
 
 CATEGORIES = ("building", "highway", "landuse", "natural")
-SCHEMA = 1
+SCHEMA = 2
 GRID_SIDE = 40
 MAX_FEATURES = 5000
 MAX_BYTES = 5 * 1024 * 1024
@@ -36,6 +36,9 @@ MAX_COORDINATES = 100_000
 MAX_CANDIDATES = 10_000
 MAX_SOURCE_GEOMETRY_BYTES = 16 * 1024 * 1024
 MAX_TAG_BYTES = 1024 * 1024
+MAX_DETAIL_TAGS = 512
+MAX_DETAIL_TOKENS = 4096
+SCORE_FIELDS = ("cost", "status", "has_default", "obstruction")
 QUERY_SECONDS = 2.0
 ELEMENT = re.compile(r"(?:node|way|relation)\Z")
 
@@ -46,6 +49,34 @@ class DisplayUnavailable(ValueError):
     def __init__(self, state, message):
         super().__init__(message)
         self.state = state
+
+
+class DisplayNotFound(LookupError):
+    """A valid OSM identity is absent from this verified snapshot."""
+
+
+class DisplayLimit(ValueError):
+    """An individual object's details exceed a bounded response/analysis budget."""
+
+
+def parse_identity(element_type, osm_id):
+    value = str(osm_id)
+    if (
+        not ELEMENT.fullmatch(element_type or "")
+        or not re.fullmatch(r"0|[1-9][0-9]{0,18}", value)
+        or int(value) > 2**63 - 1
+    ):
+        raise ValueError("A canonical node/way/relation and nonnegative int64 OSM ID are required.")
+    return element_type, int(value)
+
+
+def validate_style(style, cost_category, names):
+    if style not in ("category", "cost"):
+        raise ValueError("style must be category or cost.")
+    if style == "cost" and cost_category not in names:
+        raise ValueError("Cost style requires cost_category among the selected categories.")
+    if style == "category" and cost_category is not None:
+        raise ValueError("cost_category is only valid with style=cost.")
 
 
 def encode(value):
@@ -303,6 +334,8 @@ class DisplayStore:
                 "CREATE TABLE objects (id INTEGER PRIMARY KEY, element_type TEXT NOT NULL, "
                 "osm_id INTEGER NOT NULL, mask INTEGER NOT NULL, geometry BLOB, coordinates INTEGER, "
                 "geometry_bytes INTEGER, diagnostic TEXT, UNIQUE(element_type,osm_id));"
+                "CREATE TABLE costs (object_id INTEGER, category TEXT, cost INTEGER, status TEXT, "
+                "has_default INTEGER, obstruction INTEGER, PRIMARY KEY(object_id,category)) WITHOUT ROWID;"
                 "CREATE VIRTUAL TABLE spatial USING rtree(id,minx,maxx,miny,maxy);"
                 "CREATE TABLE overview (cell INTEGER PRIMARY KEY, total INTEGER NOT NULL, "
                 "building INTEGER, highway INTEGER, landuse INTEGER, natural INTEGER);"
@@ -399,6 +432,15 @@ class DisplayStore:
                         diagnostic,
                     ),
                 )
+                # Only primary-category scores are prepared. Explanations and original
+                # sparse tags are read for a single selected object, never on pan.
+                for name in CATEGORIES:
+                    score = classify_layer(tags, name)
+                    if score is not None:
+                        output.execute(
+                            "INSERT INTO costs VALUES (?,?,?,?,?,?)",
+                            (fid, name, *(score[field] for field in SCORE_FIELDS)),
+                        )
                 # Explicit columns avoid accidental dependence on the source schema.
                 if wkb is not None:
                     output.execute(
@@ -442,6 +484,7 @@ class DisplayStore:
                 "samples_complete": sum(reasons.values()) <= len(samples),
             },
             "overview_assignment": "One representative point of each valid object's intersection with the study; categories may overlap.",
+            "category_precedence": list(CATEGORIES),
             **index_info,
         }
 
@@ -530,6 +573,8 @@ class DisplayStore:
             "candidates": MAX_CANDIDATES,
             "query_seconds": QUERY_SECONDS,
             "overview_cells": GRID_SIDE**2,
+            "detail_tags": MAX_DETAIL_TAGS,
+            "detail_tokens": MAX_DETAIL_TOKENS,
         }
 
     def catalog(self, directory):
@@ -579,9 +624,19 @@ class DisplayStore:
         finally:
             self._queries.release()
 
-    def features(self, directory, bbox, *, categories=CATEGORIES, zoom=16):
+    def features(
+        self,
+        directory,
+        bbox,
+        *,
+        categories=CATEGORIES,
+        zoom=16,
+        style="category",
+        cost_category=None,
+    ):
         requested = parse_bbox(bbox)
         names = parse_categories(categories)
+        validate_style(style, cost_category, names)
         if type(zoom) is not int or not 0 <= zoom <= 22:
             raise ValueError("zoom must be an integer from 0 to 22.")
         with self._query(directory) as (ctx, manifest, connection, deadline):
@@ -592,18 +647,32 @@ class DisplayStore:
                 zoom=zoom,
                 simplification_tolerance_m=0,
                 geometry_policy="Original complete geometry; selection uses effective viewport intersection.",
+                style=style,
+                cost_category=cost_category,
             )
             if effective is None:
                 return result
             mask = sum(1 << CATEGORIES.index(n) for n in names)
             shape = box(*effective)
             coords, used, examined, reason = 0, 8192, 0, None
+            cost_join = (
+                "JOIN costs c ON c.object_id=o.id AND c.category=? " if style == "cost" else ""
+            )
             rows = connection.execute(
                 "SELECT o.id,o.element_type,o.osm_id,o.mask,o.coordinates,o.geometry_bytes "
                 "FROM spatial s JOIN objects o ON o.id=s.id "
-                "WHERE s.maxx>=? AND s.minx<=? AND s.maxy>=? AND s.miny<=? "
+                + cost_join
+                + "WHERE s.maxx>=? AND s.minx<=? AND s.maxy>=? AND s.miny<=? "
                 "AND (o.mask & ?)!=0 LIMIT ?",
-                (effective[0], effective[2], effective[1], effective[3], mask, MAX_CANDIDATES + 1),
+                (
+                    *((cost_category,) if style == "cost" else ()),
+                    effective[0],
+                    effective[2],
+                    effective[1],
+                    effective[3],
+                    mask,
+                    MAX_CANDIDATES + 1,
+                ),
             )
             for fid, element, osm_id, membership, count, size in rows:
                 examined += 1
@@ -634,6 +703,15 @@ class DisplayStore:
                         ],
                     },
                 }
+                if style == "cost":
+                    score = connection.execute(
+                        "SELECT cost,status,has_default,obstruction FROM costs "
+                        "WHERE object_id=? AND category=?",
+                        (fid, cost_category),
+                    ).fetchone()
+                    feature["cost_analysis"] = dict(zip(SCORE_FIELDS, score, strict=True))
+                    for field in ("has_default", "obstruction"):
+                        feature["cost_analysis"][field] = bool(feature["cost_analysis"][field])
                 feature_bytes = len(encode(feature).encode()) + 1
                 if used + feature_bytes > MAX_BYTES:
                     reason = "response_byte_limit"
@@ -650,6 +728,95 @@ class DisplayStore:
                 overview_recommended=reason is not None,
             )
             result["display"]["diagnostic_counts"] = manifest["diagnostics"]["counts"]
+            return result
+
+    def detail(self, directory, element_type, osm_id):
+        element, osm_id = parse_identity(element_type, osm_id)
+        with self._query(directory) as (ctx, _, connection, deadline):
+            row = connection.execute(
+                "SELECT id,mask,diagnostic FROM objects WHERE element_type=? AND osm_id=?",
+                (element, osm_id),
+            ).fetchone()
+            if row is None:
+                raise DisplayNotFound("OSM object is absent from this saved study.")
+            fid, mask, diagnostic = row
+            # The source fid is retained at preparation. Read by primary key; never
+            # reconstruct a GeoDataFrame or scan all source tags for a click.
+            with read_database(ctx["source"]) as source:
+                source.set_progress_handler(lambda: int(monotonic() >= deadline), 1000)
+                record = source.execute(
+                    "SELECT element_type,osm_id,length(geom),"
+                    "CASE WHEN length(geom)<=? THEN geom END,"
+                    "CASE WHEN length(CAST(tags_json AS BLOB))<=? THEN tags_json END "
+                    "FROM features WHERE fid=?",
+                    (MAX_SOURCE_GEOMETRY_BYTES, MAX_TAG_BYTES, fid),
+                ).fetchone()
+            if record is None or record[:2] != (element, osm_id):
+                raise ValueError("Source/cache object identity mismatch.")
+            _, _, size, blob, raw_tags = record
+            if raw_tags is None:
+                raise DisplayLimit("Original tags exceed the detail budget; use source export.")
+            tags = json.loads(raw_tags)
+            # Full explanations repeat original values for each independent layer.
+            # Check their work budget before allocating those copies/matches.
+            if len(tags) > MAX_DETAIL_TAGS or detail_tokens(tags) > MAX_DETAIL_TOKENS:
+                raise DisplayLimit("Full explanations exceed the detail budget; use source export.")
+            geometry, geometry_type, count = None, None, 0
+            omitted = None
+            if blob is None:
+                omitted = (
+                    "missing_source_geometry" if size is None else "source_geometry_byte_limit"
+                )
+            if blob is not None:
+                original = from_wkb(gpkg_wkb(blob))
+                geometry_type = original.geom_type
+                count = int(get_num_coordinates(original))
+                if count > MAX_COORDINATES:
+                    omitted = "coordinate_limit"
+                else:
+                    candidate = mapping(original)
+                    try:
+                        if len(encode(candidate).encode()) <= MAX_BYTES // 2:
+                            geometry = candidate
+                        else:
+                            omitted = "geometry_response_byte_limit"
+                    except ValueError:
+                        omitted = "nonfinite_source_geometry"
+            result = {
+                "type": "Feature",
+                "id": f"{element}/{osm_id}",
+                "geometry": geometry,
+                "properties": {**tags, "element_type": element, "osm_id": osm_id},
+                "layer_analyses": {name: analyze_feature(tags, name) for name in CATEGORIES},
+                "display": {
+                    "identity": ctx["identity"],
+                    "representation": "object_detail",
+                    "categories": [n for i, n in enumerate(CATEGORIES) if mask & (1 << i)],
+                    "coverage_bounds": ctx["bounds"],
+                    "diagnostic": diagnostic,
+                    "drawable": diagnostic is None,
+                    "geometry_type": geometry_type,
+                    "coordinates": count,
+                    "geometry_omitted": omitted,
+                    "geometry_policy": "Original source geometry; no clipping, simplification or repair.",
+                    "simplification_tolerance_m": 0,
+                    "tags_complete": True,
+                    "classification_complete": True,
+                    "geometry_complete": geometry is not None,
+                    "limits": self.limits(),
+                },
+            }
+            if len(encode(result).encode()) > MAX_BYTES:
+                result["geometry"] = None
+                result["display"].update(
+                    geometry_omitted="detail_response_byte_limit", geometry_complete=False
+                )
+                if len(encode(result).encode()) > MAX_BYTES:
+                    raise DisplayLimit(
+                        "Full details exceed the response budget; use source export."
+                    )
+            if monotonic() >= deadline:
+                raise DisplayUnavailable("busy", "Detail query reached its time budget; retry.")
             return result
 
     def overview(self, directory, bbox, *, categories=CATEGORIES):
@@ -707,6 +874,21 @@ class DisplayStore:
                 "outside_coverage": effective is None,
                 "limits": self.limits(),
                 "style": "category",
-                "classification_details": "Planned in Part 2",
+                "category_precedence": list(CATEGORIES),
+                "classification_details": "On demand: /study/osm/features/{element_type}/{osm_id}",
             },
         }
+
+
+def detail_tokens(tags):
+    """Bound explanation expansion, including semicolon and list-valued source tags."""
+    pending, total = list(tags.values()), 0
+    while pending:
+        value = pending.pop()
+        if isinstance(value, list):
+            pending.extend(value)
+        else:
+            total += value.count(";") + 1 if isinstance(value, str) else 1
+        if total > MAX_DETAIL_TOKENS:
+            break
+    return total

@@ -1,7 +1,8 @@
 # Iteration 012 - Hannover OSM display performance and category colors
 
 Date: 2026-10-21 (Europe/Berlin).
-Status: **Part 1 delivered to iteration/012 on 2026-10-21; Parts 2-4 remain planned**.
+Status: **Part 1 delivered; Part 2 implemented and locally verified on 2026-10-21;
+feature publication/CI-gated integration authorized and pending; Parts 3-4 remain planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
@@ -9,6 +10,14 @@ The user reviewed the plan and requested completion of Part 1. Tracking: Milesto
 is closed. This supersedes the earlier planning-only status for Part 1. Full sprint
 integration to main awaits the remaining scope. See
 [Part 1 implementation and acceptance](../iteration/iteration-012/part1.md).
+
+The user requested review of Part 1 followed by Part 2 if it passed. Review
+passed 47 focused tests and all 20 independently selected Hannover viewports.
+Part 2 is tracked by assigned Issue #106 in Milestone 11 and
+`feature/106-osm-classification-details` from `iteration/012`. Shared compact
+classification, original-object details and demo style helpers are implemented;
+see [Part 2 acceptance](../iteration/iteration-012/part2.md). Regional map integration
+remains Part 3; full main integration awaits the remaining iteration scope.
 
 ## Objective
 
@@ -99,8 +108,8 @@ silently repair source originals or feed display geometry into route checks.
 
 ## Proposed architecture and interfaces
 
-Part 1 implements summary, category-only features and overview; cost styles and
-object-detail classification are Part 2. See the
+Part 1 implements summary, category-only features and overview; Part 2 adds cost
+styles and original-object classification details. See the
 [actual API guide](../experiments/iteration-012/README.md). Validate bounding boxes,
 zoom, category/style enums and IDs, intersect requests with saved study coverage,
 and reject malformed requests before expensive reads.
@@ -168,7 +177,7 @@ totals where a bounded probe only establishes that the limit was exceeded.
 ## Implementation sequence
 
 The four Parts below form one coherent display delivery. Part 1 is tracked by
-Issue #104; the remaining Parts have not started.
+closed Issue #104 and Part 2 by Issue #106. Parts 3-4 have not started.
 
 1. **Part 1 - Bounded data access and preparation.** Confirm spatial index and
    safe sample baselines; define schemas, verification lifecycle and limits;
