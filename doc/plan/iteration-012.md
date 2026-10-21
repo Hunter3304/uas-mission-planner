@@ -1,8 +1,8 @@
 # Iteration 012 - Hannover OSM display performance and category colors
 
 Date: 2026-10-21 (Europe/Berlin).
-Status: **Part 1 delivered; Part 2 implemented and locally verified on 2026-10-21;
-feature publication/CI-gated integration authorized and pending; Parts 3-4 remain planned**.
+Status: **Parts 1-2 delivered to iteration/012 on 2026-10-21;
+Parts 3-4 remain planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
@@ -16,7 +16,10 @@ passed 47 focused tests and all 20 independently selected Hannover viewports.
 Part 2 is tracked by assigned Issue #106 in Milestone 11 and
 `feature/106-osm-classification-details` from `iteration/012`. Shared compact
 classification, original-object details and demo style helpers are implemented;
-see [Part 2 acceptance](../iteration/iteration-012/part2.md). Regional map integration
+PR #107 merged at `70ef8f4` after Linux/Windows/frontend Checks run `39648870309`
+passed on reviewed head `c67ea50`. Issue #106 is closed and its merged feature
+branch was removed locally/remotely after verification. See
+[Part 2 acceptance](../iteration/iteration-012/part2.md). Regional map integration
 remains Part 3; full main integration awaits the remaining iteration scope.
 
 ## Objective

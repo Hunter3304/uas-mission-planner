@@ -3,10 +3,33 @@
 Date: 2026-10-21 (Europe/Berlin). User requested Part 1 review, then Part 2 if
 no blocking issue was found. Tracking: Milestone 11 / Issue #106, assigned to
 Hunter3304 before branch `feature/106-osm-classification-details` was created
-from `iteration/012` at `80037e6`. Local implementation and acceptance are complete;
-Feature publication and CI-gated integration were explicitly authorized on
-2026-10-21 and are pending. Parts 3-4 and main integration
-remain outside this Part 2 delivery.
+from `iteration/012` at `80037e6`. Local implementation and acceptance are complete.
+Feature [PR #107](https://github.com/Hunter3304/uas-mission-planner/pull/107)
+merged into `iteration/012` at `70ef8f424f12be27f1828305af03aa274af9defa` on
+2026-10-21 after successful CI. Parts 3-4 and main integration remain pending.
+
+## Verified feature delivery
+
+The user explicitly authorized the Part 2 push and CI-gated merge on 2026-10-21.
+[Checks run 39648870309](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39648870309)
+passed Linux Python, Windows Python and frontend on reviewed feature head
+`c67ea50d0d1bf24f234f0380280d21dcbc127b4f`. All three jobs explicitly completed
+successfully before merging. Issue #106 was explicitly closed as completed.
+
+Local `iteration/012` was fast-forwarded to the merge. Verified PR merge and
+feature-head ancestry before deleting the merged remote feature with an
+expected-head lease and removing it locally. Fetch/prune, `git branch -a` and
+`git ls-remote --heads origin` confirmed cleanup. Keep Milestone 11 open and
+retain the iteration branch for Parts 3-4. Main remains `a034bc0`.
+
+The code merge is published. A separate post-merge documentation commit records
+these verified facts locally. Automatic approval review rejected pushing that
+additional documentation payload to the shared iteration branch, stating that
+the feature push/PR/merge authorization did not cover it. No documentation push
+was executed or retried; publishing this delivery-record update awaits explicit
+permission and does not block the already completed Part 2 code integration.
+
+## Publication history (superseded by verified delivery)
 
 Implementation and local acceptance are committed at `4309115`. Automatic
 approval review rejected the attempted push of `feature/106-osm-classification-details`

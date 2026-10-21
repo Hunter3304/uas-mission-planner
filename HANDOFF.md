@@ -2,6 +2,28 @@
 
 ## Current status
 
+### Iteration 012 Part 2 verified feature delivery (2026-10-21)
+
+- PR #107 merged Part 2 into `iteration/012` at `70ef8f4` after Checks run
+  `39648870309` passed Linux Python, Windows Python and frontend on the reviewed
+  feature head `c67ea50`. All three jobs explicitly completed successfully before
+  the merge. Issue #106 was explicitly closed as completed.
+- Local `iteration/012` fast-forwarded to the verified merge. After confirming
+  PR merge and feature-head ancestry, removed the merged feature remotely with
+  an expected-head lease and locally; fetch/prune, branch -a and ls-remote checks
+  confirmed cleanup. Keep Milestone 11 and `iteration/012` for Parts 3-4.
+- README/plan/Part 2 outcome now record the actual delivery. Earlier publication
+  blocks and pending-delivery notes below are historical and superseded. Main
+  remains `a034bc0`; the regional viewport UI and full iteration acceptance are
+  still pending. Original data, private profiles and user services remain intact.
+- The merged code is on remote `iteration/012` at `70ef8f4`. A separate local
+  documentation commit records the verified delivery and cleanup. Automatic
+  approval review rejected pushing this additional post-merge documentation to
+  the shared iteration branch, stating that the authorized feature push/PR/merge
+  did not cover this new remote payload. That documentation push was not executed
+  or retried. Preserve the local documentation commit pending explicit permission;
+  do not mistake the completed code merge for a blocked Part 2 implementation.
+
 ### Iteration 012 Part 2 publication and integration authorized (2026-10-21)
 
 - User explicitly authorized pushing the completed Part 2 branch to

@@ -5,7 +5,9 @@ Iteration 012 **Part 1**, delivered to `iteration/012` through
 adds explicit OSM display preparation, bounded regional
 viewport/overview APIs and a guard against the full Hannover response. Run
 `uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
-Part 2 adds precomputed independent category-cost styles, on-demand original-object
+Part 2, delivered to `iteration/012` through
+[PR #107](https://github.com/Hunter3304/uas-mission-planner/pull/107),
+adds precomputed independent category-cost styles, on-demand original-object
 details and shared demo style helpers. Re-run the prepare command for the new
 schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
 The regional colored-map UI is scheduled for Part 3; its existing OSM switch
