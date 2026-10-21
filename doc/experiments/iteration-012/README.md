@@ -1,9 +1,73 @@
-# Iteration 012 Parts 1-2 - Bounded regional OSM data and classification
+# Iteration 012 Parts 1-3 - Bounded regional OSM display
 
 This guide describes bounded category/cost interfaces and on-demand original-object
-classification details. Regional controls and viewport loading in the browser
-remain Part 3. The current regional browser must not use
-the old unbounded OSM switch to obtain the full Hannover collection.
+classification details and the viewport-driven regional browser. The regional
+map uses these bounded interfaces; it never requests the old full Hannover
+collection for interactive display.
+
+## Regional map controls (Part 3)
+
+Select `hannover-part1-v4` after preparing the schema-2 cache below. Refresh the
+browser after updating the frontend. **Show saved OSM** starts enabled. The full
+study view shows a labelled aggregate grid with all eight reference sites; its
+color identifies the dominant enabled category, not a combined cost or risk score.
+Cell category counts overlap and use representative-point assignment rather than
+exact viewport object counts. Whole-study totals are labelled separately.
+
+At zoom **15+**, settled pans/zooms query the viewport plus a 10% margin clamped
+to saved coverage. **Focus origin** / **Focus destination** opens zoom 16 at the
+selected reference site; **Fit saved study** restores the complete boundary.
+Four category switches use the shared demo precedence. **OSM color view** selects
+category or independent-category cost, and **OSM cost category** chooses one score.
+Selecting a cost category enables it; hiding it explicitly pauses that cost view.
+Gray/dashed styles retain unknown/default/unscored meaning, and dark outlines
+retain the qualified historical obstruction meaning. The legend follows the
+actual overview/detail representation.
+
+Click a rendered object, or expand **Inspect visible objects (first 50)** for
+keyboard-accessible selections. Details load original tags and all available
+independent classifications on demand. **Source geometry diagnostics** exposes
+the bounded retained diagnostic samples, including nondrawable originals.
+Selection clears on pan, zoom, category/style changes or display refresh; loading
+and failures cannot reuse the previous object's details. Original tags render as
+text. Oversized geometry omissions are explicitly explained.
+
+Loading, no matching objects, all categories hidden, outside coverage,
+not-prepared/verifying/stale source state, query failure and overview fallback
+have separate feedback. **Refresh OSM** clears nearby-view entries and retries.
+Preparation remains an explicit CLI operation; HTTP requests never start it.
+
+Requests debounce for **180 ms**, cancel superseded work, reject obsolete
+generations and compare complete source/rule identities. Up to **4** nearby-view
+responses / **8 MiB serialized JSON** are retained in an LRU cache; this is a
+serialized-payload budget, not a browser heap measurement. Every reuse first
+rechecks backend readiness/identity. An incomplete detail response is discarded
+and replaced by a clearly labelled bounded overview. Response/query budgets
+remain enforced by the existing backend.
+
+OSM, reference/boundary, route, constraints, DIPUL and population groups have
+independent lifecycles. OSM and the other interactive paths share the Canvas
+renderer so a transparent higher canvas cannot swallow object clicks. A
+noninteractive SVG route sits above it; the boundary is noninteractive.
+OSM toggles/styles and object selection preserve route results and map position;
+route/control updates do not reload or rebuild unchanged OSM objects. Street
+tiles can be disabled without losing saved layers. No map movement acquires data.
+
+Reproduce real Part 3 functional acceptance with isolated current-code backend
+on `8014` and frontend on `5182` (`UAS_API_URL=http://127.0.0.1:8014`):
+
+```powershell
+backend/.venv/Scripts/python.exe -m uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8014
+# In another terminal, set UAS_API_URL and start npm --prefix frontend run dev -- --port 5182.
+node doc/experiments/iteration-012/verify-part3-ui.mjs .cache/iteration012-part3-new
+```
+
+The script requires a new output directory and installed Chrome (override with
+`PLAYWRIGHT_CHANNEL`). `UAS_UI_URL` overrides the frontend URL. It blocks street
+tiles, verifies real category/cost controls and details, reproduces the historical
+2026-10-07 research route with OSM enabled, checks exact exported endpoints and
+source checksums, and saves desktop/mobile screenshots and evidence. It does not
+perform Part 4's off/on route comparison or 50-cycle resource/memory campaign.
 
 ## Prepare the retained source explicitly
 

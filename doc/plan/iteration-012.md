@@ -2,7 +2,7 @@
 
 Date: 2026-10-21 (Europe/Berlin).
 Status: **Parts 1-2 delivered to iteration/012 on 2026-10-21;
-Parts 3-4 remain planned**.
+Part 3 implemented locally with acceptance; Part 4 remains planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
@@ -19,8 +19,14 @@ classification, original-object details and demo style helpers are implemented;
 PR #107 merged at `70ef8f4` after Linux/Windows/frontend Checks run `39648870309`
 passed on reviewed head `c67ea50`. Issue #106 is closed and its merged feature
 branch was removed locally/remotely after verification. See
-[Part 2 acceptance](../iteration/iteration-012/part2.md). Regional map integration
-remains Part 3; full main integration awaits the remaining iteration scope.
+[Part 2 acceptance](../iteration/iteration-012/part2.md).
+
+The user requested Part 3 completion on 2026-10-21. Assigned Issue #108 in
+Milestone 11 precedes `feature/108-regional-osm-map`, based on `iteration/012`
+at `d5002c3`. Regional viewport/overview integration, category/cost controls,
+original-object details and independent overlay lifecycles are implemented.
+See [Part 3 acceptance](../iteration/iteration-012/part3.md). Feature publication,
+CI/integration and Part 4's full acceptance remain separate gates; main is unchanged.
 
 ## Objective
 
@@ -180,7 +186,8 @@ totals where a bounded probe only establishes that the limit was exceeded.
 ## Implementation sequence
 
 The four Parts below form one coherent display delivery. Part 1 is tracked by
-closed Issue #104 and Part 2 by Issue #106. Parts 3-4 have not started.
+closed Issue #104 and Part 2 by closed Issue #106. Part 3 is implemented under
+Issue #108; Part 4 has not started.
 
 1. **Part 1 - Bounded data access and preparation.** Confirm spatial index and
    safe sample baselines; define schemas, verification lifecycle and limits;

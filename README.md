@@ -10,8 +10,15 @@ Part 2, delivered to `iteration/012` through
 adds precomputed independent category-cost styles, on-demand original-object
 details and shared demo style helpers. Re-run the prepare command for the new
 schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
-The regional colored-map UI is scheduled for Part 3; its existing OSM switch
-still targets the guarded legacy endpoint. See the
+Part 3 implements the regional colored-map UI on
+`feature/108-regional-osm-map` (Issue #108): the initial view shows a labelled
+aggregate overview, while zoom 15+ requests bounded individual objects.
+Use **Show saved OSM**, the four category switches, **OSM color view** and
+**OSM cost category**. Click an object for original tags and independent costs;
+**Focus origin/destination** opens a local detail view. Route results and map
+position survive OSM changes. Part 3 feature CI/integration and Part 4's full
+resource/performance acceptance remain separate delivery gates. See
+[Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and
 [real-data acceptance](doc/iteration/iteration-012/part1.md).
 
@@ -72,9 +79,11 @@ A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-
 its unresolved-source checks; research routes do not establish flight permission.
 
 The regional map includes an optional online OpenStreetMap street basemap with
-explicit tile-failure feedback. Retained source data remain local. Full-region
-OSM overlay serialization/rendering currently has a known memory/timeout defect;
-keep that overlay off when reproducing route tests. Mission duration is not checked
+explicit tile-failure feedback. Retained source data remain local. Iteration 012
+Part 3 replaces the old full-region OSM overlay request with bounded viewport
+queries and aggregate overview fallback; saved objects work without street tiles.
+Part 4's resource and OSM off/on route-overhead comparison remain pending.
+Mission duration is not checked
 against the entered scenario end time. See the operation guide's supplemental
 closeout section for diagnosed limitations and deferred work.
 

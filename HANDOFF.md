@@ -2,6 +2,31 @@
 
 ## Current status
 
+### Iteration 012 Part 3 implementation and local acceptance (2026-10-21)
+
+- User requested Part 3 completion and confirmed continuing that task. Assigned
+  Issue #108 in Milestone 11 precedes `feature/108-regional-osm-map`, created from
+  `iteration/012` at `d5002c3`. Parts 1-2 delivery remains intact.
+- Implemented bounded regional overview/detail loading, four category toggles,
+  shared category/cost styles and legends, original-object details/diagnostics,
+  debounce/cancellation/generation/source checks and bounded nearby-view reuse.
+  Every cache reuse rechecks backend readiness. Partial detail falls back to a
+  labelled aggregate grid; no legacy full Hannover request is used.
+- Independent OSM/route/reference/external-layer lifecycles preserve map position,
+  route results and unchanged OSM selection. Shared Canvas hit testing and a
+  noninteractive SVG route preserve source clicks; boundary is noninteractive.
+  Fixed street-tile cleanup to retain Leaflet's internal remove listeners.
+- Local backend 313 passes / one existing Windows permission skip; Ruff,
+  frontend lint/build, 22 browser tests and 14 real-stack smoke passes. Real
+  Hannover evidence: `.cache/iteration012-part3-ui-final/`; full overview, four
+  category/cost selections, original details, historical research route/export
+  with OSM on, desktop/mobile and unchanged source bytes. Route updates do not
+  issue OSM requests. See `doc/iteration/iteration-012/part3.md`.
+- Feature publication/remote CI/integration remains pending at this local record.
+  Part 4 still owns full browser/resource/off-on route acceptance and main
+  integration. Main remains `a034bc0`. Preserve original data, private profiles,
+  user services and Milestone 11. Prior Parts 3-4-unstarted notes below are history.
+
 ### Iteration 012 Part 2 verified feature delivery (2026-10-21)
 
 - PR #107 merged Part 2 into `iteration/012` at `70ef8f4` after Checks run
