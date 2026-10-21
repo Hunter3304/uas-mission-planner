@@ -4,7 +4,8 @@ Date: 2026-10-21 (Europe/Berlin). User requested Part 1 review, then Part 2 if
 no blocking issue was found. Tracking: Milestone 11 / Issue #106, assigned to
 Hunter3304 before branch `feature/106-osm-classification-details` was created
 from `iteration/012` at `80037e6`. Local implementation and acceptance are complete;
-feature publication/CI/integration are pending. Parts 3-4 and main integration
+Feature publication and CI-gated integration were explicitly authorized on
+2026-10-21 and are pending. Parts 3-4 and main integration
 remain outside this Part 2 delivery.
 
 Implementation and local acceptance are committed at `4309115`. Automatic
@@ -15,7 +16,10 @@ destination. The push was not executed or retried. Part 2 has no remote feature
 branch/PR/CI/merge yet; Issue #106 remains open. Explicit authorization is needed
 to publish this completed Part 2 branch, create its PR and integrate it into
 `iteration/012` after successful checks. Earlier recorded Part 1 publication
-authorization does not claim to authorize this new payload.
+authorization does not claim to authorize this new payload. The user subsequently
+explicitly authorized this Part 2 push, PR and CI-gated merge into `iteration/012`
+on 2026-10-21, superseding the publication block. Proceed with the authorized
+feature delivery and verified merged-branch cleanup; preserve the iteration branch.
 
 ## Part 1 review
 

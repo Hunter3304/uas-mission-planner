@@ -2,6 +2,18 @@
 
 ## Current status
 
+### Iteration 012 Part 2 publication and integration authorized (2026-10-21)
+
+- User explicitly authorized pushing the completed Part 2 branch to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating its PR and merging
+  into `iteration/012` after successful Linux/Windows/frontend CI. This supersedes
+  the earlier Part 2 publication block below. Main integration and Parts 3-4
+  remain outside this delivery.
+- Publish `feature/106-osm-classification-details`, verify all checks on its final
+  reviewed head, merge the feature PR, explicitly close Issue #106 as needed and
+  perform verified remote/local feature cleanup. Preserve Milestone 11 and the
+  iteration branch for remaining work.
+
 ### Iteration 012 Part 2 implementation and local acceptance (2026-10-21)
 
 - User requested Part 1 review, then Part 2 if no blocking issue was found.
