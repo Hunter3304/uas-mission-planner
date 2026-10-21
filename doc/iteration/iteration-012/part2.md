@@ -7,6 +7,16 @@ from `iteration/012` at `80037e6`. Local implementation and acceptance are compl
 feature publication/CI/integration are pending. Parts 3-4 and main integration
 remain outside this Part 2 delivery.
 
+Implementation and local acceptance are committed at `4309115`. Automatic
+approval review rejected the attempted push of `feature/106-osm-classification-details`
+to `https://github.com/Hunter3304/uas-mission-planner.git`, citing sensitive egress
+of private project code and missing explicit authorization for this payload and
+destination. The push was not executed or retried. Part 2 has no remote feature
+branch/PR/CI/merge yet; Issue #106 remains open. Explicit authorization is needed
+to publish this completed Part 2 branch, create its PR and integrate it into
+`iteration/012` after successful checks. Earlier recorded Part 1 publication
+authorization does not claim to authorize this new payload.
+
 ## Part 1 review
 
 Verified clean repository state and merged PR #105 / closed Issue #104 against

@@ -2,7 +2,7 @@
 
 Date: 2026-10-21 (Europe/Berlin).
 Status: **Part 1 delivered; Part 2 implemented and locally verified on 2026-10-21;
-feature delivery pending; Parts 3-4 remain planned**.
+feature delivery awaiting explicit publication authorization; Parts 3-4 remain planned**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at

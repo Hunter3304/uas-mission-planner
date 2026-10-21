@@ -27,6 +27,14 @@
   Re-run explicit `study-osm-prepare` for schema 2; schema-1 caches are preserved.
   Part 3 regional viewport UI and Part 4 browser/route acceptance remain pending;
   no full sprint integration to main is included in Part 2.
+- Implementation and acceptance committed locally at `4309115`. Automatic
+  approval review rejected pushing `feature/106-osm-classification-details` to
+  `https://github.com/Hunter3304/uas-mission-planner.git`: private project code
+  publication to that external destination requires explicit authorization for
+  this payload. The earlier authorization recorded below was specific to Part 1.
+  The push was not executed or retried; no Part 2 PR, remote CI, merge or cleanup
+  occurred. Request explicit authorization for this Part 2 push/PR/CI-gated merge
+  into `iteration/012`. Keep Issue #106 open and preserve the local feature.
 
 ### Iteration 012 Part 1 verified feature delivery (2026-10-21)
 
