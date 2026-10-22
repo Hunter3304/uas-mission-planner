@@ -32,6 +32,9 @@ regression: backend 338 passes / one existing Windows skip, 55 browser and
 14 real-stack smoke passes. See [Part 4 status](../iteration/iteration-013/part4.md)
 for integrated real acceptance and delivery gates. Main is
 unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
+Part 4 integrated Hannover acceptance passes. Local implementation commit
+`1c1ecaa` is ready; automatic approval review rejected remote publication pending
+destination-specific user authorization. Remote CI and delivery remain pending.
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 
 ## Requested result and confirmed decisions

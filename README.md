@@ -29,6 +29,9 @@ departure-only input, actual-route cruise arrival and complete-interval constrai
 reassessment. Explicit historical API/CLI intervals remain supported. See
 [Part 4 acceptance/status](doc/iteration/iteration-013/part4.md) and
 [iteration outcome](doc/iteration/iteration-013/outcome.md).
+Local regression and integrated Hannover acceptance pass. Remote publication of
+commit `1c1ecaa` awaits destination-specific user approval after automatic review
+rejected the push; Part 4 CI/iteration merge have not occurred.
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after

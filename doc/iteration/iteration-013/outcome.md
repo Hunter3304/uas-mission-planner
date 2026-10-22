@@ -6,6 +6,9 @@ automatic cruise intervals. Plan: [Iteration 013](../../plan/iteration-013.md).
 Parts 1-3 are delivered to iteration/013 through PRs #115, #117 and #119. Part 4
 is implemented locally with passing final integrated acceptance; feature and full
 iteration/main CI/integration remain pending. Milestone 12 remains open.
+Part 4 implementation commit is `1c1ecaa`; automatic approval review rejected its
+remote push pending destination-specific user publication approval. No Part 4
+remote CI or merge is claimed.
 
 ## Delivered behavior
 

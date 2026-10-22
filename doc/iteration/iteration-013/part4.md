@@ -126,3 +126,10 @@ memory redesign. Originals/private profiles and user services are preserved.
 Feature publication/CI, iteration merge, explicit Issue closure and verified
 merged-feature cleanup remain pending. Full iteration/main integration requires
 separate complete checks; no main delivery is claimed here.
+
+Local implementation commit is `1c1ecaa`. Automatic approval review rejected the
+feature push to `Hunter3304/uas-mission-planner`, requiring explicit user approval
+for publishing the complete feature to that destination. No workaround was used;
+no Part 4 PR or remote CI was created. Resume the existing feature branch after
+destination-specific approval, then complete its CI/merge/cleanup and the
+independent complete-iteration gate.

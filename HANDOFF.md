@@ -4,6 +4,14 @@
 
 ### Iteration 013 Part 4 implementation (2026-10-22)
 
+- Local implementation commit: `1c1ecaa` on
+  `feature/120-automatic-flight-interval`. Publication was attempted only after
+  local regression and integrated acceptance passed. Automatic approval review
+  rejected the push to `Hunter3304/uas-mission-planner`: it requires explicit
+  user authorization for publishing the complete feature to that destination.
+  Do not bypass this rejection. No Part 4 push/PR/remote CI/merge has occurred.
+  Obtain destination-specific publication authorization, then continue the
+  existing feature delivery and independent iteration/main gates below.
 - User requested Part 4. Verified open Milestone 12 / assigned Issue #120 precede
   `feature/120-automatic-flight-interval`, created from iteration/013 at `289c60c`.
   Parts 1-3 remain delivered; no main merge has occurred in this Part yet.
