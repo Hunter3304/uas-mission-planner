@@ -2,6 +2,42 @@
 
 ## Current status
 
+### Iteration 012 Part 4 implementation and acceptance (2026-10-22)
+
+- User requested project review and Part 4 completion if sound. Assigned Issue
+  #110 in verified Milestone 11 precedes `feature/110-osm-real-acceptance` from
+  `iteration/012` at `aba6a4e`. Preserve Parts 1-3 and main `a034bc0` until the
+  independent integration gate. Earlier Part-4-unstarted notes below are history.
+- Review found an initial-label bottleneck: `/study` fully inspected all regional
+  payloads just to return locations. The map now uses bounded
+  `/study?catalog_only=true`, explicitly `verified: false` / catalog metadata
+  scope. Full/default study inspection, planner/source-layer checks and all OSM
+  classification/source semantics remain unchanged. New backend regression and
+  frontend request assertions verify that separation.
+- Final local backend 314 passes / one existing Windows permission skip,
+  104.40 s; Ruff, frontend lint/build, all 22 browser checks, five focused OSM
+  checks after their new assertion, and all 14 real-stack smoke checks pass.
+  Native OMPL and TestClient require host execution because the Windows sandbox
+  terminates native handles / blocks its local socket loop; these gates passed
+  outside that sandbox, using only isolated test services and new local outputs.
+- Fresh independent real evidence `.cache/iteration012-part4-independent-real/`:
+  20 spatial windows, 80 cost responses (ASGI p95 0.07049 s), 221 original details,
+  all 23 diagnostic originals agree; source unchanged. Final production/TCP/
+  browser/resource/route campaign passes under `.cache/iteration012-part4-final/`:
+  fresh preparation 73.267 s; warm TCP p95 0.1651 s; 20-view browser p95 0.9803 s;
+  50 bounded cycles with +3.02% retained heap and stable layers/listeners. Initial
+  fit 10.96 s / first-view max 11.08 s remain explicit cold limits. Route off/on
+  medians 51.9728/51.8365 s (-0.2623% overhead), identical geometry/cost/diagnostics
+  and displayed exports, zero route-caused OSM requests; conservative endpoint
+  rejection preserved. Real Braunschweig/mobile/external inspection pass with
+  no page errors/overflow. Source byte hashes unchanged; test services stopped.
+  Diagnostic v1/v2/v3 runs are superseded and not complete acceptance passes.
+- New reproducible harness/operating notes are under
+  `doc/experiments/iteration-012/`; outcome is
+  `doc/iteration/iteration-012/outcome.md`. Detailed evidence/cache/screenshots
+  stay local. Remote Part 4 CI/publication/integration have not run at this record.
+  Original sources, private profiles and user-owned services remain intact.
+
 ### Iteration 012 Part 3 verified feature delivery (2026-10-21)
 
 - PR #109 merged Part 3 into `iteration/012` at `cf23506`, after Checks run
