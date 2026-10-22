@@ -2,6 +2,28 @@
 
 ## Current status
 
+### Iteration 012 verified main delivery (2026-10-22)
+
+- Main PR #112 merged the complete four-part iteration at
+  `b1fe9ca68fc9027659c03b679b32b6e38ac64c4f`, after independent Checks run
+  `39767504376` explicitly completed Linux Python, Windows Python and frontend
+  successfully on reviewed iteration head `89e90ac7a083d2ba85d345d0203c56df5ca8c72f`.
+  This supersedes all Part 4/main-integration-pending notes below.
+- Local main synchronized to the verified merge; iteration-head ancestry and
+  identical backend/frontend trees versus measured feature `af80714` were checked.
+  Historical `iteration/012` is retained and fast-forwarded for this documentation
+  closeout, matching the existing delivery-record convention. No application code,
+  dependency, source data, private profile or user service changed after acceptance.
+- Feature PR #111 and its verified cleanup/closed Issue #110 remain recorded below.
+  Main now includes all four Parts: bounded local display access, shared category/
+  cost styles and original details, regional UI, and measured real-data acceptance.
+  Cold initial fit/first detail (~11 s), repeated route preparation (~52 s total),
+  startup/planner and full Braunschweig analysis memory remain explicit limits.
+- README, plan and outcome now record actual main delivery. Detailed source/cache/
+  browser/process evidence remains local under `.cache/iteration012-part4-final/`.
+  Isolated services are stopped; original sources, user services and all historical
+  iteration branches are preserved. This follow-up contains delivery records only.
+
 ### Iteration 012 Part 4 verified feature delivery (2026-10-22)
 
 - PR #111 merged Part 4 into `iteration/012` at `db7427f`, after Checks run
