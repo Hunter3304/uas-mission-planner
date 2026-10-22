@@ -1,5 +1,36 @@
 # UAS Mission Planner
 
+Iteration 012 **Part 1**, delivered to `iteration/012` through
+[PR #105](https://github.com/Hunter3304/uas-mission-planner/pull/105),
+adds explicit OSM display preparation, bounded regional
+viewport/overview APIs and a guard against the full Hannover response. Run
+`uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
+Part 2, delivered to `iteration/012` through
+[PR #107](https://github.com/Hunter3304/uas-mission-planner/pull/107),
+adds precomputed independent category-cost styles, on-demand original-object
+details and shared demo style helpers. Re-run the prepare command for the new
+schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
+Part 3 delivers the regional colored-map UI to `iteration/012` through
+[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109)
+(Issue #108): the initial view shows a labelled
+aggregate overview, while zoom 15+ requests bounded individual objects.
+Use **Show saved OSM**, the four category switches, **OSM color view** and
+**OSM cost category**. Click an object for original tags and independent costs;
+**Focus origin/destination** opens a local detail view. Route results and map
+position survive OSM changes. Linux/Windows/frontend CI passed before integration;
+Part 4 completes local real-data/resource acceptance and removes full source
+inspection from map-label loading. Warm TCP p95 is 0.165 s, browser-view p95
+0.980 s; 50 cycles retain bounded map/cache state. Three route runs per OSM state
+have identical outputs and -0.26% observed median overhead. Initial fit still
+takes about 11 s and routes about 52 s, dominated by source preparation.
+Part 4 [PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111)
+is merged into `iteration/012` after Linux/Windows/frontend CI passed; independent
+main integration remains pending. See
+[Part 4 measurements and limits](doc/iteration/iteration-012/outcome.md),
+[Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
+[Part 1 operation guide](doc/experiments/iteration-012/README.md) and
+[real-data acceptance](doc/iteration/iteration-012/part1.md).
+
 Iteration 011, delivered through [PR #102](https://github.com/Hunter3304/uas-mission-planner/pull/102),
 adds **independent OpenFlightMaps layers and visualization** for the
 default Hannover/Lehrte eight-site study. Acquire a pinned OFMX revision, inspect
@@ -57,9 +88,13 @@ A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-
 its unresolved-source checks; research routes do not establish flight permission.
 
 The regional map includes an optional online OpenStreetMap street basemap with
-explicit tile-failure feedback. Retained source data remain local. Full-region
-OSM overlay serialization/rendering currently has a known memory/timeout defect;
-keep that overlay off when reproducing route tests. Mission duration is not checked
+explicit tile-failure feedback. Retained source data remain local. Iteration 012
+Part 3 replaces the old full-region OSM overlay request with bounded viewport
+queries and aggregate overview fallback; saved objects work without street tiles.
+Part 4's [resource and OSM off/on route comparison](doc/iteration/iteration-012/outcome.md)
+passes its adopted warm gates; measured startup, planner and full Braunschweig
+analysis memory costs remain explicit limitations.
+Mission duration is not checked
 against the entered scenario end time. See the operation guide's supplemental
 closeout section for diagnosed limitations and deferred work.
 

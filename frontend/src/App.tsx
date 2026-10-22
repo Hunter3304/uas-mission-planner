@@ -285,7 +285,7 @@ export default function App() {
               <div className="section-kicker">DATASET EXPLORER</div>
               <h2>{id ? id.replaceAll('-', ' ') : 'Your geographic workspace'}</h2>
             </div>
-            {dataset && <span className="verified-badge">✓ Integrity verified</span>}
+            {dataset?.verified && <span className="verified-badge">✓ Integrity verified</span>}
           </div>
           {(catalogError || error) && (
             <div className="state-card error-state" role="alert">

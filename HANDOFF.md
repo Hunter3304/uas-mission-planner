@@ -2,6 +2,254 @@
 
 ## Current status
 
+### Iteration 012 Part 4 verified feature delivery (2026-10-22)
+
+- PR #111 merged Part 4 into `iteration/012` at `db7427f`, after Checks run
+  `39766913176` explicitly completed Linux Python, Windows Python and frontend
+  successfully on reviewed head `af80714143c482267f80cab2df481e0f1a4948a3`.
+  Issue #110 is explicitly closed as completed. This supersedes Part 4 remote
+  publication/feature-CI-pending notes below.
+- Local iteration fast-forwarded to the verified merge. Feature ancestry was
+  confirmed before expected-head remote deletion and local feature deletion;
+  fetch/prune, branch -a and ls-remote verify cleanup. Historical iteration
+  branches, Milestone 11, main and pre-existing feature #75 are preserved.
+- All four Parts have passed local real-data/functional acceptance and their
+  feature CI. Main integration still requires its independent PR/checks. This
+  delivery record is prepared on the existing iteration before that final gate.
+  No application code has changed since the measured/reviewed feature head.
+  Outcome and reproducible operation notes retain cold startup, route source
+  preparation and full Braunschweig memory limits. User services/data intact.
+
+### Iteration 012 Part 4 implementation and acceptance (2026-10-22)
+
+- User requested project review and Part 4 completion if sound. Assigned Issue
+  #110 in verified Milestone 11 precedes `feature/110-osm-real-acceptance` from
+  `iteration/012` at `aba6a4e`. Preserve Parts 1-3 and main `a034bc0` until the
+  independent integration gate. Earlier Part-4-unstarted notes below are history.
+- Review found an initial-label bottleneck: `/study` fully inspected all regional
+  payloads just to return locations. The map now uses bounded
+  `/study?catalog_only=true`, explicitly `verified: false` / catalog metadata
+  scope. Full/default study inspection, planner/source-layer checks and all OSM
+  classification/source semantics remain unchanged. New backend regression and
+  frontend request assertions verify that separation.
+- Final local backend 314 passes / one existing Windows permission skip,
+  104.40 s; Ruff, frontend lint/build, all 22 browser checks, five focused OSM
+  checks after their new assertion, and all 14 real-stack smoke checks pass.
+  Native OMPL and TestClient require host execution because the Windows sandbox
+  terminates native handles / blocks its local socket loop; these gates passed
+  outside that sandbox, using only isolated test services and new local outputs.
+- Fresh independent real evidence `.cache/iteration012-part4-independent-real/`:
+  20 spatial windows, 80 cost responses (ASGI p95 0.07049 s), 221 original details,
+  all 23 diagnostic originals agree; source unchanged. Final production/TCP/
+  browser/resource/route campaign passes under `.cache/iteration012-part4-final/`:
+  fresh preparation 73.267 s; warm TCP p95 0.1651 s; 20-view browser p95 0.9803 s;
+  50 bounded cycles with +3.02% retained heap and stable layers/listeners. Initial
+  fit 10.96 s / first-view max 11.08 s remain explicit cold limits. Route off/on
+  medians 51.9728/51.8365 s (-0.2623% overhead), identical geometry/cost/diagnostics
+  and displayed exports, zero route-caused OSM requests; conservative endpoint
+  rejection preserved. Real Braunschweig/mobile/external inspection pass with
+  no page errors/overflow. Source byte hashes unchanged; test services stopped.
+  Diagnostic v1/v2/v3 runs are superseded and not complete acceptance passes.
+- New reproducible harness/operating notes are under
+  `doc/experiments/iteration-012/`; outcome is
+  `doc/iteration/iteration-012/outcome.md`. Detailed evidence/cache/screenshots
+  stay local. Remote Part 4 CI/publication/integration have not run at this record.
+  Original sources, private profiles and user-owned services remain intact.
+
+### Iteration 012 Part 3 verified feature delivery (2026-10-21)
+
+- PR #109 merged Part 3 into `iteration/012` at `cf23506`, after Checks run
+  `39670301509` explicitly passed Linux Python, Windows Python and frontend on
+  reviewed head `d33763a`. Issue #108 was explicitly closed as completed.
+- Local `iteration/012` fast-forwarded to the verified merge. Confirmed feature
+  ancestry before removing the remote branch with an expected-head lease and
+  deleting the local feature. Fetch/prune, branch -a and ls-remote verify cleanup.
+  Retain Milestone 11 and `iteration/012` for Part 4. Main remains `a034bc0`.
+- README, plan and Part 3 acceptance record actual delivery. Earlier Part 3
+  publication/CI/integration-pending notes below are historical and superseded.
+  Part 4's browser latency/resource campaign and off/on route comparison remain
+  pending, together with full iteration/main integration. Original data, private
+  profiles and user-owned services remain intact; isolated test services stopped.
+
+### Iteration 012 Part 3 implementation and local acceptance (2026-10-21)
+
+- User requested Part 3 completion and confirmed continuing that task. Assigned
+  Issue #108 in Milestone 11 precedes `feature/108-regional-osm-map`, created from
+  `iteration/012` at `d5002c3`. Parts 1-2 delivery remains intact.
+- Implemented bounded regional overview/detail loading, four category toggles,
+  shared category/cost styles and legends, original-object details/diagnostics,
+  debounce/cancellation/generation/source checks and bounded nearby-view reuse.
+  Every cache reuse rechecks backend readiness. Partial detail falls back to a
+  labelled aggregate grid; no legacy full Hannover request is used.
+- Independent OSM/route/reference/external-layer lifecycles preserve map position,
+  route results and unchanged OSM selection. Shared Canvas hit testing and a
+  noninteractive SVG route preserve source clicks; boundary is noninteractive.
+  Fixed street-tile cleanup to retain Leaflet's internal remove listeners.
+- Local backend 313 passes / one existing Windows permission skip; Ruff,
+  frontend lint/build, 22 browser tests and 14 real-stack smoke passes. Real
+  Hannover evidence: `.cache/iteration012-part3-ui-final/`; full overview, four
+  category/cost selections, original details, historical research route/export
+  with OSM on, desktop/mobile and unchanged source bytes. Route updates do not
+  issue OSM requests. See `doc/iteration/iteration-012/part3.md`.
+- Feature code/local acceptance is committed at `b826f9d` and published through
+  PR #109 targeting `iteration/012`. Successful Linux/Windows/frontend CI and
+  verified feature integration/cleanup remain pending at this record.
+  Part 4 still owns full browser/resource/off-on route acceptance and main
+  integration. Main remains `a034bc0`. Preserve original data, private profiles,
+  user services and Milestone 11. Prior Parts 3-4-unstarted notes below are history.
+
+### Iteration 012 Part 2 verified feature delivery (2026-10-21)
+
+- PR #107 merged Part 2 into `iteration/012` at `70ef8f4` after Checks run
+  `39648870309` passed Linux Python, Windows Python and frontend on the reviewed
+  feature head `c67ea50`. All three jobs explicitly completed successfully before
+  the merge. Issue #106 was explicitly closed as completed.
+- Local `iteration/012` fast-forwarded to the verified merge. After confirming
+  PR merge and feature-head ancestry, removed the merged feature remotely with
+  an expected-head lease and locally; fetch/prune, branch -a and ls-remote checks
+  confirmed cleanup. Keep Milestone 11 and `iteration/012` for Parts 3-4.
+- README/plan/Part 2 outcome now record the actual delivery. Earlier publication
+  blocks and pending-delivery notes below are historical and superseded. Main
+  remains `a034bc0`; the regional viewport UI and full iteration acceptance are
+  still pending. Original data, private profiles and user services remain intact.
+- The merged code is on remote `iteration/012` at `70ef8f4`. A separate local
+  documentation commit records the verified delivery and cleanup. Automatic
+  approval review rejected pushing this additional post-merge documentation to
+  the shared iteration branch, stating that the authorized feature push/PR/merge
+  did not cover this new remote payload. That documentation push was not executed
+  or retried. Preserve the local documentation commit pending explicit permission;
+  do not mistake the completed code merge for a blocked Part 2 implementation.
+
+### Iteration 012 Part 2 publication and integration authorized (2026-10-21)
+
+- User explicitly authorized pushing the completed Part 2 branch to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating its PR and merging
+  into `iteration/012` after successful Linux/Windows/frontend CI. This supersedes
+  the earlier Part 2 publication block below. Main integration and Parts 3-4
+  remain outside this delivery.
+- Publish `feature/106-osm-classification-details`, verify all checks on its final
+  reviewed head, merge the feature PR, explicitly close Issue #106 as needed and
+  perform verified remote/local feature cleanup. Preserve Milestone 11 and the
+  iteration branch for remaining work.
+
+### Iteration 012 Part 2 implementation and local acceptance (2026-10-21)
+
+- User requested Part 1 review, then Part 2 if no blocking issue was found.
+  Review passed 47 focused tests and 20 real independent Hannover viewports
+  (API p95 0.169 s), with unchanged source bytes and no blocking issue found.
+- Created Issue #106 in verified Milestone 11, assigned to Hunter3304, before
+  `feature/106-osm-classification-details` from `iteration/012` at `80037e6`.
+- Implemented shared primary-layer classification, streamed schema-2 cached
+  scores, compact selected-category cost queries and bounded original-object
+  details/explanations by indexed identity/source fid. Shared `osmStyles.ts`
+  now supplies demo palettes, category precedence, unknown dashes and historical
+  obstruction styling. Original rules/data/planner semantics remain intact.
+- Final real evidence: `.cache/iteration012-part2-real-final/`: 80 complete
+  category-cost queries agree with independently selected original tags/demo
+  analysis, p95 0.072 s / max 0.139 s; 221 exact original-object detail checks;
+  all 23 invalid/unsupported diagnostic objects inspectable; source unchanged.
+  These are ASGI timings, excluding TCP/browser/route-overhead acceptance.
+- Backend 313 passes / one existing Windows permission skip; final focused
+  Part 2 14 passes; Ruff, frontend lint/build, 17 frontend tests and 14 real-stack
+  smoke passes with installed Chrome. User services/private profiles intact.
+- Local implementation/acceptance complete; feature publication/CI/integration
+  pending. See `doc/iteration/iteration-012/part2.md` and the expanded API guide.
+  Re-run explicit `study-osm-prepare` for schema 2; schema-1 caches are preserved.
+  Part 3 regional viewport UI and Part 4 browser/route acceptance remain pending;
+  no full sprint integration to main is included in Part 2.
+- Implementation and acceptance committed locally at `4309115`. Automatic
+  approval review rejected pushing `feature/106-osm-classification-details` to
+  `https://github.com/Hunter3304/uas-mission-planner.git`: private project code
+  publication to that external destination requires explicit authorization for
+  this payload. The earlier authorization recorded below was specific to Part 1.
+  The push was not executed or retried; no Part 2 PR, remote CI, merge or cleanup
+  occurred. Request explicit authorization for this Part 2 push/PR/CI-gated merge
+  into `iteration/012`. Keep Issue #106 open and preserve the local feature.
+
+### Iteration 012 Part 1 verified feature delivery (2026-10-21)
+
+- PR #105 merged Part 1 into `iteration/012` at `64fff6a`, after Checks run
+  `39628187365` attempt 2 passed Linux Python, Windows Python and frontend on
+  the reviewed feature head `0338388`. Issue #104 is explicitly closed.
+- The first attempt completed every frontend step but retained a stale running
+  frontend check despite a successful workflow conclusion. Reran that job and
+  verified all three checks explicitly completed successfully before merging.
+- Local `iteration/012` fast-forwarded to the verified merge. The merged feature
+  branch was removed remotely with an expected-head lease and locally after
+  ancestry verification; fetch/prune, branch -a and ls-remote checks confirm
+  cleanup. Keep `iteration/012` and Milestone 11 for the remaining Parts.
+- README/plan/outcome record the Part 1 integration. Main remains `a034bc0`;
+  Parts 2-4 have not started. Original data/private profiles and user services
+  remain intact. The earlier approval block and pending-publication notes below
+  are superseded by the explicit authorization and this verified delivery.
+
+### Iteration 012 Part 1 publication authorized (2026-10-21)
+
+- User explicitly authorized pushing `iteration/012` and
+  `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating the feature PR,
+  and merging Part 1 into `iteration/012` after successful CI. This supersedes
+  the prior publication-approval block below. Main integration remains outside
+  this Part 1 delivery.
+- Verified repository identity/push permission through the GitHub connector and
+  remote main at `a034bc0`; neither new branch existed remotely before publication.
+  Publish the reviewed code/local acceptance with this authorization record,
+  verify the final feature head's Linux/Windows/frontend CI, then merge and
+  perform the mandatory verified feature-branch cleanup. Keep Milestone 11 open
+  for later Parts; close Issue #104 after Part 1 integration is verified.
+
+### Iteration 012 Part 1 implementation and local acceptance (2026-10-21)
+
+- User reviewed the plan and requested Part 1 completion. Milestone 11 / Issue
+  #104 precede `feature/104-osm-display-access` from new `iteration/012` at main
+  `a034bc0`. Part 1 authorization supersedes its earlier planning-only status.
+  Parts 2-4 remain planned; no full sprint merge to main is included yet.
+- Implemented explicit `study-osm-prepare`, a streamed checksummed SQLite/R-tree
+  display cache, readiness, category-only viewport/summary/overview APIs, bounded
+  responses/concurrency, source/rule invalidation and guarded legacy regional
+  responses. Warm regional catalog reads avoid full GeoDataFrames. The explorer
+  integrity badge respects metadata-only `verified: false` entries.
+- Real Hannover final evidence: `.cache/iteration012-part1-real-final/`.
+  326,334 original / 326,311 drawable records; 13 invalid and 10 unsupported
+  geometries remain diagnosed. All 20 viewports agree with independent original
+  source selection; API p95 0.191 s / max 0.322 s, overview 1,580 cells / 591,227
+  bytes, explicit preparation 68.90 s. Source checksums unchanged. API timings
+  exclude real TCP/browser rendering; no colored-map completion is claimed.
+- Local backend 299 passes / one existing Windows permission skip; focused
+  API/display 33 passes / one skip; Ruff, frontend lint/build, 14 mocked browser
+  and 14 real-stack smoke passes. Local browser tests use `PLAYWRIGHT_CHANNEL=chrome`
+  because the bundled Chromium executable is absent. No user service was stopped.
+- Code/local acceptance committed at `ccfcd31`. Automatic approval review rejected
+  pushing `iteration/012` and `feature/104-osm-display-access` to
+  `https://github.com/Hunter3304/uas-mission-planner.git`, citing lack of explicit
+  authorization to publish code to that specific remote/create two branches.
+  No push was executed or retried. User approval is needed for publication; no
+  feature PR/remote CI/merge/cleanup has occurred. Issue #104 remains open.
+- Outcome: `doc/iteration/iteration-012/part1.md`; operation/reproduction:
+  `doc/experiments/iteration-012/README.md` and `verify-part1.py`. Feature CI and
+  integration are pending publication approval. Original data/cache evidence stay
+  local; Part 2 classification/detail and Part 3 map integration remain pending.
+
+### Iteration 012 OSM display plan requested (2026-10-21)
+
+- User requested an Iteration 012 plan and a Chinese report for Hannover OSM
+  loading and demo-equivalent category/cost colors. Draft:
+  `doc/plan/iteration-012.md`. Current work is local planning only; implementation
+  and remote tracking/publication have not started under this request.
+- Read-only inspection confirms 326,334 Hannover objects / 1,481 tag fields.
+  The `/features` sparse branch checks only `experiment.json`; regional data
+  expands absent tags. RegionalMap also loads the whole collection, colors OSM
+  uniformly brown and rebuilds OSM layers on unrelated route/state changes.
+- Proposed four Parts: bounded spatial access/cache and overview; shared colors
+  and object details; viewport-driven regional map; real-data/performance acceptance.
+  Reuse the saved Hannover eight-site bounds and current classification rules.
+  Include source verification/cache invalidation and OSM-on route acceptance.
+- Initial full-region view gets a labelled aggregate overview; individual colored
+  objects load at detail scale with explicit response budgets. Full multizoom
+  tiles/WebGL are deferred pending measurements. All performance gates in the
+  plan are proposed targets, not results. Original sources and planner semantics
+  remain the baseline. No application code, services or source data changed.
+
 ### Iteration 011 verified main delivery (2026-10-16)
 
 - Main PR #102 merged at `0c29142` after independent Linux/Windows/frontend run `38892111216` passed on reviewed `388bb05`.

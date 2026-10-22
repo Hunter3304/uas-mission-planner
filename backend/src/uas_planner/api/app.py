@@ -25,6 +25,7 @@ from uas_planner.core.experiment import (
     zone_layer,
 )
 from uas_planner.core.grid import build_grid
+from uas_planner.core.osm_display import MAX_BYTES, MAX_FEATURES, DisplayStore, context, encode
 from uas_planner.core.planning import plan_saved_route
 from uas_planner.core.routing import route_geojson
 from uas_planner.storage.dataset import load_dataset
@@ -81,6 +82,18 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 422, "Dataset cannot be verified. Check its files and metadata."
             ) from exc
 
+    display = DisplayStore(root / ".osm-display")
+    api.state.osm_display = display
+    from uas_planner.api.osm_display import router as osm_display_router
+
+    api.include_router(osm_display_router(display, dataset_path))
+
+    def regional_catalog(dataset_id):
+        try:
+            return display.catalog(dataset_path(dataset_id))
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            raise HTTPException(422, "Regional OSM metadata/display cannot be verified.") from exc
+
     def summary(dataset_id, frame, metadata):
         return {
             "id": dataset_id,
@@ -134,12 +147,46 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         return manifest
 
     @api.get("/api/datasets/{dataset_id}/study")
-    def regional_study(dataset_id: str):
-        from uas_planner.acquisition.study import inspect_study
+    def regional_study(dataset_id: str, catalog_only: bool = False):
+        from uas_planner.acquisition.study import inspect_study, validate_study
+        from uas_planner.core.osm_display import contained, digest, read_object
 
         try:
-            return inspect_study(dataset_path(dataset_id))
-        except (ValueError, KeyError, OSError) as exc:
+            path = dataset_path(dataset_id)
+            if not catalog_only:
+                return inspect_study(path)
+            manifest = read_object(contained(path, "study.json"))
+            if (
+                manifest.get("schema_version") != 1
+                or manifest.get("kind") != "regional-source-study"
+            ):
+                raise ValueError("Unsupported study manifest.")
+            config = manifest["config"]
+            if (
+                not isinstance(config, dict)
+                or not isinstance(config.get("locations"), list)
+                or len(config["locations"]) > 64
+            ):
+                raise ValueError("Location catalog exceeds display budget.")
+            validate_study(config)
+            sources = manifest.get("sources", {})
+            if not isinstance(sources, dict) or any(
+                not isinstance(sources.get(name, {}), dict) for name in ("osm", "dipul", "ghsl")
+            ):
+                raise ValueError("Invalid source attribution metadata.")
+            # Map labels need saved metadata, not materialized OSM/GHSL/DIPUL sources.
+            # Full inspection and every planner/source-layer verification stay unchanged.
+            return {
+                "config": {"bounds": config["bounds"], "locations": config["locations"]},
+                "sources": {
+                    name: {"attribution": str(sources.get(name, {}).get("attribution", ""))[:4096]}
+                    for name in ("osm", "dipul", "ghsl")
+                },
+                "verified": False,
+                "verification_scope": "validated_catalog_metadata_only",
+                "study_sha256": digest(manifest),
+            }
+        except (ValueError, KeyError, OSError, TypeError) as exc:
             raise HTTPException(422, "Cannot verify regional source study.") from exc
 
     @api.get("/api/datasets/{dataset_id}/study/layers/zones")
@@ -466,6 +513,9 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 if not entry.is_dir() or not DATASET_ID.fullmatch(entry.name):
                     continue
                 try:
+                    if (dataset_path(entry.name) / "study.json").is_file():
+                        items.append(regional_catalog(entry.name))
+                        continue
                     _, frame, metadata = verified(entry.name, compact=True)
                     items.append(summary(entry.name, frame, metadata))
                 except HTTPException as exc:
@@ -475,15 +525,39 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
 
     @api.get("/api/datasets/{dataset_id}")
     def details(dataset_id: str):
+        if (dataset_path(dataset_id) / "study.json").is_file():
+            return regional_catalog(dataset_id)
         _, frame, metadata = verified(dataset_id, compact=True)
         return summary(dataset_id, frame, metadata)
 
     @api.get("/api/datasets/{dataset_id}/features")
     def features(dataset_id: str, analysis: Literal["building-costs", "tag-costs"] | None = None):
+        regional = (dataset_path(dataset_id) / "study.json").is_file()
+        if regional:
+            try:
+                display_context = context(dataset_path(dataset_id))
+                metadata = display_context["metadata"]
+            except (ValueError, OSError, KeyError, TypeError) as exc:
+                raise HTTPException(422, "Regional OSM metadata cannot be verified.") from exc
+            if (
+                metadata["feature_count"] > MAX_FEATURES
+                or display_context["source_token"][2] > MAX_BYTES
+                or analysis is not None
+            ):
+                raise HTTPException(
+                    413,
+                    "Use bounded regional OSM viewing instead of the full-source/analysis response: "
+                    "/study/osm/summary, "
+                    "/study/osm/overview and /study/osm/features?bbox=west,south,east,north.",
+                )
         _, frame, metadata = verified(dataset_id, compact=True)
         # Large experiment snapshots contain many sparse OSM tag columns. Omit
         # absent tags only in their display response; source downloads stay intact.
-        na = "drop" if (dataset_path(dataset_id) / "experiment.json").is_file() else "null"
+        na = (
+            "drop"
+            if regional or (dataset_path(dataset_id) / "experiment.json").is_file()
+            else "null"
+        )
         collection = json.loads(frame.to_json(drop_id=True, na=na))
         for feature, tags in zip(collection["features"], frame.attrs["source_tags"], strict=True):
             if na == "null":
@@ -492,6 +566,13 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 )
             else:
                 feature["properties"].update(tags)
+        if regional:
+            payload = encode(collection)
+            if len(payload.encode()) > MAX_BYTES:
+                raise HTTPException(
+                    413, "Regional response exceeds 5 MiB; use /study/osm/features with bbox."
+                )
+            return Response(payload, media_type="application/geo+json")
         if analysis == "tag-costs":
             return analyze_all_layers(collection)
         return analyze_collection(collection) if analysis else collection
