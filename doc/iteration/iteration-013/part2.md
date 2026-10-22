@@ -6,10 +6,11 @@ Tracking: assigned [Issue #116](https://github.com/Hunter3304/uas-mission-planne
 in verified Milestone 12, created before `feature/116-regional-selection-inspector`
 from `iteration/013` at `515ccda`.
 
-Status: implementation and local acceptance committed at `739fe03` and published.
-[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) targets
-`iteration/013`; final-head CI and merge remain pending. Parts 3-4 and main
-integration remain deferred.
+Status: delivered through
+[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) into
+`iteration/013` at `370f1d72be3ec86818faa49bf023d2e5f8edcae7` after complete
+final-head CI. Issue #116 is closed and merged-feature cleanup is verified
+locally/remotely. Parts 3-4 and main integration remain deferred.
 
 ## Result
 
@@ -92,6 +93,25 @@ Existing full scenario payload/preparation cost is unchanged. No source data,
 private profile, permission claim or route objective is modified.
 
 Richer source-specific detail cards/help, color-mode explanations and departure/
-arrival calculation remain Parts 3-4. No main merge is included. The feature PR
-is open; exact-head Linux/Windows/frontend CI, merge into `iteration/013`, explicit Issue
-closure and verified merged-feature cleanup remain delivery gates until recorded.
+arrival calculation remain Parts 3-4. No main merge is included.
+
+## Verified delivery
+
+- Checks run [39813456762](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39813456762)
+  completed successfully on reviewed head `64129d60e4d4f59fcc0fdb17084f9208f9890139`.
+  Windows: 317 Python passes (124.31 s); Linux: 308 passes / 9 skips (138.21 s).
+  Frontend: lint/build, 37 browser passes (31.7 s) and 14 smoke passes (27.0 s).
+  All three jobs were explicitly checked as completed/successful before merge.
+- PR #117 merged with the expected-head guard. The local integration branch
+  fast-forwarded to the merge; feature ancestry and identical backend/frontend
+  application trees versus measured `739fe03` were verified. Working application
+  byte hashes still match final real acceptance after restoring only two new
+  files' LF endings changed by Windows checkout. This creates no logical diff.
+- Issue #116 was explicitly closed as completed in Milestone 12. Only the merged
+  feature was deleted remotely with an expected-head lease and locally. Fetch/
+  prune, branch -a and ls-remote verify cleanup. Main remains `4ed0023`; original
+  feature #75, historical iteration branches and Milestone 12 remain intact.
+- Initial CI run `39812090642` failed the old timing-dependent test, subsequently
+  corrected and validated. Superseded run `39812208700` was cancelled while
+  installing browser dependencies. Neither substitutes for the successful final
+  run. This delivery-record follow-up changes no application or accepted behavior.

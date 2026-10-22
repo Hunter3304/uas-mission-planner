@@ -16,8 +16,10 @@ superseded the earlier automatic rejection. Part 2 is authorized and implemented
 on `feature/116-regional-selection-inspector`, created from `515ccda`
 after assigned Issue #116 in Milestone 12. Local browser regression: 37 passes;
 real-stack smoke: 14 passes. See [Part 2 status](../iteration/iteration-013/part2.md)
-for passing final real-data acceptance and delivery gates. PR #117 targets
-`iteration/013`; final-head CI and integration are pending. Parts 3-4 remain planned; main is
+for passing final real-data acceptance. PR #117 merged into `iteration/013` at
+`370f1d7` after final-head Checks run `39813456762` explicitly passed Linux Python,
+Windows Python and frontend on reviewed head `64129d6`. Issue #116 is closed;
+merged-feature cleanup is verified locally/remotely. Parts 3-4 remain planned; main is
 unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 

@@ -2,6 +2,28 @@
 
 ## Current status
 
+### Iteration 013 Part 2 verified delivery (2026-10-22)
+
+- PR #117 merged Part 2 into `iteration/013` at
+  `370f1d72be3ec86818faa49bf023d2e5f8edcae7`. Final Checks run `39813456762`
+  explicitly completed Linux Python, Windows Python and frontend successfully on
+  reviewed head `64129d60e4d4f59fcc0fdb17084f9208f9890139`. Windows: 317 Python
+  passes; Linux: 308 passes / 9 skips; frontend: 37 browser and 14 smoke passes,
+  with lint/build. Earlier CI-pending notes below are historical and superseded.
+- Local integration fast-forwarded to the merge. Feature ancestry and identical
+  backend/frontend application trees versus accepted `739fe03` were verified.
+  Original byte hashes match final real acceptance after restoring only Windows
+  checkout's LF/CRLF changes in two new files; no logical application diff.
+- Issue #116 explicitly closed as completed. Merged feature deleted remotely
+  with an expected-head lease and locally; fetch/prune, branch -a and ls-remote
+  verify cleanup. Keep Milestone 12 / iteration/013 for Parts 3-4. Main remains
+  `4ed0023`; historical iterations and existing feature #75 are preserved.
+- Final evidence `.cache/iteration013-part2-final-v2/` passes with ten selection
+  cycles, zero map displacement, real OSM/DIPUL/GHSL and nondrawable diagnostics,
+  desktop/mobile screenshots, one scenario load (85.289 s), cached GHSL reuse,
+  zero routes/browser errors, unchanged original hashes and owned services stopped.
+  This follow-up records delivery only; Parts 3-4 and main integration are deferred.
+
 ### Iteration 013 Part 2 implementation (2026-10-22)
 
 - User requested Part 2. Verified open Milestone 12 and assigned Issue #116
