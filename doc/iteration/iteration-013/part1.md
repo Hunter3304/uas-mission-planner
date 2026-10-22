@@ -6,8 +6,10 @@ Tracking: assigned [Issue #114](https://github.com/Hunter3304/uas-mission-planne
 in verified Milestone 12, created before `feature/114-hannover-map-controls`
 from `iteration/013` at `4ed0023`.
 
-Status: implementation, regression and final real-data acceptance complete.
-Remote feature delivery remains pending. Parts 2-4 remain planned; main is unchanged.
+Status: implementation, regression and final real-data acceptance complete,
+committed locally at `c5e8806`. Publication requires explicit authorization after
+the automatic approval rejection recorded below. Parts 2-4 remain planned;
+main is unchanged.
 
 ## Result
 
@@ -96,3 +98,12 @@ Feature publication, Linux/Windows/frontend CI, merge to `iteration/013` and
 verified branch cleanup remain pending. Do not close Issue #114 or remove its
 unmerged branch before actual delivery. Keep the iteration milestone/branch for
 Parts 2-4; full iteration/main integration is outside this Part 1 delivery.
+
+Automatic approval review rejected the proposed push of `iteration/013` and
+`feature/114-hannover-map-controls` to the public
+`https://github.com/Hunter3304/uas-mission-planner` repository. Its stated reason
+was that local implementation authorization did not explicitly authorize public
+disclosure of the committed code and documentation to that destination. The push
+was not executed or retried. No PR, remote CI, merge or cleanup occurred. Preserve
+the reviewed local result until the user authorizes publication and the separate
+successful-CI-gated feature merge into `iteration/013`.

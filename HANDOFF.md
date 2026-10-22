@@ -2,6 +2,26 @@
 
 ## Current status
 
+### Iteration 013 Part 1 local completion and publication gate (2026-10-22)
+
+- Implementation and all local acceptance are committed at `c5e8806` on
+  `feature/114-hannover-map-controls`. Final evidence is
+  `.cache/iteration013-part1-final/`; current implementation byte hashes match
+  the campaign, original OSM/study hashes are unchanged and owned services stopped.
+- Automatic approval review rejected `git push --set-upstream origin iteration/013
+  feature/114-hannover-map-controls` before execution. Stated reason: the user
+  authorized local implementation, but did not explicitly authorize publishing
+  committed code/documentation to the public repository
+  `https://github.com/Hunter3304/uas-mission-planner`. The push was not executed
+  or retried, and no alternate publication mechanism was used.
+- No Part 1 PR, remote feature CI, merge or branch cleanup has occurred. Keep
+  assigned Issue #114 open in verified Milestone 12 and retain both local branches.
+  Main remains `4ed0023`. Ask for explicit authorization to push these reviewed
+  branches, create the feature PR and merge into `iteration/013` after all required
+  checks pass. This is a publication gate, not unfinished local implementation.
+- This follow-up records delivery status only; application code and acceptance
+  remain unchanged. Parts 2-4 and full iteration/main integration are deferred.
+
 ### Iteration 013 Part 1 implementation and acceptance (2026-10-22)
 
 - User approved the full plan and requested Part 1 only. Verified Milestone 12 /

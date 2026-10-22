@@ -3,7 +3,7 @@
 Iteration 013 **Part 1** is implemented locally on
 `feature/114-hannover-map-controls` (assigned Issue #114 / Milestone 12), with
 complete local regression and final Hannover acceptance; feature delivery is
-pending. It adds source-grouped
+pending explicit public-repository publication authorization. It adds source-grouped
 collapsible map controls, automatic cached scenario layers and a dedicated
 saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
 coordinate override checkbox and manual layer-load button are removed from the
