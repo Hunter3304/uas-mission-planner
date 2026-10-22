@@ -2,6 +2,30 @@
 
 ## Current status
 
+### Iteration 013 Part 3 verified delivery (2026-10-22)
+
+- PR #119 merged Part 3 into `iteration/013` at
+  `db0d40bacf4548cf45d2ef265680f1051a826f48`. Checks run `39818431931` explicitly
+  completed Linux Python, Windows Python and frontend successfully on reviewed
+  head `c9c372e3102e9c5ea5378d1d8a1d797559dba79b`. Windows: 317 passes;
+  Linux: 308 passes / 9 skips; frontend: lint/build, 46 browser and 14 smoke passes.
+  This supersedes pending delivery notes below.
+- Local integration fast-forwarded to the merge; feature ancestry and identical
+  backend/frontend trees versus accepted `c9c372e` were verified. Current byte
+  hashes match all eleven measured application files after restoring checkout-only
+  LF endings, with no logical source diff. Final real evidence
+  `.cache/iteration013-part3-final-v3/` passes: readable source cards, matched rules,
+  aggregate/diagnostic inspection, ten selection cycles, zero layout shift, one
+  scenario load (85.778 s), one cached GHSL request, zero routes/browser errors,
+  desktop/mobile, unchanged original hashes and owned services stopped.
+- Issue #118 explicitly closed as completed. Merged feature deleted remotely
+  with an expected-head lease and locally. Fetch/prune, branch -a and ls-remote
+  verify cleanup. Milestone 12 and iteration/013 remain for Part 4; main is still
+  `4ed0023`. Preserve historical iterations and original feature #75.
+- README/plan/outcome and operation guide record actual delivery. This follow-up
+  changes delivery records only. No backend/scoring/source/profile/planner changes;
+  Part 4 departure/arrival and full iteration/main integration remain deferred.
+
 ### Iteration 013 Part 3 implementation (2026-10-22)
 
 - User requested Part 3. Verified open Milestone 12 and assigned Issue #118

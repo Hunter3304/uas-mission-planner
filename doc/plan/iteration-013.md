@@ -20,10 +20,13 @@ for passing final real-data acceptance. PR #117 merged into `iteration/013` at
 `370f1d7` after final-head Checks run `39813456762` explicitly passed Linux Python,
 Windows Python and frontend on reviewed head `64129d6`. Issue #116 is closed;
 merged-feature cleanup is verified locally/remotely. Part 3 is authorized and
-implemented locally on `feature/118-readable-regional-details` from `516ffcb`,
+implemented on `feature/118-readable-regional-details` from `516ffcb`,
 after assigned Issue #118 in Milestone 12. Local acceptance: 46 browser tests,
 14 real-stack smoke and lint/build pass; see [Part 3 outcome](../iteration/iteration-013/part3.md)
-for real-data acceptance and delivery gates. Part 4 remains planned; main is
+for passing real-data acceptance. PR #119 merged into `iteration/013` at `db0d40b`
+after Checks run `39818431931` passed all three jobs on reviewed head `c9c372e`.
+Issue #118 is closed; local/remote merged-feature cleanup is verified.
+Part 4 remains planned; main is
 unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 

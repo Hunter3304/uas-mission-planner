@@ -6,8 +6,11 @@ Assigned [Issue #118](https://github.com/Hunter3304/uas-mission-planner/issues/1
 in verified open Milestone 12 precedes `feature/118-readable-regional-details`,
 created from `iteration/013` at `516ffcb`.
 
-Status: implementation and local/real Hannover acceptance complete; feature
-publication/CI/merge remain pending. Part 4 and main integration are deferred.
+Status: delivered through
+[PR #119](https://github.com/Hunter3304/uas-mission-planner/pull/119) into
+`iteration/013` at `db0d40bacf4548cf45d2ef265680f1051a826f48`, after final-head
+Linux/Windows/frontend CI passed. Issue #118 is closed and merged-feature cleanup
+is verified locally/remotely. Part 4 and main integration are deferred.
 
 ## Result
 
@@ -99,6 +102,21 @@ identity link for derived buildings. Those links are separately browser-tested.
 Existing first full scenario preparation/payload costs remain; no speedup or
 memory redesign is claimed. Original details remain on demand. Reformatting uses
 only already-loaded metadata/original responses; it adds no source acquisition or
-new API. Main and Part 4 timing/backend reassessment remain deferred. Feature PR,
-final-head CI, iteration merge, explicit Issue closure and verified merged-feature
-cleanup are pending until recorded.
+new API. Main and Part 4 timing/backend reassessment remain deferred.
+
+## Verified delivery
+
+- Checks run [39818431931](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39818431931)
+  completed successfully on reviewed head `c9c372e3102e9c5ea5378d1d8a1d797559dba79b`.
+  Windows: 317 Python passes (76.66 s); Linux: 308 passes / 9 skips (136.48 s).
+  Frontend: lint/build, 46 browser passes (31.3 s), 14 smoke passes (26.2 s).
+  All three jobs were explicitly checked completed/successful before merging.
+- PR #119 merged with an expected-head guard; local iteration/013 fast-forwarded
+  to the merge. Feature ancestry and identical backend/frontend trees versus the
+  accepted feature were verified. Current implementation bytes match final real
+  acceptance after restoring checkout-only LF endings, with no logical diff.
+- Issue #118 was explicitly closed as completed in Milestone 12. Only the merged
+  feature was deleted remotely with an expected-head lease and locally. Fetch/
+  prune, branch -a and ls-remote verify cleanup. Main stays `4ed0023`; historical
+  iterations and existing feature #75 remain. Milestone 12/iteration/013 continue
+  for Part 4. This delivery-record update changes no application behavior.
