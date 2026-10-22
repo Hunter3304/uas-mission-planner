@@ -2,6 +2,25 @@
 
 ## Current status
 
+### Iteration 013 Part 1 verified feature delivery (2026-10-22)
+
+- PR #115 merged Part 1 into `iteration/013` at
+  `3fcafdbea1448be0a2da7082855989e4e7a4cc4c`, after Checks run `39801851963`
+  explicitly completed Linux Python, Windows Python and frontend successfully on
+  reviewed head `bb0f8698a333081bb287e3860af76ad741995e7e`. Issue #114 was
+  explicitly closed as completed. Earlier publication/CI-pending notes below are
+  historical and superseded by this verified delivery.
+- Local integration fast-forwarded to the merge; feature ancestry and identical
+  backend/frontend trees versus measured `c5e8806` were checked. The merged feature
+  was deleted remotely with an expected-head lease and locally; fetch/prune,
+  branch -a and ls-remote verify cleanup. Main remains `4ed0023`; pre-existing
+  feature #75 and all historical iteration branches are retained.
+- README, plan and Part 1 outcome now record actual delivery. Keep Milestone 12
+  and `iteration/013` for Parts 2-4; no main integration is included. Local source
+  snapshots, private profiles, owned-service cleanup and final real evidence
+  `.cache/iteration013-part1-final/` remain intact. This documentation follow-up
+  changes no application code or measured behavior.
+
 ### Iteration 013 Part 1 publication and feature merge authorized (2026-10-22)
 
 - The user explicitly approved pushing `iteration/013` and

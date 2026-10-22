@@ -7,11 +7,13 @@ Part 1 tracking: assigned Issue #114 in verified Milestone 12, with
 below. Part 1 implementation and local acceptance are complete: backend 316
 passes / one existing Windows skip, 28 browser and 14 real-stack smoke passes,
 plus final Hannover acceptance with zero-request cached visibility cycles.
-See [Part 1 outcome](../iteration/iteration-013/part1.md). Publication and feature
-integration have not run. Parts 2-4 remain planned.
-The user subsequently explicitly authorized the public-repository push, feature
-PR and CI-gated merge into `iteration/013`, superseding the earlier automatic
-publication rejection. Actual CI/integration remain pending. See the outcome.
+Part 1 is delivered to `iteration/013` through
+[PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115) at `3fcafdb`,
+after Checks run `39801851963` explicitly passed Linux Python, Windows Python
+and frontend on reviewed head `bb0f869`. Issue #114 is closed, and merged feature
+cleanup is verified locally/remotely. The user's explicit publication authorization
+superseded the earlier automatic rejection. Parts 2-4 remain planned; main is
+unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 
 ## Requested result and confirmed decisions

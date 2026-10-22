@@ -1,10 +1,9 @@
 # UAS Mission Planner
 
-Iteration 013 **Part 1** is implemented locally on
-`feature/114-hannover-map-controls` (assigned Issue #114 / Milestone 12), with
-complete local regression and final Hannover acceptance; the user has authorized
-publication and CI-gated delivery into `iteration/013`, which are pending.
-It adds source-grouped
+Iteration 013 **Part 1** is delivered to `iteration/013` through
+[PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
+Linux Python, Windows Python and frontend CI passed. Issue #114 is closed;
+Milestone 12 and the iteration branch remain for Parts 2-4. It adds source-grouped
 collapsible map controls, automatic cached scenario layers and a dedicated
 saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
 coordinate override checkbox and manual layer-load button are removed from the

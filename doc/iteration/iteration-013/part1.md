@@ -6,11 +6,11 @@ Tracking: assigned [Issue #114](https://github.com/Hunter3304/uas-mission-planne
 in verified Milestone 12, created before `feature/114-hannover-map-controls`
 from `iteration/013` at `4ed0023`.
 
-Status: implementation, regression and final real-data acceptance complete,
-committed locally at `c5e8806`. The user explicitly authorized publication and
-CI-gated feature integration into `iteration/013`; execution remains pending.
-This supersedes the automatic approval rejection recorded below. Parts 2-4
-remain planned; main is unchanged.
+Status: delivered to `iteration/013` through
+[PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115) at
+`3fcafdbea1448be0a2da7082855989e4e7a4cc4c`, following complete local acceptance
+and successful Linux/Windows/frontend CI. This supersedes the earlier publication
+gate below. Parts 2-4 remain planned; main is unchanged.
 
 ## Result
 
@@ -95,10 +95,22 @@ existing costs; this Part removes repeat loading on visibility changes. The
 separate OSM viewport limits are preserved, not presented as a total-memory cap.
 No source, permission rule, objective, source acquisition or private profile changes.
 
-Feature publication, Linux/Windows/frontend CI, merge to `iteration/013` and
-verified branch cleanup remain pending. Do not close Issue #114 or remove its
-unmerged branch before actual delivery. Keep the iteration milestone/branch for
-Parts 2-4; full iteration/main integration is outside this Part 1 delivery.
+## Verified feature delivery
+
+[Checks run 39801851963](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39801851963)
+explicitly completed Linux Python, Windows Python and frontend successfully on
+reviewed head `bb0f8698a333081bb287e3860af76ad741995e7e`. PR #115 then merged
+into `iteration/013` at `3fcafdbea1448be0a2da7082855989e4e7a4cc4c`.
+Issue #114 was explicitly closed as completed. Local integration fast-forwarded
+to the verified merge; feature ancestry and identical backend/frontend trees versus
+measured implementation `c5e8806` were verified. Remote deletion used an expected-
+head lease, followed by local deletion, fetch/prune, `branch -a` and `ls-remote`
+verification. Main, all historical iteration branches and pre-existing feature #75
+remain. Keep Milestone 12 and `iteration/013` for Parts 2-4; full iteration/main
+integration is outside this Part 1 delivery. The delivery record changes no
+application code or measured behavior.
+
+## Publication history (superseded)
 
 Automatic approval review rejected the proposed push of `iteration/013` and
 `feature/114-hannover-map-controls` to the public
@@ -107,5 +119,5 @@ was that local implementation authorization did not explicitly authorize public
 disclosure of the committed code and documentation to that destination. The push
 was not executed or retried. No PR, remote CI, merge or cleanup occurred. Preserve
 the reviewed local result. The user subsequently explicitly authorized this push,
-feature PR and successful-CI-gated merge into `iteration/013`. The earlier rejection
-is historical; actual delivery still requires verified successful checks.
+feature PR and successful-CI-gated merge into `iteration/013`. That authorization
+and the verified delivery above supersede this historical gate.
