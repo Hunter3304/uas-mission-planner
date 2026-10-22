@@ -9,7 +9,13 @@ saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
 coordinate override checkbox and manual layer-load button are removed from the
 regional UI. See the [operation guide](doc/experiments/iteration-013/README.md)
 and [Part 1 evidence/status](doc/iteration/iteration-013/part1.md).
-Parts 2-4 remain planned; scenario start/end inputs still apply in this Part.
+Part 2 is implemented and under review in
+[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) for `iteration/013`
+([Issue #116](https://github.com/Hunter3304/uas-mission-planner/issues/116)):
+OSM, DIPUL, GHSL and derived overlays share one left inspector, actual-geometry
+black outlines and short map summaries. Mobile uses one collapsible detail sheet.
+See [Part 2 acceptance/status](doc/iteration/iteration-013/part2.md).
+Parts 3-4 remain planned; scenario start/end inputs still apply.
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after

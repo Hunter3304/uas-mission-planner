@@ -1037,6 +1037,30 @@ td {
 .endpoint-row [aria-invalid='true'] { border-color: #a33a32; }
 .endpoint-bounds { margin-top: 12px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
 .planning-parameters-heading { margin: 0; font-size: 13px; }
+.regional-inspector-slot { position: sticky; top: 14px; margin: 20px 0; min-width: 0; z-index: 2; }
+.regional-inspector { display: flex; flex-direction: column; gap: 10px; min-width: 0; max-height: calc(100dvh - 28px); padding: 14px; border: 1px solid #bccfc6; border-radius: 9px; background: #fff; box-shadow: 0 3px 12px #163c3e0a; overflow-wrap: anywhere; }
+.regional-inspector:focus { outline: 2px solid #26866c; outline-offset: 2px; }
+.regional-inspector-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.selection-badge { padding: 3px 6px; border-radius: 4px; background: #e9f2ed; font-size: 10px; font-weight: 650; }
+.selection-title { margin: 0; font-size: 13px; }
+.selection-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.selection-actions button { padding: 5px 7px; font-size: 11px; }
+.regional-inspector-content { min-height: 0; overflow: auto; font-size: 12px; line-height: 1.65; }
+.regional-inspector p { font-size: 12px; line-height: 1.6; margin: 5px 0; }
+.regional-inspector dl > div { padding: 5px 0; border-bottom: 1px solid #e4ebe7; }
+.regional-inspector dt { font-weight: 650; }
+.regional-inspector dd { margin: 0; white-space: pre-wrap; }
+.regional-inspector .osm-details { max-height: none; overflow: visible; margin: 0; padding: 0; border: 0; }
+.regional-inspector .osm-details dl > div { display: block; }
+.regional-inspector .cost-details { max-height: none; overflow: visible; }
+.selection-summary button { padding: 5px 8px; }
+.leaflet-regional-selection-pane { pointer-events: none; }
+@media (max-width: 760px) {
+  .regional-inspector-slot { position: static; margin: 0; }
+  .regional-inspector.selection-empty { display: none; }
+  .regional-inspector.has-selection { position: fixed; z-index: 1100; left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); max-height: 55dvh; box-shadow: 0 0 20px #163c3e30; }
+  .regional-inspector-content { max-height: 37dvh; }
+}
 @media (max-width: 1000px) {
   .endpoint-row, .endpoint-row-exact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .endpoint-row > label:first-child { grid-column: 1 / -1; }

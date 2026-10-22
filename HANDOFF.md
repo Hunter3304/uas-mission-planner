@@ -2,6 +2,48 @@
 
 ## Current status
 
+### Iteration 013 Part 2 implementation (2026-10-22)
+
+- User requested Part 2. Verified open Milestone 12 and assigned Issue #116
+  precede `feature/116-regional-selection-inspector`, created from `iteration/013`
+  at `515ccda`. Main/Parts 3-4 remain deferred; Part 1 delivery is unchanged.
+- Implemented shared OSM/DIPUL/GHSL/scenario selection, noninteractive actual
+  black/white geometry outlines, one portal inspector in the existing left
+  sidebar, small map summaries with focus action and a single mobile detail sheet.
+  OSM original details moved out of the above-map controls. Group/popup closure
+  retains selection; hidden layers, dataset refresh, identity/collection changes
+  and overview replacement clear it. Late responses are aborted/identity-checked.
+- Local regression: 37 browser tests and 14 real-stack smoke checks pass;
+  lint/build/Ruff/syntax checks pass. No backend/planner/source changes. Nine new
+  cases cover layout, focus, hit testing, cross-source/mobile selection, diagnostics,
+  stale responses/identities, dataset refresh, pan/overview, lines and polygon holes.
+- Exploratory real run `.cache/iteration013-part2-real-v1/` passed ten cycles,
+  zero layout shift, one cached GHSL/scenario load, zero route calls, no browser
+  errors and unchanged original hashes, with owned services stopped. First final
+  attempt `.cache/iteration013-part2-final/` hit the existing bounded-query
+  fallback; its driver waited for detail rather than zooming further and failed.
+  It is not accepted evidence; services stopped. The driver now permits up to two
+  further zooms, preserving query budgets. Final acceptance
+  `.cache/iteration013-part2-final-v2/` passes with current implementation hashes:
+  ten selection cycles, diagnostic relation/49267, zero map displacement, one
+  scenario load (85.289 s), one cached GHSL load, zero routes/browser errors and
+  unchanged original hashes. No further zoom was needed in this run. Desktop and
+  mobile expanded/collapsed screenshots were visually checked; owned services
+  stopped. Final browser regression is 37 passes in 29.4 s; smoke 14 in 35.8 s.
+- Implementation/local acceptance are committed at `739fe03` and published on
+  the feature branch. [PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117)
+  targets `iteration/013`. Verify completed/successful Linux Python, Windows Python
+  and frontend checks on the final reviewed head before merging. Then explicitly
+  close Issue #116 and verify merged-feature cleanup locally/remotely. These gates
+  are pending; no main merge is included. See Part 2 outcome and operation guide.
+  Original data/private profiles and user-owned services are preserved.
+- Initial PR CI exposed a timing-dependent test: a negative Loading assertion
+  could pass before the replacement collection was rendered. The test now waits
+  for the exact one-object result, reopens its remounted list and establishes the
+  selected outline before testing click-through. Ten repetitions pass (16.3 s),
+  as does ESLint. Application files and final
+  real acceptance hashes are unchanged. Verify all jobs on the amended head.
+
 ### Iteration 013 Part 1 verified feature delivery (2026-10-22)
 
 - PR #115 merged Part 1 into `iteration/013` at
