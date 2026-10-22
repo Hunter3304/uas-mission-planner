@@ -8,6 +8,7 @@ export interface MapSelection {
   version: unknown
   source: 'OSM' | 'DIPUL' | 'GHSL' | 'Scenario'
   feature: InspectableFeature
+  context?: Record<string, unknown>
   anchor?: [number, number]
   aggregate?: boolean
   diagnostic?: boolean

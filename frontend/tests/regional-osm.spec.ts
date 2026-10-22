@@ -341,7 +341,7 @@ test('obsolete requests, empty view, category changes and outside coverage', asy
   await osm(page).getByLabel('OSM color view').selectOption('cost')
   await expect(osm(page).getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
   await pending!.fulfill({ json: collection(false) }).catch(() => {})
-  await expect(osm(page).getByLabel('OSM legend')).toContainText('Cost 4')
+  await expect(osm(page).getByLabel('OSM legend')).toContainText('4 · Very high')
   empty = true
   await osm(page).getByRole('button', { name: 'Refresh OSM', exact: true }).click()
   await expect(osm(page).getByTestId('osm-status')).toContainText('No matching OSM objects')

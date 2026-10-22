@@ -2,6 +2,46 @@
 
 ## Current status
 
+### Iteration 013 Part 3 implementation (2026-10-22)
+
+- User requested Part 3. Verified open Milestone 12 and assigned Issue #118
+  precede `feature/118-readable-regional-details`, created from `iteration/013`
+  at `516ffcb`. Parts 1-2 remain delivered; Part 4/main integration are deferred.
+- Added common source cards, nested readable attribute lists and closed advanced
+  raw JSON disclosures. OSM names/types, memberships, available original height/
+  address tags and independent labelled costs show first; matched rules and
+  provenance expand separately. Missing fields/default costs and historical
+  obstruction flags are explicit; no levels-to-height or permission inference.
+- DIPUL/derived cards separate decision/reason, policy uncertainty, clearance and
+  assessed time/height scope from supplied source limits/validity/legal references.
+  Missing original zone fields remain unavailable; no raw DIPUL source fetch was
+  added. GHSL shows rounded estimates/native resolution/epoch/cell identity and
+  query coverage, with zero, small positive values and NoData distinguished.
+- OSM choices now read Feature category / Category cost, with contextual help
+  for precedence, independent ordinal 0-4 scores, gray default/unscored outlines,
+  aggregate-only overview, local refresh and extent-only Fit study. Actual GHSL
+  renderer uses pale green zero / gray NoData; corrected help matches these
+  existing shared colors rather than the old inaccurate white/pink wording.
+- Local acceptance: 46 browser tests (35.5 s), 14 real-stack smoke (36.1 s),
+  ESLint/build, experiment syntax/Ruff/format and diff checks pass. Nine new
+  source-detail cases cover units, nested/long/untrusted values, missing fields,
+  zero/NoData/small positives, independent defaults, policy scope and help.
+  Real-data source-hashed acceptance passes under
+  `.cache/iteration013-part3-final-v3/`: current implementation hashes match,
+  original OSM/study hashes are unchanged and owned services stopped. Ten
+  selection cycles retain one outline/summary and zero layout shift; actual
+  readable cards/matched rules, desktop/mobile and closed JSON pass. One scenario
+  load (85.778 s), one cached GHSL load, zero routes/browser errors. Screenshots
+  were visually checked, including complete popup bounds/visible inspector top.
+  The first campaign passed functional checks (86.680 s scenario load), but image
+  review found a clipped edge summary and long-inspector heading. Final layout
+  reserves more popup/viewport space and adds explicit real-layout assertions.
+  v2 passes these layout assertions; v3 records the final added validated original
+  OSM identity link for derived building findings, also covered by browser tests.
+- No backend/planner/source data changes. Feature publication, final-head CI,
+  iteration merge, explicit Issue closure and verified feature cleanup remain
+  pending. Preserve private profiles, originals, user services and historical refs.
+
 ### Iteration 013 Part 2 verified delivery (2026-10-22)
 
 - PR #117 merged Part 2 into `iteration/013` at

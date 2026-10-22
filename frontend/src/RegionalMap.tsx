@@ -10,6 +10,7 @@ import CollapsiblePanel from './CollapsiblePanel'
 import { decisionKeys, groupScenarioLayers, type DecisionKey, type LayerSource, type ScenarioLayerKey } from './regionalLayers'
 import { MapSelectionProvider, SelectionOverlay } from './RegionalSelection'
 import { selectionFeatureId, useMapSelection, type MapSelection } from './mapSelection'
+import { asRecord } from './sourcePresentation'
 
 export interface Site {
   id: string
@@ -83,6 +84,10 @@ function RegionalMapContent({
   const container = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const [readyMap, setReadyMap] = useState<L.Map | null>(null)
+  const scenarioContext = useMemo(() => {
+    const p = asRecord(constraints?.provenance)
+    return Object.fromEntries(['scenario', 'restriction_coverage', 'model_signature', 'restrictions_rules_version', 'study_signature'].filter(key => p[key] != null).map(key => [key, p[key]]))
+  }, [constraints])
   const [visible, setVisible] = useState({
     boundary: true,
     locations: true,
@@ -211,12 +216,12 @@ function RegionalMapContent({
               {[{ coordinates: startCoordinate, label: 'Focus origin' }, { coordinates: endCoordinate, label: 'Focus destination' }].map(({ coordinates, label }) => <button type="button" key={label} disabled={!coordinates} onClick={() => { if (coordinates) map.current?.setView([coordinates[1], coordinates[0]], 16, { animate: false }) }}>{label}</button>)}
               <button type="button" disabled={!study} onClick={() => { if (study) { const b = study.config.bounds; map.current?.fitBounds([[b.south, b.west], [b.north, b.east]], { animate: false }) } }}>Fit study</button>
             </div>
-            <p className="layer-help">Street tiles are online background imagery. Saved source layers work independently.</p>
+            <p className="layer-help">Street tiles are online background imagery. Saved source layers work independently. Fit study changes the map extent only.</p>
           </CollapsiblePanel>
           <CollapsiblePanel className="map-layer-group" title="GHSL population">
             <label className="map-layer-choice"><input type="checkbox" checked={visible.population} onChange={event => setVisible(current => ({ ...current, population: event.target.checked }))} />GHSL — population cells</label>
             <div className="cost-legend">{[[0, 'Zero'], [10, 'Under 25'], [50, '25–99'], [100, '100+'], [null, 'NoData']].map(([value, label]) => <span key={String(label)}><i style={{ background: populationColor(value) }} />{label}</span>)}</div>
-            <p className="layer-help">Estimated people per native 100 m cell. Population is inspection only; zero and NoData are distinct.</p>
+            <p className="layer-help">Estimated people per native 100 m cell. Very pale green means a known zero estimate; gray means NoData, not zero. Population is inspection only.</p>
             {readyMap && <PopulationOverlay key={`${datasetId}:population`} map={readyMap} datasetId={datasetId} visible={visible.population} />}
           </CollapsiblePanel>
           <CollapsiblePanel className="map-layer-group map-layer-group-osm" title="OSM">
@@ -235,7 +240,7 @@ function RegionalMapContent({
           </CollapsiblePanel>
         </div>
       </section>
-      {readyMap && (Object.keys(grouped) as ScenarioLayerKey[]).map(key => <GeoOverlay key={key} owner={`scenario:${key}`} source={key.startsWith('dipul:') ? 'DIPUL' : key.startsWith('osm:') ? 'OSM' : 'Scenario'} map={readyMap} collection={grouped[key]} visible={layerVisibility[key]} color={decisionColors[key.split(':')[1] as DecisionKey]} />)}
+      {readyMap && (Object.keys(grouped) as ScenarioLayerKey[]).map(key => <GeoOverlay key={key} owner={`scenario:${key}`} source={key.startsWith('dipul:') ? 'DIPUL' : key.startsWith('osm:') ? 'OSM' : 'Scenario'} context={scenarioContext} map={readyMap} collection={grouped[key]} visible={layerVisibility[key]} color={decisionColors[key.split(':')[1] as DecisionKey]} />)}
       <div className="map-shell"><div className="map" style={{ minHeight: 480 }} ref={container} role="region" aria-label="Hannover regional map" /></div>
       {readyMap && <SelectionOverlay map={readyMap} />}
       <details className="regional-source-attribution"><summary>Saved source attribution</summary><p>{study ? Object.values(study.sources).map(source => source.attribution).filter(Boolean).join(' · ') : 'Loading study catalog…'}</p></details>
@@ -251,6 +256,7 @@ function GeoOverlay({
   population = false,
   owner,
   source,
+  context,
 }: {
   map: L.Map
   collection?: FeatureCollection
@@ -259,6 +265,7 @@ function GeoOverlay({
   population?: boolean
   owner: string
   source: MapSelection['source']
+  context?: Record<string, unknown>
 }) {
   const { select, reconcile } = useMapSelection()
   useEffect(() => {
@@ -276,13 +283,13 @@ function GeoOverlay({
       }),
       onEachFeature: (feature, layer) =>
         layer.on('click', (event: L.LeafletMouseEvent) => {
-          select({ owner, source, id: selectionFeatureId(feature), version: collection, feature, anchor: [event.latlng.lat, event.latlng.lng] })
+          select({ owner, source, id: selectionFeatureId(feature), version: collection, feature, context, anchor: [event.latlng.lat, event.latlng.lng] })
         }),
     }).addTo(map)
     return () => {
       group.remove()
     }
-  }, [map, collection, visible, color, population, owner, source, select])
+  }, [map, collection, visible, color, population, owner, source, context, select])
   return null
 }
 
@@ -296,7 +303,7 @@ function PopulationOverlay({
   visible: boolean
 }) {
   const [collection, setCollection] = useState<FeatureCollection>()
-  const [populationMetadata, setPopulationMetadata] = useState<{ epoch?: number; native_support_m?: number }>({})
+  const [populationMetadata, setPopulationMetadata] = useState<Record<string, unknown>>({})
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
   useEffect(() => {
@@ -311,7 +318,7 @@ function PopulationOverlay({
       .then((response) => {
         if (!active.signal.aborted) {
           setCollection('layer' in response ? response.layer : response)
-          if ('layer' in response) setPopulationMetadata({ epoch: response.epoch, native_support_m: response.native_support_m })
+          if ('layer' in response) setPopulationMetadata(Object.fromEntries(Object.entries(response).filter(([key]) => key !== 'layer')))
         }
       })
       .catch((failure) => {
@@ -324,13 +331,14 @@ function PopulationOverlay({
       <GeoOverlay
         owner="population"
         source="GHSL"
+        context={populationMetadata}
         map={map}
         collection={collection}
         visible={visible}
         color="#527b66"
         population
       />
-      {visible && collection && <p className="layer-help">Ready · {collection.features.length.toLocaleString()} cells · Epoch: {populationMetadata.epoch ?? 'not supplied'} · Native resolution: {populationMetadata.native_support_m == null ? 'not supplied' : `${populationMetadata.native_support_m} m`}. Loaded cells are cached for display toggles.</p>}
+      {visible && collection && <p className="layer-help">Ready · {collection.features.length.toLocaleString()} cells · Epoch: {String(populationMetadata.epoch ?? 'not supplied')} · Native resolution: {populationMetadata.native_support_m == null ? 'not supplied' : `${populationMetadata.native_support_m} m`}. Loaded cells are cached for display toggles.</p>}
       {visible &&
         !collection &&
         (error ? (

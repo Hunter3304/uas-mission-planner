@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { getJson } from './api'
-import { CostDetails, showValue } from './BuildingCosts'
 import { layers, type OsmObjectDetail } from './types'
 import { snapshotKey, useMapSelection } from './mapSelection'
+import { AttributeList, Fact, OriginalAttributes, SourceFacts } from './SourceFacts'
+import { categoryNames, objectTitle, sourceText } from './sourcePresentation'
+import RegionalOsmCosts from './RegionalOsmCosts'
 
 export default function OsmObjectDetails({
   base,
@@ -38,7 +40,8 @@ export default function OsmObjectDetails({
   }, [base, selection.key, selection.snapshot, attempt, invalidate])
   return (
     <section className="osm-details" aria-label="Selected OSM object">
-      <h3>OSM {selection.key}</h3>
+      <h3>{detail ? objectTitle(detail.properties) : 'OSM object'}</h3>
+      <p className="source-identity">OSM {selection.key}</p>
       {!detail && !error && <p role="status">Loading original object details…</p>}
       {error && (
         <>
@@ -50,11 +53,19 @@ export default function OsmObjectDetails({
       )}
       {detail && (
         <>
-          <p>
-            Original source tags and geometry; categories:{' '}
-            {detail.display.categories.join(', ') || 'none'}. Rule version:{' '}
-            {detail.display.identity.rule_version}.
-          </p>
+          <SourceFacts title="Original source facts"><dl>
+            <Fact label="Category membership">{categoryNames(detail.display.categories) || 'None supplied'}</Fact>
+            {['height', 'min_height', 'building:levels', 'building:min_level'].filter(key => sourceText(detail.properties[key]) != null).map(key => {
+              const raw = sourceText(detail.properties[key])!
+              const isHeight = key === 'height' || key === 'min_height'
+              const value = isHeight && /^\d+(\.\d+)?$/.test(raw) ? `${raw} m` : raw
+              return <Fact key={key} label={{ height: 'Height (source tag)', min_height: 'Minimum height (source tag)', 'building:levels': 'Building levels', 'building:min_level': 'Minimum building level' }[key]!}>{value}{!isHeight && ' · levels, not a measured height'}</Fact>
+            })}
+            {['addr:street', 'addr:housenumber', 'addr:postcode', 'addr:city', 'addr:country'].some(key => sourceText(detail.properties[key])) && <Fact label="Address">{['addr:street', 'addr:housenumber', 'addr:postcode', 'addr:city', 'addr:country'].map(key => sourceText(detail.properties[key])).filter(Boolean).join(' ')}</Fact>}
+          </dl>{sourceText(detail.properties.height) == null && <p>Height not supplied by original tags.</p>}
+          <p>Original map tags describe the source object; they do not establish current flight permission.</p></SourceFacts>
+          {detail.display.tags_complete === false && <p className="source-interpretation">Original tags are incomplete; absent fields may be unavailable in this response.</p>}
+          {detail.display.classification_complete === false && <p className="source-interpretation">Category classification is incomplete; the displayed costs do not cover every source tag.</p>}
           {detail.display.diagnostic && (
             <p>
               Geometry diagnostic: {detail.display.diagnostic}. Drawable:{' '}
@@ -67,23 +78,15 @@ export default function OsmObjectDetails({
               available below.
             </p>
           )}
-          <details open>
-            <summary>Original tags</summary>
-            <dl>
-              {Object.entries(detail.properties).map(([key, value]) => (
-                <div key={key}>
-                  <dt>{key}</dt>
-                  <dd>{showValue(value)}</dd>
-                </div>
-              ))}
-            </dl>
-          </details>
           {layers.map(
             ({ key }) =>
               detail.layer_analyses?.[key] && (
-                <CostDetails key={key} layer={key} analysis={detail.layer_analyses[key]!} />
+                <RegionalOsmCosts key={key} layer={key} analysis={detail.layer_analyses[key]!} />
               ),
           )}
+          {!Object.values(detail.layer_analyses ?? {}).some(Boolean) && <p>No category cost analysis supplied for this object.</p>}
+          <OriginalAttributes values={detail.properties} title="Original tags" />
+          <details className="source-disclosure"><summary>OSM provenance and completeness</summary><AttributeList values={{ source_identity: detail.display.identity, tags_complete: detail.display.tags_complete, classification_complete: detail.display.classification_complete, geometry_complete: detail.display.geometry_complete }} /></details>
         </>
       )}
     </section>
