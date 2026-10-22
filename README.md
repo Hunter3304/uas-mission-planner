@@ -1,5 +1,17 @@
 # UAS Mission Planner
 
+Iteration 013 **Part 1** is implemented locally on
+`feature/114-hannover-map-controls` (assigned Issue #114 / Milestone 12), with
+complete local regression and final Hannover acceptance; the user has authorized
+publication and CI-gated delivery into `iteration/013`, which are pending.
+It adds source-grouped
+collapsible map controls, automatic cached scenario layers and a dedicated
+saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
+coordinate override checkbox and manual layer-load button are removed from the
+regional UI. See the [operation guide](doc/experiments/iteration-013/README.md)
+and [Part 1 evidence/status](doc/iteration/iteration-013/part1.md).
+Parts 2-4 remain planned; scenario start/end inputs still apply in this Part.
+
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after
 independent Linux/Windows/frontend CI. All four Parts, including real-data

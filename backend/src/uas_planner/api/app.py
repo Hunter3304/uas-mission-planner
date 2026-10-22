@@ -6,6 +6,7 @@ import os
 import re
 from functools import lru_cache
 from pathlib import Path
+from threading import BoundedSemaphore
 from time import perf_counter
 from typing import Literal
 
@@ -83,6 +84,9 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             ) from exc
 
     display = DisplayStore(root / ".osm-display")
+    # A timed-out/disconnected browser cannot cancel native source preparation.
+    # Bound actual server work too, including requests from another browser tab.
+    scenario_layer_slot = BoundedSemaphore(1)
     api.state.osm_display = display
     from uas_planner.api.osm_display import router as osm_display_router
 
@@ -263,6 +267,8 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     def regional_constraint_layers(dataset_id: str, request: dict = Body(...)):
         from uas_planner.core.regional import RegionalConstraints, constraint_layers
 
+        if not scenario_layer_slot.acquire(blocking=False):
+            raise HTTPException(503, "Scenario layers are already preparing. Wait, then retry.")
         try:
             if set(request) - {"scenario", "terrain_id", "profile_id", "planning_mode"}:
                 raise ValueError("Unknown constraint layer controls.")
@@ -280,6 +286,8 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
                 model.terrain.close()
         except (ValueError, KeyError, OSError, TypeError) as exc:
             raise HTTPException(422, str(exc)) from exc
+        finally:
+            scenario_layer_slot.release()
 
     @api.post("/api/datasets/{dataset_id}/study/route")
     def regional_route(dataset_id: str, request: dict = Body(...)):

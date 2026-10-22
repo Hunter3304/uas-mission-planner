@@ -42,7 +42,7 @@ export default function RestrictionProfiles({ datasetId, report, start, end, onS
   function add() {
     try {
       const zone = report?.decisions.find(item => item.source === entry.source)
-      if (!zone) throw new Error('Load scenario layers, then select a zone.')
+      if (!zone) throw new Error('Enable a scenario layer and wait for it to load, then select a zone.')
       if (!entry.evidence.trim()) throw new Error('Enter evidence for this assessment.')
       const dates = scenarioInterval(entry.start || start, entry.end || end)
       const conditions = entry.conditions.split('\n').map(c => c.trim()).filter(Boolean)
@@ -77,7 +77,7 @@ export default function RestrictionProfiles({ datasetId, report, start, end, onS
       } catch (err) { setError(err instanceof Error ? err.message : 'Cannot import profile.') }
     }} /></label>
     <fieldset><legend>Add a zone assessment</legend>
-      <label>Assessed zone<select aria-label="Assessed zone" value={entry.source} onChange={event => setEntry({ ...entry, source: event.target.value })}><option value="">Load layers and select zone</option>{report?.decisions.map(z => <option key={z.source} value={z.source}>{z.source} — {z.state}</option>)}</select></label>
+      <label>Assessed zone<select aria-label="Assessed zone" value={entry.source} onChange={event => setEntry({ ...entry, source: event.target.value })}><option value="">Select a zone from loaded scenario layers</option>{report?.decisions.map(z => <option key={z.source} value={z.source}>{z.source} — {z.state}</option>)}</select></label>
       <label>Assessment decision<select aria-label="Assessment decision" value={entry.state} onChange={event => setEntry({ ...entry, state: event.target.value })}><option value="prohibited">Prohibited with evidence</option><option value="conditional_allowed">Conditions satisfied with evidence</option></select></label>
       <label>Permission phase<select aria-label="Permission phase" value={entry.phase} onChange={event => setEntry({ ...entry, phase: event.target.value })}>{['transit', 'launch', 'landing', 'all'].map(p => <option key={p}>{p}</option>)}</select></label>
       <label>Assessment valid from<input type="datetime-local" value={entry.start} onChange={event => setEntry({ ...entry, start: event.target.value })} /></label>

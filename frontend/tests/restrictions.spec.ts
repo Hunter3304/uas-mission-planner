@@ -39,7 +39,7 @@ test('default conservative policy, saved evidence revision, scoped request and i
   await expect(panel.getByLabel('Planning mode', { exact: true })).toHaveValue('conservative')
   await panel.getByLabel('Scenario start').fill('2026-10-07T10:00')
   await panel.getByLabel('Scenario end').fill('2026-10-07T10:15')
-  await panel.getByRole('button', { name: 'Load scenario layers' }).click()
+  await expect(panel.getByLabel('Assessed zone', { exact: true }).locator('option')).toHaveCount(2)
   await panel.getByText('Restriction assessments and reviewed notices', { exact: true }).click()
   await panel.getByLabel('Profile name', { exact: true }).fill('Reviewed launch consent')
   await panel.getByLabel('Assessed zone', { exact: true }).selectOption('dipul:test/1')
