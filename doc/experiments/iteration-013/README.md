@@ -1,6 +1,6 @@
 # Iteration 013 - Regional controls and shared inspection
 
-Scope: Hannover regional UI. Parts 3-4 are separate planned work. Original data,
+Scope: Hannover regional UI. Part 4 is separate planned work. Original data,
 costs, routing objectives, permissions and the small-area UI are preserved.
 
 ## Using the controls
@@ -51,8 +51,8 @@ are not cached as empty results. Source-local Retry recovers from errors.
 Initial preparation still reads the full existing constraint model, including
 many uncertain buildings. This Part caches that response; it does not redesign
 preparation or bound the scenario payload to OSM viewport limits. The independent
-bounded OSM display and its readiness checks remain in place. Part 2 adds the
-shared selection interaction below; richer source formatting/help remains Part 3.
+bounded OSM display and its readiness checks remain in place. Parts 2-3 below
+add shared selection and richer source formatting/help.
 
 ## Selecting objects (Part 2)
 
@@ -79,8 +79,8 @@ source collection. Group folding does not reload originals.
 On mobile, the same inspector becomes one bottom detail sheet, at most 55% of
 the viewport height. Collapse object details reduces it to its heading/actions;
 Expand object details or View details reveals the content again. Main facts and
-original attributes are retained; source-specific cards, translations, units and
-color-mode explanations remain Part 3. Departure-only timing remains Part 4.
+original attributes are retained; Part 3 below adds source-specific cards, units
+and color-mode explanations. Departure-only timing remains Part 4.
 
 ## Reproducing Part 2 real acceptance
 
@@ -103,6 +103,64 @@ browser errors. It uses historical scenario 2026-10-07 10:00-10:15 Europe/Berlin
 solely to prepare assessed overlays. Existing first-load preparation costs remain.
 Evidence is local/ignored, including source/implementation hashes and services.json.
 See [Part 2 outcome](../../iteration/iteration-013/part2.md) for actual results.
+
+## Reading source details (Part 3)
+
+Each selection shows main facts and interpretation first. Original attributes,
+matched rules and provenance are separately expandable; Advanced: raw JSON is
+closed initially. Nested original objects/arrays appear as readable labelled
+lists, and long values wrap. The desktop inspector and mobile sheet retain their
+bounded scrolling and selection behavior.
+
+OSM shows its original identity, available name/type, category memberships, height/
+address tags and independent ordinal costs. Height-tag units are preserved;
+unqualified numeric OSM height tags are metres. Building levels are not converted
+to measured height. A provisional score can contain both known matches and
+default values. Historical paper obstruction flags do not establish current flight
+restrictions. Expand Matched rules and evidence for rule reasons/references.
+
+DIPUL/scenario cards separate assessment decision, reason, policy/uncertainty and
+supplied time/height scope from original source facts. Source limits retain units
+and references (for example ft AGL versus m MSL); absent limits remain unknown.
+Current assessed responses do not always include original zone names/limits/
+validity. The UI does not invent them or fetch a separate raw source overlay.
+Source validity and compared assessment bounds are distinct facts. A policy
+exclusion is not a confirmed prohibition; conditional evidence is scoped.
+
+GHSL values are estimated people per native cell, not exact headcounts or people
+exposed to a flight. Resolution/epoch come from the returned cell/query. Known
+zero is very pale green; NoData is gray and never counted as zero. Small positive
+values below 0.01 display as less than 0.01. Query coverage can be incomplete even
+when the selected cell is known. Original precision stays in expanded attributes.
+
+OSM color view has two choices:
+
+- Feature category uses fixed category colors. With multiple memberships, the
+  first enabled category wins: buildings, roads/paths, land use, natural features.
+  Hiding one can reveal another membership of the same object.
+- Category cost shows one selected category's independent 0-4 ordinal score:
+  very low, low, medium, high, very high. Costs are not added; this is not an
+  overall risk surface. Unknown/default/unscored objects are gray/dashed. Dark
+  paper-obstruction strokes are explained separately. Blank areas are unassessed.
+- OSM cost category enables/selects the category to inspect; it does not change
+  route objective. Overview always uses aggregate category colors, with no object
+  cost score. Zoom in to inspect individual costs.
+- Refresh OSM reloads prepared local display data without acquiring originals.
+  Fit study in Base map & references changes extent only.
+
+## Reproducing Part 3 real acceptance
+
+```powershell
+npm --prefix frontend run build
+backend/.venv/Scripts/python.exe doc/experiments/iteration-013/verify-part3.py --output .cache/iteration013-part3-new
+```
+
+Use a new output directory; defaults are isolated ports 8022/5192. Prerequisites
+and hidden owned-service lifecycle match Part 2. The driver adds assertions for
+actual readable OSM/DIPUL/GHSL facts, native units/epoch, assessment scope, matched
+rules and closed raw JSON; it retains selection/cache/source-hash/mobile checks.
+Evidence/screenshots stay local and ignored. See
+[Part 3 outcome](../../iteration/iteration-013/part3.md) for completed results.
 
 ## Reproducing real acceptance
 

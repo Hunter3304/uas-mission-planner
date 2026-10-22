@@ -2,10 +2,11 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState, createCo
 import { createPortal } from 'react-dom'
 import L from 'leaflet'
 import OsmObjectDetails from './OsmObjectDetails'
+import RegionalSourceDetails from './RegionalSourceDetails'
+import { selectionSummary, selectionTitle } from './sourcePresentation'
 import { MapSelectionContext, selectionFeatureId, type MapSelection, type SelectionActions } from './mapSelection'
 
 const SelectedContext = createContext<MapSelection | null>(null)
-const titleOf = (item: MapSelection) => String(item.feature.properties?.name ?? item.id)
 
 export function MapSelectionProvider({ children }: { children: ReactNode }) {
   const [{ selected, notice }, setInspection] = useState<{ selected: MapSelection | null; notice: string }>({ selected: null, notice: '' })
@@ -41,26 +42,14 @@ export function MapSelectionProvider({ children }: { children: ReactNode }) {
           {selected && <span className="selection-badge">Selected · {selected.source}</span>}
         </div>
         {selected ? <>
-          <h4 className="selection-title">{titleOf(selected)}</h4>
+          <h4 className="selection-title">{selectionTitle(selected)}</h4>
           <div className="selection-actions">
             <button type="button" onClick={actions.clear}>Clear selection</button>
             <button type="button" aria-expanded={expanded} aria-controls="regional-inspector-content" onClick={() => setExpanded(value => !value)}>{expanded ? 'Collapse object details' : 'Expand object details'}</button>
           </div>
           <div id="regional-inspector-content" className="regional-inspector-content" hidden={!expanded}>
             {!selected.feature.geometry && <p>No drawable geometry is available for this object. No outline is drawn.</p>}
-            {selected.osm ? <OsmObjectDetails key={`${selected.osm.snapshot}:${selected.osm.key}`} base={selected.osm.base} selection={selected.osm} /> : <>
-              <p>{selected.source} · {selected.id}</p>
-              {selected.aggregate ? <>
-                <p>Aggregate overview cell · {String(selected.feature.properties?.objects ?? 'Unknown')} assigned objects. This is not an individual OSM object or a cost score.</p>
-                <dl>{Object.entries(selected.feature.properties?.category_counts ?? {}).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{String(value)}</dd></div>)}</dl>
-                <button type="button" onClick={selected.zoom}>Zoom for objects</button>
-              </> : <>
-                {selected.feature.properties?.state != null && <p>Status: {String(selected.feature.properties.state)}</p>}
-                {selected.feature.properties?.reason != null && <p>{String(selected.feature.properties.reason)}</p>}
-                {selected.source === 'GHSL' && <p>Population: {selected.feature.properties?.people_per_cell == null ? 'NoData' : String(selected.feature.properties.people_per_cell)} people per native cell.</p>}
-                <details open><summary>Original attributes</summary><dl>{Object.entries(selected.feature.properties ?? {}).map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{typeof value === 'object' && value != null ? JSON.stringify(value) : String(value ?? 'Not supplied')}</dd></div>)}</dl></details>
-              </>}
-            </>}
+            {selected.osm ? <OsmObjectDetails key={`${selected.osm.snapshot}:${selected.osm.key}`} base={selected.osm.base} selection={selected.osm} /> : <RegionalSourceDetails item={selected} />}
           </div>
         </> : <><p>Select an OSM object, population cell or constraint area on the map.</p>{notice && <p role="alert">{notice}</p>}</>}
       </section>, target)}
@@ -94,12 +83,10 @@ export function SelectionOverlay({ map }: { map: L.Map }) {
       }).addTo(group)
     const content = document.createElement('div')
     const title = document.createElement('strong')
-    title.textContent = `${selected.source} · ${selected.aggregate ? 'Aggregate overview' : titleOf(selected)}`
+    title.textContent = `${selected.source} · ${selectionTitle(selected)}`
     content.append(title)
     const description = document.createElement('p')
-    const p = selected.feature.properties ?? {}
-    const counts = Object.entries(p.category_counts ?? {}).map(([key, value]) => `${key}: ${value}`).join(' · ')
-    description.textContent = selected.aggregate ? `${p.objects ?? 'Unknown'} assigned objects. ${counts}. Zoom for individual objects.` : selected.source === 'GHSL' ? `Population: ${p.people_per_cell ?? 'NoData'} per native cell` : String(p.state ?? selected.id)
+    description.textContent = selectionSummary(selected)
     content.append(description)
     const button = document.createElement('button')
     button.type = 'button'
@@ -109,7 +96,7 @@ export function SelectionOverlay({ map }: { map: L.Map }) {
     const bounds = L.geoJSON(selected.feature).getBounds()
     const desired = map.latLngToContainerPoint(selected.anchor ?? bounds.getCenter())
     const size = map.getSize()
-    const margin = Math.min(140, size.x / 2)
+    const margin = Math.min(180, size.x / 2)
     const anchor = map.containerPointToLatLng(L.point(
       Math.max(margin, Math.min(size.x - margin, desired.x)),
       Math.max(Math.min(140, size.y / 2), Math.min(size.y - 24, desired.y)),

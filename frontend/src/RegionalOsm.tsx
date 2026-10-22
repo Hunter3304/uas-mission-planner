@@ -3,6 +3,7 @@ import L from 'leaflet'
 import { getJson } from './api'
 import { snapshotKey, selectionFeatureId, useMapSelection } from './mapSelection'
 import { categoryColor, costColors, osmStyle, unknownCostColor } from './osmStyles'
+import { costLabels } from './sourcePresentation'
 import {
   layers,
   type LayerKey,
@@ -309,17 +310,19 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           <label>
             OSM color view{' '}
             <select
+              aria-describedby="osm-color-help"
               value={costMode ? 'cost' : 'category'}
               onChange={(event) => setCostMode(event.target.value === 'cost')}
             >
-              <option value="category">Category</option>
-              <option value="cost">Independent category cost</option>
+              <option value="category">Feature category</option>
+              <option value="cost">Category cost</option>
             </select>
           </label>
           {costMode && (
             <label>
               OSM cost category{' '}
               <select
+                aria-describedby="osm-cost-category-help"
                 value={costCategory}
                 onChange={(event) => {
                   const category = event.target.value as LayerKey
@@ -351,7 +354,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
               {costColors.map((color, index) => (
                 <span key={color}>
                   <i style={{ background: color }} />
-                  Cost {index}
+                  {index} · {costLabels[index]}
                 </span>
               ))}
               <span>
@@ -369,10 +372,12 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
             ))
           )}
         </div>
-        <p>
-          Category precedence: buildings, roads, land use, natural features among enabled
-          categories. Costs are independent; blank areas are unassessed.
-        </p>
+        <p className="layer-help" id="osm-color-help">{costMode
+          ? 'Category cost: colors show the selected category’s independent ordinal score, from 0 (very low) to 4 (very high). Costs are never added together; this is not an overall risk surface.'
+          : 'Feature category: fixed colors identify buildings, roads & paths, land use and natural features. For overlapping memberships, the first enabled category in that order wins; hiding one can reveal another.'}</p>
+        {costMode && <p className="layer-help" id="osm-cost-category-help">Cost category chooses which category is displayed and enables it. It does not change the route objective. Unknown/default/no numeric costs are gray and dashed. Dark outlines mark historical paper obstruction flags, not current flight restrictions.</p>}
+        {view?.data.display.representation === 'aggregate_overview' && <p className="source-overview-help">Overview uses aggregate category colors, even in Category cost mode. Zoom in for individual objects and cost scores; overview cells have no cost score.</p>}
+        <p className="layer-help">Blank areas are unassessed. Refresh OSM reloads prepared local display data; it does not acquire new OSM originals.</p>
         <p
           role="status"
           data-testid="osm-status"

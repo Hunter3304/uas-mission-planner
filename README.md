@@ -16,7 +16,12 @@ closed and merged-feature cleanup is verified locally/remotely.
 OSM, DIPUL, GHSL and derived overlays share one left inspector, actual-geometry
 black outlines and short map summaries. Mobile uses one collapsible detail sheet.
 See [Part 2 acceptance/status](doc/iteration/iteration-013/part2.md).
-Parts 3-4 remain planned; scenario start/end inputs still apply.
+Part 3 is implemented locally on `feature/118-readable-regional-details`
+([Issue #118](https://github.com/Hunter3304/uas-mission-planner/issues/118)):
+readable source cards, nested expandable attributes, explicit uncertainty/units,
+and Feature category / Category cost explanations. See
+[Part 3 acceptance/status](doc/iteration/iteration-013/part3.md).
+Part 4 remains planned; scenario start/end inputs still apply.
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after
