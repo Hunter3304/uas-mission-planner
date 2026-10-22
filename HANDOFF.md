@@ -2,6 +2,24 @@
 
 ## Current status
 
+### Iteration 012 Part 4 verified feature delivery (2026-10-22)
+
+- PR #111 merged Part 4 into `iteration/012` at `db7427f`, after Checks run
+  `39766913176` explicitly completed Linux Python, Windows Python and frontend
+  successfully on reviewed head `af80714143c482267f80cab2df481e0f1a4948a3`.
+  Issue #110 is explicitly closed as completed. This supersedes Part 4 remote
+  publication/feature-CI-pending notes below.
+- Local iteration fast-forwarded to the verified merge. Feature ancestry was
+  confirmed before expected-head remote deletion and local feature deletion;
+  fetch/prune, branch -a and ls-remote verify cleanup. Historical iteration
+  branches, Milestone 11, main and pre-existing feature #75 are preserved.
+- All four Parts have passed local real-data/functional acceptance and their
+  feature CI. Main integration still requires its independent PR/checks. This
+  delivery record is prepared on the existing iteration before that final gate.
+  No application code has changed since the measured/reviewed feature head.
+  Outcome and reproducible operation notes retain cold startup, route source
+  preparation and full Braunschweig memory limits. User services/data intact.
+
 ### Iteration 012 Part 4 implementation and acceptance (2026-10-22)
 
 - User requested project review and Part 4 completion if sound. Assigned Issue

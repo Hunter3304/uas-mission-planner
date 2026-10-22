@@ -23,7 +23,9 @@ inspection from map-label loading. Warm TCP p95 is 0.165 s, browser-view p95
 0.980 s; 50 cycles retain bounded map/cache state. Three route runs per OSM state
 have identical outputs and -0.26% observed median overhead. Initial fit still
 takes about 11 s and routes about 52 s, dominated by source preparation.
-Remote Part 4 CI and main integration remain pending. See
+Part 4 [PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111)
+is merged into `iteration/012` after Linux/Windows/frontend CI passed; independent
+main integration remains pending. See
 [Part 4 measurements and limits](doc/iteration/iteration-012/outcome.md),
 [Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and

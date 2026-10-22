@@ -2,8 +2,8 @@
 
 Date: 2026-10-21; Part 4 acceptance updated 2026-10-22 (Europe/Berlin).
 Status: **Parts 1-3 delivered to iteration/012 on 2026-10-21;
-Part 4 implementation and full local acceptance complete on 2026-10-22;
-remote Part 4 CI and iteration/main integration pending**.
+Part 4 locally accepted and delivered to iteration/012 through PR #111 on
+2026-10-22; independent main integration pending**.
 The user reviewed the plan and requested completion of Part 1. Tracking: Milestone
 11 / Issue #104; integration `iteration/012`; feature
 `feature/104-osm-display-access` (merged and cleaned up). Part 1 PR #105 merged at
@@ -40,7 +40,9 @@ acceptance passes unchanged warm API/browser/route gates, with actual process/
 browser memory, 50-cycle state, exact exports and remaining startup/route costs
 recorded. A bounded metadata-only catalog query fixes the observed map-label
 full-source-loading bottleneck; full inspection/planner verification is intact.
-Remote CI/integration remain pending; main is unchanged.
+PR #111 merged at `db7427f` after Linux/Windows/frontend run `39766913176`
+passed on `af80714`; Issue #110 is explicitly closed, and feature cleanup is
+verified locally/remotely. Independent main integration remains pending.
 
 ## Objective
 
@@ -201,8 +203,9 @@ totals where a bounded probe only establishes that the limit was exceeded.
 
 The four Parts below form one coherent display delivery. Part 1 is tracked by
 closed Issue #104 and Part 2 by closed Issue #106. Part 3 is delivered under
-closed Issue #108; Part 4 is locally complete under Issue #110, with remote
-delivery pending. Earlier unstarted scope is retained below as the planned sequence.
+closed Issue #108; Part 4 is delivered through PR #111 / closed Issue #110.
+Independent main integration is pending. Earlier unstarted scope is retained
+below as the planned sequence.
 
 1. **Part 1 - Bounded data access and preparation.** Confirm spatial index and
    safe sample baselines; define schemas, verification lifecycle and limits;

@@ -5,7 +5,9 @@ Tracking: assigned [Issue #110](https://github.com/Hunter3304/uas-mission-planne
 in verified Milestone 11, created before `feature/110-osm-real-acceptance` from
 `iteration/012` at `aba6a4e`. The user requested project review followed by Part 4
 completion if no blocking problem was found. Parts 1-3 remain delivered through
-PRs #105, #107 and #109. Main integration and remote CI are pending.
+PRs #105, #107 and #109. Part 4 is delivered to `iteration/012` through
+[PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111) at `db7427f`.
+Independent main integration remains pending.
 Part 4 implementation and full local real-data acceptance are complete; the final
 harness exits successfully with `browser_passed: true` / `passed: true`.
 
@@ -194,9 +196,14 @@ cold/startup limits despite the successful warm percentile gates.
   termination) or TestClient sockets; the successful full suites run in isolated
   host processes with the installed environment. This is not a skipped OMPL gate.
 - Existing Starlette TestClient and Rasterio deprecation warnings remain nonfatal.
-- Local evidence is preserved. Remote feature CI, iteration integration and its
-  independent main gate have not yet run for this Part 4 payload. No remote merge
-  or branch cleanup is claimed at this record.
+- [Checks run 39766913176](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39766913176)
+  explicitly completed Linux Python, Windows Python and frontend successfully
+  on reviewed head `af80714143c482267f80cab2df481e0f1a4948a3` before PR #111
+  merged at `db7427f28b9c017397acd0b882a416fb61cf7d7c`. Issue #110 is explicitly
+  closed as completed. Local iteration synchronized; feature ancestry, expected-
+  head remote deletion, local deletion, fetch/prune, branch -a and ls-remote
+  verified cleanup. Main and historical iteration references remain. Independent
+  iteration-to-main CI/integration remain pending; all detailed evidence is local.
 - The final browser completes without page errors or horizontal mobile overflow;
   real Braunschweig start/end population/terrain inspection and DIPUL/GHSL
   switches succeed. The conservative route returns `invalid_endpoint` with null
@@ -225,3 +232,20 @@ Strict unresolved-source behavior, conservative endpoint conflicts, unverified
 temporary coverage, mission-duration enforcement, expanded acquisition, 3D/flight
 phases and OFM integration into route decisions retain their earlier scope/limits.
 Original sources, private profiles and user-owned services are preserved.
+
+## Iteration feedback
+
+The four-part delivery addresses the measured source-null expansion and full-map
+layer construction separately from classifier semantics: bounded indexed access,
+precomputed shared styles/on-demand original details, independent regional layers
+and finally measured real-data acceptance. Explicit overview and completeness
+states make a dense or limited response reviewable instead of silently incomplete.
+
+The last campaign also exposed how a metadata request can recreate expensive
+source materialization outside the primary display path. The catalog-only fix
+keeps that path bounded and explicitly scoped. Future performance work should
+measure cold imports/catalog startup, repeated route source/model preparation
+and the legacy Braunschweig analysis as separate tasks. The current warm display
+gates pass without claiming those remaining costs are solved. Keep original
+snapshots, independent permission/coverage gates and exact displayed-route exports
+as baselines for subsequent work.
