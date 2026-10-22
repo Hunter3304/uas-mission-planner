@@ -1,5 +1,11 @@
 # UAS Mission Planner
 
+Iteration 012 is delivered to `main` through
+[PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after
+independent Linux/Windows/frontend CI. All four Parts, including real-data
+performance/resource acceptance, are complete. See
+[actual measurements and remaining limits](doc/iteration/iteration-012/outcome.md).
+
 Iteration 012 **Part 1**, delivered to `iteration/012` through
 [PR #105](https://github.com/Hunter3304/uas-mission-planner/pull/105),
 adds explicit OSM display preparation, bounded regional
@@ -24,8 +30,8 @@ inspection from map-label loading. Warm TCP p95 is 0.165 s, browser-view p95
 have identical outputs and -0.26% observed median overhead. Initial fit still
 takes about 11 s and routes about 52 s, dominated by source preparation.
 Part 4 [PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111)
-is merged into `iteration/012` after Linux/Windows/frontend CI passed; independent
-main integration remains pending. See
+is merged into `iteration/012` after Linux/Windows/frontend CI passed; the complete
+iteration then passed its independent main gate and merged through PR #112. See
 [Part 4 measurements and limits](doc/iteration/iteration-012/outcome.md),
 [Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and

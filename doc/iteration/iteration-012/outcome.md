@@ -7,7 +7,9 @@ in verified Milestone 11, created before `feature/110-osm-real-acceptance` from
 completion if no blocking problem was found. Parts 1-3 remain delivered through
 PRs #105, #107 and #109. Part 4 is delivered to `iteration/012` through
 [PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111) at `db7427f`.
-Independent main integration remains pending.
+The complete iteration is delivered to main through
+[PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112) at
+`b1fe9ca68fc9027659c03b679b32b6e38ac64c4f`.
 Part 4 implementation and full local real-data acceptance are complete; the final
 harness exits successfully with `browser_passed: true` / `passed: true`.
 
@@ -203,7 +205,15 @@ cold/startup limits despite the successful warm percentile gates.
   closed as completed. Local iteration synchronized; feature ancestry, expected-
   head remote deletion, local deletion, fetch/prune, branch -a and ls-remote
   verified cleanup. Main and historical iteration references remain. Independent
-  iteration-to-main CI/integration remain pending; all detailed evidence is local.
+  iteration-to-main CI/integration then passed as recorded below; all detailed
+  evidence is local.
+- [Independent main Checks run 39767504376](https://github.com/Hunter3304/uas-mission-planner/actions/runs/39767504376)
+  explicitly completed Linux Python, Windows Python and frontend successfully on
+  reviewed head `89e90ac7a083d2ba85d345d0203c56df5ca8c72f` before PR #112 merged
+  at `b1fe9ca68fc9027659c03b679b32b6e38ac64c4f`. Local main synchronized, ancestry
+  was verified and backend/frontend trees match measured feature `af80714`.
+  Historical iteration references remain. This subsequent documentation record
+  changes no application code or measured behavior.
 - The final browser completes without page errors or horizontal mobile overflow;
   real Braunschweig start/end population/terrain inspection and DIPUL/GHSL
   switches succeed. The conservative route returns `invalid_endpoint` with null
