@@ -37,6 +37,12 @@
   close Issue #116 and verify merged-feature cleanup locally/remotely. These gates
   are pending; no main merge is included. See Part 2 outcome and operation guide.
   Original data/private profiles and user-owned services are preserved.
+- Initial PR CI exposed a timing-dependent test: a negative Loading assertion
+  could pass before the replacement collection was rendered. The test now waits
+  for the exact one-object result, reopens its remounted list and establishes the
+  selected outline before testing click-through. Ten repetitions pass (16.3 s),
+  as does ESLint. Application files and final
+  real acceptance hashes are unchanged. Verify all jobs on the amended head.
 
 ### Iteration 013 Part 1 verified feature delivery (2026-10-22)
 

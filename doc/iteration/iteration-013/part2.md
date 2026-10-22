@@ -42,6 +42,11 @@ integration remain deferred.
   dataset refresh cleanup, changed display identity before a delayed replacement,
   line geometry and multipart holes. Existing OSM assertions now use the shared
   inspector. Original tags are rendered safely as text.
+- Initial CI found a race in the click-through test's negative Loading wait.
+  It now waits positively for the one-object replacement collection, reopens its
+  remounted object list and establishes the new outline before checking hit
+  testing. Ten repeated runs pass (16.3 s), and ESLint passes. This is a test-only
+  change; measured application bytes are unchanged.
 - **14 real-stack smoke tests passed (35.8 s)**, covering small-area workflows,
   native routing, controls, OFM, downloads and exports. Backend application code,
   contracts and planner semantics are unchanged in this Part. Part 1's 316 Python

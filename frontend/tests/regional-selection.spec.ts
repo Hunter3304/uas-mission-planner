@@ -76,7 +76,10 @@ test('selection outlines preserve map layout, hit testing and focus; popup close
   await expect(black(page)).toHaveCount(1)
   // Hide the other object so clicking through the outline selects the same point.
   await osm(page).getByLabel('Land use', { exact: true }).uncheck()
-  await expect(page.getByTestId('osm-status')).not.toContainText('Loading')
+  await expect(page.getByTestId('osm-status')).toHaveText('1 individual OSM objects in the buffered viewport.')
+  await osm(page).getByText('Inspect visible objects (first 50)', { exact: true }).click()
+  await osm(page).getByRole('button', { name: 'node/1', exact: true }).click()
+  await expect(black(page)).toHaveCount(1)
   await centerClick(page)
   await expect(inspector(page)).toContainText('First selected object')
   const requestCount = calls.urls.length
