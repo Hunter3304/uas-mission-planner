@@ -1,6 +1,6 @@
 # Iteration 013 - Regional controls and shared inspection
 
-Scope: Hannover regional UI. Part 4 is separate planned work. Original data,
+Scope: Hannover regional UI and automatic cruise intervals. Original data,
 costs, routing objectives, permissions and the small-area UI are preserved.
 
 ## Using the controls
@@ -26,8 +26,8 @@ There is no separate Original DIPUL switch/raw overlay or full-region OSM render
 Fit study is in Base map & references; OSM source counts are in a disclosure.
 
 Scenario overlays load automatically once an enabled layer has valid scenario
-inputs. Part 1 still uses the existing **Scenario start and Scenario end** fields;
-departure-only input and automatic arrival belong to Part 4. Until inputs are
+inputs. The current regional form takes **Departure time** only; the explicit
+Scenario start/end inputs were Part 1's historical intermediate state. Until inputs are
 ready, source groups explain what is missing. Valid edits are debounced by 300 ms.
 Plan regional route remains an explicit independent action; layer toggles never
 call the route endpoint. The old Load scenario layers button is removed.
@@ -161,6 +161,65 @@ actual readable OSM/DIPUL/GHSL facts, native units/epoch, assessment scope, matc
 rules and closed raw JSON; it retains selection/cache/source-hash/mobile checks.
 Evidence/screenshots stay local and ignored. See
 [Part 3 outcome](../../iteration/iteration-013/part3.md) for completed results.
+
+## Departure and automatic arrival (Part 4)
+
+Enter Departure time in Europe/Berlin and the existing 25-35 m/s cruise speed.
+There is no editable flight end time. Before a successful current route, Estimated
+arrival shows Awaiting route. On success it shows actual verified route length /
+speed, cruise duration and local arrival with the resulting offset, plus the
+containing assessed interval. Computation time is separate. Cruise only excludes
+takeoff/landing/wind/dynamics. Edits, failed planning and late responses cannot
+restore an old arrival/route/export.
+
+Enabled layers initially show a clearly marked provisional inspection interval,
+seeded by actual-endpoint metric straight-line duration. This is not a route ETA.
+After success they refresh automatically using the returned assessed interval;
+old preview findings disappear while that final result loads. Same-identity
+visibility toggles still use cached collections. A solve waits for already-running
+preview preparation; valid queued previews are suspended while it runs. The first
+preview, route preparation and final-layer preparation can each remain substantial.
+
+Source preparation is reused only within one automatic request. Candidate flight
+time can expand the assessment, and the complete route is checked again. A conflict
+requires replan; there are at most three candidate passes under one shared search
+budget and cooperative 110 s request deadline. The browser timeout stays 120 s.
+Explicit timeout/nonconvergence outcomes have no accepted route/ETA. Evidence is
+not extended to fit a route: expired/out-of-scope validity is reevaluated. The
+evidence editor's blank dates explicitly use its shown provisional/completed
+inspection interval; enter the documented broader validity when appropriate.
+
+Actual zero-length cruise is instantaneous after endpoint checks. Its conservative
+one-microsecond assessment envelope is explicitly recorded. Fractional timestamps
+round upward to microseconds; UI displays milliseconds. UTC elapsed arithmetic
+handles midnight/DST; missing/ambiguous UI departure times are rejected.
+
+API callers select `duration_mode: "automatic"`, provide normal start/end catalog
+IDs/optional coordinates and omit `scenario.mission_end`. The same mode on
+`study/layers/constraints` requests a provisional preview. Route responses return
+`timing.estimated_interval`, `timing.assessed_interval`, exact numeric cruise time
+and the pass audit. Mission end is the estimated arrival; restriction/provenance
+scope explicitly uses the containing assessed interval. UI and API exports retain
+both. Historical `duration_mode: "explicit"` (also the default) keeps mandatory
+offset-aware start/end and unchanged explicit CLI/API semantics.
+
+## Reproducing Part 4 integrated acceptance
+
+```powershell
+npm --prefix frontend run build
+backend/.venv/Scripts/python.exe doc/experiments/iteration-013/verify-part4.py --output .cache/iteration013-part4-new
+```
+
+Use a new directory; isolated hidden services default to 8024/5194. Prerequisites
+and owned-service cleanup match earlier campaigns. The driver includes actual
+category/cost display, selection/cards/diagnostics/mobile, provisional conservative
+layers and failure, exact-endpoint automatic research routing, explicit-baseline
+geometry/cost comparison, final assessed overlays, ten cached visibility cycles,
+matching export and stale-time invalidation. It records source/application hashes
+and separate preparation/route timings; it never acquires originals or edits a
+private profile. No map tiles are needed. Evidence stays local/ignored. See
+[Part 4 status](../../iteration/iteration-013/part4.md) and
+[iteration outcome](../../iteration/iteration-013/outcome.md).
 
 ## Reproducing real acceptance
 

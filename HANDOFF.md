@@ -2,6 +2,52 @@
 
 ## Current status
 
+### Iteration 013 Part 4 implementation (2026-10-22)
+
+- User requested Part 4. Verified open Milestone 12 / assigned Issue #120 precede
+  `feature/120-automatic-flight-interval`, created from iteration/013 at `289c60c`.
+  Parts 1-3 remain delivered; no main merge has occurred in this Part yet.
+- Added explicit `duration_mode: automatic`; historical explicit intervals remain
+  the default core/API/CLI contract. Automatic requests omit scenario.mission_end.
+  Seed uses EPSG:25832 distance between actual endpoints / validated cruise speed;
+  a verified catalog is checked after request-local source preparation.
+- Prepare sources once per automatic request. On candidate duration extension,
+  only expand mission_end, refresh temporal decisions/coverage/provenance and
+  check the complete candidate. Replan only on conflict. At most three candidate
+  passes share the requested search budget and a cooperative 110 s overall
+  deadline below the unchanged 120 s browser timeout. No accepted route/ETA on
+  timeout/nonconvergence/failed validation. All source geometry/index/risk inputs
+  and non-time scenario controls remain fixed within the request.
+- UTC elapsed arithmetic then declared-zone formatting handles fractional
+  seconds, midnight and DST. Timestamps round upward to microseconds. Actual
+  zero-length cruise is instantaneous; endpoint assessment conservatively spans
+  one microsecond, explicitly recorded rather than inventing flight time.
+- Regional UI now has Departure time only. It verifies returned L/v, arrival,
+  containing assessment interval and mission metadata before displaying success.
+  Preview is marked provisional with its inspection interval. Successful routing
+  promotes enabled layers to the returned assessed interval; stale previews/ETAs
+  disappear on edits. In-flight layer preparation is awaited before routing;
+  starting a solve suppresses queued preview loads, avoiding overlapping jobs.
+  Evidence editor defaults explicitly name preview/completed scope and retain
+  independently editable evidence validity. Export uses the displayed result.
+- Final local regression: 338 backend passes / one existing Windows skip (99.57 s),
+  including 22 new temporal/API/budget cases; 55 browser checks (36.7 s), including
+  nine new arrival/UTC/export/stale-result cases; 14 real-stack smoke (33.4 s).
+  Ruff/format, ESLint/build and experiment syntax pass. A*/Dijkstra/native ABIT*
+  remain compatible; finite-budget native timeout is a valid unsuccessful result.
+- Integrated Hannover campaign `.cache/iteration013-part4-real-v1/` passes:
+  all 21 application hashes match, originals are unchanged and owned services
+  stopped. Desktop/mobile screenshots were inspected. Ten selection cycles have
+  zero map shift; ten initial and ten final visibility cycles add no loads.
+  Preview 74.268 s; conservative invalid_endpoint 40.246 s with no ETA; automatic
+  research success 50.185 s; independent explicit baseline 50.595 s with identical
+  geometry/cost/source signature; final assessed layers 74.498 s. Actual route
+  3715.5915279316932 m / 30 m/s = 123.85305093105644 s, arriving
+  2026-10-07T10:02:03.853051+02:00; full expanded interval passes revalidation.
+  Export, final layer scope and edit invalidation pass; two scenario loads, one
+  GHSL load and no browser errors. Feature PR/CI/integration/Issue closure/verified cleanup are pending;
+  full iteration/main integration needs its independent CI gate.
+
 ### Iteration 013 Part 3 verified delivery (2026-10-22)
 
 - PR #119 merged Part 3 into `iteration/013` at

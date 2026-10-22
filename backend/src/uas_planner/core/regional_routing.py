@@ -24,12 +24,18 @@ class RegionalPlanner:
         self.forward = Transformer.from_crs(4326, 25832, always_xy=True).transform
         self.reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
 
+    def ensure_deadline(self):
+        if perf_counter() >= getattr(self, "_request_deadline", float("inf")):
+            raise TimeoutError("Automatic flight interval deadline reached.")
+
     def check(self, coordinates, mode):
+        self.ensure_deadline()
         # Bound each complete terrain window, preserving the whole polyline and buffers.
         # Subdivision changes query resource usage, never relaxes unknown support.
         points = [self.forward(*p) for p in coordinates]
         pieces = []
         for a, b in zip(points, points[1:]):
+            self.ensure_deadline()
             count = max(1, ceil(hypot(b[0] - a[0], b[1] - a[1]) / 500))
             if count + len(pieces) > 10000:
                 return {
@@ -72,7 +78,7 @@ class RegionalPlanner:
         return result
 
     def grid(self, endpoints, cell_m, mode, check, boundary=None):
-        deadline = perf_counter() + 30
+        deadline = min(perf_counter() + 30, getattr(self, "_request_deadline", float("inf")))
         boundary = boundary if boundary is not None else self.constraints.boundary
         minx, miny, maxx, maxy = boundary.bounds
         nx, ny = ceil((maxx - minx) / cell_m), ceil((maxy - miny) / cell_m)
@@ -266,6 +272,7 @@ class RegionalPlanner:
             return self.check(points, planning_mode)["state"]
 
         def check(points):
+            self.ensure_deadline()
             return cached(tuple(tuple(p) for p in points))
 
         reports = {n: self.check([p], planning_mode) for n, p in endpoints.items()}
@@ -329,6 +336,11 @@ class RegionalPlanner:
                     if grid is not None:
                         preparation_ms = (perf_counter() - started) * 1000
                         search_started = perf_counter()
+                        search_deadline = (
+                            min(search_started + time_budget_s, self._request_deadline)
+                            if hasattr(self, "_request_deadline")
+                            else None
+                        )
                         extra_preparation_ms = 0
                         if algorithm == "abitstar":
                             attempts.append({"scope": "initial_corridor", "candidate_cells": None})
@@ -344,7 +356,13 @@ class RegionalPlanner:
                             )
                             result.update(
                                 plan_abitstar(
-                                    grid, native_model, endpoints, time_budget_s=time_budget_s
+                                    grid,
+                                    native_model,
+                                    endpoints,
+                                    time_budget_s=time_budget_s,
+                                    cancel=(lambda: perf_counter() >= self._request_deadline)
+                                    if hasattr(self, "_request_deadline")
+                                    else None,
                                 )
                             )
                             result["randomness"] = {
@@ -365,6 +383,7 @@ class RegionalPlanner:
                                     safety_distance_m=self.constraints.scenario.get(
                                         "clearance_m", 0
                                     ),
+                                    deadline=search_deadline,
                                 )
                             )
                             for boundary in corridors[1:]:
@@ -409,6 +428,7 @@ class RegionalPlanner:
                                         safety_distance_m=self.constraints.scenario.get(
                                             "clearance_m", 0
                                         ),
+                                        deadline=search_deadline,
                                     )
                                 )
                         result.update(
@@ -532,8 +552,23 @@ class RegionalPlanner:
 
 
 def plan_regional_route(
-    directory, scenario, start_id, end_id, *, terrain_directory=None, **controls
+    directory,
+    scenario,
+    start_id,
+    end_id,
+    *,
+    terrain_directory=None,
+    duration_mode="explicit",
+    **controls,
 ):
+    if duration_mode == "automatic":
+        from uas_planner.core.flight_interval import automatic_route
+
+        return automatic_route(
+            directory, scenario, start_id, end_id, terrain_directory=terrain_directory, **controls
+        )
+    if duration_mode != "explicit":
+        raise ValueError("Unknown flight duration mode.")
     started = perf_counter()
     planner = RegionalPlanner(directory, scenario, terrain_directory=terrain_directory)
     source_ms = (perf_counter() - started) * 1000

@@ -116,6 +116,7 @@ def search_graph(
     max_expansions=MAX_EXPANSIONS,
     objective="distance",
     distance_weight=0.1,
+    deadline=None,
 ):
     """A* or its zero-heuristic Dijkstra oracle; finish on current goal pop."""
     if algorithm not in ("astar", "dijkstra"):
@@ -159,7 +160,7 @@ def search_graph(
         _, distance, node = heappop(queue)
         if distance != distances[node]:
             continue
-        if expanded >= max_expansions:
+        if expanded >= max_expansions or deadline is not None and perf_counter() >= deadline:
             return {"status": "resource_limit", "expanded": expanded}
         expanded += 1
         if node == goal:
@@ -189,6 +190,7 @@ def plan_route(
     max_expansions=MAX_EXPANSIONS,
     risk_model=None,
     safety_distance_m=None,
+    deadline=None,
 ):
     if algorithm not in ("astar", "dijkstra"):
         raise ValueError("Unknown routing algorithm.")
@@ -321,6 +323,7 @@ def plan_route(
             max_expansions=max_expansions,
             objective="risk" if risk_model is not None else "distance",
             distance_weight=risk_model.distance_weight if risk_model is not None else 1,
+            deadline=deadline,
         )
         result.update(found)
         if found["status"] == "success":

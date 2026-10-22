@@ -64,5 +64,6 @@ export default function useScenarioLayers(datasetId: string, requestKey: string,
     error: current?.error ?? '',
     loading: enabled && !!requestKey && (!current || !!current.loading),
     retry: () => { cached.current = null; setAttempt(value => value + 1) },
+    waitForIdle: () => running.current ?? Promise.resolve(),
   }
 }

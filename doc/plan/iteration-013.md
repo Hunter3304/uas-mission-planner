@@ -26,7 +26,11 @@ after assigned Issue #118 in Milestone 12. Local acceptance: 46 browser tests,
 for passing real-data acceptance. PR #119 merged into `iteration/013` at `db0d40b`
 after Checks run `39818431931` passed all three jobs on reviewed head `c9c372e`.
 Issue #118 is closed; local/remote merged-feature cleanup is verified.
-Part 4 remains planned; main is
+Part 4 is authorized/implemented on `feature/120-automatic-flight-interval`,
+created from `289c60c` after assigned Issue #120 in Milestone 12. Final local
+regression: backend 338 passes / one existing Windows skip, 55 browser and
+14 real-stack smoke passes. See [Part 4 status](../iteration/iteration-013/part4.md)
+for integrated real acceptance and delivery gates. Main is
 unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 

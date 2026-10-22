@@ -23,7 +23,12 @@ cleanup is verified locally/remotely. It adds
 readable source cards, nested expandable attributes, explicit uncertainty/units,
 and Feature category / Category cost explanations. See
 [Part 3 acceptance/status](doc/iteration/iteration-013/part3.md).
-Part 4 remains planned; scenario start/end inputs still apply.
+Part 4 is implemented locally on `feature/120-automatic-flight-interval`
+([Issue #120](https://github.com/Hunter3304/uas-mission-planner/issues/120)):
+departure-only input, actual-route cruise arrival and complete-interval constraint
+reassessment. Explicit historical API/CLI intervals remain supported. See
+[Part 4 acceptance/status](doc/iteration/iteration-013/part4.md) and
+[iteration outcome](doc/iteration/iteration-013/outcome.md).
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after

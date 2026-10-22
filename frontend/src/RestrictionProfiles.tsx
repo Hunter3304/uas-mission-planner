@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getJson, postJson } from './api'
-import { scenarioInterval } from './scenarioTime'
+import { berlinTimestamp, type FlightInterval } from './scenarioTime'
 import './restrictionProfiles.css'
 
 export interface RestrictionReport {
@@ -16,8 +16,8 @@ interface Profile {
 }
 const empty: Profile = { schema_version: 1, name: '', zone_assessments: {}, notices: [] }
 
-export default function RestrictionProfiles({ datasetId, report, start, end, onSelect }: {
-  datasetId: string; report?: RestrictionReport; start: string; end: string
+export default function RestrictionProfiles({ datasetId, report, interval, intervalLabel, onSelect }: {
+  datasetId: string; report?: RestrictionReport; interval?: FlightInterval; intervalLabel: string
   onSelect: (id: string) => void
 }) {
   const [profiles, setProfiles] = useState<Profile[]>([])
@@ -44,7 +44,10 @@ export default function RestrictionProfiles({ datasetId, report, start, end, onS
       const zone = report?.decisions.find(item => item.source === entry.source)
       if (!zone) throw new Error('Enable a scenario layer and wait for it to load, then select a zone.')
       if (!entry.evidence.trim()) throw new Error('Enter evidence for this assessment.')
-      const dates = scenarioInterval(entry.start || start, entry.end || end)
+      const dates = { mission_start: entry.start ? berlinTimestamp(entry.start) : interval?.mission_start, mission_end: entry.end ? berlinTimestamp(entry.end) : interval?.mission_end }
+      if (!dates.mission_start || !dates.mission_end) throw new Error('Enter evidence validity or wait for the preview/route assessment interval.')
+      const duration = Date.parse(dates.mission_end) - Date.parse(dates.mission_start)
+      if (!Number.isFinite(duration) || duration <= 0 || duration > 86_400_000) throw new Error('Evidence validity must be positive and within 24 hours.')
       const conditions = entry.conditions.split('\n').map(c => c.trim()).filter(Boolean)
       if (entry.state === 'conditional_allowed' && !conditions.length) throw new Error('List the conditions satisfied by the evidence.')
       changed({ ...draft, zone_assessments: { ...draft.zone_assessments, [zone.source]: {
@@ -82,7 +85,7 @@ export default function RestrictionProfiles({ datasetId, report, start, end, onS
       <label>Permission phase<select aria-label="Permission phase" value={entry.phase} onChange={event => setEntry({ ...entry, phase: event.target.value })}>{['transit', 'launch', 'landing', 'all'].map(p => <option key={p}>{p}</option>)}</select></label>
       <label>Assessment valid from<input type="datetime-local" value={entry.start} onChange={event => setEntry({ ...entry, start: event.target.value })} /></label>
       <label>Assessment valid until<input type="datetime-local" value={entry.end} onChange={event => setEntry({ ...entry, end: event.target.value })} /></label>
-      <p>Blank validity fields use the scenario interval. Enter Europe/Berlin local times.</p>
+      <p>Blank validity fields use the {intervalLabel.toLowerCase()}. {interval ? `${interval.mission_start} — ${interval.mission_end}` : 'No interval is available yet.'} Enter explicit Europe/Berlin validity if the evidence covers a different interval. A provisional preview may be shorter than the actual flight; expired evidence will be reassessed.</p>
       <label>Assessment minimum AGL (m)<input type="number" min="0" max="10000" value={entry.lower} onChange={event => setEntry({ ...entry, lower: Number(event.target.value) })} /></label>
       <label>Assessment maximum AGL (m)<input type="number" min="0" max="10000" value={entry.upper} onChange={event => setEntry({ ...entry, upper: Number(event.target.value) })} /></label>
       <label>Assessment evidence<textarea value={entry.evidence} onChange={event => setEntry({ ...entry, evidence: event.target.value })} /></label>

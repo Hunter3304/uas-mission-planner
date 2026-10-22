@@ -702,6 +702,32 @@ class RegionalConstraints:
         self.provenance["model_signature"] = signature(self.provenance)
         self.population = PopulationInspector(directory, self.manifest)
 
+    def expand_interval(self, mission_end):
+        """Only time expands; source geometries, heights, profiles and indices stay fixed."""
+        next_scenario = {**deepcopy(self.scenario), "mission_end": mission_end}
+        validate_scenario(next_scenario)
+        if datetime.fromisoformat(mission_end) < datetime.fromisoformat(
+            self.scenario["mission_end"]
+        ):
+            raise ValueError("Automatic assessed intervals may only expand.")
+        self.scenario = next_scenario
+        for record in self.records:
+            if record["category"] != "building_obstacle":
+                evaluated = zone_decision(
+                    record, self.scenario, self.zone_terrain(record), vertical_state, assessed_zone
+                )
+                record["state"] = (
+                    "blocked" if evaluated["state"] == "prohibited" else evaluated["state"]
+                )
+        self.restriction_coverage = coverage_report(
+            self.manifest, self.scenario.get("restriction_notices", []), self.scenario
+        )
+        self.provenance = {k: v for k, v in self.provenance.items() if k != "model_signature"}
+        self.provenance.update(
+            scenario=self.scenario, restriction_coverage=self.restriction_coverage
+        )
+        self.provenance["model_signature"] = signature(self.provenance)
+
     def check(self, coordinates, *, mode="strict"):
         if mode not in ("strict", "research", "conservative"):
             raise ValueError("Unknown planning mode.")
