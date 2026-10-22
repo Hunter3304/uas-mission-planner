@@ -6,8 +6,10 @@ Tracking: assigned [Issue #116](https://github.com/Hunter3304/uas-mission-planne
 in verified Milestone 12, created before `feature/116-regional-selection-inspector`
 from `iteration/013` at `515ccda`.
 
-Status: implementation and local acceptance complete; feature publication/CI/
-merge remain pending. Parts 3-4 and main integration remain deferred.
+Status: implementation and local acceptance committed at `739fe03` and published.
+[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) targets
+`iteration/013`; final-head CI and merge remain pending. Parts 3-4 and main
+integration remain deferred.
 
 ## Result
 
@@ -85,6 +87,6 @@ Existing full scenario payload/preparation cost is unchanged. No source data,
 private profile, permission claim or route objective is modified.
 
 Richer source-specific detail cards/help, color-mode explanations and departure/
-arrival calculation remain Parts 3-4. No main merge is included. Feature PR,
-exact-head Linux/Windows/frontend CI, merge into `iteration/013`, explicit Issue
+arrival calculation remain Parts 3-4. No main merge is included. The feature PR
+is open; exact-head Linux/Windows/frontend CI, merge into `iteration/013`, explicit Issue
 closure and verified merged-feature cleanup remain delivery gates until recorded.

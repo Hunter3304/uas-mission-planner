@@ -13,10 +13,11 @@ after Checks run `39801851963` explicitly passed Linux Python, Windows Python
 and frontend on reviewed head `bb0f869`. Issue #114 is closed, and merged feature
 cleanup is verified locally/remotely. The user's explicit publication authorization
 superseded the earlier automatic rejection. Part 2 is authorized and implemented
-locally on `feature/116-regional-selection-inspector`, created from `515ccda`
+on `feature/116-regional-selection-inspector`, created from `515ccda`
 after assigned Issue #116 in Milestone 12. Local browser regression: 37 passes;
 real-stack smoke: 14 passes. See [Part 2 status](../iteration/iteration-013/part2.md)
-for final real-data acceptance and delivery gates. Parts 3-4 remain planned; main is
+for passing final real-data acceptance and delivery gates. PR #117 targets
+`iteration/013`; final-head CI and integration are pending. Parts 3-4 remain planned; main is
 unchanged. See [Part 1 outcome](../iteration/iteration-013/part1.md).
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 

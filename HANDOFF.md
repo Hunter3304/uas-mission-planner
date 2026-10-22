@@ -30,10 +30,13 @@
   unchanged original hashes. No further zoom was needed in this run. Desktop and
   mobile expanded/collapsed screenshots were visually checked; owned services
   stopped. Final browser regression is 37 passes in 29.4 s; smoke 14 in 35.8 s.
-- See Part 2 outcome and operation guide. Feature publication/PR, exact-head
-  Linux/Windows/frontend CI, iteration merge, explicit Issue #116 closure and
-  verified merged-feature cleanup are pending. No main merge is authorized by
-  this Part. Original data/private profiles and user-owned services are preserved.
+- Implementation/local acceptance are committed at `739fe03` and published on
+  the feature branch. [PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117)
+  targets `iteration/013`. Verify completed/successful Linux Python, Windows Python
+  and frontend checks on the final reviewed head before merging. Then explicitly
+  close Issue #116 and verify merged-feature cleanup locally/remotely. These gates
+  are pending; no main merge is included. See Part 2 outcome and operation guide.
+  Original data/private profiles and user-owned services are preserved.
 
 ### Iteration 013 Part 1 verified feature delivery (2026-10-22)
 
