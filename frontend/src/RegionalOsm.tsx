@@ -337,23 +337,6 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           >
             Refresh OSM
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              const b = summary?.coverage_bounds
-              if (b)
-                map.fitBounds(
-                  [
-                    [b[1], b[0]],
-                    [b[3], b[2]],
-                  ],
-                  { animate: false },
-                )
-            }}
-            disabled={!summary?.verified}
-          >
-            Fit saved study
-          </button>
         </div>
         <div className="cost-legend" aria-label="OSM legend">
           {costMode && view?.data.display.representation !== 'aggregate_overview' ? (
@@ -392,6 +375,8 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
         </p>
         {error && <p role="alert">{error} Use Refresh OSM to retry.</p>}
         {view?.notice && <p>{view.notice} Showing an aggregate overview instead.</p>}
+        <details>
+          <summary>OSM coverage and counts</summary>
         {view?.data.display.representation === 'aggregate_overview' && (
           <p>
             {view.data.features.length} aggregate cells; color shows the dominant enabled category,
@@ -411,6 +396,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
             .
           </p>
         )}
+        </details>
         {enabled && summary?.verified && Object.keys(summary.diagnostics.counts).length > 0 && (
           <details>
             <summary>Source geometry diagnostics</summary>

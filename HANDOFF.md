@@ -2,6 +2,86 @@
 
 ## Current status
 
+### Iteration 013 Part 1 implementation and acceptance (2026-10-22)
+
+- User approved the full plan and requested Part 1 only. Verified Milestone 12 /
+  assigned Issue #114 precede `feature/114-hannover-map-controls`, created from
+  `iteration/013` at main `4ed0023`. Parts 2-4 and main integration remain deferred.
+- Implemented one collapsible source-grouped control area, removal of the raw
+  DIPUL display/fetch path and old load/coordinate-checkbox controls, dedicated
+  eight-site/exact-coordinate section with study bounds, active endpoint markers/
+  focus/export, and compact OSM source-count disclosure with one fit action.
+- Successful shared scenario responses (hidden/empty collections included) and
+  GHSL cells survive visibility/fold changes. Only actual scenario changes reload;
+  serial browser preparation/debounce/identity checks prevent stale presentation.
+  Backend semaphore limits real constraint preparation to one job per app process,
+  including after browser disconnects; contextual retry handles occupied slots.
+- Final regression: backend 316 passes / one existing Windows permission skip,
+  100.03 s; 28 mocked browser tests, 19.9 s; 14 real-stack smoke passes, 34.4 s;
+  ESLint/build and Ruff pass. New concurrency tests verify slot release/cleanup.
+- Real functional campaign `.cache/iteration013-part1-real-v2/` passes: 10 cycles,
+  zero additional requests, GHSL cache reuse, separate 162,011 building findings /
+  324 DIPUL findings, exact-coordinate 3,715.6 m research route/export and mobile.
+  Original OSM/study hashes unchanged; owned services stopped. Final source-hashed
+  acceptance `.cache/iteration013-part1-final/` also passes, with matching current
+  application hashes, visually inspected desktop/mobile, 79.940 s initial load /
+  50.982 s route and zero toggle requests. Each existing full scenario response is
+  ~85.75 MB; no preparation/payload/memory redesign is claimed. v1's DevTools-body retention failure
+  is diagnostic only. See `doc/iteration/iteration-013/part1.md` and operation guide.
+- Cache lifetime is the current page/dataset session. Use sidebar Refresh after
+  replacing sources. Initial scenario preparation (~88 s in v2), large existing
+  building collections and route preparation remain explicit costs. Start/end
+  inputs remain until Part 4; details/selection behavior remains until Parts 2-3.
+- Implementation/local acceptance are complete; feature publication/CI/merge
+  remain pending. Preserve original sources, private profiles, user-owned services,
+  historical branches and the iteration milestone. Earlier planning-only notes
+  below describe the prior session and are superseded by this authorized work.
+
+### Iteration 013 UI and estimated-arrival plan (2026-10-22)
+
+- User requested requirements clarification and a plan, based on three UI
+  screenshots: one source-grouped layer area, removal of legacy uniform-color
+  OSM display, black selected outlines, left-side readable details, color-mode
+  explanations and departure-only input with estimated arrival.
+- User explicitly confirmed Hannover first (preserve other pages), one shared
+  left inspector for OSM/DIPUL/GHSL plus short map summaries, and constant-speed
+  cruise-only estimates from actual route length. No takeoff/landing allowance.
+- Follow-up requirements are included in Part 1: a dedicated endpoint row with
+  one Selection method dropdown, defaulting to the eight saved sites; exact
+  coordinate mode alone reveals four coordinate inputs and current study bounds.
+  Remove the old `Use explicitly selected launch/landing coordinates` checkbox.
+  Keep endpoints separate from other parameters, and use active-mode coordinates
+  consistently for markers/focus, planning, ETA invalidation and exports.
+- User also requested removing the Original DIPUL purple raw-zone switch and
+  its separate overlay from the Hannover UI. Part 1 now retains assessed decision
+  layers only, with original attributes available for provenance/details. Remove
+  overlay-only fetching; preserve original data, planner use and other pages/APIs.
+- User clarified that scenario overlays (for example orange exclusions) should
+  load immediately on enabling and refresh automatically on relevant input changes.
+  Remove `Load scenario layers`, not `Plan regional route`. Part 1 includes
+  dependency-aware shared loading, pending/error states, debounce, bounded stale
+  work and late-response rejection; Part 4 automatically promotes preview layers
+  to the successful route's assessed interval. Layer toggles never trigger routing.
+- Further clarified: after the first successful layer load, cache all returned
+  collections (including hidden and valid empty ones). For unchanged scenario/
+  source identity, later checks/unchecks only show/hide, with no network request,
+  source verification or preparation. Hiding all layers or collapsing groups must
+  retain the current-scenario cache. Relevant input/source changes invalidate it;
+  Part 1 acceptance now checks repeated toggles and shared-response cache reuse.
+- Local draft: `doc/plan/iteration-013.md`, in four Parts with acceptance criteria.
+  Source grouping must separate mixed OSM building/DIPUL/coverage derivatives.
+  The current Category-mode brown building color is not the obsolete uniform-color
+  renderer requested for removal. The inspected regional controls already use the
+  bounded display path; do not restore full-region OSM queries.
+- Automatic arrival needs backend interval reassessment and consistent profile,
+  restriction, preview and export semantics; simply hiding `mission_end` is not
+  sufficient. The draft proposes bounded expanding-interval passes and retains
+  explicit historical interval requests. Actual timing/budget feasibility remains
+  an implementation gate, not an accepted performance claim.
+- Planning only: no application changes, tests, services, data, remote tracking,
+  branches, commits, push or merge. Baseline main is `4ed0023`; Iteration 012
+  verified delivery below remains current application behavior.
+
 ### Iteration 012 verified main delivery (2026-10-22)
 
 - Main PR #112 merged the complete four-part iteration at

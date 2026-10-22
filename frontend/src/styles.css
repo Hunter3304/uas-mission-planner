@@ -1012,3 +1012,36 @@ td {
 .osm-details dl > div { display: grid; grid-template-columns: minmax(80px, 1fr) minmax(0, 3fr); gap: 8px; border-bottom: 1px solid #e4ebe7; padding: 5px 0; }
 .osm-details dt { font-weight: 600; }
 .osm-details dd { margin: 0; white-space: pre-wrap; }
+
+/* Regional controls stay mounted when folded so cached source data survives. */
+.regional-map-controls { margin: 14px 0; padding: 16px; background: #eaf0ed; border: 1px solid #cbd8d5; border-radius: 12px; min-width: 0; }
+.map-controls-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.map-controls-heading > span, .layer-help { font-size: 12px; line-height: 1.6; color: #617570; }
+.map-controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.map-layer-group { min-width: 0; padding: 14px; background: #fff; border: 1px solid #d5e0da; border-radius: 8px; overflow-wrap: anywhere; }
+.map-layer-group-osm { grid-column: 1 / -1; }
+.map-layer-choice { display: flex; align-items: start; gap: 8px; padding: 5px 0; font-size: 13px; line-height: 1.5; cursor: pointer; }
+.map-layer-choice input { flex: 0 0 auto; margin: 2px 0 0; }
+.layer-load-state { margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: #f1f5f3; font-size: 12px; line-height: 1.65; }
+.layer-load-state[role='alert'], .field-error { color: #9a312b; }
+.map-layer-group details, .regional-source-attribution { margin-top: 10px; font-size: 12px; line-height: 1.6; }
+.map-layer-group summary, .regional-source-attribution summary { cursor: pointer; }
+.map-layer-group .regional-osm fieldset { margin-bottom: 8px; }
+.endpoint-section { min-width: 0; margin: 18px 0 22px; padding: 16px; border: 1px solid #cbd8d5; border-radius: 8px; background: #fff; }
+.endpoint-section legend { padding: 0 6px; font-weight: 650; }
+.endpoint-row { display: grid; grid-template-columns: minmax(180px, .8fr) repeat(2, minmax(0, 1fr)); gap: 14px; }
+.endpoint-row-exact { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.endpoint-row-exact > label:first-child { grid-column: 1 / -1; max-width: 280px; }
+.endpoint-row label { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 13px; }
+.endpoint-row input, .endpoint-row select { min-width: 0; width: 100%; padding: 9px; border: 1px solid #cbd8d5; border-radius: 6px; background: #fff; }
+.endpoint-row [aria-invalid='true'] { border-color: #a33a32; }
+.endpoint-bounds { margin-top: 12px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.planning-parameters-heading { margin: 0; font-size: 13px; }
+@media (max-width: 1000px) {
+  .endpoint-row, .endpoint-row-exact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .endpoint-row > label:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 650px) {
+  .map-controls-grid, .endpoint-row, .endpoint-row-exact { grid-template-columns: minmax(0, 1fr); }
+  .regional-map-controls, .endpoint-section { padding: 12px; }
+}
