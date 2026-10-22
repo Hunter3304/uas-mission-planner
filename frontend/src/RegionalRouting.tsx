@@ -55,7 +55,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     getJson<{ datasets: { id: string; tiles: number }[] }>('/api/terrain-datasets', active.signal)
       .then(value => { if (!active.signal.aborted) setTerrains(value.datasets ?? []) })
       .catch(error => { if (!active.signal.aborted) setTerrainError(error.message) })
-    getJson<Study>(`/api/datasets/${encodeURIComponent(datasetId)}/study`, active.signal)
+    getJson<Study>(`/api/datasets/${encodeURIComponent(datasetId)}/study?catalog_only=true`, active.signal)
       .then(value => { if (!active.signal.aborted) setStudy(value) })
       .catch(error => { if (!active.signal.aborted) setStudyError(error.message) })
     return () => { active.abort(); layerController.current?.abort() }

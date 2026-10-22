@@ -195,6 +195,8 @@ test('overview, detail styles, original tags and independent route updates', asy
   const panel = osm(page)
   await expect(panel.getByTestId('osm-status')).toContainText('Aggregate OSM overview')
   await expect(panel).toContainText('2 original objects; 1 drawable')
+  expect(urls).toContain('/api/datasets/regional-osm/study?catalog_only=true')
+  expect(urls).not.toContain('/api/datasets/regional-osm/study')
   expect(urls.some((url) => url === '/api/datasets/regional-osm/features')).toBe(false)
   await page.getByLabel('Street basemap').uncheck()
   await zoomDetail(page)

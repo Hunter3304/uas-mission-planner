@@ -147,12 +147,46 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         return manifest
 
     @api.get("/api/datasets/{dataset_id}/study")
-    def regional_study(dataset_id: str):
-        from uas_planner.acquisition.study import inspect_study
+    def regional_study(dataset_id: str, catalog_only: bool = False):
+        from uas_planner.acquisition.study import inspect_study, validate_study
+        from uas_planner.core.osm_display import contained, digest, read_object
 
         try:
-            return inspect_study(dataset_path(dataset_id))
-        except (ValueError, KeyError, OSError) as exc:
+            path = dataset_path(dataset_id)
+            if not catalog_only:
+                return inspect_study(path)
+            manifest = read_object(contained(path, "study.json"))
+            if (
+                manifest.get("schema_version") != 1
+                or manifest.get("kind") != "regional-source-study"
+            ):
+                raise ValueError("Unsupported study manifest.")
+            config = manifest["config"]
+            if (
+                not isinstance(config, dict)
+                or not isinstance(config.get("locations"), list)
+                or len(config["locations"]) > 64
+            ):
+                raise ValueError("Location catalog exceeds display budget.")
+            validate_study(config)
+            sources = manifest.get("sources", {})
+            if not isinstance(sources, dict) or any(
+                not isinstance(sources.get(name, {}), dict) for name in ("osm", "dipul", "ghsl")
+            ):
+                raise ValueError("Invalid source attribution metadata.")
+            # Map labels need saved metadata, not materialized OSM/GHSL/DIPUL sources.
+            # Full inspection and every planner/source-layer verification stay unchanged.
+            return {
+                "config": {"bounds": config["bounds"], "locations": config["locations"]},
+                "sources": {
+                    name: {"attribution": str(sources.get(name, {}).get("attribution", ""))[:4096]}
+                    for name in ("osm", "dipul", "ghsl")
+                },
+                "verified": False,
+                "verification_scope": "validated_catalog_metadata_only",
+                "study_sha256": digest(manifest),
+            }
+        except (ValueError, KeyError, OSError, TypeError) as exc:
             raise HTTPException(422, "Cannot verify regional source study.") from exc
 
     @api.get("/api/datasets/{dataset_id}/study/layers/zones")

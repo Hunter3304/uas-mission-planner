@@ -18,7 +18,13 @@ Use **Show saved OSM**, the four category switches, **OSM color view** and
 **OSM cost category**. Click an object for original tags and independent costs;
 **Focus origin/destination** opens a local detail view. Route results and map
 position survive OSM changes. Linux/Windows/frontend CI passed before integration;
-Part 4's full resource/performance acceptance and main integration remain pending. See
+Part 4 completes local real-data/resource acceptance and removes full source
+inspection from map-label loading. Warm TCP p95 is 0.165 s, browser-view p95
+0.980 s; 50 cycles retain bounded map/cache state. Three route runs per OSM state
+have identical outputs and -0.26% observed median overhead. Initial fit still
+takes about 11 s and routes about 52 s, dominated by source preparation.
+Remote Part 4 CI and main integration remain pending. See
+[Part 4 measurements and limits](doc/iteration/iteration-012/outcome.md),
 [Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
 [Part 1 operation guide](doc/experiments/iteration-012/README.md) and
 [real-data acceptance](doc/iteration/iteration-012/part1.md).
@@ -83,7 +89,9 @@ The regional map includes an optional online OpenStreetMap street basemap with
 explicit tile-failure feedback. Retained source data remain local. Iteration 012
 Part 3 replaces the old full-region OSM overlay request with bounded viewport
 queries and aggregate overview fallback; saved objects work without street tiles.
-Part 4's resource and OSM off/on route-overhead comparison remain pending.
+Part 4's [resource and OSM off/on route comparison](doc/iteration/iteration-012/outcome.md)
+passes its adopted warm gates; measured startup, planner and full Braunschweig
+analysis memory costs remain explicit limitations.
 Mission duration is not checked
 against the entered scenario end time. See the operation guide's supplemental
 closeout section for diagnosed limitations and deferred work.

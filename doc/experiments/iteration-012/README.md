@@ -1,9 +1,88 @@
-# Iteration 012 Parts 1-3 - Bounded regional OSM display
+# Iteration 012 - Bounded regional OSM display and real-data acceptance
 
 This guide describes bounded category/cost interfaces and on-demand original-object
 classification details and the viewport-driven regional browser. The regional
 map uses these bounded interfaces; it never requests the old full Hannover
 collection for interactive display.
+
+## Reproduce Part 4 performance and resource acceptance
+
+Use the retained Hannover/Braunschweig datasets and prepared schema-2 serving
+cache. Build the current production frontend first, then run from the repository
+root with the installed backend environment and Chrome:
+
+```powershell
+npm --prefix frontend run build
+backend/.venv/Scripts/python.exe doc/experiments/iteration-012/verify-part4.py --output .cache/iteration012-part4-new
+```
+
+The output directory must be new. The harness creates a separate fresh display
+cache to measure explicit preparation, then starts hidden isolated services on
+`8016` and `5186` and closes only its own processes. Override occupied ports with
+`--api-port` / `--ui-port`. Existing source files, serving caches and private
+profiles are preserved; source/rule checksums are checked before/after the browser
+campaign. No OSM acquisition or online basemap access occurs. `--skip-prepare`
+is useful for diagnosing a browser run but does not provide preparation evidence.
+
+Regional map labels and initial fit use `GET /api/datasets/{id}/study?catalog_only=true`.
+This bounded read validates the saved study schema/configuration and returns only
+locations, bounds and attribution. Its `verified: false` and
+`verification_scope: validated_catalog_metadata_only` explicitly exclude source
+payload verification. It reads at most a 4 MiB study manifest and 64 locations;
+it does not open a full OSM GeoDataFrame, GHSL raster or DIPUL payload. The ordinary
+`/study` endpoint still performs complete inspection. Planning and source-layer
+reads keep their complete source checks; OSM display readiness has its separate
+verified snapshot identity. This removes the initial-label source-loading bottleneck
+without substituting catalog metadata for planning evidence.
+
+`process-evidence.json` records preparation wall time, runtime and Windows process
+memory; `memory-samples.json` retains timestamped process counters. The monitor
+includes descendants of Windows virtual-environment redirectors, rather than
+mistaking the small launcher for the actual Python process. Working-set/private
+memory is sampled at a nominal 100 ms interval. Per-process working-set peaks
+come from OS counters; summing those peaks over a process tree is an upper bound,
+not a claim that all process peaks occurred simultaneously. Browser-driver tree
+memory includes Node and Chrome; Chrome's renderer JavaScript heap/DOM counters
+are recorded separately through DevTools. Sampling can miss short private-memory
+peaks. The OS disk cache is not flushed: “cold” means a fresh API process with
+unverified source/display state, not cold physical storage.
+Browser phase timestamps also split sampled backend/browser-tree memory into cold,
+warm, view, cycle, planning and Braunschweig phases. Those phase values are sampled
+current counters, rather than process-lifetime peak counters.
+
+`browser-evidence.json` records hardware, runtime/source identities, fixed query
+sequence, response sizes/counts/coordinate budgets and observed gates. It includes:
+
+- A cold TCP summary/first detail request and 20 warm TCP queries across MHH,
+  Podbi, central Hannover, Lehrte and the study boundary, using the same spans as
+  Part 1's independent spatial-selection checks.
+- Initial full-study overview/eight sites, then 20 fixed browser views at zooms
+  17/16/15/14. Browser latency includes the 180 ms debounce, readiness verification,
+  loading, Leaflet construction and two animation frames after React commits.
+  Automation dispatch overhead is included; this is a conservative proxy for a
+  settled view becoming painted, not a direct human-input latency measurement.
+- Fifty settled pan/zoom/category/cost cycles, serialized cache occupancy, live
+  Leaflet layers/render paths/listeners, outstanding requests and sampled heap.
+  Five identical endpoint checkpoints collect garbage for retained-heap comparison;
+  they are separate from natural, uncollected heap peaks. A 20% retained-heap rise
+  between identical checkpoints triggers investigation, not a universal heap limit.
+- Rapid superseding movements, original-object inspection, desktop/390 px mobile,
+  saved layers with street tiles disabled, and real Braunschweig category costs.
+- One warm-up route in each OSM state, then three runs per state in alternating
+  order, all using the same historical research A* request. Each run records source
+  preparation, total preparation and search separately; geometry, costs, mission,
+  endpoint diagnostics and assumptions must agree. Every displayed export must
+  match that run's returned geometry and exact catalog endpoints. The conservative
+  version of the request must still reject the endpoint without a route.
+
+The harness uses read-only inspection of pinned React/Leaflet internals to measure
+map/cache state; an incompatible runtime change fails that inspection explicitly.
+No diagnostics UI or application global is added. The browser writes partial
+evidence even when an assertion fails; only `passed: true` means all browser gates
+completed. Screenshots and exact displayed exports remain local in the output.
+See [Part 4 outcome](../../iteration/iteration-012/outcome.md) for the observed
+results, limits and delivery state. Existing backend/browser regression suites
+remain separate from these measurements so their CPU load does not bias timings.
 
 ## Regional map controls (Part 3)
 
