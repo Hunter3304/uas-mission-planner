@@ -207,7 +207,7 @@ test('overview, detail styles, original tags and independent route updates', asy
   const map = page.getByRole('region', { name: 'Hannover regional map' })
   const box = await map.boundingBox()
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
-  const details = panel.getByRole('region', { name: 'Selected OSM object' })
+  const details = page.getByRole('region', { name: 'Selected OSM object' })
   await expect(details).toContainText('<script>unsafe tag</script>')
   await expect(details).toContainText('Building cost: 4')
   const before = urls.filter((url) => /\/osm\/(summary|features|overview)/.test(url)).length
@@ -221,12 +221,12 @@ test('overview, detail styles, original tags and independent route updates', asy
   await expect(map.locator('.leaflet-regional-route-pane svg')).toBeAttached()
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true)
   expect(urls.filter((url) => /\/osm\/(summary|features|overview)/.test(url)).length).toBe(before)
-  await panel.getByRole('button', { name: 'Close OSM details', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear selection', exact: true }).click()
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
   await expect(details).toContainText('Building cost: 4')
   await panel.getByLabel('Buildings', { exact: true }).uncheck()
   await expect(panel.getByTestId('osm-status')).toContainText('Enable the selected cost category')
-  await expect(panel.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
   await expect(routing.getByRole('button', { name: 'Export displayed result' })).toBeVisible()
   await panel.getByLabel('OSM cost category').selectOption('natural')
   await expect(panel.getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
@@ -266,7 +266,7 @@ test('bounded detail falls back to labelled overview; diagnostic originals remai
   await osm(page)
     .getByRole('button', { name: /way\/2/ })
     .click()
-  await expect(osm(page).getByRole('region', { name: 'Selected OSM object' })).toContainText(
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toContainText(
     'Drawable: false',
   )
 })
@@ -397,7 +397,7 @@ test('cached views still recheck readiness; closing details rejects late origina
   await panel.getByText('Inspect visible objects (first 50)', { exact: true }).click()
   await panel.getByRole('button', { name: 'node/1', exact: true }).click()
   await expect.poll(() => Boolean(pending)).toBe(true)
-  await panel.getByRole('button', { name: 'Close OSM details', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear selection', exact: true }).click()
   await pending!.fulfill({ json: detail('node/1') }).catch(() => {})
-  await expect(panel.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
 })

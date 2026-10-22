@@ -1,6 +1,6 @@
-# Iteration 013 Part 1 - Regional controls and cached overlays
+# Iteration 013 - Regional controls and shared inspection
 
-Scope: Hannover regional UI. Parts 2-4 are separate planned work. Original data,
+Scope: Hannover regional UI. Parts 3-4 are separate planned work. Original data,
 costs, routing objectives, permissions and the small-area UI are preserved.
 
 ## Using the controls
@@ -51,8 +51,58 @@ are not cached as empty results. Source-local Retry recovers from errors.
 Initial preparation still reads the full existing constraint model, including
 many uncertain buildings. This Part caches that response; it does not redesign
 preparation or bound the scenario payload to OSM viewport limits. The independent
-bounded OSM display and its readiness checks remain in place. Source details and
-raw scenario popups remain the old behavior until Parts 2-3.
+bounded OSM display and its readiness checks remain in place. Part 2 adds the
+shared selection interaction below; richer source formatting/help remains Part 3.
+
+## Selecting objects (Part 2)
+
+Click an OSM object, DIPUL restriction, GHSL cell or derived scenario area. A
+black outline with a white halo follows its actual geometry and preserves its
+original fill. The outline does not intercept clicks. One selected object is
+shared across all sources; choosing another replaces its outline and details.
+
+The left sidebar shows Object details with its own scroll area. The small map
+summary's View details button expands and focuses this inspector without moving
+the map. Closing the summary or folding a source group retains the selection.
+Clear selection removes it. Hiding its layer, changing dataset/source identity,
+replacing its displayed collection or moving outside the object clears stale
+selection. A small pan retains an object that remains in the current collection.
+Late original-object responses cannot overwrite the latest choice.
+
+OSM overview cells are labelled aggregate cells, with assigned-object/category
+counts and Zoom for objects. They do not represent individual objects or cost
+scores. Source geometry diagnostics remain inspectable with original tags and
+an explicit No drawable geometry message; they never create an invented outline.
+Individual OSM details load on demand; selecting does not fetch the full regional
+source collection. Group folding does not reload originals.
+
+On mobile, the same inspector becomes one bottom detail sheet, at most 55% of
+the viewport height. Collapse object details reduces it to its heading/actions;
+Expand object details or View details reveals the content again. Main facts and
+original attributes are retained; source-specific cards, translations, units and
+color-mode explanations remain Part 3. Departure-only timing remains Part 4.
+
+## Reproducing Part 2 real acceptance
+
+```powershell
+npm --prefix frontend run build
+backend/.venv/Scripts/python.exe doc/experiments/iteration-013/verify-part2.py --output .cache/iteration013-part2-new
+```
+
+Use a new output directory. The wrapper uses free isolated ports 8020/5190 by
+default, hidden services and owned-process cleanup. It needs installed Chrome,
+the existing locked backend environment and prepared Hannover display. Optional
+--api-port and --ui-port select other free ports. Run outside Windows socket/
+native-handle sandbox restrictions. No acquisition or profile edit is performed.
+
+The driver verifies aggregate-to-object inspection, ten selection replacements,
+non-drawable diagnostic originals, left layout without map displacement, source
+group retention, DIPUL/GHSL selection, cached GHSL visibility, desktop/mobile
+screenshots, zero route requests, unchanged original OSM/study hashes and no
+browser errors. It uses historical scenario 2026-10-07 10:00-10:15 Europe/Berlin
+solely to prepare assessed overlays. Existing first-load preparation costs remain.
+Evidence is local/ignored, including source/implementation hashes and services.json.
+See [Part 2 outcome](../../iteration/iteration-013/part2.md) for actual results.
 
 ## Reproducing real acceptance
 

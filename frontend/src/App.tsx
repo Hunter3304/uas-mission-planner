@@ -245,6 +245,7 @@ export default function App() {
             </div>
             <p className="subtle">Layers may overlap. Totals count each feature once.</p>
           </section>}
+          {dataset?.has_study && <div id="regional-inspector" className="regional-inspector-slot" />}
           <section className="side-section export-section">
             <h2>Take your data further</h2>
             <p className="subtle">Download the complete dataset, including hidden layers.</p>

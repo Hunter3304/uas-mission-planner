@@ -8,6 +8,8 @@ import type { RestrictionReport } from './RestrictionProfiles'
 import RegionalOsm from './RegionalOsm'
 import CollapsiblePanel from './CollapsiblePanel'
 import { decisionKeys, groupScenarioLayers, type DecisionKey, type LayerSource, type ScenarioLayerKey } from './regionalLayers'
+import { MapSelectionProvider, SelectionOverlay } from './RegionalSelection'
+import { selectionFeatureId, useMapSelection, type MapSelection } from './mapSelection'
 
 export interface Site {
   id: string
@@ -48,7 +50,10 @@ const decisionLabels: Record<DecisionKey, string> = {
 }
 const decisionColors: Record<DecisionKey, string> = { blocked: '#b33e39', excluded: '#df6800', allowed: '#305fbc', inactive: '#777777', unknown: '#c87928' }
 export interface ScenarioLayerState { pendingReason: string; loading: boolean; error: string; retry: () => void }
-export default function RegionalMap({
+export default function RegionalMap(props: Parameters<typeof RegionalMapContent>[0]) {
+  return <MapSelectionProvider><RegionalMapContent {...props} /></MapSelectionProvider>
+}
+function RegionalMapContent({
   datasetId,
   study,
   startId,
@@ -91,7 +96,7 @@ export default function RegionalMap({
   const [endLon, endLat] = endCoordinate ?? []
   useEffect(() => {
     if (!container.current) return
-    const instance = L.map(container.current, { preferCanvas: true, zoomAnimation: false }).setView(
+    const instance = L.map(container.current, { preferCanvas: true, zoomAnimation: false, fadeAnimation: false }).setView(
       [52.38, 9.9],
       11,
     )
@@ -230,8 +235,9 @@ export default function RegionalMap({
           </CollapsiblePanel>
         </div>
       </section>
-      {readyMap && (Object.keys(grouped) as ScenarioLayerKey[]).map(key => <GeoOverlay key={key} map={readyMap} collection={grouped[key]} visible={layerVisibility[key]} color={decisionColors[key.split(':')[1] as DecisionKey]} />)}
+      {readyMap && (Object.keys(grouped) as ScenarioLayerKey[]).map(key => <GeoOverlay key={key} owner={`scenario:${key}`} source={key.startsWith('dipul:') ? 'DIPUL' : key.startsWith('osm:') ? 'OSM' : 'Scenario'} map={readyMap} collection={grouped[key]} visible={layerVisibility[key]} color={decisionColors[key.split(':')[1] as DecisionKey]} />)}
       <div className="map-shell"><div className="map" style={{ minHeight: 480 }} ref={container} role="region" aria-label="Hannover regional map" /></div>
+      {readyMap && <SelectionOverlay map={readyMap} />}
       <details className="regional-source-attribution"><summary>Saved source attribution</summary><p>{study ? Object.values(study.sources).map(source => source.attribution).filter(Boolean).join(' · ') : 'Loading study catalog…'}</p></details>
     </>
   )
@@ -243,13 +249,22 @@ function GeoOverlay({
   visible,
   color,
   population = false,
+  owner,
+  source,
 }: {
   map: L.Map
   collection?: FeatureCollection
   visible: boolean
   color: string
   population?: boolean
+  owner: string
+  source: MapSelection['source']
 }) {
+  const { select, reconcile } = useMapSelection()
+  useEffect(() => {
+    reconcile(owner, visible ? collection?.features ?? null : null, collection)
+    return () => { reconcile(owner, null, null) }
+  }, [owner, collection, visible, reconcile])
   useEffect(() => {
     if (!visible || !collection) return
     const group = L.geoJSON(collection, {
@@ -260,16 +275,14 @@ function GeoOverlay({
         fillColor: population ? populationColor(feature?.properties.people_per_cell) : undefined,
       }),
       onEachFeature: (feature, layer) =>
-        layer.on('click', () => {
-          const label = document.createElement('span')
-          label.textContent = JSON.stringify(feature.properties)
-          layer.bindPopup(label).openPopup()
+        layer.on('click', (event: L.LeafletMouseEvent) => {
+          select({ owner, source, id: selectionFeatureId(feature), version: collection, feature, anchor: [event.latlng.lat, event.latlng.lng] })
         }),
     }).addTo(map)
     return () => {
       group.remove()
     }
-  }, [map, collection, visible, color, population])
+  }, [map, collection, visible, color, population, owner, source, select])
   return null
 }
 
@@ -309,6 +322,8 @@ function PopulationOverlay({
   return (
     <>
       <GeoOverlay
+        owner="population"
+        source="GHSL"
         map={map}
         collection={collection}
         visible={visible}
