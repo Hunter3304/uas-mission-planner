@@ -2,6 +2,19 @@
 
 ## Current status
 
+### Iteration 013 Part 1 publication and feature merge authorized (2026-10-22)
+
+- The user explicitly approved pushing `iteration/013` and
+  `feature/114-hannover-map-controls` to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating the feature PR and
+  merging into `iteration/013` after successful CI. This supersedes the earlier
+  automatic publication rejection below. Main integration remains deferred.
+- Publish the reviewed Part 1 result plus this authorization record, verify the
+  final head's Linux Python, Windows Python and frontend checks, then merge, close
+  Issue #114 explicitly if needed and perform verified merged-feature cleanup.
+  Retain Milestone 12, `iteration/013`, main and historical branches. All local
+  acceptance remains valid: backend/frontend code is identical to `c5e8806`.
+
 ### Iteration 013 Part 1 local completion and publication gate (2026-10-22)
 
 - Implementation and all local acceptance are committed at `c5e8806` on

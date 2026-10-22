@@ -9,8 +9,9 @@ passes / one existing Windows skip, 28 browser and 14 real-stack smoke passes,
 plus final Hannover acceptance with zero-request cached visibility cycles.
 See [Part 1 outcome](../iteration/iteration-013/part1.md). Publication and feature
 integration have not run. Parts 2-4 remain planned.
-The proposed push was rejected before execution by automatic approval review;
-explicit public-repository publication authorization is pending. See the outcome.
+The user subsequently explicitly authorized the public-repository push, feature
+PR and CI-gated merge into `iteration/013`, superseding the earlier automatic
+publication rejection. Actual CI/integration remain pending. See the outcome.
 Baseline: clean local `main` at `4ed0023`, including verified Iteration 012.
 
 ## Requested result and confirmed decisions
