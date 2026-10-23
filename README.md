@@ -3,7 +3,7 @@
 Iteration 013 **Part 1** is delivered to `iteration/013` through
 [PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
 Linux Python, Windows Python and frontend CI passed. Issue #114 is closed;
-Milestone 12 and the iteration branch remain for Part 4. It adds source-grouped
+Milestone 12 and the iteration branch remain for the full iteration/main gate. It adds source-grouped
 collapsible map controls, automatic cached scenario layers and a dedicated
 saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
 coordinate override checkbox and manual layer-load button are removed from the
@@ -23,15 +23,17 @@ cleanup is verified locally/remotely. It adds
 readable source cards, nested expandable attributes, explicit uncertainty/units,
 and Feature category / Category cost explanations. See
 [Part 3 acceptance/status](doc/iteration/iteration-013/part3.md).
-Part 4 is implemented locally on `feature/120-automatic-flight-interval`
-([Issue #120](https://github.com/Hunter3304/uas-mission-planner/issues/120)):
+Part 4 is delivered to `iteration/013` through
+[PR #121](https://github.com/Hunter3304/uas-mission-planner/pull/121) at `81ec028`,
+after final-head Linux/Windows/frontend CI passed. Issue #120 is closed and
+merged-feature cleanup is verified locally/remotely. It adds
 departure-only input, actual-route cruise arrival and complete-interval constraint
 reassessment. Explicit historical API/CLI intervals remain supported. See
 [Part 4 acceptance/status](doc/iteration/iteration-013/part4.md) and
 [iteration outcome](doc/iteration/iteration-013/outcome.md).
-Local regression and integrated Hannover acceptance pass. Remote publication of
-commit `1c1ecaa` awaits destination-specific user approval after automatic review
-rejected the push; Part 4 CI/iteration merge have not occurred.
+Local regression and integrated Hannover acceptance pass. The user's explicit
+publication approval superseded the earlier automatic block. All four Parts are
+on iteration/013; main integration still requires its independent CI gate.
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after

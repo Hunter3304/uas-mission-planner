@@ -2,6 +2,26 @@
 
 ## Current status
 
+### Iteration 013 Part 4 verified delivery (2026-10-23)
+
+- User's explicit publication approval superseded the earlier automatic block.
+  PR #121 merged into iteration/013 at
+  `81ec0287e65b4a7b87b1c0d0dd04c38cefefc68a`. Checks run `39947203136`
+  completed successfully on final head `500d49634f9945f0a2eb043d20661a4f6f017cb9`:
+  Windows 339 passes (81.61 s); Linux 329 passes / 10 skips (109.86 s);
+  frontend lint/build, 55 browser (52.5 s) and 14 smoke (44.3 s) passes.
+- Local iteration/013 fast-forwarded to the merge. Feature ancestry and identical
+  backend/frontend Git trees versus the accepted final head were verified.
+  All 21 real-acceptance application hashes match after checkout-only line-ending
+  restoration. No logical application changes were introduced by integration.
+- Issue #120 explicitly closed as completed. The merged feature was deleted
+  remotely with an exact expected-head lease and locally; fetch/prune, branch -a
+  and ls-remote confirm cleanup. Historical iterations and feature #75 remain.
+- All four Parts are delivered to iteration/013. Main remains `4ed0023` and
+  Milestone 12 remains open for the separate complete-iteration/main CI gate.
+  This session publishes Part 4 and records its verified iteration delivery;
+  no complete-iteration/main merge is claimed.
+
 ### Iteration 013 Part 4 publication authorized (2026-10-23)
 
 - The user explicitly approved pushing the prepared Part 4 to

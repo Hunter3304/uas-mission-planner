@@ -6,8 +6,8 @@ Assigned [Issue #120](https://github.com/Hunter3304/uas-mission-planner/issues/1
 in verified open Milestone 12 precedes `feature/120-automatic-flight-interval`,
 created from iteration/013 at `289c60c`.
 
-Status: implementation, local regression and integrated Hannover acceptance
-complete; feature delivery gates are pending. Full iteration/main integration requires
+Status: implementation, local regression, integrated Hannover acceptance and
+feature delivery complete through PR #121. Full iteration/main integration requires
 its independent final-head CI gate.
 
 ## Result and temporal contract
@@ -138,3 +138,23 @@ On 2026-10-23 the user explicitly approved publication in response to the
 destination-specific push/CI/iteration-merge request. The earlier publication
 block is superseded. Application code and acceptance evidence are unchanged;
 remote CI and delivery facts must still be verified before claiming delivery.
+
+## Verified iteration delivery (2026-10-23)
+
+[PR #121](https://github.com/Hunter3304/uas-mission-planner/pull/121) merged into
+iteration/013 at `81ec0287e65b4a7b87b1c0d0dd04c38cefefc68a` after Checks run
+`39947203136` explicitly completed successfully on final reviewed head
+`500d49634f9945f0a2eb043d20661a4f6f017cb9`. Windows: 339 passes (81.61 s);
+Linux: 329 passes / 10 skips (109.86 s); frontend: lint/build, 55 browser
+(52.5 s) and 14 real-stack smoke (44.3 s) passes.
+
+Local iteration/013 is synchronized. Feature ancestry and identical application
+Git trees were verified. All 21 measured application byte hashes match accepted
+real evidence after restoring checkout-only line endings; no logical source diff.
+Issue #120 is explicitly closed as completed. Remote feature deletion used an
+expected-head lease; local deletion, fetch/prune, branch -a and ls-remote verify
+cleanup. Historical iteration branches and feature #75 remain.
+
+This supersedes the pending publication/delivery notes above. All four Parts are
+on iteration/013. Main remains `4ed0023`, Milestone 12 stays open, and the separate
+complete-iteration/main CI gate has not been performed in this delivery.
