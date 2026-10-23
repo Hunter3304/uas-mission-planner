@@ -133,3 +133,8 @@ for publishing the complete feature to that destination. No workaround was used;
 no Part 4 PR or remote CI was created. Resume the existing feature branch after
 destination-specific approval, then complete its CI/merge/cleanup and the
 independent complete-iteration gate.
+
+On 2026-10-23 the user explicitly approved publication in response to the
+destination-specific push/CI/iteration-merge request. The earlier publication
+block is superseded. Application code and acceptance evidence are unchanged;
+remote CI and delivery facts must still be verified before claiming delivery.

@@ -2,6 +2,15 @@
 
 ## Current status
 
+### Iteration 013 Part 4 publication authorized (2026-10-23)
+
+- The user explicitly approved pushing the prepared Part 4 to
+  `Hunter3304/uas-mission-planner`, in response to the destination-specific
+  request to publish, pass CI and merge into iteration/013. This supersedes the
+  publication block recorded below. Continue the existing feature; application
+  code and accepted evidence remain unchanged. Require final-head CI before
+  merging, then close Issue #120 and verify local/remote feature cleanup.
+
 ### Iteration 013 Part 4 implementation (2026-10-22)
 
 - Local implementation commit: `1c1ecaa` on
