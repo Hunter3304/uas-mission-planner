@@ -1,3 +1,4 @@
+import { timedResult } from './fixtures/flightInterval'
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const bounds = { west: 9.7, south: 52.3, east: 9.9, north: 52.5 }
@@ -22,7 +23,7 @@ async function setup(page: Page, respond?: (route: Route, count: number) => Prom
     }
     if (path.endsWith('/study/route')) {
       const body = route.request().postDataJSON(); calls.routes.push(body)
-      return route.fulfill({ json: { status: 'success', geometry: { type: 'LineString', coordinates: [body.start_coordinate ?? [9.76, 52.38], body.end_coordinate ?? [9.77, 52.38]] }, length_m: 1000, risk_length_cost: 20, objective_cost: 118, cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5, research_assumptions: [], endpoint_diagnostics: {} } })
+      return route.fulfill({ json: timedResult(route.request().postDataJSON(), { status: 'success', geometry: { type: 'LineString', coordinates: [body.start_coordinate ?? [9.76, 52.38], body.end_coordinate ?? [9.77, 52.38]] }, length_m: 1000, risk_length_cost: 20, objective_cost: 118, cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5, research_assumptions: [], endpoint_diagnostics: {} }) })
     }
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds, locations: sites }, sources: {} } })
     if (path === '/api/terrain-datasets') return route.fulfill({ json: { datasets: [{ id: 'hannover-part2-terrain-v1', tiles: 120 }] } })
@@ -35,8 +36,7 @@ async function setup(page: Page, respond?: (route: Route, count: number) => Prom
   return calls
 }
 async function dates(page: Page) {
-  await page.getByLabel('Scenario start', { exact: true }).fill('2026-10-07T10:00')
-  await page.getByLabel('Scenario end', { exact: true }).fill('2026-10-07T10:15')
+  await page.getByLabel('Departure time', { exact: true }).fill('2026-10-07T10:00')
 }
 const group = (page: Page, name: string) => page.getByRole('region', { name, exact: true })
 

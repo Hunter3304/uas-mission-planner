@@ -1,3 +1,4 @@
+import { timedResult } from './fixtures/flightInterval'
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const identity = {
@@ -135,7 +136,7 @@ async function setup(page: Page, override?: (route: Route, url: URL) => Promise<
       return route.fulfill({ json: collection(false, url.searchParams.get('style') === 'cost') })
     if (url.pathname.endsWith('/study/route'))
       return route.fulfill({
-        json: {
+        json: timedResult(route.request().postDataJSON(), {
           status: 'success',
           geometry: {
             type: 'LineString',
@@ -154,7 +155,7 @@ async function setup(page: Page, override?: (route: Route, url: URL) => Promise<
           research_assumptions: [],
           endpoint_diagnostics: {},
           provenance: { signature: 'fixture' },
-        },
+        }),
       })
     if (url.pathname.endsWith('/study'))
       return route.fulfill({
@@ -213,8 +214,7 @@ test('overview, detail styles, original tags and independent route updates', asy
   const before = urls.filter((url) => /\/osm\/(summary|features|overview)/.test(url)).length
   const canvas = await map.locator('.leaflet-overlay-pane canvas').elementHandle()
   const routing = page.getByRole('region', { name: 'Regional route planning' })
-  await routing.getByLabel('Scenario start').fill('2026-10-07T10:00')
-  await routing.getByLabel('Scenario end').fill('2026-10-07T10:15')
+  await routing.getByLabel('Departure time').fill('2026-10-07T10:00')
   await routing.getByRole('button', { name: 'Plan regional route', exact: true }).click()
   await expect(routing.getByRole('status')).toContainText('Length 1000.0 m')
   await expect(details).toContainText('node/1')

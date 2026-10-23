@@ -27,6 +27,7 @@ export interface Study {
   sources: Record<string, { attribution?: string }>
 }
 export interface ConstraintLayers {
+  flight_interval?: { mode: 'provisional'; assessed_interval: { mission_start: string; mission_end: string }; interpretation: string }
   blocked: FeatureCollection
   unknown: FeatureCollection
   excluded?: FeatureCollection

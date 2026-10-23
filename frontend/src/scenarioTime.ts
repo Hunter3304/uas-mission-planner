@@ -21,3 +21,31 @@ export function scenarioInterval(start: string, end: string) {
     throw new Error('Scenario end must be after start and within 24 hours.')
   return { mission_start, mission_end }
 }
+
+export interface FlightInterval { mission_start: string; mission_end: string }
+export interface FlightTiming {
+  mode: 'automatic'
+  departure?: string
+  estimated_arrival: string | null
+  cruise_time_s: number | null
+  estimated_interval: FlightInterval | null
+  assessed_interval: FlightInterval
+  cruise_only: boolean
+}
+
+export function berlinDisplay(value: string) {
+  const date = new Date(value)
+  if (!Number.isFinite(date.getTime())) return 'Unavailable'
+  const parts = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3, timeZoneName: 'longOffset', hourCycle: 'h23' }).formatToParts(date)
+  const get = (key: string) => parts.find(part => part.type === key)?.value ?? ''
+  return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}.${get('fractionalSecond')} ${get('timeZoneName').replace('GMT', '')} (Europe/Berlin)`
+}
+
+export function checkFlightTiming(timing: FlightTiming | undefined, departure: string, length: number | null, speed: number) {
+  if (!timing || timing.mode !== 'automatic' || !timing.cruise_only || timing.departure !== departure || length == null || !Number.isFinite(length) || length < 0 || !Number.isFinite(speed) || speed < 25 || speed > 35 || typeof timing.cruise_time_s !== 'number' || !Number.isFinite(timing.cruise_time_s) || !timing.estimated_arrival || !timing.estimated_interval || !timing.assessed_interval)
+    throw new Error('The data service returned an invalid automatic flight interval. Refresh and plan again.')
+  const start = Date.parse(departure), end = Date.parse(timing.estimated_arrival)
+  const duration = length / speed
+  if (!Number.isFinite(end) || !Number.isFinite(start) || timing.cruise_time_s == null || Math.abs(timing.cruise_time_s - duration) > 0.000001 || Math.abs(end - start - duration * 1000) > 1.01 || Date.parse(timing.estimated_interval.mission_start) !== start || Date.parse(timing.estimated_interval.mission_end) !== end || !(Date.parse(timing.assessed_interval.mission_start) <= start && Date.parse(timing.assessed_interval.mission_end) >= end))
+    throw new Error('The returned route time is outside its assessed interval or does not match its length and speed.')
+}

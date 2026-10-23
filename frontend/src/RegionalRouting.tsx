@@ -4,7 +4,7 @@ import type { Geometry } from 'geojson'
 import RegionalMap, { type Study, type ConstraintLayers } from './RegionalMap'
 import { getJson, postJson } from './api'
 import CollapsiblePanel from './CollapsiblePanel'
-import { scenarioInterval } from './scenarioTime'
+import { berlinTimestamp, berlinDisplay, checkFlightTiming, type FlightTiming } from './scenarioTime'
 import RestrictionProfiles, { type RestrictionReport } from './RestrictionProfiles'
 import useScenarioLayers from './useScenarioLayers'
 import { initialScenarioVisibility } from './regionalLayers'
@@ -19,6 +19,7 @@ interface VerticalComparison {
   vertical_reference_assumption?: unknown
 }
 interface RegionalResult {
+  timing?: FlightTiming
   status: string
   message?: string
   length_m: number | null
@@ -43,7 +44,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const [controls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
     algorithm: 'astar', objective: 'risk', planning_mode: 'conservative', profile_id: '', cell_m: 250, background: '', time_budget_s: 3,
     risk_weight: 0.9, distance_weight: 0.1, agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
-    mission_start: '', mission_end: '', research_height_m: 30, corridor_margin_m: 1000,
+    mission_start: '', research_height_m: 30, corridor_margin_m: 1000,
     vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
   const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
   const [terrainError, setTerrainError] = useState('')
@@ -62,9 +63,11 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       .catch(error => { if (!active.signal.aborted) setStudyError(error.message) })
     return () => { active.abort() }
   }, [datasetId])
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
   function scenario() {
-    const { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start, mission_end } = controls
-    return { agl_m, speed_m_s, clearance_m, vertical_clearance_m, ...scenarioInterval(mission_start, mission_end), scenario: 'civil', timezone: 'Europe/Berlin', building_unknown_height: 'unresolved', zone_assessments: {},
+    const { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start } = controls
+    return { agl_m, speed_m_s, clearance_m, vertical_clearance_m, mission_start: berlinTimestamp(mission_start), scenario: 'civil', timezone: 'Europe/Berlin', building_unknown_height: 'unresolved', zone_assessments: {},
       ...(controls.planning_mode !== 'strict' ? { research_geometry: 'derived', research_height_m: controls.research_height_m, research_geometry_buffer_m: 20,
         vertical_reference_policy: controls.vertical_reference_policy, nhn_msl_offset_m: controls.nhn_msl_offset_m, nhn_msl_uncertainty_m: controls.nhn_msl_uncertainty_m } : {}) }
   }
@@ -95,16 +98,14 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       if (!start || !end) throw new Error('Choose an origin and destination from the saved sites.')
       activeStart = [start.longitude, start.latitude]; activeEnd = [end.longitude, end.latitude]
     }
-    if (!controls.mission_start || !controls.mission_end) throw new Error('Enter scenario start and end times in the planning panel.')
+    if (!controls.mission_start) throw new Error('Enter a departure time in the planning panel.')
     if (!terrains.some(terrain => terrain.id === controls.terrain_id)) throw new Error('Choose an available terrain dataset in the planning panel.')
     if (![controls.agl_m, controls.speed_m_s, controls.clearance_m, controls.vertical_clearance_m, controls.research_height_m, controls.nhn_msl_offset_m, controls.nhn_msl_uncertainty_m].every(Number.isFinite)) throw new Error('Complete the scenario height, speed and clearance inputs.')
     if (controls.agl_m < 100 || controls.agl_m > 120 || controls.speed_m_s < 25 || controls.speed_m_s > 35 || controls.clearance_m < 0 || controls.vertical_clearance_m < 0) throw new Error('Check the scenario altitude, speed and clearance ranges.')
-    layerKey = JSON.stringify({ scenario: scenario(), terrain_id: controls.terrain_id, profile_id: controls.profile_id || undefined, planning_mode: controls.planning_mode })
+    layerKey = JSON.stringify({ duration_mode: result?.status === 'success' ? 'explicit' : 'automatic', start_id: controls.start_id, end_id: controls.end_id, ...(override.enabled ? { start_coordinate: activeStart, end_coordinate: activeEnd } : {}), scenario: { ...scenario(), ...(result?.status === 'success' ? result.timing?.assessed_interval : {}) }, terrain_id: controls.terrain_id, profile_id: controls.profile_id || undefined, planning_mode: controls.planning_mode })
   } catch (failure) { pendingReason = failure instanceof Error ? failure.message : 'Complete the scenario inputs.' }
-  const layers = useScenarioLayers(datasetId, layerKey, Object.values(layerVisibility).some(Boolean))
+  const layers = useScenarioLayers(datasetId, layerKey, Object.values(layerVisibility).some(Boolean) && !busy)
   const constraints: ConstraintLayers | null = layers.data
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const controller = useRef<AbortController | null>(null)
   useEffect(() => () => controller.current?.abort(), [])
   function update(name: keyof typeof controls, value: string | number) {
@@ -122,16 +123,26 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setResult(null)
     setError('')
     try {
+      await layers.waitForIdle()
+      if (active.signal.aborted) return
+      const requestedScenario = scenario()
       const response = await postJson<RegionalResult>(`/api/datasets/${encodeURIComponent(datasetId)}/study/route`, {
-        start_id: controls.start_id, end_id: controls.end_id, terrain_id: controls.terrain_id,
+        duration_mode: 'automatic', start_id: controls.start_id, end_id: controls.end_id, terrain_id: controls.terrain_id,
         algorithm: controls.algorithm, objective: controls.objective, planning_mode: controls.planning_mode,
         profile_id: controls.profile_id || undefined,
         cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
         risk_weight: controls.risk_weight, distance_weight: controls.distance_weight,
-        background_cost: controls.background === '' ? null : Number(controls.background), scenario: scenario(),
+        background_cost: controls.background === '' ? null : Number(controls.background), scenario: requestedScenario,
         ...(override.enabled ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
       }, active.signal)
-      if (!active.signal.aborted) setResult(response)
+      if (!active.signal.aborted) {
+        if (response.status === 'success') {
+          checkFlightTiming(response.timing, requestedScenario.mission_start, response.length_m, controls.speed_m_s)
+          if (response.mission?.mission_start !== requestedScenario.mission_start || response.mission?.mission_end !== response.timing?.estimated_arrival)
+            throw new Error('The returned mission interval does not match its flight estimate. Plan again.')
+        }
+        setResult(response)
+      }
     } catch (err) {
       if (!active.signal.aborted) setError(err instanceof Error ? err.message : 'Regional planning failed.')
     } finally {
@@ -152,10 +163,11 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
   const mapTarget = document.getElementById('regional-map')
+  const assessedInterval = result?.status === 'success' ? result.timing?.assessed_interval : constraints?.flight_interval?.assessed_interval
   return <CollapsiblePanel title="Regional route planning">
     {mapTarget && createPortal(<RegionalMap datasetId={datasetId} study={study} startId={controls.start_id} endId={controls.end_id} startCoordinate={activeStart} endCoordinate={activeEnd} exactCoordinates={override.enabled} geometry={result?.status === 'success' ? result.geometry : null} constraints={constraints} layerVisibility={layerVisibility} onLayerVisibility={setLayerVisibility} layerState={{ pendingReason, loading: layers.loading, error: layers.error, retry: layers.retry }} />, mapTarget)}
     {studyError && <p role="alert">Location catalog: {studyError}</p>}
-    <p>Select catalog addresses and scenario times in Europe/Berlin. The UTC offset is added automatically. End must be after start, within 24 hours. Addresses are not verified launch or landing sites.</p>
+    <p>Select endpoints and departure in Europe/Berlin. Estimated arrival uses the successful route length divided by cruise speed, with no takeoff/landing allowance. Addresses are not verified launch or landing sites.</p>
     {terrainError && <p role="alert">Terrain catalog: {terrainError}</p>}
     <form onSubmit={event => { event.preventDefault(); void solve() }}>
       <fieldset className="endpoint-section">
@@ -195,9 +207,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           {!terrains.some(t => t.id === controls.terrain_id) && <option value={controls.terrain_id}>{controls.terrain_id} — awaiting catalog</option>}
           {terrains.map(t => <option key={t.id} value={t.id}>{t.id} ({t.tiles} tiles)</option>)}
         </select></label>
-        {(['mission_start', 'mission_end'] as const).map(name =>
-          <label key={name}>{name === 'mission_start' ? 'Scenario start' : 'Scenario end'}
-            <input type="datetime-local" required step="60" value={controls[name]} onChange={event => update(name, event.target.value)} /></label>)}
+<label>Departure time<input type="datetime-local" required step="1" value={controls.mission_start} onChange={event => update('mission_start', event.target.value)} /></label>
         {(['algorithm', 'objective', 'planning_mode'] as const).map(name =>
           <label key={name}>{name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'}
             <select aria-label={name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'} value={controls[name]} onChange={event => update(name, event.target.value)}>
@@ -205,7 +215,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
             </select></label>)}
         {([{ name: 'agl_m', label: 'Altitude AGL (m)', min: 100, max: 120 }, { name: 'speed_m_s', label: 'Cruise speed (m/s)', min: 25, max: 35 },
           { name: 'cell_m', label: 'Grid spacing (m)', min: 1 }, { name: 'clearance_m', label: 'Horizontal clearance (m)', min: 0, max: 1000 },
-          { name: 'vertical_clearance_m', label: 'Vertical clearance (m)', min: 0, max: 1000 }, { name: 'time_budget_s', label: 'ABIT* budget (s)', min: 0, max: 60 },
+          { name: 'vertical_clearance_m', label: 'Vertical clearance (m)', min: 0, max: 1000 }, { name: 'time_budget_s', label: 'Search budget (s)', min: 0, max: 60 },
           { name: 'corridor_margin_m', label: 'Initial corridor margin (m)', min: 100, max: 10000 },
           ...(controls.planning_mode !== 'strict' ? [{ name: 'research_height_m', label: 'Missing building height estimate (m)', min: 0, max: 1000 }] : []),
           ...(controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' ? [
@@ -223,7 +233,9 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       {!override.enabled && controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
       <button disabled={busy || !study}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
     </form>
-    <RestrictionProfiles datasetId={datasetId} report={constraints?.restriction_report ?? result?.restriction_report} start={controls.mission_start} end={controls.mission_end} onSelect={id => update('profile_id', id)} />
+    <section className="flight-estimate source-card" aria-label="Flight time estimate"><h4>Estimated arrival</h4>{result?.status === 'success' && result.timing?.estimated_arrival ? <><p className="source-main-value">{berlinDisplay(result.timing.estimated_arrival)}</p><p>{result.length_m?.toFixed(1)} m ÷ {controls.speed_m_s} m/s = {result.timing.cruise_time_s?.toFixed(3)} s of cruise. Cruise only; planning computation time is separate.</p><p>Assessed interval: {berlinDisplay(result.timing.assessed_interval.mission_start)} — {berlinDisplay(result.timing.assessed_interval.mission_end)}</p></> : <p>Awaiting route</p>}</section>
+    <p className="layer-help" data-testid="flight-interval-scope" data-assessed-start={assessedInterval?.mission_start} data-assessed-end={assessedInterval?.mission_end}>{result?.status === 'success' ? 'Completed route assessment: enabled layers refresh automatically to the returned assessed interval.' : 'Provisional preview: layers use a straight-line duration seed, not a successful route ETA. The actual flight interval is checked after planning.'}{assessedInterval && <> Inspection interval: {berlinDisplay(assessedInterval.mission_start)} — {berlinDisplay(assessedInterval.mission_end)}.</>}</p>
+    <RestrictionProfiles datasetId={datasetId} report={result?.restriction_report ?? constraints?.restriction_report} interval={assessedInterval} intervalLabel={result?.status === 'success' ? 'Completed route assessment interval' : 'Provisional preview interval'} onSelect={id => update('profile_id', id)} />
     {error && <p role="alert">{error}</p>}
     {result && <div role="status">
       <p>{result.status}: {result.message}</p>

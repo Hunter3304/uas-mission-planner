@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from threading import BoundedSemaphore
@@ -270,18 +271,69 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
         if not scenario_layer_slot.acquire(blocking=False):
             raise HTTPException(503, "Scenario layers are already preparing. Wait, then retry.")
         try:
-            if set(request) - {"scenario", "terrain_id", "profile_id", "planning_mode"}:
+            if set(request) - {
+                "scenario",
+                "terrain_id",
+                "profile_id",
+                "planning_mode",
+                "duration_mode",
+                "start_id",
+                "end_id",
+                "start_coordinate",
+                "end_coordinate",
+            }:
                 raise ValueError("Unknown constraint layer controls.")
             terrain_id = request.get("terrain_id")
             if terrain_id is not None and not isinstance(terrain_id, str):
                 raise ValueError("terrain_id must be a dataset identifier.")
+            scenario = restriction_scenario(dataset_id, request)
+            automatic = request.get("duration_mode", "explicit") == "automatic"
+            if request.get("duration_mode", "explicit") not in {"explicit", "automatic"}:
+                raise ValueError("Unknown flight duration mode.")
+            if automatic:
+                from uas_planner.core.flight_interval import provisional_scenario
+
+                original = scenario
+                endpoints = {
+                    k: request[k] for k in ("start_coordinate", "end_coordinate") if k in request
+                }
+                scenario = provisional_scenario(
+                    dataset_path(dataset_id),
+                    scenario,
+                    request["start_id"],
+                    request["end_id"],
+                    **endpoints,
+                )
             model = RegionalConstraints(
                 dataset_path(dataset_id),
-                restriction_scenario(dataset_id, request),
+                scenario,
                 terrain_directory=dataset_path(terrain_id) if terrain_id else None,
             )
             try:
-                return constraint_layers(model, request.get("planning_mode", "strict"))
+                if automatic:
+                    from uas_planner.core.flight_interval import seed_interval
+
+                    verified = seed_interval(
+                        original,
+                        model.manifest["config"]["locations"],
+                        request["start_id"],
+                        request["end_id"],
+                        **endpoints,
+                    )
+                    if datetime.fromisoformat(verified["mission_end"]) > datetime.fromisoformat(
+                        model.scenario["mission_end"]
+                    ):
+                        model.expand_interval(verified["mission_end"])
+                result = constraint_layers(model, request.get("planning_mode", "strict"))
+                if automatic:
+                    result["flight_interval"] = {
+                        "mode": "provisional",
+                        "assessed_interval": {
+                            k: model.scenario[k] for k in ("mission_start", "mission_end")
+                        },
+                        "interpretation": "Straight-line duration seed only; not a successful route ETA or completed flight assessment.",
+                    }
+                return result
             finally:
                 model.terrain.close()
         except (ValueError, KeyError, OSError, TypeError) as exc:
@@ -311,6 +363,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "start_coordinate",
             "end_coordinate",
             "profile_id",
+            "duration_mode",
         }
         try:
             if set(request) - allowed:
