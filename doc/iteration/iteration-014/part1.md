@@ -97,7 +97,10 @@ Publication explicitly authorized on 2026-10-25 before Part 2. The earlier
 credential limitation below is historical: verified local credentials are
 available outside the sandbox. Milestone 13, remote `iteration/014` at `d0782d3`
 and assigned Issue #122 now exist. Feature renamed to
-`feature/122-population-surface`; final-head CI remains required before integration.
+`feature/122-population-surface`. Part 1 was then pushed as `e7459c6`, and PR #123
+passed exact-head Linux/Windows/frontend Checks run `40189193801`. Automatic
+approval rejected iteration integration without explicit user consent; that
+specific approval is pending. See [Part 2 status](part2.md) for the current record.
 
 Local branch: `feature/iteration014-population-surface`, from new local
 `iteration/014` at Iteration 013 head `d0782d3`. The GitHub connector does not

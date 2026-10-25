@@ -63,6 +63,8 @@ def parser():
     regional_route.add_argument("--background-cost", type=float)
     regional_route.add_argument("--risk-weight", type=float, default=0.9)
     regional_route.add_argument("--distance-weight", type=float, default=0.1)
+    regional_route.add_argument("--include-population", action="store_true")
+    regional_route.add_argument("--population-weight", type=float, default=1.0)
     regional_route.add_argument("--time-budget-s", type=float, default=3)
     regional_route.add_argument("--output", type=Path)
     restriction_fetch = commands.add_parser(
@@ -252,6 +254,8 @@ def main(argv=None):
                         "background_cost",
                         "risk_weight",
                         "distance_weight",
+                        "include_population",
+                        "population_weight",
                         "time_budget_s",
                     )
                 },

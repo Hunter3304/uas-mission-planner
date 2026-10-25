@@ -228,8 +228,10 @@ def plan_route(
     }
     if risk_model is not None:
         result["risk_model"] = deepcopy(risk_model.provenance)
-        result["rules_version"] = RISK_VERSION
+        result["rules_version"] = risk_model.provenance.get("rules_version", RISK_VERSION)
         result["optimality"] = "Minimum weighted objective on the assessed constructed graph only."
+        if hasattr(risk_model, "population_weight"):
+            result["population_length_cost"] = None
     point_states = [check([coordinates[n]]) for n in ("start", "end")]
     risk_points = (
         [risk_model.evaluate([coordinates[n]]) for n in ("start", "end")]
@@ -263,10 +265,16 @@ def plan_route(
             },
         )
         if risk_model is not None:
+            if hasattr(risk_model, "population_weight"):
+                result["population_length_cost"] = 0.0
             result["assessment_flags"] = {
                 key: risk_points[0][key]
                 for key in ("has_default", "background_assumed", "source_ids")
             }
+            if hasattr(risk_model, "population_weight"):
+                result["assessment_flags"]["population_source_ids"] = risk_points[0][
+                    "population_source_ids"
+                ]
     else:
         valid = {c["id"] for c in grid["cells"] if c["state"] == "permitted"}
         forward = Transformer.from_crs(4326, grid["analysis_crs"], always_xy=True)
@@ -295,6 +303,13 @@ def plan_route(
                     edges.append((u, v, assessment["length_m"], assessment["objective_cost"]))
 
         for edge in grid["edges"]:
+            if deadline is not None and perf_counter() >= deadline:
+                result.update(
+                    status="resource_limit",
+                    message="Graph cost preparation exceeded the search deadline.",
+                    runtime_ms=(perf_counter() - started) * 1000,
+                )
+                return result
             u, v = edge["from"], edge["to"]
             if edge["state"] != "permitted" or u not in valid or v not in valid:
                 continue
@@ -308,6 +323,13 @@ def plan_route(
             if check([coordinates[u], coordinates[v]]) == "permitted":
                 add_edge(u, v)
         for name, c in connectors.items():
+            if deadline is not None and perf_counter() >= deadline:
+                result.update(
+                    status="resource_limit",
+                    message="Connector cost preparation exceeded the search deadline.",
+                    runtime_ms=(perf_counter() - started) * 1000,
+                )
+                return result
             if (
                 c["state"] == "permitted"
                 and c["cell"] in valid
@@ -362,6 +384,13 @@ def plan_route(
                                 ),
                             },
                         )
+                        if hasattr(risk_model, "population_weight"):
+                            result["population_length_cost"] = sum(
+                                a["population_length_cost"] for a in assessments
+                            )
+                            result["assessment_flags"]["population_source_ids"] = sorted(
+                                {i for a in assessments for i in a["population_source_ids"]}
+                            )
         elif found["status"] == "no_path_on_grid":
             if risk_unresolved or any(
                 item["state"] == "unresolved"
@@ -393,6 +422,7 @@ def route_geojson(result):
                 "properties": {
                     "length_m": result["length_m"],
                     "risk_length_cost": result.get("risk_length_cost"),
+                    "population_length_cost": result.get("population_length_cost"),
                     "objective_cost": result.get("objective_cost"),
                     "rules_version": result["rules_version"],
                 },

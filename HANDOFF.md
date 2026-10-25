@@ -2,6 +2,27 @@
 
 ## Current status
 
+### Iteration 014 Part 1 published; Part 2 implemented locally (2026-10-25)
+
+- User requested pushing Part 1 before completing Part 2. Published accepted
+  `e7459c6` on `origin/feature/122-population-surface`; PR #123 targets iteration/014.
+  Exact-head Checks run `40189193801` passed Linux Python, Windows Python and
+  frontend including test steps. Milestone 13 / Issue #122 remain open.
+- Automatic review rejected merging PR #123: the request authorized push but
+  not iteration integration. The specific user approval question is pending.
+  Do not bypass or merge until approval; main remains outside this request.
+- Part 2 is Issue #124 / `feature/124-population-routing`, stacked locally on
+  the published Part 1 head. Shared indexed population evaluator/combined model,
+  regional API/CLI controls, all three planners/connectors/final validation,
+  provenance/exports, deadline-aware source preparation and automatic interval
+  handling are implemented. Part 3 routing UI remains deferred. Rules updated.
+- Final backend 372 passes / one existing skip (133.09 s); focused 58 passes
+  (63.29 s); 14 smoke passes (35.8 s); lint/build/format pass. Real Hannover
+  baseline/risk+population/distance+population all succeed, original hashes
+  unchanged and independent P differs by under 0.000001 score-metres. See
+  `doc/iteration/iteration-014/part2.md` and `.cache/iteration014-part2-real-v1/`.
+  No Part 2 remote publication/CI/merge is claimed.
+
 ### Iteration 014 publication and Part 2 authorized (2026-10-25)
 
 - User explicitly requested publishing accepted Part 1 to the existing origin

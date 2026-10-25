@@ -3,9 +3,13 @@
 Date: 2026-10-25 (Europe/Berlin).
 Status: Part 1 implementation authorized on 2026-10-25, including colored grid
 visualization brought forward from Part 3. The user additionally requested replacing
-the old green native-count overlay with this grid. Parts 2-4 remain planned.
+the old green native-count overlay with this grid. Part 2 was authorized after
+Part 1 publication and is implemented locally; Parts 3-4 remain planned.
 Part 1 is implemented and locally accepted; see [Part 1 outcome](../iteration/iteration-014/part1.md)
 for numerical/browser/real-data results and the local-only delivery state.
+Part 1 is now published as PR #123 with all remote checks passed; integration
+awaits explicit user approval following automatic review. Part 2 is tracked by
+Issue #124 / Milestone 13; see [Part 2 outcome](../iteration/iteration-014/part2.md).
 Baseline inspected: local `iteration/013`, with the completed Iteration 013 Parts.
 This plan does not claim Iteration 013 delivery to main or create remote tracking.
 

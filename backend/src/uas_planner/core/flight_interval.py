@@ -159,11 +159,16 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
                     else 0
                 )
                 result["provenance"] = deepcopy(planner.constraints.provenance)
+                if result.get("population_active") and result.get("population_model"):
+                    result["provenance"].update(
+                        ghsl_routing_cost=True,
+                        population_model_identity=result["population_model"]["identity"],
+                    )
                 if isinstance(result.get("assumptions"), dict):
                     result["assumptions"] = deepcopy(current)
                 if "risk_model" in result:
                     provenance = result["risk_model"]
-                    provenance["source"] = deepcopy(planner.constraints.provenance)
+                    provenance["source"] = deepcopy(result["provenance"])
                     provenance.pop("model_signature", None)
                     provenance["model_signature"] = signature(provenance)
                 result["mission"] = {
@@ -179,6 +184,11 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
                         "provenance": result["provenance"],
                         "controls": result["controls"],
                         "endpoints": {k: result[k] for k in ("start", "end")},
+                        **(
+                            {"population_model_identity": result["population_model"]["identity"]}
+                            if result.get("population_active") and result.get("population_model")
+                            else {}
+                        ),
                     }
                 )
                 result["timing"] = {
@@ -215,16 +225,21 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
     finally:
         planner.constraints.terrain.close()
     if result["status"] != "success":
+        result = {**deepcopy(getattr(planner, "_last_result", {})), **result}
         result.update(
             geometry=None,
             length_m=None,
             risk_length_cost=None,
+            population_length_cost=None,
             objective_cost=None,
             cruise_time_s=None,
             cruise_time_range_s=None,
             exact=False,
             solution_kind="none",
+            independent_validation=False,
         )
+        if result.get("population_active"):
+            result["population_assessment"] = "unresolved"
         result["timing"] = {
             "mode": "automatic",
             "estimated_arrival": None,
@@ -234,6 +249,8 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             "passes": passes,
             "cruise_only": True,
         }
+        if isinstance(result.get("controls"), dict):
+            result["controls"].update(duration_mode="automatic", time_budget_s=budget)
     result.update(
         runtime_ms=(perf_counter() - started) * 1000,
         source_preparation_ms=source_ms,
