@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
 import 'leaflet/dist/leaflet.css'
-import { getJson } from './api'
-import { populationColor } from './external'
+import PopulationCostOverlay from './PopulationCostOverlay'
 import type { RestrictionReport } from './RestrictionProfiles'
 import RegionalOsm from './RegionalOsm'
 import CollapsiblePanel from './CollapsiblePanel'
@@ -220,10 +219,8 @@ function RegionalMapContent({
             <p className="layer-help">Street tiles are online background imagery. Saved source layers work independently. Fit study changes the map extent only.</p>
           </CollapsiblePanel>
           <CollapsiblePanel className="map-layer-group" title="GHSL population">
-            <label className="map-layer-choice"><input type="checkbox" checked={visible.population} onChange={event => setVisible(current => ({ ...current, population: event.target.checked }))} />GHSL — population cells</label>
-            <div className="cost-legend">{[[0, 'Zero'], [10, 'Under 25'], [50, '25–99'], [100, '100+'], [null, 'NoData']].map(([value, label]) => <span key={String(label)}><i style={{ background: populationColor(value) }} />{label}</span>)}</div>
-            <p className="layer-help">Estimated people per native 100 m cell. Very pale green means a known zero estimate; gray means NoData, not zero. Population is inspection only.</p>
-            {readyMap && <PopulationOverlay key={`${datasetId}:population`} map={readyMap} datasetId={datasetId} visible={visible.population} />}
+            <label className="map-layer-choice"><input type="checkbox" checked={visible.population} onChange={event => setVisible(current => ({ ...current, population: event.target.checked }))} />GHSL — population risk (250 m)</label>
+            {readyMap && <PopulationCostOverlay key={`${datasetId}:population-cost`} map={readyMap} datasetId={datasetId} visible={visible.population} />}
           </CollapsiblePanel>
           <CollapsiblePanel className="map-layer-group map-layer-group-osm" title="OSM">
             {readyMap && <RegionalOsm key={datasetId} map={readyMap} datasetId={datasetId} />}
@@ -254,7 +251,6 @@ function GeoOverlay({
   collection,
   visible,
   color,
-  population = false,
   owner,
   source,
   context,
@@ -263,7 +259,6 @@ function GeoOverlay({
   collection?: FeatureCollection
   visible: boolean
   color: string
-  population?: boolean
   owner: string
   source: MapSelection['source']
   context?: Record<string, unknown>
@@ -276,11 +271,10 @@ function GeoOverlay({
   useEffect(() => {
     if (!visible || !collection) return
     const group = L.geoJSON(collection, {
-      style: (feature) => ({
+      style: () => ({
         color,
-        weight: population ? 0.4 : 1.5,
-        fillOpacity: population ? 0.55 : 0.2,
-        fillColor: population ? populationColor(feature?.properties.people_per_cell) : undefined,
+        weight: 1.5,
+        fillOpacity: 0.2,
       }),
       onEachFeature: (feature, layer) =>
         layer.on('click', (event: L.LeafletMouseEvent) => {
@@ -290,68 +284,6 @@ function GeoOverlay({
     return () => {
       group.remove()
     }
-  }, [map, collection, visible, color, population, owner, source, context, select])
+  }, [map, collection, visible, color, owner, source, context, select])
   return null
-}
-
-function PopulationOverlay({
-  map,
-  datasetId,
-  visible,
-}: {
-  map: L.Map
-  datasetId: string
-  visible: boolean
-}) {
-  const [collection, setCollection] = useState<FeatureCollection>()
-  const [populationMetadata, setPopulationMetadata] = useState<Record<string, unknown>>({})
-  const [error, setError] = useState('')
-  const [attempt, setAttempt] = useState(0)
-  useEffect(() => {
-    if (!visible || collection) return
-    const active = new AbortController()
-    setError('')
-    const suffix = '/study/population?cells=true'
-    getJson<FeatureCollection | { layer: FeatureCollection; epoch?: number; native_support_m?: number }>(
-      `/api/datasets/${encodeURIComponent(datasetId)}${suffix}`,
-      active.signal,
-    )
-      .then((response) => {
-        if (!active.signal.aborted) {
-          setCollection('layer' in response ? response.layer : response)
-          if ('layer' in response) setPopulationMetadata(Object.fromEntries(Object.entries(response).filter(([key]) => key !== 'layer')))
-        }
-      })
-      .catch((failure) => {
-        if (!active.signal.aborted) setError(failure.message)
-      })
-    return () => active.abort()
-  }, [datasetId, visible, collection, attempt])
-  return (
-    <>
-      <GeoOverlay
-        owner="population"
-        source="GHSL"
-        context={populationMetadata}
-        map={map}
-        collection={collection}
-        visible={visible}
-        color="#527b66"
-        population
-      />
-      {visible && collection && <p className="layer-help">Ready · {collection.features.length.toLocaleString()} cells · Epoch: {String(populationMetadata.epoch ?? 'not supplied')} · Native resolution: {populationMetadata.native_support_m == null ? 'not supplied' : `${populationMetadata.native_support_m} m`}. Loaded cells are cached for display toggles.</p>}
-      {visible &&
-        !collection &&
-        (error ? (
-          <p role="alert">
-            GHSL: {error}{' '}
-            <button type="button" onClick={() => setAttempt((value) => value + 1)}>
-              Retry GHSL
-            </button>
-          </p>
-        ) : (
-          <p role="status">Loading GHSL…</p>
-        ))}
-    </>
-  )
 }

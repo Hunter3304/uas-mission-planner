@@ -102,6 +102,10 @@ still remains unknown. No GHSL count is added to the objective.
 
 ## Population interpretation and visualization
 
+The Hannover map now displays [250 m population classes](population-costs.md)
+instead of its former green native-count bins. The native query/CLI interpretation
+below remains valid. Both products remain separate from route costs in Part 1.
+
 Windowed GHSL queries retain native 100 m ESRI:54009 cells, population units,
 2020 estimate/2025 projection metadata, known zeros and NoData. At most 100,000
 candidate cells are examined. Returned region/corridor population estimates sum

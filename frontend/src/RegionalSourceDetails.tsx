@@ -30,6 +30,37 @@ function PopulationDetails({ item }: { item: MapSelection }) {
   </>
 }
 
+function PopulationCostDetails({ item }: { item: MapSelection }) {
+  const p = item.feature.properties ?? {}, context = item.context ?? {}
+  const summary = populationSummary(p), source = asRecord(context.source)
+  const bins = Array.isArray(context.bins) ? context.bins.map(asRecord) : []
+  const bin = asRecord(p.density_bin ?? bins.find(b => b.score === p.risk_score))
+  const measured = (value: unknown, unit: string) => typeof value === 'number' && Number.isFinite(value) ? `${numberText(value)} ${unit}` : 'Unavailable'
+  const countBounds = Array.isArray(p.actual_cell_count_bounds) ? p.actual_cell_count_bounds : typeof p.native_support_area_m2 === 'number' && typeof bin.lower_people_per_km2 === 'number' && typeof bin.upper_people_per_km2 === 'number' ? [bin.lower_people_per_km2 * p.native_support_area_m2 / 1e6, bin.upper_people_per_km2 * p.native_support_area_m2 / 1e6] : []
+  return <>
+    <SourceFacts title="Population risk class"><p className="source-main-value">{summary.text}</p><p>{summary.note}</p><dl>
+      <Fact label="Aggregated grid">250 m × 250 m · clipped at study boundary</Fact>
+      <Fact label="Native support">100 m × 100 m</Fact>
+      <Fact label="Estimated population">{measured(p.estimated_people, 'people in this cell')}</Fact>
+      <Fact label="Density">{measured(p.people_per_km2, 'people/km²')}</Fact>
+      <Fact label="Epoch">{sourceText(p.epoch ?? context.epoch) ?? 'Not supplied'}</Fact>
+      <Fact label="Cell identity">{item.id}</Fact>
+      <Fact label="Product">{sourceText(source.product) ?? 'Not supplied'}</Fact>
+    </dl></SourceFacts>
+    <SourceFacts title="Classification and support"><p>Five classes relative to the complete saved study. Population does not change route costs.</p><dl>
+      <Fact label="Study maximum density">{measured(context.maximum_people_per_km2, 'people/km²')}</Fact>
+      <Fact label="Density interval">{context.all_zero === true && summary.known ? 'Known zero study · class 0' : typeof bin.lower_people_per_km2 === 'number' && typeof bin.upper_people_per_km2 === 'number' ? `${numberText(bin.lower_people_per_km2)} ≤ density ${bin.upper_inclusive ? '≤' : '<'} ${numberText(bin.upper_people_per_km2)} people/km²` : 'Unavailable'}</Fact>
+      {countBounds.length === 2 && <Fact label="Count interval for this cell">{measured(countBounds[0], '')} to {measured(countBounds[1], 'people')} · uses actual cell area</Fact>}
+      <Fact label="Native support area">{measured(p.native_support_area_m2, 'm²')}</Fact>
+      <Fact label="Unknown support area">{measured(p.unknown_area_m2, 'm²')}</Fact>
+      {!summary.known && <Fact label="Observed partial estimate">{measured(p.observed_estimated_people, 'people · incomplete total')}</Fact>}
+      <Fact label="Rule version">{sourceText(context.version) ?? 'Not supplied'}</Fact>
+    </dl><p>Counts are transferred by intersected area, assuming uniform population within each native cell. Gray means NoData; it is separate from the green lowest class. These are research preference classes, not flight permission.</p></SourceFacts>
+    <OriginalAttributes values={p} title="Derived population cell attributes" />
+    <details className="source-disclosure"><summary>Population classification provenance</summary><AttributeList values={context} /></details>
+  </>
+}
+
 export default function RegionalSourceDetails({ item }: { item: MapSelection }) {
   const p = item.feature.properties ?? {}, context = item.context ?? {}
   if (item.aggregate) return <>
@@ -37,7 +68,7 @@ export default function RegionalSourceDetails({ item }: { item: MapSelection }) 
       {Object.entries(asRecord(p.category_counts)).map(([key, value]) => <Fact key={key} label={categoryNames([key])}>{sourceText(value) ?? 'Not supplied'}</Fact>)}
     </dl><p>Whole cells intersecting the view are counted using one representative point per object. Counts are not exact viewport totals; category memberships overlap.</p><button type="button" onClick={item.zoom}>Zoom for objects</button></SourceFacts>
   </>
-  if (item.source === 'GHSL') return <PopulationDetails item={item} />
+  if (item.source === 'GHSL') return p.layer_kind === 'population_cost' ? <PopulationCostDetails item={item} /> : <PopulationDetails item={item} />
   const decision = decisionSummary(p), scenario = asRecord(context.scenario)
   const msl = asRecord(p.zone_msl_bounds_m)
   const originalOsm = item.source === 'OSM' ? sourceText(p.source)?.match(/^(node|way|relation)\/([0-9]+)$/) : null

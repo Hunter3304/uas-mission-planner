@@ -1,3 +1,4 @@
+import { populationCosts } from './populationCosts'
 import { expect, type Page, type Route } from '@playwright/test'
 
 export const bounds = { west: 9.79, south: 52.378, east: 9.81, north: 52.398 }
@@ -32,7 +33,7 @@ export async function setup(page: Page, override?: (route: Route, path: string) 
       calls.constraints++
       return route.fulfill({ json: { blocked: empty, unknown: empty, excluded: { type: 'FeatureCollection', features: [{ type: 'Feature', id: 'zone/1', geometry, properties: { source: 'dipul:test/1', category: 'conditional_zone', state: 'unresolved', reason: 'No scoped evidence' } }] }, diagnostics: [], provenance: {}, interpretation: 'Selection fixture' } })
     }
-    if (path.endsWith('/study/population')) return route.fulfill({ json: { epoch: 2020, native_support_m: 100, layer: { type: 'FeatureCollection', features: [{ type: 'Feature', id: '10:20', geometry, properties: { people_per_cell: 0, epoch: 2020, native_support_m: 100 } }] } } })
+    if (path.endsWith('/study/population-costs')) return route.fulfill({ json: populationCosts() })
     if (path.endsWith('/study/route')) { calls.routes++; return route.fulfill({ json: {} }) }
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds, locations: [{ id: 'rheuma-podbi', name: 'Origin', longitude: 9.8, latitude: 52.388 }, { id: 'mhh', name: 'Destination', longitude: 9.805, latitude: 52.388 }] }, sources: {} } })
     if (path === '/api/terrain-datasets') return route.fulfill({ json: { datasets: [{ id: 'hannover-part2-terrain-v1', tiles: 1 }] } })

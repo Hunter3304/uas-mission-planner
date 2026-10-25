@@ -1,5 +1,12 @@
 # UAS Mission Planner
 
+Iteration 014 Part 1 adds a fixed **250 m population risk grid** to the Hannover
+GHSL map group, replacing its former green native-count overlay. Five ordinal
+classes run green to red; gray means NoData. Click a cell for density, estimated
+population, support and study-wide thresholds. Population routing is deferred to
+Part 2. See [population rules](doc/rules/population-costs.md) and the
+[plan](doc/plan/iteration-014.md). Native inspection APIs and original data remain available.
+
 Iteration 013 **Part 1** is delivered to `iteration/013` through
 [PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
 Linux Python, Windows Python and frontend CI passed. Issue #114 is closed;
