@@ -13,15 +13,18 @@ Part 1 was committed as `e7459c6d81c1b37e0b1217e035d6332fffbce382` and pushed
 to `origin/feature/122-population-surface` before Part 2 application edits.
 [PR #123](https://github.com/Hunter3304/uas-mission-planner/pull/123) targets
 `iteration/014`. Checks run `40189193801` passed on that exact head: Linux Python,
-Windows Python and frontend, including their test steps. Issue #122 remains open
-until integration. The remote iteration branch is the verified `d0782d3` baseline.
+Windows Python and frontend, including their test steps. The user then explicitly
+approved merging into iteration/014, superseding the earlier automatic approval
+block. PR #123 merged at `d3b01542252b7fdf66d2cabc722e0a66e20c3de5`, and
+Issue #122 was explicitly closed as completed. The merge tree equals Part 1's
+accepted tree; local iteration/014 tracks this verified remote merge.
 
-Automatic approval rejected merging PR #123 because the explicit user request
-authorized pushing Part 1, but did not authorize remote iteration integration.
-The user was asked for that specific approval. Do not bypass the rejection or
-merge into iteration/014/main without the requested authorization. Part 2 work
-continues independently on Part 1's published head; its local feature is stacked
-until Part 1 integration is authorized. No Part 2 publication is claimed here.
+Part 2 implementation commit `f2c700ba9213e3d6505eeb81192d4cafaef6665e`
+incorporated the integration merge locally without file changes; backend/frontend
+Git trees remain identical to the locally accepted Part 2 implementation. Delivery
+record edits are documentation only. No Part 2 publication or remote CI is claimed.
+Main remains `4ed0023`. Automatic approval rejected deleting the merged Part 1
+remote feature without specific deletion authorization; both feature refs remain.
 
 ## Implemented behavior
 

@@ -98,11 +98,17 @@ credential limitation below is historical: verified local credentials are
 available outside the sandbox. Milestone 13, remote `iteration/014` at `d0782d3`
 and assigned Issue #122 now exist. Feature renamed to
 `feature/122-population-surface`. Part 1 was then pushed as `e7459c6`, and PR #123
-passed exact-head Linux/Windows/frontend Checks run `40189193801`. Automatic
-approval rejected iteration integration without explicit user consent; that
-specific approval is pending. See [Part 2 status](part2.md) for the current record.
+passed exact-head Linux/Windows/frontend Checks run `40189193801`. The user
+subsequently explicitly approved integration into iteration/014, superseding
+the earlier automatic approval block. PR #123 merged at
+`d3b01542252b7fdf66d2cabc722e0a66e20c3de5`; Issue #122 was explicitly closed
+as completed. Local iteration/014 is synchronized, and the merged tree equals
+the accepted Part 1 tree. Main remains unchanged. Automatic approval rejected
+deleting the merged remote feature without specific deletion authorization;
+both Part 1 feature refs are retained. See [Part 2 status](part2.md).
 
-Local branch: `feature/iteration014-population-surface`, from new local
+Historical pre-publication record (superseded above): local branch
+`feature/iteration014-population-surface`, from new local
 `iteration/014` at Iteration 013 head `d0782d3`. The GitHub connector does not
 support milestone creation and no local GitHub credential was available to the
 fallback. Therefore no remote milestone, assigned issue, PR, push, remote CI or
