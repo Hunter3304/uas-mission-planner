@@ -521,6 +521,7 @@ class RegionalPlanner:
                                 0, (perf_counter() - search_started) * 1000 - extra_preparation_ms
                             ),
                         )
+        validation_started = perf_counter()
         if result["status"] == "success":
             result.pop("message", None)
             path = result["geometry"]["coordinates"]
@@ -563,6 +564,7 @@ class RegionalPlanner:
                     objective_cost=None,
                     message="Independent route validation failed.",
                 )
+        result["final_validation_ms"] = (perf_counter() - validation_started) * 1000
         if objective == "distance":
             result["risk_length_cost"] = None
         result["objective"] = objective
