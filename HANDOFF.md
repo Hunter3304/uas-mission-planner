@@ -13,9 +13,10 @@
   Issue #122 was explicitly closed as completed. Milestone 13 remains open.
 - Local iteration/014 tracks the verified remote merge. Part 2 incorporated that
   merge locally with identical backend/frontend Git trees and no file changes.
-  Main remains `4ed0023`. Automatic approval rejected deletion of the merged
-  remote feature because the user approved merging only; both Part 1 feature
-  refs are retained. Do not delete without specific approval.
+  Main remains `4ed0023`. The user explicitly approved branch cleanup after the
+  earlier automatic deletion block. The merged Part 1 feature was deleted
+  remotely with an exact-head lease and locally; fetch/prune, local ref checks
+  and ls-remote verified cleanup. Part 2's local feature remains intact.
 - Part 2 is Issue #124 / `feature/124-population-routing`, stacked locally on
   the published Part 1 head. Shared indexed population evaluator/combined model,
   regional API/CLI controls, all three planners/connectors/final validation,

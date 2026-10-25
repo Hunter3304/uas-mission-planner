@@ -23,8 +23,10 @@ Part 2 implementation commit `f2c700ba9213e3d6505eeb81192d4cafaef6665e`
 incorporated the integration merge locally without file changes; backend/frontend
 Git trees remain identical to the locally accepted Part 2 implementation. Delivery
 record edits are documentation only. No Part 2 publication or remote CI is claimed.
-Main remains `4ed0023`. Automatic approval rejected deleting the merged Part 1
-remote feature without specific deletion authorization; both feature refs remain.
+Main remains `4ed0023`. Following explicit user approval that superseded the
+earlier automatic deletion block, the merged Part 1 feature was deleted remotely
+with an exact-head lease and locally. Fetch/prune, local ref checks and ls-remote
+verified cleanup. Part 2's local feature remains intact and unpublished.
 
 ## Implemented behavior
 

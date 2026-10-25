@@ -103,9 +103,10 @@ subsequently explicitly approved integration into iteration/014, superseding
 the earlier automatic approval block. PR #123 merged at
 `d3b01542252b7fdf66d2cabc722e0a66e20c3de5`; Issue #122 was explicitly closed
 as completed. Local iteration/014 is synchronized, and the merged tree equals
-the accepted Part 1 tree. Main remains unchanged. Automatic approval rejected
-deleting the merged remote feature without specific deletion authorization;
-both Part 1 feature refs are retained. See [Part 2 status](part2.md).
+the accepted Part 1 tree. Main remains unchanged. The user explicitly approved
+branch cleanup after the earlier automatic deletion block. The merged feature
+was deleted remotely with an exact-head lease and locally; fetch/prune, local
+ref checks and ls-remote verified cleanup. See [Part 2 status](part2.md).
 
 Historical pre-publication record (superseded above): local branch
 `feature/iteration014-population-surface`, from new local
