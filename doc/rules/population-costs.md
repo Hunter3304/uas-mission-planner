@@ -200,6 +200,8 @@ Results report separate `population_length_cost`, `population_active`,
 `effective_objective` (`risk+population` or `distance+population`).
 `risk_length_cost` stays building-only and is null in distance mode. Endpoint
 support findings and successful-route population cell IDs remain inspectable.
+Automatic arrival/complete-interval reassessment refreshes hard-constraint findings
+while retaining the independently verified endpoint population support reports.
 GeoJSON metadata/feature properties preserve separate costs. Inactive/unsuccessful
 results expose no accepted population cost; failed solves export no route features.
 
@@ -212,6 +214,13 @@ retain their existing shared 110-second deadline and complete-cruise-interval
 revalidation. Search and edge/connector cost preparation respect the search budget.
 Resource/validation failures clear accepted geometry, costs and ETA, retaining
 available request controls and population diagnostics.
+
+Regional results include `final_validation_ms` for independent candidate
+length/cost/constraint validation. Automatic requests sum it across completed
+candidate passes and separately report `complete_interval_validation_ms` for
+completed actual-flight-interval route checks. These are wall-clock diagnostics,
+not extra objective terms. They exclude later report formatting/endpoint refresh
+and are not an additive partition of every request operation.
 
 The inspection product retains `routing_cost: false` because displaying it does
 not enable optimization. Active route provenance separately records

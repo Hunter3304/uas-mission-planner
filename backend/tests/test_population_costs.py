@@ -179,6 +179,40 @@ def test_source_verification_before_cache_and_policy_identity(tmp_path):
         pc.prepare_population_surface(directory)
 
 
+def test_bounds_and_rule_changes_invalidate_cached_population(tmp_path, monkeypatch):
+    directory, manifest = study(tmp_path)
+    original = pc.prepare_population_surface(directory)
+    manifest["config"]["bounds"]["east"] -= 0.001
+    write_json(directory / "study.json", manifest)
+    bounded = pc.prepare_population_surface(directory)
+    assert bounded is not original
+    assert bounded.metadata["identity"] != original.metadata["identity"]
+    assert bounded.metadata["source"]["sha256"] == original.metadata["source"]["sha256"]
+    monkeypatch.setattr(pc, "VERSION", "acceptance-next-rule")
+    revised = pc.prepare_population_surface(directory)
+    assert revised is not bounded
+    assert revised.metadata["identity"] != bounded.metadata["identity"]
+    assert revised.metadata["version"] == "acceptance-next-rule"
+
+
+def test_population_cache_evicts_third_study_without_changing_rebuilt_reference(tmp_path):
+    pc._prepared.cache_clear()
+    directories = []
+    for index in range(3):
+        parent = tmp_path / str(index)
+        parent.mkdir()
+        directory, _ = study(parent)
+        directories.append(directory)
+    first = pc.prepare_population_surface(directories[0])
+    pc.prepare_population_surface(directories[1])
+    pc.prepare_population_surface(directories[2])
+    assert pc._prepared.cache_info().currsize == 2
+    rebuilt = pc.prepare_population_surface(directories[0])
+    assert rebuilt is not first
+    assert rebuilt.metadata == first.metadata
+    assert pc._prepared.cache_info().currsize == 2
+
+
 def test_preparation_limits_cancel_and_display_limits(tmp_path, monkeypatch):
     directory, _ = study(tmp_path)
     surface = pc.prepare_population_surface(directory)

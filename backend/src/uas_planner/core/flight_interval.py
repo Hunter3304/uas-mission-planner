@@ -84,6 +84,7 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
     source_ms = (perf_counter() - started) * 1000
     planner._request_deadline = deadline
     passes, search_ms, preparation_ms = [], 0.0, source_ms
+    validation_ms = interval_validation_ms = 0.0
     result = None
     status, message = (
         "duration_resource_limit",
@@ -108,6 +109,7 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             remaining = max(0, budget - search_ms / 1000)
             result = planner.plan(start_id, end_id, **{**controls, "time_budget_s": remaining})
             search_ms += result["planner_ms"]
+            validation_ms += result.get("final_validation_ms", 0.0)
             preparation_ms += result["preparation_ms"]
             passes.append(
                 {
@@ -131,16 +133,30 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             if datetime.fromisoformat(arrival) > assessed_end:
                 planner.constraints.expand_interval(arrival)
             planner.ensure_deadline()
+            interval_validation_started = perf_counter()
             checked = planner.check(
                 result["geometry"]["coordinates"], controls.get("planning_mode", "strict")
             )
+            interval_validation_ms += (perf_counter() - interval_validation_started) * 1000
             passes[-1]["complete_interval_state"] = checked["state"]
             passes[-1]["rechecked_interval"] = interval_of(planner.constraints.scenario)
             if checked["state"] == "permitted":
                 planner.ensure_deadline()
                 current = planner.constraints.scenario
+                population_reports = {
+                    name: deepcopy(report["population"])
+                    for name, report in result.get("endpoint_diagnostics", {}).items()
+                    if "population" in report
+                }
                 result["endpoint_diagnostics"] = {
-                    name: planner.check([result[name]], controls.get("planning_mode", "strict"))
+                    name: {
+                        **planner.check([result[name]], controls.get("planning_mode", "strict")),
+                        **(
+                            {"population": population_reports[name]}
+                            if name in population_reports
+                            else {}
+                        ),
+                    }
                     for name in ("start", "end")
                 }
                 result["research_assumptions"] = list(
@@ -256,5 +272,7 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
         source_preparation_ms=source_ms,
         preparation_ms=preparation_ms,
         planner_ms=search_ms,
+        final_validation_ms=validation_ms,
+        complete_interval_validation_ms=interval_validation_ms,
     )
     return result

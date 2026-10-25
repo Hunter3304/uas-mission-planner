@@ -9,7 +9,14 @@ remote checks and explicit user merge authorization.
 Part 3 implementation was authorized on 2026-10-25 and locally accepted,
 including browser and real Hannover UI verification. Following explicit user
 publication/merge authorization and exact-head remote checks, PR #127 delivered
-Part 3 to iteration/014 at `3bcb713`; Issue #125 is closed. Part 4 remains planned.
+Part 3 to iteration/014 at `3bcb713`; Issue #125 is closed. Part 4 implementation
+was authorized on 2026-10-25 and is tracked by Issue #128 /
+`feature/128-population-acceptance`. See [Part 4](../iteration/iteration-014/part4.md)
+and [iteration outcome](../iteration/iteration-014/outcome.md) for integrated
+coverage, actual resource evidence and publication scope. Part 4 is now locally
+accepted: 374 backend passes / one skip, 68 browser and 14 real-backend smoke
+passes, nine successful real route requests, two preserved catalog-address
+conflicts, and final real display/resource acceptance. Part 4 publication remains pending.
 Part 1 is delivered to iteration/014 through PR #123 at `d3b0154`, following
 exact-head remote checks and the user's explicit integration approval;
 Issue #122 is closed. See [Part 1 outcome](../iteration/iteration-014/part1.md)
@@ -39,7 +46,7 @@ Existing small-area pages and historical requests retain their existing behavior
 Repository documents and application labels remain English; the plan is reported
 to the user in Chinese.
 
-## Current implementation and paper evidence
+## Pre-implementation baseline and paper evidence
 
 - GHSL is GHS-POP R2023A V1.0, using 2020 estimates on native 100 m
   ESRI:54009 cells. Values are floating-point estimated people per native cell.
@@ -364,9 +371,10 @@ objective/API/all planners, Part 3 UI/derived inspection, then Part 4 integrated
 acceptance and documentation completion. Follow the existing milestone ->
 iteration branch -> assigned issue -> feature branch workflow when implementation
 is requested, recording actual IDs and respecting Iteration 013 integration state.
-This documentation-only task creates no remote milestone, issue, PR or publication.
+The original planning task was documentation only; later implementation tracking
+and actual delivery are recorded in this plan's status and the Part reports.
 
-## Proposed defaults to review with implementation
+## Original proposed defaults, now implemented
 
 The user has confirmed 250 m aggregation, length-times-class cost, optional
 population weight input and rule documentation. This plan proposes the remaining

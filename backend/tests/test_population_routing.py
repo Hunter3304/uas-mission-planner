@@ -430,6 +430,16 @@ def test_automatic_duration_preserves_population_identity_and_costs(monkeypatch)
     assert len(prepared) == 1 and counts == {"prepare": 1, "close": 1}
     assert result["mission"]["mission_end"] == result["timing"]["estimated_arrival"]
     assert route_geojson(result)["metadata"]["population_model"]["identity"] == identity
+    for endpoint in ("start", "end"):
+        report = result["endpoint_diagnostics"][endpoint]["population"]
+        assert report["assessment"] == "assessed"
+        assert report["population_source_ids"] == ["study"]
+        assert report["population_unknown_cell_ids"] == []
+        assert report["population_length_cost"] == 0
+        assert (
+            route_geojson(result)["metadata"]["endpoint_diagnostics"][endpoint]["population"]
+            == report
+        )
 
 
 def test_automatic_nonconvergence_retains_population_diagnostics(monkeypatch):

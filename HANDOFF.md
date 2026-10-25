@@ -2,6 +2,41 @@
 
 ## Current status
 
+### Iteration 014 Part 4 locally accepted (2026-10-25)
+
+- User requested implementing the final Part 4 after Parts 2-3 delivery. Assigned
+  Issue #128 in Milestone 13; local `feature/128-population-acceptance` starts at
+  delivered `iteration/014` / `38f1b1d`. Base Checks `40212518930` passed all jobs.
+- Reproduced/fixed lost population endpoint diagnostics when automatic arrival
+  refreshed hard constraints. Success/export regression now checks both endpoints.
+  Added changed-bounds/rule invalidation and two-entry LRU eviction/rebuild checks.
+  Added candidate/complete-interval validation timing diagnostics, preserving all
+  cost, population reference and hard-constraint semantics. Backend base `663f493`.
+- Final image inspection found stale map/inspector text claiming population could
+  not affect routing; corrected it to distinguish display from Include population.
+  Updated the existing assertion; final frontend lint/build and 68 browser tests
+  passed (56.9 s). Backend 374 passed / one existing skip (210.33 s), focused 36
+  passed (49.44 s), real-backend smoke 14 passed (45.7 s); Ruff/format/script checks pass.
+- Sequential isolated real core campaign `.cache/iteration014-part4-core-v2/`:
+  nine successful requests, actual A*/Dijkstra/ABIT* off/on plus A* distance+population;
+  A* risk repeats preserve costs/reference. Independent population re-scores,
+  final constraints, automatic ETA and endpoint/export diagnostics pass. All 127
+  original study/population/OSM/terrain files retain their hashes. Separate real
+  saved-address conservative off/on both return invalid_endpoint without accepted
+  route/cost/ETA or population preparation (`iteration014-part4-catalog-v1`).
+- Population cold 14.557 s; verified warm hits median 4.710 ms. Active A* total
+  85.019/69.797 s, with source preparation still dominant. Full worker peak working
+  sets 1333.84-1360.77 MiB; single paired runs do not establish a latency/memory guarantee.
+- Final `.cache/iteration014-part4-display-v2/`: first view 30.132 s, decoded body
+  5,047,456 bytes, ten cached cycles median 233.807 ms, one population request and
+  zero solves. Renderer JS heap after GC 30.374 -> 31.881 MiB (+4.96%), stable
+  listeners; excludes native/browser/GPU memory and long-run leak claims. Final
+  desktop/mobile images inspected; original hashes unchanged, owned services stopped.
+- Operating guide, rules/README and `doc/iteration/iteration-014/part4.md` / `outcome.md`
+  now record coverage, methods, failures and actual limits. No Part 4 push/PR/remote
+  CI/merge is claimed. Issue #128 and Milestone 13 remain open pending publication
+  and independent iteration/main delivery gates. Main remains `4ed0023`.
+
 ### Iteration 014 Parts 2-3 delivered to iteration/014 (2026-10-25)
 
 - User explicitly requested pushing and merging the accepted work. Part 2 PR #126
