@@ -2,6 +2,503 @@
 
 ## Current status
 
+### Iteration 014 Part 4 locally accepted (2026-10-25)
+
+- User requested implementing the final Part 4 after Parts 2-3 delivery. Assigned
+  Issue #128 in Milestone 13; local `feature/128-population-acceptance` starts at
+  delivered `iteration/014` / `38f1b1d`. Base Checks `40212518930` passed all jobs.
+- Reproduced/fixed lost population endpoint diagnostics when automatic arrival
+  refreshed hard constraints. Success/export regression now checks both endpoints.
+  Added changed-bounds/rule invalidation and two-entry LRU eviction/rebuild checks.
+  Added candidate/complete-interval validation timing diagnostics, preserving all
+  cost, population reference and hard-constraint semantics. Backend base `663f493`.
+- Final image inspection found stale map/inspector text claiming population could
+  not affect routing; corrected it to distinguish display from Include population.
+  Updated the existing assertion; final frontend lint/build and 68 browser tests
+  passed (56.9 s). Backend 374 passed / one existing skip (210.33 s), focused 36
+  passed (49.44 s), real-backend smoke 14 passed (45.7 s); Ruff/format/script checks pass.
+- Sequential isolated real core campaign `.cache/iteration014-part4-core-v2/`:
+  nine successful requests, actual A*/Dijkstra/ABIT* off/on plus A* distance+population;
+  A* risk repeats preserve costs/reference. Independent population re-scores,
+  final constraints, automatic ETA and endpoint/export diagnostics pass. All 127
+  original study/population/OSM/terrain files retain their hashes. Separate real
+  saved-address conservative off/on both return invalid_endpoint without accepted
+  route/cost/ETA or population preparation (`iteration014-part4-catalog-v1`).
+- Population cold 14.557 s; verified warm hits median 4.710 ms. Active A* total
+  85.019/69.797 s, with source preparation still dominant. Full worker peak working
+  sets 1333.84-1360.77 MiB; single paired runs do not establish a latency/memory guarantee.
+- Final `.cache/iteration014-part4-display-v2/`: first view 30.132 s, decoded body
+  5,047,456 bytes, ten cached cycles median 233.807 ms, one population request and
+  zero solves. Renderer JS heap after GC 30.374 -> 31.881 MiB (+4.96%), stable
+  listeners; excludes native/browser/GPU memory and long-run leak claims. Final
+  desktop/mobile images inspected; original hashes unchanged, owned services stopped.
+- Operating guide, rules/README and `doc/iteration/iteration-014/part4.md` / `outcome.md`
+  now record coverage, methods, failures and actual limits. No Part 4 push/PR/remote
+  CI/merge is claimed. Issue #128 and Milestone 13 remain open pending publication
+  and independent iteration/main delivery gates. Main remains `4ed0023`.
+
+### Iteration 014 Parts 2-3 delivered to iteration/014 (2026-10-25)
+
+- User explicitly requested pushing and merging the accepted work. Part 2 PR #126
+  merged at `0a174f84b507884fd5b442b07e5d55d3282b81a4`; exact-head Checks
+  `40209689283` and integration Checks `40211386802` passed all three jobs.
+  Issue #124 is closed as completed.
+- Part 3 published head `faf2f2dc71c78d500494129c521e77d3b5880e41` on the existing
+  feature; PR #127 targeted iteration/014. Exact-head Checks `40211460838` passed
+  Windows Python, Linux Python and frontend, including test steps. Browser
+  installation was slow but completed without a retry or application changes.
+  PR #127 merged at `3bcb7130045bec63e86b66f8e0b0c3d274a4b3f6`; Issue #125 is closed.
+- Local iteration/014 fast-forwarded to the verified Part 3 merge. Exact merged
+  tree equals the checked Part 3 head; backend/frontend trees equal the accepted
+  local Part 3 implementation `7684638`. This closeout changes documentation only.
+  Feature refs are retained. Main remains `4ed0023`; Milestone 13 remains open
+  for Part 4 broader integrated/resource acceptance. No main delivery is claimed.
+- See `doc/iteration/iteration-014/part3.md` for validation and delivery evidence,
+  and `doc/experiments/iteration-014/README.md` for the operation/verification guide.
+
+### Earlier: Part 2 delivered; Part 3 publication authorized (2026-10-25)
+
+- User explicitly requested pushing and merging the prepared work. After verifying
+  exact head and green Checks run `40209689283`, PR #126 merged into iteration/014
+  at `0a174f84b507884fd5b442b07e5d55d3282b81a4`. Issue #124 is closed as completed.
+- Part 3 incorporated the verified integration merge with no file changes.
+  Backend/frontend Git trees still match accepted Part 3 `7684638`. Publish its
+  existing feature, require final-head remote CI, then merge into iteration/014.
+  Main and Part 4 remain outside this delivery. Feature refs are retained.
+
+### Earlier: Part 2 published; Part 3 locally accepted (2026-10-25)
+
+- User requested checking/pushing Part 2 and completing Part 3. Published Part 2
+  `8dac2a6d608e04935c6d4750f60d507013e38e0c` on its existing feature and opened
+  PR #126 to iteration/014. Exact-head Checks run `40209689283` passed Windows
+  Python, Linux Python and frontend, including test steps. Pre-push Ruff/format
+  and 22 population routing tests (35.16 s) passed. PR #126 / Issue #124 remain
+  open; no Part 2 merge or deletion is claimed. Main remains `4ed0023`;
+  iteration/014 remains `d3b0154`, the verified Part 1 merge.
+- Part 3: Issue #125 / `feature/125-population-routing-ui`, stacked locally on
+  the published Part 2 head. Default-off Include population beside the regional
+  objective, conditional weight, inactive/zero/invalid input handling, stale solve
+  cancellation, separate result costs/effective weights and displayed-result export
+  are implemented. Map visibility and weighting remain independent. Rules and
+  operation guide updated. No backend/source-data changes in Part 3.
+- Final frontend 68 browser passes (48.5 s), including eight new population cases;
+  real-backend smoke 14 passes (37.4 s); TypeScript/Vite build, ESLint and script
+  syntax/diff checks pass. Installed Chrome was used locally. Real Hannover UI
+  risk+population and distance+population both succeed, matching displayed/exported
+  costs, source identity and automatic ETA. Exactly two solves, zero population
+  display requests, no source hash changes or browser errors. Desktop/mobile
+  images inspected; owned verification services stopped. See Part 3 outcome and
+  `.cache/iteration014-part3-real-v1/`.
+- Part 3 remains local only: no push/PR/remote CI/merge is claimed. Part 4 broader
+  integrated/resource acceptance remains planned. See `doc/iteration/iteration-014/part3.md`
+  and `doc/experiments/iteration-014/README.md` before continuing.
+
+### Earlier: Part 1 delivered; Part 2 implemented locally (2026-10-25)
+
+- User requested pushing Part 1 before completing Part 2. Published accepted
+  `e7459c6` on `origin/feature/122-population-surface`; PR #123 targets iteration/014.
+  Exact-head Checks run `40189193801` passed Linux Python, Windows Python and
+  frontend including test steps. The user subsequently explicitly approved
+  merging into iteration/014, superseding the earlier automatic approval block.
+  PR #123 merged at `d3b01542252b7fdf66d2cabc722e0a66e20c3de5`;
+  Issue #122 was explicitly closed as completed. Milestone 13 remains open.
+- Local iteration/014 tracks the verified remote merge. Part 2 incorporated that
+  merge locally with identical backend/frontend Git trees and no file changes.
+  Main remains `4ed0023`. The user explicitly approved branch cleanup after the
+  earlier automatic deletion block. The merged Part 1 feature was deleted
+  remotely with an exact-head lease and locally; fetch/prune, local ref checks
+  and ls-remote verified cleanup. Part 2's local feature remains intact.
+- Part 2 is Issue #124 / `feature/124-population-routing`, stacked locally on
+  the published Part 1 head. Shared indexed population evaluator/combined model,
+  regional API/CLI controls, all three planners/connectors/final validation,
+  provenance/exports, deadline-aware source preparation and automatic interval
+  handling are implemented. Part 3 routing UI remains deferred. Rules updated.
+- Final backend 372 passes / one existing skip (133.09 s); focused 58 passes
+  (63.29 s); 14 smoke passes (35.8 s); lint/build/format pass. Real Hannover
+  baseline/risk+population/distance+population all succeed, original hashes
+  unchanged and independent P differs by under 0.000001 score-metres. See
+  `doc/iteration/iteration-014/part2.md` and `.cache/iteration014-part2-real-v1/`.
+  No Part 2 remote publication/CI/merge is claimed.
+
+### Iteration 014 publication and Part 2 authorized (2026-10-25)
+
+- User explicitly requested publishing accepted Part 1 to the existing origin
+  `Hunter3304/uas-mission-planner`, then implementing Part 2. Local GitHub
+  credentials are available outside the restricted sandbox; the earlier local
+  tracking limitation is resolved. Created verified Milestone 13, remote
+  `iteration/014` at `d0782d3`, and assigned Part 1 Issue #122.
+- Rename the local feature to `feature/122-population-surface` for publication.
+  Preserve accepted Part 1 application behavior and run final-head remote CI
+  before any iteration integration. Part 2 gets a separate issue/feature.
+
+### Iteration 014 Part 1 local acceptance (2026-10-25)
+
+- User authorized Part 1 and colored population grids, then explicitly replaced
+  the old Hannover green native-count display with five green-to-red risk classes
+  and gray NoData. Plan: `doc/plan/iteration-014.md`; implemented rules:
+  `doc/rules/population-costs.md`; acceptance: `doc/iteration/iteration-014/part1.md`.
+- Fixed 250 m study lattice, area-weighted native GHSL counts, complete-support
+  density, full-study maximum and deterministic classes 0-4. New source-verified,
+  cached/bounded `/study/population-costs` inspection API and shared-map inspector.
+  Original native APIs/small-area behavior remain. Routing integration is Part 2;
+  routing checkbox/weight is Part 3. No population objective is active yet.
+- Local backend 350 passes / one existing skip; final focused 12 passes; final
+  browser 60 passes; real-stack smoke 14 passes; lint/build/format/diff checks pass.
+  Real Hannover: 6,759 supported cells; class counts 5322/1051/295/68/23; first
+  visible load 28.673 s; one population request for ten visibility cycles; zero
+  route requests; original source hashes unchanged. Actual desktop/mobile images
+  in `.cache/iteration014-real/` were inspected. Independent count conservation
+  differs by approximately 0.000011 people. See Part 1 outcome for measurement scope.
+- Local `iteration/014` and `feature/iteration014-population-surface` derive from
+  `d0782d3`. GitHub connector lacks milestone creation; local credential fallback
+  was unavailable. No remote milestone/issue/PR/push/CI/merge is claimed. Record
+  actual remote tracking and complete normal publication gates before publication.
+  Iteration 013/main state below is unchanged. Original data and user services
+  were preserved; isolated owned verification services were stopped.
+
+### Iteration 013 Part 4 verified delivery (2026-10-23)
+
+- User's explicit publication approval superseded the earlier automatic block.
+  PR #121 merged into iteration/013 at
+  `81ec0287e65b4a7b87b1c0d0dd04c38cefefc68a`. Checks run `39947203136`
+  completed successfully on final head `500d49634f9945f0a2eb043d20661a4f6f017cb9`:
+  Windows 339 passes (81.61 s); Linux 329 passes / 10 skips (109.86 s);
+  frontend lint/build, 55 browser (52.5 s) and 14 smoke (44.3 s) passes.
+- Local iteration/013 fast-forwarded to the merge. Feature ancestry and identical
+  backend/frontend Git trees versus the accepted final head were verified.
+  All 21 real-acceptance application hashes match after checkout-only line-ending
+  restoration. No logical application changes were introduced by integration.
+- Issue #120 explicitly closed as completed. The merged feature was deleted
+  remotely with an exact expected-head lease and locally; fetch/prune, branch -a
+  and ls-remote confirm cleanup. Historical iterations and feature #75 remain.
+- All four Parts are delivered to iteration/013. Main remains `4ed0023` and
+  Milestone 12 remains open for the separate complete-iteration/main CI gate.
+  This session publishes Part 4 and records its verified iteration delivery;
+  no complete-iteration/main merge is claimed.
+
+### Iteration 013 Part 4 publication authorized (2026-10-23)
+
+- The user explicitly approved pushing the prepared Part 4 to
+  `Hunter3304/uas-mission-planner`, in response to the destination-specific
+  request to publish, pass CI and merge into iteration/013. This supersedes the
+  publication block recorded below. Continue the existing feature; application
+  code and accepted evidence remain unchanged. Require final-head CI before
+  merging, then close Issue #120 and verify local/remote feature cleanup.
+
+### Iteration 013 Part 4 implementation (2026-10-22)
+
+- Local implementation commit: `1c1ecaa` on
+  `feature/120-automatic-flight-interval`. Publication was attempted only after
+  local regression and integrated acceptance passed. Automatic approval review
+  rejected the push to `Hunter3304/uas-mission-planner`: it requires explicit
+  user authorization for publishing the complete feature to that destination.
+  Do not bypass this rejection. No Part 4 push/PR/remote CI/merge has occurred.
+  Obtain destination-specific publication authorization, then continue the
+  existing feature delivery and independent iteration/main gates below.
+- User requested Part 4. Verified open Milestone 12 / assigned Issue #120 precede
+  `feature/120-automatic-flight-interval`, created from iteration/013 at `289c60c`.
+  Parts 1-3 remain delivered; no main merge has occurred in this Part yet.
+- Added explicit `duration_mode: automatic`; historical explicit intervals remain
+  the default core/API/CLI contract. Automatic requests omit scenario.mission_end.
+  Seed uses EPSG:25832 distance between actual endpoints / validated cruise speed;
+  a verified catalog is checked after request-local source preparation.
+- Prepare sources once per automatic request. On candidate duration extension,
+  only expand mission_end, refresh temporal decisions/coverage/provenance and
+  check the complete candidate. Replan only on conflict. At most three candidate
+  passes share the requested search budget and a cooperative 110 s overall
+  deadline below the unchanged 120 s browser timeout. No accepted route/ETA on
+  timeout/nonconvergence/failed validation. All source geometry/index/risk inputs
+  and non-time scenario controls remain fixed within the request.
+- UTC elapsed arithmetic then declared-zone formatting handles fractional
+  seconds, midnight and DST. Timestamps round upward to microseconds. Actual
+  zero-length cruise is instantaneous; endpoint assessment conservatively spans
+  one microsecond, explicitly recorded rather than inventing flight time.
+- Regional UI now has Departure time only. It verifies returned L/v, arrival,
+  containing assessment interval and mission metadata before displaying success.
+  Preview is marked provisional with its inspection interval. Successful routing
+  promotes enabled layers to the returned assessed interval; stale previews/ETAs
+  disappear on edits. In-flight layer preparation is awaited before routing;
+  starting a solve suppresses queued preview loads, avoiding overlapping jobs.
+  Evidence editor defaults explicitly name preview/completed scope and retain
+  independently editable evidence validity. Export uses the displayed result.
+- Final local regression: 338 backend passes / one existing Windows skip (99.57 s),
+  including 22 new temporal/API/budget cases; 55 browser checks (36.7 s), including
+  nine new arrival/UTC/export/stale-result cases; 14 real-stack smoke (33.4 s).
+  Ruff/format, ESLint/build and experiment syntax pass. A*/Dijkstra/native ABIT*
+  remain compatible; finite-budget native timeout is a valid unsuccessful result.
+- Integrated Hannover campaign `.cache/iteration013-part4-real-v1/` passes:
+  all 21 application hashes match, originals are unchanged and owned services
+  stopped. Desktop/mobile screenshots were inspected. Ten selection cycles have
+  zero map shift; ten initial and ten final visibility cycles add no loads.
+  Preview 74.268 s; conservative invalid_endpoint 40.246 s with no ETA; automatic
+  research success 50.185 s; independent explicit baseline 50.595 s with identical
+  geometry/cost/source signature; final assessed layers 74.498 s. Actual route
+  3715.5915279316932 m / 30 m/s = 123.85305093105644 s, arriving
+  2026-10-07T10:02:03.853051+02:00; full expanded interval passes revalidation.
+  Export, final layer scope and edit invalidation pass; two scenario loads, one
+  GHSL load and no browser errors. Feature PR/CI/integration/Issue closure/verified cleanup are pending;
+  full iteration/main integration needs its independent CI gate.
+
+### Iteration 013 Part 3 verified delivery (2026-10-22)
+
+- PR #119 merged Part 3 into `iteration/013` at
+  `db0d40bacf4548cf45d2ef265680f1051a826f48`. Checks run `39818431931` explicitly
+  completed Linux Python, Windows Python and frontend successfully on reviewed
+  head `c9c372e3102e9c5ea5378d1d8a1d797559dba79b`. Windows: 317 passes;
+  Linux: 308 passes / 9 skips; frontend: lint/build, 46 browser and 14 smoke passes.
+  This supersedes pending delivery notes below.
+- Local integration fast-forwarded to the merge; feature ancestry and identical
+  backend/frontend trees versus accepted `c9c372e` were verified. Current byte
+  hashes match all eleven measured application files after restoring checkout-only
+  LF endings, with no logical source diff. Final real evidence
+  `.cache/iteration013-part3-final-v3/` passes: readable source cards, matched rules,
+  aggregate/diagnostic inspection, ten selection cycles, zero layout shift, one
+  scenario load (85.778 s), one cached GHSL request, zero routes/browser errors,
+  desktop/mobile, unchanged original hashes and owned services stopped.
+- Issue #118 explicitly closed as completed. Merged feature deleted remotely
+  with an expected-head lease and locally. Fetch/prune, branch -a and ls-remote
+  verify cleanup. Milestone 12 and iteration/013 remain for Part 4; main is still
+  `4ed0023`. Preserve historical iterations and original feature #75.
+- README/plan/outcome and operation guide record actual delivery. This follow-up
+  changes delivery records only. No backend/scoring/source/profile/planner changes;
+  Part 4 departure/arrival and full iteration/main integration remain deferred.
+
+### Iteration 013 Part 3 implementation (2026-10-22)
+
+- User requested Part 3. Verified open Milestone 12 and assigned Issue #118
+  precede `feature/118-readable-regional-details`, created from `iteration/013`
+  at `516ffcb`. Parts 1-2 remain delivered; Part 4/main integration are deferred.
+- Added common source cards, nested readable attribute lists and closed advanced
+  raw JSON disclosures. OSM names/types, memberships, available original height/
+  address tags and independent labelled costs show first; matched rules and
+  provenance expand separately. Missing fields/default costs and historical
+  obstruction flags are explicit; no levels-to-height or permission inference.
+- DIPUL/derived cards separate decision/reason, policy uncertainty, clearance and
+  assessed time/height scope from supplied source limits/validity/legal references.
+  Missing original zone fields remain unavailable; no raw DIPUL source fetch was
+  added. GHSL shows rounded estimates/native resolution/epoch/cell identity and
+  query coverage, with zero, small positive values and NoData distinguished.
+- OSM choices now read Feature category / Category cost, with contextual help
+  for precedence, independent ordinal 0-4 scores, gray default/unscored outlines,
+  aggregate-only overview, local refresh and extent-only Fit study. Actual GHSL
+  renderer uses pale green zero / gray NoData; corrected help matches these
+  existing shared colors rather than the old inaccurate white/pink wording.
+- Local acceptance: 46 browser tests (35.5 s), 14 real-stack smoke (36.1 s),
+  ESLint/build, experiment syntax/Ruff/format and diff checks pass. Nine new
+  source-detail cases cover units, nested/long/untrusted values, missing fields,
+  zero/NoData/small positives, independent defaults, policy scope and help.
+  Real-data source-hashed acceptance passes under
+  `.cache/iteration013-part3-final-v3/`: current implementation hashes match,
+  original OSM/study hashes are unchanged and owned services stopped. Ten
+  selection cycles retain one outline/summary and zero layout shift; actual
+  readable cards/matched rules, desktop/mobile and closed JSON pass. One scenario
+  load (85.778 s), one cached GHSL load, zero routes/browser errors. Screenshots
+  were visually checked, including complete popup bounds/visible inspector top.
+  The first campaign passed functional checks (86.680 s scenario load), but image
+  review found a clipped edge summary and long-inspector heading. Final layout
+  reserves more popup/viewport space and adds explicit real-layout assertions.
+  v2 passes these layout assertions; v3 records the final added validated original
+  OSM identity link for derived building findings, also covered by browser tests.
+- No backend/planner/source data changes. Feature publication, final-head CI,
+  iteration merge, explicit Issue closure and verified feature cleanup remain
+  pending. Preserve private profiles, originals, user services and historical refs.
+
+### Iteration 013 Part 2 verified delivery (2026-10-22)
+
+- PR #117 merged Part 2 into `iteration/013` at
+  `370f1d72be3ec86818faa49bf023d2e5f8edcae7`. Final Checks run `39813456762`
+  explicitly completed Linux Python, Windows Python and frontend successfully on
+  reviewed head `64129d60e4d4f59fcc0fdb17084f9208f9890139`. Windows: 317 Python
+  passes; Linux: 308 passes / 9 skips; frontend: 37 browser and 14 smoke passes,
+  with lint/build. Earlier CI-pending notes below are historical and superseded.
+- Local integration fast-forwarded to the merge. Feature ancestry and identical
+  backend/frontend application trees versus accepted `739fe03` were verified.
+  Original byte hashes match final real acceptance after restoring only Windows
+  checkout's LF/CRLF changes in two new files; no logical application diff.
+- Issue #116 explicitly closed as completed. Merged feature deleted remotely
+  with an expected-head lease and locally; fetch/prune, branch -a and ls-remote
+  verify cleanup. Keep Milestone 12 / iteration/013 for Parts 3-4. Main remains
+  `4ed0023`; historical iterations and existing feature #75 are preserved.
+- Final evidence `.cache/iteration013-part2-final-v2/` passes with ten selection
+  cycles, zero map displacement, real OSM/DIPUL/GHSL and nondrawable diagnostics,
+  desktop/mobile screenshots, one scenario load (85.289 s), cached GHSL reuse,
+  zero routes/browser errors, unchanged original hashes and owned services stopped.
+  This follow-up records delivery only; Parts 3-4 and main integration are deferred.
+
+### Iteration 013 Part 2 implementation (2026-10-22)
+
+- User requested Part 2. Verified open Milestone 12 and assigned Issue #116
+  precede `feature/116-regional-selection-inspector`, created from `iteration/013`
+  at `515ccda`. Main/Parts 3-4 remain deferred; Part 1 delivery is unchanged.
+- Implemented shared OSM/DIPUL/GHSL/scenario selection, noninteractive actual
+  black/white geometry outlines, one portal inspector in the existing left
+  sidebar, small map summaries with focus action and a single mobile detail sheet.
+  OSM original details moved out of the above-map controls. Group/popup closure
+  retains selection; hidden layers, dataset refresh, identity/collection changes
+  and overview replacement clear it. Late responses are aborted/identity-checked.
+- Local regression: 37 browser tests and 14 real-stack smoke checks pass;
+  lint/build/Ruff/syntax checks pass. No backend/planner/source changes. Nine new
+  cases cover layout, focus, hit testing, cross-source/mobile selection, diagnostics,
+  stale responses/identities, dataset refresh, pan/overview, lines and polygon holes.
+- Exploratory real run `.cache/iteration013-part2-real-v1/` passed ten cycles,
+  zero layout shift, one cached GHSL/scenario load, zero route calls, no browser
+  errors and unchanged original hashes, with owned services stopped. First final
+  attempt `.cache/iteration013-part2-final/` hit the existing bounded-query
+  fallback; its driver waited for detail rather than zooming further and failed.
+  It is not accepted evidence; services stopped. The driver now permits up to two
+  further zooms, preserving query budgets. Final acceptance
+  `.cache/iteration013-part2-final-v2/` passes with current implementation hashes:
+  ten selection cycles, diagnostic relation/49267, zero map displacement, one
+  scenario load (85.289 s), one cached GHSL load, zero routes/browser errors and
+  unchanged original hashes. No further zoom was needed in this run. Desktop and
+  mobile expanded/collapsed screenshots were visually checked; owned services
+  stopped. Final browser regression is 37 passes in 29.4 s; smoke 14 in 35.8 s.
+- Implementation/local acceptance are committed at `739fe03` and published on
+  the feature branch. [PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117)
+  targets `iteration/013`. Verify completed/successful Linux Python, Windows Python
+  and frontend checks on the final reviewed head before merging. Then explicitly
+  close Issue #116 and verify merged-feature cleanup locally/remotely. These gates
+  are pending; no main merge is included. See Part 2 outcome and operation guide.
+  Original data/private profiles and user-owned services are preserved.
+- Initial PR CI exposed a timing-dependent test: a negative Loading assertion
+  could pass before the replacement collection was rendered. The test now waits
+  for the exact one-object result, reopens its remounted list and establishes the
+  selected outline before testing click-through. Ten repetitions pass (16.3 s),
+  as does ESLint. Application files and final
+  real acceptance hashes are unchanged. Verify all jobs on the amended head.
+
+### Iteration 013 Part 1 verified feature delivery (2026-10-22)
+
+- PR #115 merged Part 1 into `iteration/013` at
+  `3fcafdbea1448be0a2da7082855989e4e7a4cc4c`, after Checks run `39801851963`
+  explicitly completed Linux Python, Windows Python and frontend successfully on
+  reviewed head `bb0f8698a333081bb287e3860af76ad741995e7e`. Issue #114 was
+  explicitly closed as completed. Earlier publication/CI-pending notes below are
+  historical and superseded by this verified delivery.
+- Local integration fast-forwarded to the merge; feature ancestry and identical
+  backend/frontend trees versus measured `c5e8806` were checked. The merged feature
+  was deleted remotely with an expected-head lease and locally; fetch/prune,
+  branch -a and ls-remote verify cleanup. Main remains `4ed0023`; pre-existing
+  feature #75 and all historical iteration branches are retained.
+- README, plan and Part 1 outcome now record actual delivery. Keep Milestone 12
+  and `iteration/013` for Parts 2-4; no main integration is included. Local source
+  snapshots, private profiles, owned-service cleanup and final real evidence
+  `.cache/iteration013-part1-final/` remain intact. This documentation follow-up
+  changes no application code or measured behavior.
+
+### Iteration 013 Part 1 publication and feature merge authorized (2026-10-22)
+
+- The user explicitly approved pushing `iteration/013` and
+  `feature/114-hannover-map-controls` to
+  `https://github.com/Hunter3304/uas-mission-planner`, creating the feature PR and
+  merging into `iteration/013` after successful CI. This supersedes the earlier
+  automatic publication rejection below. Main integration remains deferred.
+- Publish the reviewed Part 1 result plus this authorization record, verify the
+  final head's Linux Python, Windows Python and frontend checks, then merge, close
+  Issue #114 explicitly if needed and perform verified merged-feature cleanup.
+  Retain Milestone 12, `iteration/013`, main and historical branches. All local
+  acceptance remains valid: backend/frontend code is identical to `c5e8806`.
+
+### Iteration 013 Part 1 local completion and publication gate (2026-10-22)
+
+- Implementation and all local acceptance are committed at `c5e8806` on
+  `feature/114-hannover-map-controls`. Final evidence is
+  `.cache/iteration013-part1-final/`; current implementation byte hashes match
+  the campaign, original OSM/study hashes are unchanged and owned services stopped.
+- Automatic approval review rejected `git push --set-upstream origin iteration/013
+  feature/114-hannover-map-controls` before execution. Stated reason: the user
+  authorized local implementation, but did not explicitly authorize publishing
+  committed code/documentation to the public repository
+  `https://github.com/Hunter3304/uas-mission-planner`. The push was not executed
+  or retried, and no alternate publication mechanism was used.
+- No Part 1 PR, remote feature CI, merge or branch cleanup has occurred. Keep
+  assigned Issue #114 open in verified Milestone 12 and retain both local branches.
+  Main remains `4ed0023`. Ask for explicit authorization to push these reviewed
+  branches, create the feature PR and merge into `iteration/013` after all required
+  checks pass. This is a publication gate, not unfinished local implementation.
+- This follow-up records delivery status only; application code and acceptance
+  remain unchanged. Parts 2-4 and full iteration/main integration are deferred.
+
+### Iteration 013 Part 1 implementation and acceptance (2026-10-22)
+
+- User approved the full plan and requested Part 1 only. Verified Milestone 12 /
+  assigned Issue #114 precede `feature/114-hannover-map-controls`, created from
+  `iteration/013` at main `4ed0023`. Parts 2-4 and main integration remain deferred.
+- Implemented one collapsible source-grouped control area, removal of the raw
+  DIPUL display/fetch path and old load/coordinate-checkbox controls, dedicated
+  eight-site/exact-coordinate section with study bounds, active endpoint markers/
+  focus/export, and compact OSM source-count disclosure with one fit action.
+- Successful shared scenario responses (hidden/empty collections included) and
+  GHSL cells survive visibility/fold changes. Only actual scenario changes reload;
+  serial browser preparation/debounce/identity checks prevent stale presentation.
+  Backend semaphore limits real constraint preparation to one job per app process,
+  including after browser disconnects; contextual retry handles occupied slots.
+- Final regression: backend 316 passes / one existing Windows permission skip,
+  100.03 s; 28 mocked browser tests, 19.9 s; 14 real-stack smoke passes, 34.4 s;
+  ESLint/build and Ruff pass. New concurrency tests verify slot release/cleanup.
+- Real functional campaign `.cache/iteration013-part1-real-v2/` passes: 10 cycles,
+  zero additional requests, GHSL cache reuse, separate 162,011 building findings /
+  324 DIPUL findings, exact-coordinate 3,715.6 m research route/export and mobile.
+  Original OSM/study hashes unchanged; owned services stopped. Final source-hashed
+  acceptance `.cache/iteration013-part1-final/` also passes, with matching current
+  application hashes, visually inspected desktop/mobile, 79.940 s initial load /
+  50.982 s route and zero toggle requests. Each existing full scenario response is
+  ~85.75 MB; no preparation/payload/memory redesign is claimed. v1's DevTools-body retention failure
+  is diagnostic only. See `doc/iteration/iteration-013/part1.md` and operation guide.
+- Cache lifetime is the current page/dataset session. Use sidebar Refresh after
+  replacing sources. Initial scenario preparation (~88 s in v2), large existing
+  building collections and route preparation remain explicit costs. Start/end
+  inputs remain until Part 4; details/selection behavior remains until Parts 2-3.
+- Implementation/local acceptance are complete; feature publication/CI/merge
+  remain pending. Preserve original sources, private profiles, user-owned services,
+  historical branches and the iteration milestone. Earlier planning-only notes
+  below describe the prior session and are superseded by this authorized work.
+
+### Iteration 013 UI and estimated-arrival plan (2026-10-22)
+
+- User requested requirements clarification and a plan, based on three UI
+  screenshots: one source-grouped layer area, removal of legacy uniform-color
+  OSM display, black selected outlines, left-side readable details, color-mode
+  explanations and departure-only input with estimated arrival.
+- User explicitly confirmed Hannover first (preserve other pages), one shared
+  left inspector for OSM/DIPUL/GHSL plus short map summaries, and constant-speed
+  cruise-only estimates from actual route length. No takeoff/landing allowance.
+- Follow-up requirements are included in Part 1: a dedicated endpoint row with
+  one Selection method dropdown, defaulting to the eight saved sites; exact
+  coordinate mode alone reveals four coordinate inputs and current study bounds.
+  Remove the old `Use explicitly selected launch/landing coordinates` checkbox.
+  Keep endpoints separate from other parameters, and use active-mode coordinates
+  consistently for markers/focus, planning, ETA invalidation and exports.
+- User also requested removing the Original DIPUL purple raw-zone switch and
+  its separate overlay from the Hannover UI. Part 1 now retains assessed decision
+  layers only, with original attributes available for provenance/details. Remove
+  overlay-only fetching; preserve original data, planner use and other pages/APIs.
+- User clarified that scenario overlays (for example orange exclusions) should
+  load immediately on enabling and refresh automatically on relevant input changes.
+  Remove `Load scenario layers`, not `Plan regional route`. Part 1 includes
+  dependency-aware shared loading, pending/error states, debounce, bounded stale
+  work and late-response rejection; Part 4 automatically promotes preview layers
+  to the successful route's assessed interval. Layer toggles never trigger routing.
+- Further clarified: after the first successful layer load, cache all returned
+  collections (including hidden and valid empty ones). For unchanged scenario/
+  source identity, later checks/unchecks only show/hide, with no network request,
+  source verification or preparation. Hiding all layers or collapsing groups must
+  retain the current-scenario cache. Relevant input/source changes invalidate it;
+  Part 1 acceptance now checks repeated toggles and shared-response cache reuse.
+- Local draft: `doc/plan/iteration-013.md`, in four Parts with acceptance criteria.
+  Source grouping must separate mixed OSM building/DIPUL/coverage derivatives.
+  The current Category-mode brown building color is not the obsolete uniform-color
+  renderer requested for removal. The inspected regional controls already use the
+  bounded display path; do not restore full-region OSM queries.
+- Automatic arrival needs backend interval reassessment and consistent profile,
+  restriction, preview and export semantics; simply hiding `mission_end` is not
+  sufficient. The draft proposes bounded expanding-interval passes and retains
+  explicit historical interval requests. Actual timing/budget feasibility remains
+  an implementation gate, not an accepted performance claim.
+- Planning only: no application changes, tests, services, data, remote tracking,
+  branches, commits, push or merge. Baseline main is `4ed0023`; Iteration 012
+  verified delivery below remains current application behavior.
+
 ### Iteration 012 verified main delivery (2026-10-22)
 
 - Main PR #112 merged the complete four-part iteration at

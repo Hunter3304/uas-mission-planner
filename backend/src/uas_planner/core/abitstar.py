@@ -188,6 +188,9 @@ class AbitPlanner:
             "geometry": None,
             "length_m": None,
             "risk_length_cost": None,
+            **(
+                {"population_length_cost": None} if hasattr(self.model, "population_weight") else {}
+            ),
             "objective_cost": None,
             "start": self.endpoints["start"],
             "end": self.endpoints["end"],
@@ -230,6 +233,7 @@ class AbitPlanner:
         totals = {
             name: sum(a[name] for a in assessments)
             for name in ("length_m", "risk_length_cost", "objective_cost")
+            + (("population_length_cost",) if hasattr(self.model, "population_weight") else ())
         }
         if not all(isfinite(v) for v in totals.values()) or not isclose(
             totals["objective_cost"], path.cost(self.objective).value(), rel_tol=1e-7, abs_tol=1e-5
@@ -245,6 +249,15 @@ class AbitPlanner:
                 "has_default": any(a["has_default"] for a in assessments),
                 "background_assumed": any(a["background_assumed"] for a in assessments),
                 "source_ids": sorted({i for a in assessments for i in a["source_ids"]}),
+                **(
+                    {
+                        "population_source_ids": sorted(
+                            {i for a in assessments for i in a["population_source_ids"]}
+                        )
+                    }
+                    if hasattr(self.model, "population_weight")
+                    else {}
+                ),
             },
         }
 
@@ -314,6 +327,8 @@ class AbitPlanner:
             )
         except _Stopped:
             return self._result("cancelled" if self.stop_reason == "cancelled" else "timeout")
+        except TimeoutError as error:
+            return self._result("timeout", message=str(error))
         except Exception as error:
             return self._result("computational_failure", message=f"{type(error).__name__}: {error}")
 

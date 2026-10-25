@@ -64,6 +64,7 @@ class RiskModel:
         source=None,
         safety_distance_m=0,
         unsupported_policy="block",
+        _allow_zero_weights=False,
     ):
         self.crs = metric_crs(analysis_crs)
         forward = _coordinate_transform(input_crs, self.crs.to_string())
@@ -79,7 +80,7 @@ class RiskModel:
         )
         self.risk_weight = nonnegative(risk_weight, "Risk weight")
         self.distance_weight = nonnegative(distance_weight, "Distance weight")
-        if self.risk_weight + self.distance_weight == 0:
+        if self.risk_weight + self.distance_weight == 0 and not _allow_zero_weights:
             raise ValueError("At least one objective weight must be positive.")
         self.safety_distance_m = nonnegative(safety_distance_m, "Safety distance")
         if unsupported_policy not in ("block", "polygon_only_research"):

@@ -1,3 +1,5 @@
+import { populationCosts } from './fixtures/populationCosts'
+import { timedResult } from './fixtures/flightInterval'
 import { expect, test } from '@playwright/test'
 
 test('regional controls preserve weighted defaults, invalidate results and export without another solve', async ({ page }) => {
@@ -29,8 +31,7 @@ test('regional controls preserve weighted defaults, invalidate results and expor
   await page.getByLabel('Street basemap').check()
   await expect(map.locator('img.leaflet-tile').first()).toHaveAttribute('src', /tile\.openstreetmap\.org/)
   const panel = page.getByRole('region', { name: 'Regional route planning' })
-  await panel.getByLabel('Scenario start').fill('2026-10-07T10:00')
-  await panel.getByLabel('Scenario end').fill('2026-10-07T10:15')
+  await panel.getByLabel('Departure time').fill('2026-10-07T10:00')
   await panel.getByRole('button', { name: 'Plan regional route' }).click()
   await expect(panel.getByRole('status')).toContainText('Missing building heights')
   const download = page.waitForEvent('download')
@@ -59,12 +60,13 @@ test('eight catalog endpoints, independent layers, successful route export and p
   await page.route('**/api/**', route => {
     const path = new URL(route.request().url()).pathname
     loaded.push(path)
+    if (path === '/api/terrain-datasets') return route.fulfill({ json: { datasets: [{ id: 'hannover-part2-terrain-v1', tiles: 120 }] } })
     if (path.endsWith('/study/route')) {
       solves++
-      return route.fulfill({ json: { status: 'success', geometry: { type: 'LineString', coordinates: [[9.76, 52.3], [9.7, 52.3]] }, length_m: 1000, risk_length_cost: 20, objective_cost: 118, cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5, runtime_ms: 25, research_assumptions: [], endpoint_diagnostics: {}, provenance: { model_signature: 'retained-source' }, mission: { speed_m_s: 30 } } })
+      return route.fulfill({ json: timedResult(route.request().postDataJSON(), { status: 'success', geometry: { type: 'LineString', coordinates: [[9.76, 52.3], [9.7, 52.3]] }, length_m: 1000, risk_length_cost: 20, objective_cost: 118, cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5, runtime_ms: 25, research_assumptions: [], endpoint_diagnostics: {}, provenance: { model_signature: 'retained-source' }, mission: { speed_m_s: 30 } }) })
     }
     if (path.endsWith('/study/layers/constraints')) return route.fulfill({ json: { blocked: empty, unknown: empty, diagnostics: [{ reason: 'Fixture uncertainty' }], provenance: {}, interpretation: 'No permission inferred' } })
-    if (path.endsWith('/study/population')) return route.fulfill({ json: { layer: empty } })
+    if (path.endsWith('/study/population-costs')) return route.fulfill({ json: populationCosts() })
     if (path.endsWith('/study/layers/zones') || path.endsWith('/features')) return route.fulfill({ json: empty })
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds, locations: sites }, sources: {} } })
     return route.fulfill({ json: path === '/api/datasets' ? { datasets: [dataset] } : dataset })
@@ -77,14 +79,11 @@ test('eight catalog endpoints, independent layers, successful route export and p
   await panel.getByLabel('Destination', { exact: true }).selectOption('rheuma-podbi')
   await expect(panel).toContainText('same address')
   await panel.getByLabel('Destination', { exact: true }).selectOption('mhh')
-  await panel.getByLabel('Scenario start').fill('2026-10-07T10:00')
-  await panel.getByLabel('Scenario end').fill('2026-10-07T10:15')
-  await panel.getByRole('button', { name: 'Load scenario layers' }).click()
+  await panel.getByLabel('Departure time').fill('2026-10-07T10:00')
   await expect(page.getByText('Layer coverage and applicability findings')).toBeVisible()
-  await page.getByLabel('Original DIPUL').check()
+  await expect(page.getByLabel('Original DIPUL')).toHaveCount(0)
   await page.getByLabel('GHSL —').check()
-  await expect.poll(() => loaded.includes('/api/datasets/hannover/study/population')).toBe(true)
-  await page.getByLabel('Original DIPUL').uncheck()
+  await expect.poll(() => loaded.includes('/api/datasets/hannover/study/population-costs')).toBe(true)
   await expect(page.getByLabel('GHSL —')).toBeChecked()
   await panel.getByRole('button', { name: 'Plan regional route', exact: true }).click()
   await expect(panel.getByRole('status')).toContainText('Length 1000.0 m')

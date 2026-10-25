@@ -4,6 +4,10 @@ Implemented core policy: `building-length-risk-v1`. Classification remains
 `ramke-building-tags-v1`; its canonical JSON SHA-256 is recorded with results.
 These are ordinal research costs, not accident probabilities.
 
+Iteration 014 adds [250 m population classes](population-costs.md) and optional
+population routing through regional core/API/CLI. Building-only routing remains
+the default; enabled population adds its separate length-times-class term.
+
 ## Coordinates and physical lengths
 
 Source/display coordinates are EPSG:4326, always longitude then latitude.

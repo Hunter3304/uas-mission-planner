@@ -1,14 +1,17 @@
 """Bounded Hannover routing using existing graph/native planners and regional checks."""
 
+from copy import deepcopy
 from functools import lru_cache
 from math import ceil, hypot, isclose
 from time import perf_counter
 
 from pyproj import Transformer
-from shapely.geometry import box, mapping
+from shapely.geometry import box, mapping, shape
 from shapely.ops import transform
 
 from uas_planner.core.grid import MAX_GRID_CELLS, validate_cell_size
+from uas_planner.core.population_costs import PopulationResourceLimit, prepare_population_surface
+from uas_planner.core.population_routing import PopulationEvaluator, PopulationRiskModel
 from uas_planner.core.regional import RegionalConstraints
 from uas_planner.core.risk import RiskModel, nonnegative, signature
 from uas_planner.core.routing import connect_endpoints, plan_route
@@ -18,18 +21,26 @@ class RegionalPlanner:
     """Request-scoped source verification; bounded motion cache never crosses snapshots."""
 
     def __init__(self, directory, scenario, *, terrain_directory=None):
+        self.directory = directory
+        self._population = None
         self.constraints = RegionalConstraints(
             directory, scenario, terrain_directory=terrain_directory
         )
         self.forward = Transformer.from_crs(4326, 25832, always_xy=True).transform
         self.reverse = Transformer.from_crs(25832, 4326, always_xy=True).transform
 
+    def ensure_deadline(self):
+        if perf_counter() >= getattr(self, "_request_deadline", float("inf")):
+            raise TimeoutError("Automatic flight interval deadline reached.")
+
     def check(self, coordinates, mode):
+        self.ensure_deadline()
         # Bound each complete terrain window, preserving the whole polyline and buffers.
         # Subdivision changes query resource usage, never relaxes unknown support.
         points = [self.forward(*p) for p in coordinates]
         pieces = []
         for a, b in zip(points, points[1:]):
+            self.ensure_deadline()
             count = max(1, ceil(hypot(b[0] - a[0], b[1] - a[1]) / 500))
             if count + len(pieces) > 10000:
                 return {
@@ -72,7 +83,7 @@ class RegionalPlanner:
         return result
 
     def grid(self, endpoints, cell_m, mode, check, boundary=None):
-        deadline = perf_counter() + 30
+        deadline = min(perf_counter() + 30, getattr(self, "_request_deadline", float("inf")))
         boundary = boundary if boundary is not None else self.constraints.boundary
         minx, miny, maxx, maxy = boundary.bounds
         nx, ny = ceil((maxx - minx) / cell_m), ceil((maxy - miny) / cell_m)
@@ -209,12 +220,22 @@ class RegionalPlanner:
         background_cost=None,
         risk_weight=0.9,
         distance_weight=0.1,
+        include_population=False,
+        population_weight=1.0,
         time_budget_s=3,
         corridor_margin_m=1000,
         start_coordinate=None,
         end_coordinate=None,
     ):
         started = perf_counter()
+        if not isinstance(include_population, bool):
+            raise ValueError("include_population must be a boolean.")
+        population_weight = (
+            nonnegative(population_weight, "Population weight") if include_population else 0.0
+        )
+        population_active = include_population and population_weight > 0
+        if population_active and not hasattr(self, "_request_deadline"):
+            self._request_deadline = started + 110
         cell_m = validate_cell_size(cell_m)
         if (
             algorithm not in ("astar", "dijkstra", "abitstar")
@@ -228,7 +249,11 @@ class RegionalPlanner:
             (time_budget_s, "Time budget"),
         ):
             nonnegative(value, label)
-        if time_budget_s > 60 or objective == "risk" and risk_weight + distance_weight == 0:
+        if (
+            time_budget_s > 60
+            or objective == "risk"
+            and risk_weight + distance_weight + population_weight == 0
+        ):
             raise ValueError("Invalid budget or zero objective weights.")
         if background_cost is not None:
             nonnegative(background_cost, "Background cost")
@@ -266,9 +291,10 @@ class RegionalPlanner:
             return self.check(points, planning_mode)["state"]
 
         def check(points):
+            self.ensure_deadline()
             return cached(tuple(tuple(p) for p in points))
 
-        reports = {n: self.check([p], planning_mode) for n, p in endpoints.items()}
+        reports = {}
         result = {
             "algorithm": algorithm,
             "objective": objective,
@@ -282,7 +308,84 @@ class RegionalPlanner:
             "status": "unresolved_input",
             "planning_mode": planning_mode,
             "endpoint_diagnostics": reports,
+            "population_length_cost": None,
+            "population_model": None,
+            "population_active": population_active,
+            "effective_objective": f"{objective}+population" if population_active else objective,
+            "effective_weights": {
+                "building": risk_weight if objective == "risk" else 0,
+                "distance": distance_weight if objective == "risk" else 1,
+                "population": population_weight,
+            },
+            "controls": {
+                "cell_m": cell_m,
+                "algorithm": algorithm,
+                "objective": objective,
+                "planning_mode": planning_mode,
+                "background_cost": background_cost,
+                "risk_weight": risk_weight,
+                "distance_weight": distance_weight,
+                "include_population": include_population,
+                "population_weight": population_weight if include_population else None,
+                "time_budget_s": time_budget_s,
+                "corridor_margin_m": corridor_margin_m,
+            },
+            "provenance": deepcopy(self.constraints.provenance),
+            "mission": {**self.constraints.scenario, "start_id": start_id, "end_id": end_id},
         }
+        self._last_result = result
+        reports.update({n: self.check([p], planning_mode) for n, p in endpoints.items()})
+
+        def make_model(boundary):
+            base = None
+            if objective == "risk":
+                base = self.constraints.risk_model(
+                    background_cost=background_cost,
+                    mode=planning_mode,
+                    risk_weight=risk_weight,
+                    distance_weight=distance_weight,
+                    search_boundary=boundary,
+                    **(
+                        {"_allow_zero_weights": True}
+                        if risk_weight + distance_weight == 0 and population_active
+                        else {}
+                    ),
+                )
+            if not population_active:
+                return base
+            if self._population is None:
+                surface = prepare_population_surface(
+                    self.directory, deadline=self._request_deadline
+                )
+                candidate = PopulationEvaluator(surface)
+                if not shape(candidate.metadata["study_boundary_metric"]).equals_exact(
+                    self.constraints.boundary, 1e-7
+                ):
+                    raise ValueError("Population and constraint study boundaries differ.")
+                self._population = candidate
+            result["population_model"] = deepcopy(self._population.metadata)
+            result["provenance"].update(
+                ghsl_routing_cost=True,
+                population_model_identity=self._population.metadata["identity"],
+            )
+            base = base or RiskModel(
+                {"type": "FeatureCollection", "features": []},
+                mapping(boundary),
+                input_crs="EPSG:25832",
+                background_cost=0,
+                risk_weight=0,
+                distance_weight=1,
+                safety_distance_m=self.constraints.scenario.get("clearance_m", 0),
+                source=self.constraints.provenance,
+            )
+            return PopulationRiskModel(
+                base,
+                self._population,
+                objective=objective,
+                population_weight=population_weight,
+                deadline=self._request_deadline,
+            )
+
         model = None
         if any(r["state"] == "blocked" for r in reports.values()):
             result.update(
@@ -295,24 +398,19 @@ class RegionalPlanner:
             )
         else:
             try:
-                model = (
-                    self.constraints.risk_model(
-                        background_cost=background_cost,
-                        mode=planning_mode,
-                        risk_weight=risk_weight,
-                        distance_weight=distance_weight,
-                        search_boundary=corridors[0],
-                    )
-                    if objective == "risk"
-                    else None
-                )
+                model = make_model(corridors[0])
+            except PopulationResourceLimit as error:
+                result.update(status="resource_limit", message=str(error))
             except ValueError as error:
                 result["message"] = str(error)
             else:
+                if population_active:
+                    for name, point in endpoints.items():
+                        reports[name]["population"] = self._population.evaluate([point])
                 if model and any(
                     model.evaluate([p])["assessment"] != "assessed" for p in endpoints.values()
                 ):
-                    result["message"] = "Endpoint building-risk support is unassessed."
+                    result["message"] = "Endpoint cost support (building/population) is unassessed."
                 else:
                     grid = self.base_grid(check)
                     grid["validation"]["boundary"] = mapping(transform(self.reverse, corridors[0]))
@@ -329,6 +427,11 @@ class RegionalPlanner:
                     if grid is not None:
                         preparation_ms = (perf_counter() - started) * 1000
                         search_started = perf_counter()
+                        search_deadline = (
+                            min(search_started + time_budget_s, self._request_deadline)
+                            if hasattr(self, "_request_deadline")
+                            else None
+                        )
                         extra_preparation_ms = 0
                         if algorithm == "abitstar":
                             attempts.append({"scope": "initial_corridor", "candidate_cells": None})
@@ -344,7 +447,13 @@ class RegionalPlanner:
                             )
                             result.update(
                                 plan_abitstar(
-                                    grid, native_model, endpoints, time_budget_s=time_budget_s
+                                    grid,
+                                    native_model,
+                                    endpoints,
+                                    time_budget_s=time_budget_s,
+                                    cancel=(lambda: perf_counter() >= self._request_deadline)
+                                    if hasattr(self, "_request_deadline")
+                                    else None,
                                 )
                             )
                             result["randomness"] = {
@@ -352,7 +461,7 @@ class RegionalPlanner:
                                 "budget_s": time_budget_s,
                                 "variability": "Independent finite-budget stochastic runs; global optimality not established.",
                             }
-                            if objective == "distance":
+                            if objective == "distance" and not population_active:
                                 result.update(objective="distance", risk_length_cost=None)
                                 result.pop("risk_model", None)
                         else:
@@ -365,6 +474,7 @@ class RegionalPlanner:
                                     safety_distance_m=self.constraints.scenario.get(
                                         "clearance_m", 0
                                     ),
+                                    deadline=search_deadline,
                                 )
                             )
                             for boundary in corridors[1:]:
@@ -390,14 +500,7 @@ class RegionalPlanner:
                                         message=f"Expanded preparation refused ({count}); increase grid spacing.",
                                     )
                                     break
-                                if objective == "risk":
-                                    model = self.constraints.risk_model(
-                                        background_cost=background_cost,
-                                        mode=planning_mode,
-                                        risk_weight=risk_weight,
-                                        distance_weight=distance_weight,
-                                        search_boundary=boundary,
-                                    )
+                                model = make_model(boundary)
                                 preparation_ms += (perf_counter() - retry_started) * 1000
                                 extra_preparation_ms += (perf_counter() - retry_started) * 1000
                                 grid = self.attach(grid, endpoints, check, model)
@@ -409,6 +512,7 @@ class RegionalPlanner:
                                         safety_distance_m=self.constraints.scenario.get(
                                             "clearance_m", 0
                                         ),
+                                        deadline=search_deadline,
                                     )
                                 )
                         result.update(
@@ -417,6 +521,7 @@ class RegionalPlanner:
                                 0, (perf_counter() - search_started) * 1000 - extra_preparation_ms
                             ),
                         )
+        validation_started = perf_counter()
         if result["status"] == "success":
             result.pop("message", None)
             path = result["geometry"]["coordinates"]
@@ -434,14 +539,18 @@ class RegionalPlanner:
             valid &= isclose(length, result["length_m"], rel_tol=1e-7, abs_tol=1e-6)
             if model:
                 assessments = [model.evaluate([a, b]) for a, b in zip(path, path[1:])]
-                valid &= all(a["assessment"] == "assessed" for a in assessments)
-                for field in ("risk_length_cost", "objective_cost"):
-                    valid &= isclose(
-                        sum(a[field] for a in assessments),
-                        result[field],
-                        rel_tol=1e-7,
-                        abs_tol=1e-6,
-                    )
+                assessed = all(a["assessment"] == "assessed" for a in assessments)
+                valid &= assessed
+                if assessed:
+                    for field in ("risk_length_cost", "objective_cost") + (
+                        ("population_length_cost",) if population_active else ()
+                    ):
+                        valid &= isclose(
+                            sum(a[field] for a in assessments),
+                            result[field],
+                            rel_tol=1e-7,
+                            abs_tol=1e-6,
+                        )
             else:
                 valid &= isclose(length, result["objective_cost"], rel_tol=1e-7, abs_tol=1e-6)
             result["independent_validation"] = bool(valid)
@@ -451,9 +560,23 @@ class RegionalPlanner:
                     geometry=None,
                     length_m=None,
                     risk_length_cost=None,
+                    population_length_cost=None,
                     objective_cost=None,
                     message="Independent route validation failed.",
                 )
+        result["final_validation_ms"] = (perf_counter() - validation_started) * 1000
+        if objective == "distance":
+            result["risk_length_cost"] = None
+        result["objective"] = objective
+        result["population_assessment"] = (
+            "assessed"
+            if population_active and result["status"] == "success"
+            else "unresolved"
+            if population_active
+            else "not_evaluated"
+        )
+        if population_active and model is not None:
+            result["rules_version"] = model.provenance["rules_version"]
         result.setdefault("planner_ms", 0.0)
         result.setdefault("preparation_ms", (perf_counter() - started) * 1000)
         scenario = self.constraints.scenario
@@ -466,10 +589,22 @@ class RegionalPlanner:
                 "background_cost": background_cost,
                 "risk_weight": risk_weight,
                 "distance_weight": distance_weight,
+                "include_population": include_population,
+                "population_weight": population_weight if include_population else None,
                 "time_budget_s": time_budget_s,
                 "corridor_margin_m": corridor_margin_m,
             },
-            provenance=self.constraints.provenance,
+            provenance={
+                **deepcopy(self.constraints.provenance),
+                **(
+                    {
+                        "ghsl_routing_cost": True,
+                        "population_model_identity": self._population.metadata["identity"],
+                    }
+                    if population_active and self._population is not None
+                    else {}
+                ),
+            },
             mission={**scenario, "start_id": start_id, "end_id": end_id},
             catalog_endpoints=catalog_endpoints,
             endpoint_overrides={
@@ -504,6 +639,11 @@ class RegionalPlanner:
                 "provenance": self.constraints.provenance,
                 "controls": result["controls"],
                 "endpoints": endpoints,
+                **(
+                    {"population_model_identity": self._population.metadata["identity"]}
+                    if population_active and self._population is not None
+                    else {}
+                ),
             }
         )
         length = result["length_m"]
@@ -532,13 +672,56 @@ class RegionalPlanner:
 
 
 def plan_regional_route(
-    directory, scenario, start_id, end_id, *, terrain_directory=None, **controls
+    directory,
+    scenario,
+    start_id,
+    end_id,
+    *,
+    terrain_directory=None,
+    duration_mode="explicit",
+    **controls,
 ):
+    if duration_mode == "automatic":
+        from uas_planner.core.flight_interval import automatic_route
+
+        return automatic_route(
+            directory, scenario, start_id, end_id, terrain_directory=terrain_directory, **controls
+        )
+    if duration_mode != "explicit":
+        raise ValueError("Unknown flight duration mode.")
     started = perf_counter()
     planner = RegionalPlanner(directory, scenario, terrain_directory=terrain_directory)
     source_ms = (perf_counter() - started) * 1000
     try:
-        result = planner.plan(start_id, end_id, **controls)
+        if (
+            controls.get("include_population") is True
+            and nonnegative(controls.get("population_weight", 1), "Population weight") > 0
+        ):
+            planner._request_deadline = started + 110
+        try:
+            result = planner.plan(start_id, end_id, **controls)
+        except TimeoutError as error:
+            result = {
+                **deepcopy(getattr(planner, "_last_result", {})),
+                "status": "resource_limit",
+                "message": str(error),
+                "geometry": None,
+                "length_m": None,
+                "risk_length_cost": None,
+                "population_length_cost": None,
+                "objective_cost": None,
+                "exact": False,
+                "cruise_time_s": None,
+                "cruise_time_range_s": None,
+                "solution_kind": "none",
+                "independent_validation": False,
+                "population_assessment": "unresolved"
+                if controls.get("include_population")
+                else "not_evaluated",
+                "preparation_ms": max(0, (perf_counter() - started) * 1000 - source_ms),
+                "planner_ms": 0,
+                "runtime_ms": max(0, (perf_counter() - started) * 1000 - source_ms),
+            }
     finally:
         planner.constraints.terrain.close()
     result["source_preparation_ms"] = source_ms

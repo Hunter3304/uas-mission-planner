@@ -1,5 +1,56 @@
 # UAS Mission Planner
 
+Iteration 014 Part 1 adds a fixed **250 m population risk grid** to the Hannover
+GHSL map group, replacing its former green native-count overlay. Five ordinal
+classes run green to red; gray means NoData. Click a cell for density, estimated
+population, support and study-wide thresholds. Part 2 adds optional population
+routing through regional API/CLI. Part 3 adds **Include population** beside the
+regional objective, with a weight input shown only when checked. Route results
+and exports separate building/population cost, physical length and the combined
+objective. The population map toggle is independent from route weighting.
+See the [operation guide](doc/experiments/iteration-014/README.md).
+Part 4 completes local integrated/resource acceptance, preserves population endpoint
+diagnostics through automatic arrival, and corrects inspection help. See the
+[iteration outcome](doc/iteration/iteration-014/outcome.md) for actual timing,
+memory, validation and delivery limits; Part 4 publication remains pending.
+See [population rules](doc/rules/population-costs.md) and the
+[plan](doc/plan/iteration-014.md). Native inspection APIs and original data remain available.
+
+Iteration 013 **Part 1** is delivered to `iteration/013` through
+[PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
+Linux Python, Windows Python and frontend CI passed. Issue #114 is closed;
+Milestone 12 and the iteration branch remain for the full iteration/main gate. It adds source-grouped
+collapsible map controls, automatic cached scenario layers and a dedicated
+saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
+coordinate override checkbox and manual layer-load button are removed from the
+regional UI. See the [operation guide](doc/experiments/iteration-013/README.md)
+and [Part 1 evidence/status](doc/iteration/iteration-013/part1.md).
+Part 2 is delivered through
+[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) to `iteration/013`
+at `370f1d7`, after final-head Linux/Windows/frontend CI passed. Issue #116 is
+closed and merged-feature cleanup is verified locally/remotely.
+OSM, DIPUL, GHSL and derived overlays share one left inspector, actual-geometry
+black outlines and short map summaries. Mobile uses one collapsible detail sheet.
+See [Part 2 acceptance/status](doc/iteration/iteration-013/part2.md).
+Part 3 is delivered through
+[PR #119](https://github.com/Hunter3304/uas-mission-planner/pull/119) at `db0d40b`,
+after final-head Linux/Windows/frontend CI. Issue #118 is closed; merged-feature
+cleanup is verified locally/remotely. It adds
+readable source cards, nested expandable attributes, explicit uncertainty/units,
+and Feature category / Category cost explanations. See
+[Part 3 acceptance/status](doc/iteration/iteration-013/part3.md).
+Part 4 is delivered to `iteration/013` through
+[PR #121](https://github.com/Hunter3304/uas-mission-planner/pull/121) at `81ec028`,
+after final-head Linux/Windows/frontend CI passed. Issue #120 is closed and
+merged-feature cleanup is verified locally/remotely. It adds
+departure-only input, actual-route cruise arrival and complete-interval constraint
+reassessment. Explicit historical API/CLI intervals remain supported. See
+[Part 4 acceptance/status](doc/iteration/iteration-013/part4.md) and
+[iteration outcome](doc/iteration/iteration-013/outcome.md).
+Local regression and integrated Hannover acceptance pass. The user's explicit
+publication approval superseded the earlier automatic block. All four Parts are
+on iteration/013; main integration still requires its independent CI gate.
+
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after
 independent Linux/Windows/frontend CI. All four Parts, including real-data
@@ -160,7 +211,8 @@ same point, motion and connector checks. Native LGLN terrain uses separate bound
 checksummed snapshots through `terrain-fetch`; NHN is not silently equated with MSL.
 `study-population` produces native-cell statistics/GeoJSON and an optional SVG
 preview. Read-only `/api/datasets/{id}/study/population` exposes the same inspection
-core. GHSL does not change the building-only 0.9/0.1 routing objective.
+core. This native inspection does not change the default building-only 0.9/0.1
+objective; Iteration 014 separately adds optional 250 m population routing.
 See the [Part 2 operating guide](doc/experiments/iteration-008/README.md#part-2-regional-constraints-and-native-population-inspection)
 and [traceable rules](doc/rules/regional-constraints.md). Unknown height, geometry,
 time, vertical reference and coverage remain explicit; regional route/selector/UI
@@ -223,7 +275,8 @@ length and runtime. **Export route GeoJSON** includes provenance and assumptions
 failures export empty features with their explicit outcome. The optional dashed
 **Straight-line reference** has no constraint validation. Changing endpoints,
 dataset or cell size clears the old route. Grid colors: green permitted, red
-blocked, amber unresolved. Population and OSM scores are independent of routing.
+blocked, amber unresolved. This historical synthetic distance demo does not use
+population or OSM soft scores; regional population routing is available in Iteration 014.
 
 The API is `/api/datasets/{id}/experiment/route?cell_m=50` with optional
 `start_lon`, `start_lat`, `end_lon`, `end_lat`; add `export=true` for GeoJSON.
@@ -338,7 +391,8 @@ and [binary source/build provenance](backend/vendor/README.md).
 CLI/API/UI now select A*, Dijkstra or ABIT*, distance or weighted building risk,
 weights, an explicit background score, safety distance and ABIT* time budget.
 Existing requests default to distance-only A*. Blank background remains
-unassessed; background 0 is an explicit research assumption. Population is separate.
+unassessed; background 0 is an explicit research assumption. These small-area
+controls remain separate from Iteration 014 regional population routing.
 
 Create a **new** synthetic low-risk-detour dataset and compare offline:
 
@@ -459,7 +513,8 @@ Paper obstruction flags do not establish current flight restrictions.
 Restart the backend after updating rules/code, then Refresh the dataset.
 Original datasets and downloads are unchanged; analysis is calculated on read.
 Independent tag analysis remains separate from building-risk route optimization;
-population and cross-layer cost fusion are still deferred.
+general cross-layer tag-cost fusion remains deferred. Iteration 014 separately
+supports a building/distance objective with an optional population term.
 
 One public monorepo, separately running frontend/backend. React communicates through HTTP. **The Python core must never depend on React or FastAPI**; CLI, API and future experiments reuse the core. Code, UI and project documentation default to English.
 
@@ -508,9 +563,10 @@ Droniq and the assessed methodology-only sources retain their documented scope.
 
 The local prototype supports small-area and Hannover regional mission research
 and loads source data into memory for verification. Building tag costs are ordinal
-research classifications. Browser-triggered acquisition, background jobs, regional
-OSM payload/rendering/cancellation performance, population/cost fusion and public
-deployment remain future work. Mission-end feasibility, full flight phases, real
+research classifications. Regional OSM display uses the bounded indexed queries
+from Iteration 012 and population routing is optional in Iteration 014.
+Browser-triggered acquisition, background jobs, general cross-layer tag fusion
+and public deployment remain future work. Full flight phases, real
 permission evidence and complete NOTAM coverage remain unresolved. No next sprint
 is approved automatically by a stage release.
 

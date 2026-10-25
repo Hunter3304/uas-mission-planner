@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import { getJson } from './api'
-import { CostDetails, showValue } from './BuildingCosts'
+import { snapshotKey, selectionFeatureId, useMapSelection } from './mapSelection'
 import { categoryColor, costColors, osmStyle, unknownCostColor } from './osmStyles'
+import { costLabels } from './sourcePresentation'
 import {
   layers,
   type LayerKey,
@@ -10,12 +11,10 @@ import {
   type OsmIdentity,
   type OsmSummary,
   type OsmCollection,
-  type OsmObjectDetail,
 } from './types'
 
 const allCategories: Visibility = { building: true, highway: true, landuse: true, natural: true }
-const identityKey = (identity: OsmIdentity) =>
-  JSON.stringify(Object.entries(identity).sort(([a], [b]) => a.localeCompare(b)))
+const identityKey = (identity: OsmIdentity) => snapshotKey(identity)
 const objectKey = (feature: OsmCollection['features'][number]) =>
   `${feature.properties.element_type}/${feature.properties.osm_id}`
 const MAX_CACHE_BYTES = 8 * 1024 * 1024
@@ -23,10 +22,6 @@ interface View {
   data: OsmCollection
   snapshot: string
   notice?: string
-}
-interface Selection {
-  key: string
-  snapshot: string
 }
 
 function checkCollection(data: OsmCollection, snapshot: string) {
@@ -53,7 +48,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
   const [costCategory, setCostCategory] = useState<LayerKey>('building')
   const [summary, setSummary] = useState<OsmSummary | null>(null)
   const [view, setView] = useState<View | null>(null)
-  const [selection, setSelection] = useState<Selection | null>(null)
+  const { select, reconcile } = useMapSelection()
   const [status, setStatus] = useState('Loading saved OSM…')
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
@@ -65,7 +60,22 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
     .map(({ key }) => key)
     .join(',')
 
+
+  const selectObject = useCallback((key: string, snapshot: string, anchor?: [number, number]) => {
+    const feature = view?.data.display.representation === 'detail' ? view.data.features.find(item => objectKey(item) === key) : undefined
+    select({ owner: 'osm', id: key, version: snapshot, source: 'OSM',
+      feature: feature ? { ...feature, id: key } : { type: 'Feature', id: key, geometry: null, properties: {} },
+      diagnostic: !feature, anchor, osm: { base, key, snapshot } })
+  }, [base, select, view])
   useEffect(() => {
+    const originals = summary?.verified ? summary.diagnostics.samples.map(item => ({ type: 'Feature' as const, id: `${item.element_type}/${item.osm_id}`, geometry: null, properties: {} })) : []
+    const displayed = view?.data.features.map(feature => ({ ...feature, id: view.data.display.representation === 'detail' ? objectKey(feature) : selectionFeatureId(feature) })) ?? []
+    reconcile('osm', enabled ? [...displayed, ...originals] : null, view?.snapshot ?? (summary?.verified ? identityKey(summary.identity) : null))
+  }, [view, summary, enabled, reconcile])
+
+  useEffect(() => {
+    reconcile('osm', null, null)
+    setView(null)
     let generation = 0
     let active: AbortController | null = null
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -73,15 +83,13 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       generation++
       active?.abort()
       clearTimeout(timer)
-      setSelection(null)
-      setView(null)
     }
     function moving() {
       cancel()
       setError('')
       if (enabled && categories)
         setStatus(
-          'Moving map — waiting for a settled view. Selection clears when the view changes.',
+          'Moving map — waiting for a settled view. Selection follows objects still in the display.',
         )
     }
     async function load(ticket: number) {
@@ -115,6 +123,8 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
         if (cacheIdentity.current !== snapshot) {
           cache.current.clear()
           cacheIdentity.current = snapshot
+          setView(null)
+          reconcile('osm', null, null)
         }
         const bounds = map.getBounds().pad(0.1)
         const [west, south, east, north] = info.coverage_bounds
@@ -195,14 +205,17 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       setError('')
       setSummary(null)
       if (!enabled) {
+        setView(null)
         setStatus('OSM display is off.')
         return
       }
       if (!categories) {
+        setView(null)
         setStatus('All OSM categories are hidden.')
         return
       }
       if (costMode && !visibility[costCategory]) {
+        setView(null)
         setStatus('Enable the selected cost category to display its objects.')
         return
       }
@@ -222,7 +235,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       map.off('movestart zoomstart', moving)
       map.off('moveend zoomend', schedule)
     }
-  }, [map, base, enabled, categories, costMode, costCategory, visibility, retry])
+  }, [map, base, enabled, categories, costMode, costCategory, visibility, retry, reconcile])
 
   useEffect(() => {
     if (!view || !enabled) return
@@ -251,16 +264,11 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           radius: 4,
         }),
       onEachFeature: (feature, layer) => {
-        layer.on('click', () => {
-          if (overview) {
-            const element = document.createElement('span')
-            element.textContent = `Aggregate cell: ${feature.properties.objects} unique assigned objects; categories overlap. ${JSON.stringify(feature.properties.category_counts)}. Zoom in for details; this grid shows no cost score.`
-            layer.bindPopup(element).openPopup()
-          } else
-            setSelection({
-              key: objectKey(feature as OsmCollection['features'][number]),
-              snapshot: view.snapshot,
-            })
+        layer.on('click', (event: L.LeafletMouseEvent) => {
+          if (overview) select({ owner: 'osm', id: selectionFeatureId(feature), version: view.snapshot, source: 'OSM', feature, aggregate: true,
+            anchor: [event.latlng.lat, event.latlng.lng],
+            zoom: () => { const bounds = L.geoJSON(feature).getBounds(); map.fitBounds(bounds, { maxZoom: 17, animate: false }); if (map.getZoom() < 15) map.setZoom(15, { animate: false }) } })
+          else selectObject(objectKey(feature as OsmCollection['features'][number]), view.snapshot, [event.latlng.lat, event.latlng.lng])
         })
       },
     })
@@ -270,7 +278,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       group.clearLayers()
       group.remove()
     }
-  }, [map, view, enabled, visibility, costMode])
+  }, [map, view, enabled, visibility, costMode, select, selectObject])
 
   return (
     <section className="regional-osm" aria-label="Regional OSM display">
@@ -302,17 +310,19 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           <label>
             OSM color view{' '}
             <select
+              aria-describedby="osm-color-help"
               value={costMode ? 'cost' : 'category'}
               onChange={(event) => setCostMode(event.target.value === 'cost')}
             >
-              <option value="category">Category</option>
-              <option value="cost">Independent category cost</option>
+              <option value="category">Feature category</option>
+              <option value="cost">Category cost</option>
             </select>
           </label>
           {costMode && (
             <label>
               OSM cost category{' '}
               <select
+                aria-describedby="osm-cost-category-help"
                 value={costCategory}
                 onChange={(event) => {
                   const category = event.target.value as LayerKey
@@ -337,23 +347,6 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           >
             Refresh OSM
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              const b = summary?.coverage_bounds
-              if (b)
-                map.fitBounds(
-                  [
-                    [b[1], b[0]],
-                    [b[3], b[2]],
-                  ],
-                  { animate: false },
-                )
-            }}
-            disabled={!summary?.verified}
-          >
-            Fit saved study
-          </button>
         </div>
         <div className="cost-legend" aria-label="OSM legend">
           {costMode && view?.data.display.representation !== 'aggregate_overview' ? (
@@ -361,7 +354,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
               {costColors.map((color, index) => (
                 <span key={color}>
                   <i style={{ background: color }} />
-                  Cost {index}
+                  {index} · {costLabels[index]}
                 </span>
               ))}
               <span>
@@ -379,10 +372,12 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
             ))
           )}
         </div>
-        <p>
-          Category precedence: buildings, roads, land use, natural features among enabled
-          categories. Costs are independent; blank areas are unassessed.
-        </p>
+        <p className="layer-help" id="osm-color-help">{costMode
+          ? 'Category cost: colors show the selected category’s independent ordinal score, from 0 (very low) to 4 (very high). Costs are never added together; this is not an overall risk surface.'
+          : 'Feature category: fixed colors identify buildings, roads & paths, land use and natural features. For overlapping memberships, the first enabled category in that order wins; hiding one can reveal another.'}</p>
+        {costMode && <p className="layer-help" id="osm-cost-category-help">Cost category chooses which category is displayed and enables it. It does not change the route objective. Unknown/default/no numeric costs are gray and dashed. Dark outlines mark historical paper obstruction flags, not current flight restrictions.</p>}
+        {view?.data.display.representation === 'aggregate_overview' && <p className="source-overview-help">Overview uses aggregate category colors, even in Category cost mode. Zoom in for individual objects and cost scores; overview cells have no cost score.</p>}
+        <p className="layer-help">Blank areas are unassessed. Refresh OSM reloads prepared local display data; it does not acquire new OSM originals.</p>
         <p
           role="status"
           data-testid="osm-status"
@@ -392,6 +387,8 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
         </p>
         {error && <p role="alert">{error} Use Refresh OSM to retry.</p>}
         {view?.notice && <p>{view.notice} Showing an aggregate overview instead.</p>}
+        <details>
+          <summary>OSM coverage and counts</summary>
         {view?.data.display.representation === 'aggregate_overview' && (
           <p>
             {view.data.features.length} aggregate cells; color shows the dominant enabled category,
@@ -411,6 +408,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
             .
           </p>
         )}
+        </details>
         {enabled && summary?.verified && Object.keys(summary.diagnostics.counts).length > 0 && (
           <details>
             <summary>Source geometry diagnostics</summary>
@@ -426,10 +424,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
                   type="button"
                   key={`${item.element_type}/${item.osm_id}`}
                   onClick={() =>
-                    setSelection({
-                      key: `${item.element_type}/${item.osm_id}`,
-                      snapshot: identityKey(summary.identity),
-                    })
+                    selectObject(`${item.element_type}/${item.osm_id}`, identityKey(summary.identity))
                   }
                 >
                   {item.element_type}/{item.osm_id} · {item.reason}
@@ -445,15 +440,14 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           <details>
             <summary>Inspect visible objects (first 50)</summary>
             <p>
-              Click any object on the map or choose one below. Selection clears when the view,
-              categories or style change.
+              Click an object on the map or choose one below. Details open in the shared inspector; selection clears if the object leaves the display.
             </p>
             <div className="osm-object-list">
               {view.data.features.slice(0, 50).map((feature) => (
                 <button
                   type="button"
                   key={objectKey(feature)}
-                  onClick={() => setSelection({ key: objectKey(feature), snapshot: view.snapshot })}
+                  onClick={() => selectObject(objectKey(feature), view.snapshot)}
                 >
                   {objectKey(feature)}
                 </button>
@@ -462,100 +456,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           </details>
         )}
       </fieldset>
-      {enabled && selection && (
-        <ObjectDetails
-          key={`${selection.snapshot}:${selection.key}`}
-          base={base}
-          selection={selection}
-          onClose={() => setSelection(null)}
-        />
-      )}
-    </section>
-  )
-}
 
-function ObjectDetails({
-  base,
-  selection,
-  onClose,
-}: {
-  base: string
-  selection: Selection
-  onClose: () => void
-}) {
-  const [detail, setDetail] = useState<OsmObjectDetail | null>(null)
-  const [error, setError] = useState('')
-  const [attempt, setAttempt] = useState(0)
-  useEffect(() => {
-    const active = new AbortController()
-    setDetail(null)
-    setError('')
-    getJson<OsmObjectDetail>(`${base}/features/${selection.key}`, active.signal)
-      .then((value) => {
-        if (active.signal.aborted) return
-        if (identityKey(value.display.identity) !== selection.snapshot)
-          throw new Error('The source changed. Refresh OSM before selecting this object again.')
-        setDetail(value)
-      })
-      .catch((failure) => {
-        if (!active.signal.aborted)
-          setError(failure instanceof Error ? failure.message : 'Cannot load object details.')
-      })
-    return () => active.abort()
-  }, [base, selection.key, selection.snapshot, attempt])
-  return (
-    <section className="osm-details" aria-label="Selected OSM object">
-      <h3>OSM {selection.key}</h3>
-      <button type="button" onClick={onClose}>
-        Close OSM details
-      </button>
-      {!detail && !error && <p role="status">Loading original object details…</p>}
-      {error && (
-        <>
-          <p role="alert">{error}</p>
-          <button type="button" onClick={() => setAttempt((value) => value + 1)}>
-            Retry object details
-          </button>
-        </>
-      )}
-      {detail && (
-        <>
-          <p>
-            Original source tags and geometry; categories:{' '}
-            {detail.display.categories.join(', ') || 'none'}. Rule version:{' '}
-            {detail.display.identity.rule_version}.
-          </p>
-          {detail.display.diagnostic && (
-            <p>
-              Geometry diagnostic: {detail.display.diagnostic}. Drawable:{' '}
-              {String(detail.display.drawable)}.
-            </p>
-          )}
-          {detail.display.geometry_omitted && (
-            <p>
-              Geometry omitted: {detail.display.geometry_omitted}. Tags and classification are
-              available below.
-            </p>
-          )}
-          <details open>
-            <summary>Original tags</summary>
-            <dl>
-              {Object.entries(detail.properties).map(([key, value]) => (
-                <div key={key}>
-                  <dt>{key}</dt>
-                  <dd>{showValue(value)}</dd>
-                </div>
-              ))}
-            </dl>
-          </details>
-          {layers.map(
-            ({ key }) =>
-              detail.layer_analyses?.[key] && (
-                <CostDetails key={key} layer={key} analysis={detail.layer_analyses[key]!} />
-              ),
-          )}
-        </>
-      )}
     </section>
   )
 }

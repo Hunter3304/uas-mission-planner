@@ -1,3 +1,4 @@
+import { previewResult } from './fixtures/flightInterval'
 import { expect, test } from '@playwright/test'
 
 test('default conservative policy, saved evidence revision, scoped request and invalidation', async ({ page }) => {
@@ -20,7 +21,7 @@ test('default conservative policy, saved evidence revision, scoped request and i
       }
       return route.fulfill({ json: { profiles, errors: [] } })
     }
-    if (path.endsWith('/study/layers/constraints')) return route.fulfill({ json: { blocked: empty, unknown: empty, excluded: empty, diagnostics: [], provenance: {}, interpretation: 'Fixture', restriction_report: report } })
+    if (path.endsWith('/study/layers/constraints')) return route.fulfill({ json: previewResult(route.request().postDataJSON(), { blocked: empty, unknown: empty, excluded: empty, diagnostics: [], provenance: {}, interpretation: 'Fixture', restriction_report: report }) })
     if (path.endsWith('/study/route')) {
       routeRequests++
       const body = route.request().postDataJSON()
@@ -37,9 +38,8 @@ test('default conservative policy, saved evidence revision, scoped request and i
   await page.goto('/')
   const panel = page.getByRole('region', { name: 'Regional route planning' })
   await expect(panel.getByLabel('Planning mode', { exact: true })).toHaveValue('conservative')
-  await panel.getByLabel('Scenario start').fill('2026-10-07T10:00')
-  await panel.getByLabel('Scenario end').fill('2026-10-07T10:15')
-  await panel.getByRole('button', { name: 'Load scenario layers' }).click()
+  await panel.getByLabel('Departure time').fill('2026-10-07T10:00')
+  await expect(panel.getByLabel('Assessed zone', { exact: true }).locator('option')).toHaveCount(2)
   await panel.getByText('Restriction assessments and reviewed notices', { exact: true }).click()
   await panel.getByLabel('Profile name', { exact: true }).fill('Reviewed launch consent')
   await panel.getByLabel('Assessed zone', { exact: true }).selectOption('dipul:test/1')
@@ -57,7 +57,7 @@ test('default conservative policy, saved evidence revision, scoped request and i
   await expect(panel.getByRole('status')).toHaveCount(0)
   await panel.getByRole('button', { name: 'Plan regional route', exact: true }).click()
   await expect(panel.getByRole('status')).toContainText('Policy exclusion')
-  await panel.getByLabel('Scenario end').fill('2026-10-07T10:20')
+  await panel.getByLabel('Departure time').fill('2026-10-07T10:20')
   await expect(panel.getByRole('status')).toHaveCount(0)
   expect(routeRequests).toBe(2)
   await page.setViewportSize({ width: 390, height: 844 })

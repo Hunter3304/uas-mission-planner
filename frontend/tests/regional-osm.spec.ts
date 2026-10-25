@@ -1,3 +1,4 @@
+import { timedResult } from './fixtures/flightInterval'
 import { expect, test, type Page, type Route } from '@playwright/test'
 
 const identity = {
@@ -135,7 +136,7 @@ async function setup(page: Page, override?: (route: Route, url: URL) => Promise<
       return route.fulfill({ json: collection(false, url.searchParams.get('style') === 'cost') })
     if (url.pathname.endsWith('/study/route'))
       return route.fulfill({
-        json: {
+        json: timedResult(route.request().postDataJSON(), {
           status: 'success',
           geometry: {
             type: 'LineString',
@@ -154,7 +155,7 @@ async function setup(page: Page, override?: (route: Route, url: URL) => Promise<
           research_assumptions: [],
           endpoint_diagnostics: {},
           provenance: { signature: 'fixture' },
-        },
+        }),
       })
     if (url.pathname.endsWith('/study'))
       return route.fulfill({
@@ -207,26 +208,25 @@ test('overview, detail styles, original tags and independent route updates', asy
   const map = page.getByRole('region', { name: 'Hannover regional map' })
   const box = await map.boundingBox()
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
-  const details = panel.getByRole('region', { name: 'Selected OSM object' })
+  const details = page.getByRole('region', { name: 'Selected OSM object' })
   await expect(details).toContainText('<script>unsafe tag</script>')
   await expect(details).toContainText('Building cost: 4')
   const before = urls.filter((url) => /\/osm\/(summary|features|overview)/.test(url)).length
   const canvas = await map.locator('.leaflet-overlay-pane canvas').elementHandle()
   const routing = page.getByRole('region', { name: 'Regional route planning' })
-  await routing.getByLabel('Scenario start').fill('2026-10-07T10:00')
-  await routing.getByLabel('Scenario end').fill('2026-10-07T10:15')
+  await routing.getByLabel('Departure time').fill('2026-10-07T10:00')
   await routing.getByRole('button', { name: 'Plan regional route', exact: true }).click()
   await expect(routing.getByRole('status')).toContainText('Length 1000.0 m')
   await expect(details).toContainText('node/1')
   await expect(map.locator('.leaflet-regional-route-pane svg')).toBeAttached()
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true)
   expect(urls.filter((url) => /\/osm\/(summary|features|overview)/.test(url)).length).toBe(before)
-  await panel.getByRole('button', { name: 'Close OSM details', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear selection', exact: true }).click()
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
   await expect(details).toContainText('Building cost: 4')
   await panel.getByLabel('Buildings', { exact: true }).uncheck()
   await expect(panel.getByTestId('osm-status')).toContainText('Enable the selected cost category')
-  await expect(panel.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
   await expect(routing.getByRole('button', { name: 'Export displayed result' })).toBeVisible()
   await panel.getByLabel('OSM cost category').selectOption('natural')
   await expect(panel.getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
@@ -266,7 +266,7 @@ test('bounded detail falls back to labelled overview; diagnostic originals remai
   await osm(page)
     .getByRole('button', { name: /way\/2/ })
     .click()
-  await expect(osm(page).getByRole('region', { name: 'Selected OSM object' })).toContainText(
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toContainText(
     'Drawable: false',
   )
 })
@@ -341,7 +341,7 @@ test('obsolete requests, empty view, category changes and outside coverage', asy
   await osm(page).getByLabel('OSM color view').selectOption('cost')
   await expect(osm(page).getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
   await pending!.fulfill({ json: collection(false) }).catch(() => {})
-  await expect(osm(page).getByLabel('OSM legend')).toContainText('Cost 4')
+  await expect(osm(page).getByLabel('OSM legend')).toContainText('4 · Very high')
   empty = true
   await osm(page).getByRole('button', { name: 'Refresh OSM', exact: true }).click()
   await expect(osm(page).getByTestId('osm-status')).toContainText('No matching OSM objects')
@@ -397,7 +397,7 @@ test('cached views still recheck readiness; closing details rejects late origina
   await panel.getByText('Inspect visible objects (first 50)', { exact: true }).click()
   await panel.getByRole('button', { name: 'node/1', exact: true }).click()
   await expect.poll(() => Boolean(pending)).toBe(true)
-  await panel.getByRole('button', { name: 'Close OSM details', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear selection', exact: true }).click()
   await pending!.fulfill({ json: detail('node/1') }).catch(() => {})
-  await expect(panel.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
 })

@@ -2,10 +2,18 @@
 
 This directory documents implemented cost classification and routing rules.
 
+[Population classes](population-costs.md) specifies Iteration 014 Part 1's fixed
+250 m aggregation, complete-study 0-4 classes, colored grid and inspection API.
+Part 2 adds optional shared population weighting through regional core/API/CLI;
+Part 3 implements its default-off UI checkbox and conditional weight field.
+Part 4 verifies combined routing, cache/resource limits, source identities and
+automatic endpoint diagnostics; see the [iteration outcome](../iteration/iteration-014/outcome.md).
+
 [Metric building-risk routing](risk-weighted-routing.md) records Iteration 006
 Part 1's length-times-score formula, 0.9/0.1 objective, maximum overlap policy,
 explicit background assumptions, metric point/motion collision checks and
-weighted A*/Dijkstra. This mode is currently exposed through the Python core.
+weighted A*/Dijkstra. The shared core is exposed through API, CLI and planning UI;
+regional population controls add a separate optional term.
 
 [Constrained shortest-path routing](routing-algorithms.md) specifies the confirmed
 A* planner and Dijkstra verification roles implemented in Part 3. Routing does
