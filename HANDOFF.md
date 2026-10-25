@@ -2,7 +2,34 @@
 
 ## Current status
 
-### Iteration 014 Part 1 delivered; Part 2 implemented locally (2026-10-25)
+### Iteration 014 Part 2 published; Part 3 locally accepted (2026-10-25)
+
+- User requested checking/pushing Part 2 and completing Part 3. Published Part 2
+  `8dac2a6d608e04935c6d4750f60d507013e38e0c` on its existing feature and opened
+  PR #126 to iteration/014. Exact-head Checks run `40209689283` passed Windows
+  Python, Linux Python and frontend, including test steps. Pre-push Ruff/format
+  and 22 population routing tests (35.16 s) passed. PR #126 / Issue #124 remain
+  open; no Part 2 merge or deletion is claimed. Main remains `4ed0023`;
+  iteration/014 remains `d3b0154`, the verified Part 1 merge.
+- Part 3: Issue #125 / `feature/125-population-routing-ui`, stacked locally on
+  the published Part 2 head. Default-off Include population beside the regional
+  objective, conditional weight, inactive/zero/invalid input handling, stale solve
+  cancellation, separate result costs/effective weights and displayed-result export
+  are implemented. Map visibility and weighting remain independent. Rules and
+  operation guide updated. No backend/source-data changes in Part 3.
+- Final frontend 68 browser passes (48.5 s), including eight new population cases;
+  real-backend smoke 14 passes (37.4 s); TypeScript/Vite build, ESLint and script
+  syntax/diff checks pass. Installed Chrome was used locally. Real Hannover UI
+  risk+population and distance+population both succeed, matching displayed/exported
+  costs, source identity and automatic ETA. Exactly two solves, zero population
+  display requests, no source hash changes or browser errors. Desktop/mobile
+  images inspected; owned verification services stopped. See Part 3 outcome and
+  `.cache/iteration014-part3-real-v1/`.
+- Part 3 remains local only: no push/PR/remote CI/merge is claimed. Part 4 broader
+  integrated/resource acceptance remains planned. See `doc/iteration/iteration-014/part3.md`
+  and `doc/experiments/iteration-014/README.md` before continuing.
+
+### Earlier: Part 1 delivered; Part 2 implemented locally (2026-10-25)
 
 - User requested pushing Part 1 before completing Part 2. Published accepted
   `e7459c6` on `origin/feature/122-population-surface`; PR #123 targets iteration/014.

@@ -1,11 +1,24 @@
 # Iteration 014 Part 2 - Optional population route objective
 
-Date: 2026-10-25 (Europe/Berlin). Status: implemented and locally accepted.
+Date: 2026-10-25 (Europe/Berlin). Status: published; exact-head remote checks passed.
 User authorized Part 2 after publishing Part 1.
 Implementation: `feature/124-population-routing`, assigned Issue #124 in
 [Milestone 13](https://github.com/Hunter3304/uas-mission-planner/milestone/13).
 Plan: [Iteration 014](../../plan/iteration-014.md).
 Rules: [Population routing](../../rules/population-costs.md).
+
+## Part 2 publication
+
+The user explicitly requested pushing Part 2 after verification on 2026-10-25.
+Application trees still matched the accepted implementation; pre-publication
+Ruff/format checks passed and 22 population routing tests passed (35.16 s).
+Published head `8dac2a6d608e04935c6d4750f60d507013e38e0c` on
+`origin/feature/124-population-routing` and opened
+[PR #126](https://github.com/Hunter3304/uas-mission-planner/pull/126), targeting
+iteration/014. Exact-head Checks run `40209689283` passed Windows Python, Linux
+Python and frontend, including all test steps. The PR and Issue #124 remain open;
+no Part 2 merge or branch deletion is claimed. Part 3 is implemented separately
+on a local feature stacked on this published head. Main remains unchanged.
 
 ## Part 1 publication
 
@@ -22,11 +35,11 @@ accepted tree; local iteration/014 tracks this verified remote merge.
 Part 2 implementation commit `f2c700ba9213e3d6505eeb81192d4cafaef6665e`
 incorporated the integration merge locally without file changes; backend/frontend
 Git trees remain identical to the locally accepted Part 2 implementation. Delivery
-record edits are documentation only. No Part 2 publication or remote CI is claimed.
+record edits were documentation only before the publication recorded above.
 Main remains `4ed0023`. Following explicit user approval that superseded the
 earlier automatic deletion block, the merged Part 1 feature was deleted remotely
 with an exact-head lease and locally. Fetch/prune, local ref checks and ls-remote
-verified cleanup. Part 2's local feature remains intact and unpublished.
+verified cleanup. Part 2's feature remains intact; its later publication is recorded above.
 
 ## Implemented behavior
 
@@ -126,4 +139,5 @@ weight zero to preserve the existing objective and skip population requirements.
 
 CLI adds `--include-population --population-weight 1` to `uas-planner study-route`.
 It retains the existing explicit scenario/terrain/endpoints and interval contract.
-The UI routing toggle and conditional input remain Part 3.
+The UI routing toggle and conditional input are implemented separately in
+[Part 3](part3.md); the Part 2 published head contains API/CLI controls only.
