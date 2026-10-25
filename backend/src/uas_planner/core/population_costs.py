@@ -2,6 +2,7 @@
 
 import json
 from bisect import bisect_right
+from contextvars import ContextVar
 from copy import deepcopy
 from functools import lru_cache
 from math import ceil, floor, isfinite
@@ -29,6 +30,7 @@ MAX_WINDOW_PIXELS = 10000
 MAX_DISPLAY_CELLS = 10000
 MAX_DISPLAY_BYTES = 5 * 1024 * 1024
 PREPARATION_SECONDS = 90
+_preparation_limits = ContextVar("population_preparation_limits", default=(None, None))
 
 
 class PopulationResourceLimit(ValueError):
@@ -228,6 +230,11 @@ class PopulationSurface:
     def metadata(self):
         return deepcopy(self._metadata)
 
+    @property
+    def metric_cells(self):
+        """Immutable metric footprints/IDs/classes for independent route evaluation."""
+        return tuple((g, f["id"], f["properties"]["risk_score"]) for g, f in self._cells)
+
     def display(self, bbox=None):
         """Bounded geographic subset, preserving full-study classification metadata."""
         metadata = self.metadata
@@ -275,16 +282,26 @@ def _prepared(directory, payload):
     boundary = transform(
         Transformer.from_crs(4326, 25832, always_xy=True).transform, box(*area.as_tuple())
     )
+    deadline, cancel = _preparation_limits.get()
     return PopulationSurface(
-        boundary, safe_file(directory, source["path"]), source, manifest["epoch"]
+        boundary,
+        safe_file(directory, source["path"]),
+        source,
+        manifest["epoch"],
+        deadline=deadline,
+        cancel=cancel,
     )
 
 
-def prepare_population_surface(directory):
+def prepare_population_surface(directory, *, deadline=None, cancel=None):
     """Verify population-specific source integrity on every call, including cache hits.
 
     This endpoint does not load or attest unrelated OSM/DIPUL/terrain sources.
     """
+    deadline = min(
+        perf_counter() + PREPARATION_SECONDS, float("inf") if deadline is None else deadline
+    )
+    check_deadline(deadline, cancel)
     directory = Path(directory).resolve()
     manifest = read_json(safe_file(directory, "study.json"))
     if manifest.get("schema_version") != 1 or manifest.get("kind") != "regional-source-study":
@@ -313,8 +330,14 @@ def prepare_population_surface(directory):
     )
     # Validate bounds even on a cached call.
     area.as_tuple()
-    surface = _prepared(str(directory), payload)
+    check_deadline(deadline, cancel)
+    token = _preparation_limits.set((deadline, cancel))
+    try:
+        surface = _prepared(str(directory), payload)
+    finally:
+        _preparation_limits.reset(token)
     if checksum(source_path) != actual:
         _prepared.cache_clear()
         raise ValueError("Population source changed during preparation.")
+    check_deadline(deadline, cancel)
     return surface

@@ -98,13 +98,15 @@ non-polygon source diagnostics remain intact. Weights remain 0.9 risk / 0.1 leng
 Unassessed background is not observed zero risk. Invalid/collection building
 support prevents risk preparation. Research can explicitly omit non-polygon
 buildings from soft scoring with diagnostics; their unbounded hard-obstacle extent
-still remains unknown. No GHSL count is added to the objective.
+still remains unknown. Optional [population routing](population-costs.md) adds
+length times the 250 m population class, rather than raw GHSL counts.
 
 ## Population interpretation and visualization
 
 The Hannover map now displays [250 m population classes](population-costs.md)
 instead of its former green native-count bins. The native query/CLI interpretation
-below remains valid. Both products remain separate from route costs in Part 1.
+below remains valid. Viewing either product does not enable route weighting.
+Part 2 adds independent regional API/CLI controls for population costs.
 
 Windowed GHSL queries retain native 100 m ESRI:54009 cells, population units,
 2020 estimate/2025 projection metadata, known zeros and NoData. At most 100,000

@@ -1,5 +1,10 @@
 # Constrained shortest-path routing rules
 
+Optional [population routing](population-costs.md) uses the same 250 m classified
+centreline evaluator in A*, Dijkstra and native ABIT*, including connectors and
+independent final costs. Default distance/building-only routing remains available
+without population support.
+
 Status: algorithm roles confirmed on 2026-09-29; Part 3 implementation authorized
 on 2026-09-30. Original baseline version: `distance-grid-v1`; Iteration 006
 Part 1 reports `distance-grid-v2` for configurable clearance and conservative

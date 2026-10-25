@@ -909,6 +909,7 @@ class RegionalConstraints:
         risk_weight=0.9,
         distance_weight=0.1,
         search_boundary=None,
+        _allow_zero_weights=False,
     ):
         """Reuse approved soft semantics; unsafe source support remains explicit."""
         if mode not in ("strict", "research", "conservative"):
@@ -950,6 +951,7 @@ class RegionalConstraints:
             source=self.provenance,
             risk_weight=risk_weight,
             distance_weight=distance_weight,
+            _allow_zero_weights=_allow_zero_weights,
             safety_distance_m=self.scenario.get("clearance_m", 0),
         )
 

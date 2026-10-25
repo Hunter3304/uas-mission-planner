@@ -1,7 +1,7 @@
 # Population classes on a 250 m grid
 
-Implemented in Iteration 014 Part 1: aggregation, classification, inspection API
-and colored Hannover map cells. Route weighting is deferred to Part 2.
+Part 1 implements aggregation, classification, inspection API and colored map
+cells. Part 2 adds optional population routing through the regional core/API/CLI.
 Rule version: `ramke-population-250m-v1`.
 
 ## Source and interpretation
@@ -128,8 +128,8 @@ Cache at most two immutable study surfaces by source, bounds, epoch and rule
 identity. Bound preparation to 100,000 candidate target cells, 10,000 pixels per
 native window and 90 seconds, with per-cell/per-row deadline/cancellation checks.
 Serialize at most 10,000 display features and a bounded 5 MiB response, reserving
-64 KiB for metadata. A geographic STRtree bounds viewport selection. One API
-population preparation runs at a time; concurrent requests receive 409/retry.
+64 KiB for metadata. A geographic STRtree bounds viewport selection. One population
+inspection request runs at a time; concurrent inspection requests receive 409/retry.
 Resource exhaustion returns a structured `resource_limit`, never a coarser grid
 or corridor-local normalization.
 
@@ -148,16 +148,75 @@ Native population inspection remains available through `/study/population`, CLI
 and the existing small-area experiment page. Its 100 m raw counts are not relabelled
 as risk classes. The original source raster remains unchanged.
 
-## Route contract reserved for Part 2
+## Optional population routing - Part 2
 
-The approved next-part formula is:
+Routing rule version: `population-length-risk-v1`. Classification retains its
+separate identity `ramke-population-250m-v1`. All three planners use:
 
 `P(route) = sum(length_m(segment intersect population_cell) * class(population_cell))`
 
-Intersection lengths will be measured in EPSG:25832, including endpoint connectors
-and repeated traversals, with shared-edge/unknown-support policies documented
-when implemented. Building score-metres, population score-metres and physical
-distance will remain separate quantities. Part 1 exposes `routing_cost: false`:
-these classes currently do not alter A*, Dijkstra, ABIT* or their constraints.
+Intersection lengths use the complete centreline in EPSG:25832. Partition by
+descending class so the maximum adjacent class is counted once on shared edges.
+Exact endpoint connectors and repeated traversals contribute. Zero-length paths
+have zero cost but still require known support. Any unknown cell contact, including
+a corner/endpoint touch, is unresolved. Building background and research planning
+mode never fill missing population support.
+
+Cell footprints use a `1e-7 m` expansion with mitred corners for numerical contact/
+projection roundoff; the study boundary uses the same tolerance. This is a numerical
+convention, not a buffered flight corridor or exposure width. Length remains the
+unbuffered centreline length. Hard constraint checks remain separate and unchanged.
+
+`include_population` defaults false and must be boolean. When enabled,
+`population_weight` defaults to 1 and must be finite/nonnegative. Disabled population
+ignores any retained hidden weight. Weight 0 makes population inactive: no source
+preparation/support requirements and null population cost rather than measured zero.
+Weights need not sum to 1; at least one effective weight must be positive.
+
+For base objective `risk`:
+
+`J = risk_weight * B + distance_weight * L + population_weight * P`.
+
+For base objective `distance`:
+
+`J = L + population_weight * P`.
+
+B is building score-metres, P population score-metres and L physical metres.
+Distance mode uses effective building/distance coefficients 0/1 regardless of
+hidden risk controls, and requires no building soft-cost support. Risk mode retains
+existing building coverage/background semantics. A positive population coefficient
+also permits risk mode with both building/distance coefficients set to 0.
+
+The regional POST `/api/datasets/{id}/study/route` accepts both population controls.
+CLI `study-route` accepts `--include-population --population-weight VALUE`.
+Historical omitted controls preserve the existing objective. Search graph spacing
+defaults to 250 m; ABIT* stays continuous. Graph edges/connectors, native motion
+callbacks and independent final checks share one population evaluator. The
+effective distance coefficient times Euclidean distance remains an admissible
+heuristic because the additional terms are nonnegative.
+
+Results report separate `population_length_cost`, `population_active`,
+`population_assessment`, classification identity/reference, effective weights and
+`effective_objective` (`risk+population` or `distance+population`).
+`risk_length_cost` stays building-only and is null in distance mode. Endpoint
+support findings and successful-route population cell IDs remain inspectable.
+GeoJSON metadata/feature properties preserve separate costs. Inactive/unsuccessful
+results expose no accepted population cost; failed solves export no route features.
+
+Prepare population once per regional request; reuse its fixed reference across
+corridor and automatic-duration retries. Preparation obeys the smaller of its
+90-second limit and remaining overall deadline, including cache hits. A local
+spatial index avoids raster reads per edge. Population-active explicit requests
+share a 110-second deadline across source preparation/planning. Automatic requests
+retain their existing shared 110-second deadline and complete-cruise-interval
+revalidation. Search and edge/connector cost preparation respect the search budget.
+Resource/validation failures clear accepted geometry, costs and ETA, retaining
+available request controls and population diagnostics.
+
+The inspection product retains `routing_cost: false` because displaying it does
+not enable optimization. Active route provenance separately records
+`ghsl_routing_cost: true`, the population identity and numerical/boundary policy.
+The UI routing checkbox/conditional weight field remain Part 3; API/CLI enable
+the new objective in Part 2. Map visibility alone changes no route objective.
 
 See the [implementation plan](../plan/iteration-014.md) for later objective/UI work.

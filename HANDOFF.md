@@ -2,6 +2,33 @@
 
 ## Current status
 
+### Iteration 014 Part 1 delivered; Part 2 implemented locally (2026-10-25)
+
+- User requested pushing Part 1 before completing Part 2. Published accepted
+  `e7459c6` on `origin/feature/122-population-surface`; PR #123 targets iteration/014.
+  Exact-head Checks run `40189193801` passed Linux Python, Windows Python and
+  frontend including test steps. The user subsequently explicitly approved
+  merging into iteration/014, superseding the earlier automatic approval block.
+  PR #123 merged at `d3b01542252b7fdf66d2cabc722e0a66e20c3de5`;
+  Issue #122 was explicitly closed as completed. Milestone 13 remains open.
+- Local iteration/014 tracks the verified remote merge. Part 2 incorporated that
+  merge locally with identical backend/frontend Git trees and no file changes.
+  Main remains `4ed0023`. The user explicitly approved branch cleanup after the
+  earlier automatic deletion block. The merged Part 1 feature was deleted
+  remotely with an exact-head lease and locally; fetch/prune, local ref checks
+  and ls-remote verified cleanup. Part 2's local feature remains intact.
+- Part 2 is Issue #124 / `feature/124-population-routing`, stacked locally on
+  the published Part 1 head. Shared indexed population evaluator/combined model,
+  regional API/CLI controls, all three planners/connectors/final validation,
+  provenance/exports, deadline-aware source preparation and automatic interval
+  handling are implemented. Part 3 routing UI remains deferred. Rules updated.
+- Final backend 372 passes / one existing skip (133.09 s); focused 58 passes
+  (63.29 s); 14 smoke passes (35.8 s); lint/build/format pass. Real Hannover
+  baseline/risk+population/distance+population all succeed, original hashes
+  unchanged and independent P differs by under 0.000001 score-metres. See
+  `doc/iteration/iteration-014/part2.md` and `.cache/iteration014-part2-real-v1/`.
+  No Part 2 remote publication/CI/merge is claimed.
+
 ### Iteration 014 publication and Part 2 authorized (2026-10-25)
 
 - User explicitly requested publishing accepted Part 1 to the existing origin
