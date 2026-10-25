@@ -16,7 +16,12 @@ and [iteration outcome](../iteration/iteration-014/outcome.md) for integrated
 coverage, actual resource evidence and publication scope. Part 4 is now locally
 accepted: 374 backend passes / one skip, 68 browser and 14 real-backend smoke
 passes, nine successful real route requests, two preserved catalog-address
-conflicts, and final real display/resource acceptance. Part 4 publication remains pending.
+conflicts, and final real display/resource acceptance. Following explicit user
+authorization to publish to main, Part 4 PR #129 passed exact-head remote Checks
+`40216146234` and merged at `fb8ee00`; Issue #128 is closed. Full-integration
+PR #130 passed independent Checks `40216570440` and merged to main at `7c79b88`,
+including the completed Iteration 013 ancestor. Main's merged tree equals accepted
+Part 4 `5008357`; Milestones 12/13 are closed with no open issues.
 Part 1 is delivered to iteration/014 through PR #123 at `d3b0154`, following
 exact-head remote checks and the user's explicit integration approval;
 Issue #122 is closed. See [Part 1 outcome](../iteration/iteration-014/part1.md)
@@ -26,7 +31,8 @@ see [Part 2 outcome](../iteration/iteration-014/part2.md). Part 3 is tracked by
 Issue #125 / `feature/125-population-routing-ui`, delivered through PR #127;
 see [Part 3 outcome](../iteration/iteration-014/part3.md).
 Baseline inspected: local `iteration/013`, with the completed Iteration 013 Parts.
-This plan does not claim Iteration 013 delivery to main or create remote tracking.
+The original plan did not claim Iteration 013 main delivery; the later authorized
+publication through PR #130 delivered both completed iterations, as recorded above.
 
 ## Requested result and confirmed scope
 

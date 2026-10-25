@@ -8,8 +8,13 @@ All four Parts are delivered to iteration/013 through PRs #115, #117, #119 and
 head `500d496`: Windows 339 passes; Linux 329 passes / 10 skips; frontend lint/
 build, 55 browser and 14 real-stack smoke passes. Issue #120 is closed and
 local/remote merged-feature cleanup is verified. Explicit user publication
-approval on 2026-10-23 superseded the earlier automatic block. Full iteration/main
-CI/integration remains pending. Main is `4ed0023`; Milestone 12 remains open.
+approval on 2026-10-23 superseded the earlier automatic block. On 2026-10-25 the
+user authorized current-version publication to main. The completed Iteration 013
+ancestor entered main together with Iteration 014 through PR #130 at `7c79b88`,
+after independent combined Checks `40216570440` passed Windows 375 tests,
+Linux 364 / 11 skips, frontend 68 browser and 14 smoke tests plus lint/format/build.
+Milestone 12 is closed with zero open/four closed issues. This records combined
+publication, not a separate Iteration 013 main PR.
 
 ## Delivered behavior
 
@@ -47,9 +52,10 @@ at 30 m/s takes 123.853 s; automatic and explicit baseline geometry/cost agree.
 Initial/final layers take 74.268/74.498 s; automatic/baseline requests take
 50.185/50.595 s. Conservative invalid-endpoint failure has no ETA. Export,
 completed assessment scope, desktop/mobile, Parts 1-3 interaction and zero-request
-cached toggles pass. The feature CI gate passed; the independent complete-iteration
-gate remains before claiming main delivery. All 21 application hashes still match
-after integration with no logical source change.
+cached toggles pass. The feature CI gate passed, followed by the independent
+combined main gate recorded above. All 21 application hashes matched after
+Iteration 013 integration with no logical source change; Iteration 014 subsequently
+adds its documented optional population behavior and final acceptance fixes.
 
 Unchanged limits: full scenario preparation/payload costs, bounded OSM queries,
 current-page cache lifetime and request-local source preparation. Data completeness,

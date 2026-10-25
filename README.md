@@ -9,17 +9,21 @@ regional objective, with a weight input shown only when checked. Route results
 and exports separate building/population cost, physical length and the combined
 objective. The population map toggle is independent from route weighting.
 See the [operation guide](doc/experiments/iteration-014/README.md).
-Part 4 completes local integrated/resource acceptance, preserves population endpoint
+Part 4 completes integrated/resource acceptance, preserves population endpoint
 diagnostics through automatic arrival, and corrects inspection help. See the
 [iteration outcome](doc/iteration/iteration-014/outcome.md) for actual timing,
-memory, validation and delivery limits; Part 4 publication remains pending.
+memory, validation and delivery limits. All four Parts are delivered to main;
+Part 4 [PR #129](https://github.com/Hunter3304/uas-mission-planner/pull/129) passed
+Linux/Windows/frontend CI. Full integration merged through
+[PR #130](https://github.com/Hunter3304/uas-mission-planner/pull/130) at `7c79b88`,
+after independent Linux/Windows/frontend CI. Milestones 12 and 13 are closed.
 See [population rules](doc/rules/population-costs.md) and the
 [plan](doc/plan/iteration-014.md). Native inspection APIs and original data remain available.
 
 Iteration 013 **Part 1** is delivered to `iteration/013` through
 [PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
-Linux Python, Windows Python and frontend CI passed. Issue #114 is closed;
-Milestone 12 and the iteration branch remain for the full iteration/main gate. It adds source-grouped
+Linux Python, Windows Python and frontend CI passed. Issue #114 is closed.
+The completed iteration also entered main through PR #130. It adds source-grouped
 collapsible map controls, automatic cached scenario layers and a dedicated
 saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
 coordinate override checkbox and manual layer-load button are removed from the
@@ -49,7 +53,8 @@ reassessment. Explicit historical API/CLI intervals remain supported. See
 [iteration outcome](doc/iteration/iteration-013/outcome.md).
 Local regression and integrated Hannover acceptance pass. The user's explicit
 publication approval superseded the earlier automatic block. All four Parts are
-on iteration/013; main integration still requires its independent CI gate.
+on iteration/013 and entered main as the completed ancestor of Iteration 014
+through PR #130, after the independent full-integration CI gate passed.
 
 Iteration 012 is delivered to `main` through
 [PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after

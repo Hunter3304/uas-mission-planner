@@ -1,6 +1,6 @@
 # Iteration 014 Part 4 - Integrated acceptance and resource evidence
 
-Date: 2026-10-25 (Europe/Berlin). Status: implemented and locally accepted.
+Date: 2026-10-25 (Europe/Berlin). Status: delivered to main through PR #130.
 User authorized implementing the final Part 4 after Parts 2-3 delivery.
 Tracking: assigned [Issue #128](https://github.com/Hunter3304/uas-mission-planner/issues/128)
 in Milestone 13; `feature/128-population-acceptance` from `iteration/014` at
@@ -197,6 +197,22 @@ long-run heap convergence, absence of leaks or total native browser/GPU memory.
 
 ## Delivery scope
 
-Part 4 is local implementation/acceptance work. No Part 4 push, PR, remote CI or
-merge is claimed. Parts 1-3 remain delivered to iteration/014; main and Milestone
-13 are unchanged. Complete iteration/main integration remains a separate gate.
+The user explicitly authorized publication to main after local acceptance.
+Published final head `50083570aee786b69395795aa2dd85a3c1462036` and opened
+[PR #129](https://github.com/Hunter3304/uas-mission-planner/pull/129) to iteration/014.
+Exact-head Checks `40216146234` passed Windows 375 tests (158.09 s), Linux 364
+tests / 11 skips (214.50 s), frontend 68 browser (59.9 s) and 14 real-backend smoke
+tests (39.7 s), with lint/format/build. PR #129 merged at
+`fb8ee00a2f9490424ee743766825d1ca3566f527`; Issue #128 was closed as completed.
+Local iteration/014 is synchronized and its application tree equals the accepted
+final Part 4. Feature refs are retained.
+
+All four Parts are delivered to main. Full iteration/main
+[PR #130](https://github.com/Hunter3304/uas-mission-planner/pull/130) independently
+checked head `fb8ee00`, including the completed Iteration 013 ancestor. Checks
+`40216570440` passed Windows 375 tests (147.76 s), Linux 364 / 11 skips (226.34 s),
+frontend 68 browser (46.6 s) and 14 smoke tests (26.7 s), with lint/format/build.
+The authorized merge is `7c79b88ce7374225d87783978a15be910ff6cf28`, verified through
+GitHub and fetched Git history. Its entire tree equals accepted head `5008357`.
+Local main is synchronized; Milestones 12/13 are closed with no open issues.
+The final closeout changes documentation only and retains feature/iteration refs.

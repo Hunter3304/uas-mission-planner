@@ -2,7 +2,28 @@
 
 ## Current status
 
-### Iteration 014 Part 4 locally accepted (2026-10-25)
+### Iterations 013 and 014 delivered to main (2026-10-25)
+
+- User explicitly requested publishing the accepted final work to main. Published
+  Part 4 head `50083570aee786b69395795aa2dd85a3c1462036`; PR #129 passed Checks
+  `40216146234`: Windows 375 passes (158.09 s), Linux 364 passes / 11 skips
+  (214.50 s), frontend 68 browser (59.9 s) and 14 smoke (39.7 s), plus lint/build.
+  PR #129 merged into iteration/014 at `fb8ee00a2f9490424ee743766825d1ca3566f527`.
+  Issue #128 is closed. Local iteration/014 fast-forwarded; merged application
+  trees equal the accepted final Part 4 implementation. Feature refs are retained.
+- Main previously remained at Iteration 012 (`4ed0023`), so the requested current-version
+  publication includes the already completed Iteration 013 ancestor. Verified
+  full ancestry and opened PR #130 (`iteration/014` -> `main`) with an independent
+  full-integration Checks gate on exact head `fb8ee00`. Checks `40216570440` passed:
+  Windows 375 tests (147.76 s), Linux 364 / 11 skips (226.34 s), frontend 68 browser
+  (46.6 s) and 14 smoke (26.7 s), plus lint/format/build. PR #130 merged to main at
+  `7c79b88ce7374225d87783978a15be910ff6cf28`; GitHub and fetched Git history agree.
+  The entire merged tree equals accepted Part 4 `5008357`, with completed
+  Iteration 013 and all four Iteration 014 Parts in its ancestry. Local main is
+  synchronized. Milestones 12/13 are closed, each with zero open/four closed issues.
+  This closeout updates documentation only; application trees remain unchanged.
+
+### Earlier: Iteration 014 Part 4 locally accepted (2026-10-25)
 
 - User requested implementing the final Part 4 after Parts 2-3 delivery. Assigned
   Issue #128 in Milestone 13; local `feature/128-population-acceptance` starts at

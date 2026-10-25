@@ -4,11 +4,16 @@ Date: 2026-10-25 (Europe/Berlin).
 Plan: [Iteration 014](../../plan/iteration-014.md).
 Operation and reproduction: [guide](../../experiments/iteration-014/README.md).
 
-Parts 1-3 are delivered to iteration/014 through PRs #123, #126 and #127.
-Part 4 completes local integrated acceptance and resource evidence on
-`feature/128-population-acceptance` / Issue #128 in Milestone 13. Part 4 remote
-publication and full iteration/main integration remain separate gates. Main
-remains `4ed0023`; no complete-iteration delivery to main is claimed.
+All four Parts are delivered to iteration/014 through PRs #123, #126, #127 and
+#129. Part 4 merged at `fb8ee00` after exact-head Checks `40216146234` passed:
+Windows 375 tests, Linux 364 tests / 11 skips, frontend 68 browser and 14 real-backend
+smoke tests plus lint/format/build. Issue #128 is closed. The user explicitly
+authorized publication to main. Full-integration PR #130 merged at
+`7c79b88ce7374225d87783978a15be910ff6cf28`, including the completed Iteration 013
+ancestor, after independent Checks `40216570440` passed Windows 375 tests,
+Linux 364 / 11 skips, frontend 68 browser and 14 smoke tests plus lint/format/build.
+The fetched main tree equals accepted Part 4 `5008357`; local main is synchronized.
+Milestones 12/13 are closed with all eight feature issues completed.
 
 ## Implemented result
 
