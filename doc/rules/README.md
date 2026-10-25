@@ -2,6 +2,10 @@
 
 This directory documents implemented cost classification and routing rules.
 
+[Population classes](population-costs.md) specifies Iteration 014 Part 1's fixed
+250 m aggregation, complete-study 0-4 classes, colored grid and inspection API.
+Population weighting in routing remains the next Part.
+
 [Metric building-risk routing](risk-weighted-routing.md) records Iteration 006
 Part 1's length-times-score formula, 0.9/0.1 objective, maximum overlap policy,
 explicit background assumptions, metric point/motion collision checks and

@@ -1,5 +1,6 @@
+import { populationCosts } from './fixtures/populationCosts'
 import { expect, test } from '@playwright/test'
-import { detail, detailView, geometry, setup, inspector, osm, map, centerClick, empty } from './fixtures/regionalSelection'
+import { detail, detailView, geometry, setup, inspector, osm, centerClick, empty } from './fixtures/regionalSelection'
 
 test('OSM source facts preserve heights, address, independent costs, defaults and safely nested original tags', async ({ page }) => {
   const attack = '<img src=x onerror="window.sourceExecuted=true">'
@@ -50,28 +51,35 @@ test('missing OSM facts remain absent rather than becoming measured zeroes or su
   await expect(inspector(page).locator('.source-raw pre')).not.toBeVisible()
 })
 
-for (const [name, value, expected] of [['zero', 0, 'Estimated population: 0 people per native cell'], ['NoData', null, 'NoData · population unavailable'], ['small positive', 0.00001, 'Estimated population: less than 0.01 people per native cell']] as const)
-  test(`GHSL ${name} is distinguished with native units, epoch and query coverage`, async ({ page }) => {
+for (const [name, score, people] of [['zero', 0, 0], ['positive lowest class', 0, .31], ['NoData', null, 0], ['highest class', 4, 600]] as const)
+  test(`250 m GHSL ${name} has ordinal colors, density, epoch and support`, async ({ page }) => {
     await setup(page, async (route, path) => {
-      if (!path.endsWith('/study/population')) return false
-      await route.fulfill({ json: { product: 'GHS-POP test', epoch: 2020, native_support_m: 100, complete_support: false, layer: { type: 'FeatureCollection', features: [{ type: 'Feature', id: '10:20', geometry, properties: { people_per_cell: value, status: value == null ? 'unknown' : 'known' } }] } } })
+      if (!path.endsWith('/study/population-costs')) return false
+      await route.fulfill({ json: populationCosts(score, people) })
       return true
     })
     await osm(page).getByLabel('Show saved OSM').uncheck()
-    await page.getByLabel('GHSL — population cells', { exact: true }).check()
+    await page.getByLabel('GHSL — population risk (250 m)', { exact: true }).check()
     const group = page.getByRole('region', { name: 'GHSL population', exact: true })
     await expect(group).toContainText('Ready · 1 cells')
     await centerClick(page)
-    await expect(inspector(page)).toContainText(expected)
-    await expect(inspector(page)).toContainText('100 m × 100 m')
-    await expect(inspector(page)).toContainText('2020')
-    await expect(inspector(page)).toContainText('GHS-POP test')
-    await expect(inspector(page)).toContainText('incomplete population support')
-    await expect(group.locator('.cost-legend span').filter({ hasText: /^Zero$/ }).locator('i')).toHaveCSS('background-color', 'rgb(241, 249, 235)')
-    await expect(group.locator('.cost-legend span').filter({ hasText: /^NoData$/ }).locator('i')).toHaveCSS('background-color', 'rgb(116, 123, 134)')
-    await expect(map(page).locator('.selection-summary')).toContainText(expected)
-    if (value == null) await expect(inspector(page)).toContainText('Missing population data is not zero')
-    else if (value === 0) await expect(inspector(page)).toContainText('Known zero estimate')
+    const panel = inspector(page)
+    await expect(panel).toContainText(score == null ? 'NoData · population risk unavailable' : `Population risk: ${score}`)
+    await expect(panel).toContainText('250 m × 250 m')
+    await expect(panel).toContainText('100 m × 100 m')
+    await expect(panel).toContainText('2020')
+    await expect(panel).toContainText('GHS-POP test')
+    await expect(panel).toContainText('complete saved study')
+    await expect(panel).toContainText('does not change route costs')
+    if (score == null) await expect(panel).toContainText('not zero population or class 0')
+    else await expect(panel).toContainText(`${people} people in this cell`)
+    await expect(group.getByLabel('Population risk legend').locator('span')).toHaveCount(6)
+    await expect(group.getByLabel('Population risk legend').locator('span').first().locator('i')).toHaveCSS('background-color', 'rgb(38, 134, 108)')
+    await expect(group.getByLabel('Population risk legend').locator('span').nth(4).locator('i')).toHaveCSS('background-color', 'rgb(189, 56, 73)')
+    await expect(group.getByLabel('Population risk legend').locator('span').last().locator('i')).toHaveCSS('background-color', 'rgb(120, 131, 142)')
+    await expect(page.getByLabel('GHSL — population cells', { exact: true })).toHaveCount(0)
+    await page.setViewportSize({ width: 390, height: 844 })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   })
 
 test('DIPUL assessment separates policy, original limits, scoped height/time and nested provenance', async ({ page }) => {

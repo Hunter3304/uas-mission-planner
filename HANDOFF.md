@@ -2,6 +2,42 @@
 
 ## Current status
 
+### Iteration 014 publication and Part 2 authorized (2026-10-25)
+
+- User explicitly requested publishing accepted Part 1 to the existing origin
+  `Hunter3304/uas-mission-planner`, then implementing Part 2. Local GitHub
+  credentials are available outside the restricted sandbox; the earlier local
+  tracking limitation is resolved. Created verified Milestone 13, remote
+  `iteration/014` at `d0782d3`, and assigned Part 1 Issue #122.
+- Rename the local feature to `feature/122-population-surface` for publication.
+  Preserve accepted Part 1 application behavior and run final-head remote CI
+  before any iteration integration. Part 2 gets a separate issue/feature.
+
+### Iteration 014 Part 1 local acceptance (2026-10-25)
+
+- User authorized Part 1 and colored population grids, then explicitly replaced
+  the old Hannover green native-count display with five green-to-red risk classes
+  and gray NoData. Plan: `doc/plan/iteration-014.md`; implemented rules:
+  `doc/rules/population-costs.md`; acceptance: `doc/iteration/iteration-014/part1.md`.
+- Fixed 250 m study lattice, area-weighted native GHSL counts, complete-support
+  density, full-study maximum and deterministic classes 0-4. New source-verified,
+  cached/bounded `/study/population-costs` inspection API and shared-map inspector.
+  Original native APIs/small-area behavior remain. Routing integration is Part 2;
+  routing checkbox/weight is Part 3. No population objective is active yet.
+- Local backend 350 passes / one existing skip; final focused 12 passes; final
+  browser 60 passes; real-stack smoke 14 passes; lint/build/format/diff checks pass.
+  Real Hannover: 6,759 supported cells; class counts 5322/1051/295/68/23; first
+  visible load 28.673 s; one population request for ten visibility cycles; zero
+  route requests; original source hashes unchanged. Actual desktop/mobile images
+  in `.cache/iteration014-real/` were inspected. Independent count conservation
+  differs by approximately 0.000011 people. See Part 1 outcome for measurement scope.
+- Local `iteration/014` and `feature/iteration014-population-surface` derive from
+  `d0782d3`. GitHub connector lacks milestone creation; local credential fallback
+  was unavailable. No remote milestone/issue/PR/push/CI/merge is claimed. Record
+  actual remote tracking and complete normal publication gates before publication.
+  Iteration 013/main state below is unchanged. Original data and user services
+  were preserved; isolated owned verification services were stopped.
+
 ### Iteration 013 Part 4 verified delivery (2026-10-23)
 
 - User's explicit publication approval superseded the earlier automatic block.

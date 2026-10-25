@@ -88,6 +88,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
     # A timed-out/disconnected browser cannot cancel native source preparation.
     # Bound actual server work too, including requests from another browser tab.
     scenario_layer_slot = BoundedSemaphore(1)
+    population_cost_slot = BoundedSemaphore(1)
     api.state.osm_display = display
     from uas_planner.api.osm_display import router as osm_display_router
 
@@ -416,6 +417,37 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             return PopulationInspector(path, manifest).query(geometry, include_cells=cells)
         except (ValueError, KeyError, OSError, TypeError, AttributeError) as exc:
             raise HTTPException(422, "Cannot inspect regional population query.") from exc
+
+    @api.get("/api/datasets/{dataset_id}/study/population-costs")
+    def regional_population_costs(dataset_id: str, bbox: str | None = Query(None, max_length=160)):
+        from math import isfinite
+
+        from uas_planner.core.population_costs import (
+            PopulationResourceLimit,
+            prepare_population_surface,
+        )
+
+        path = dataset_path(dataset_id)
+        if not population_cost_slot.acquire(blocking=False):
+            raise HTTPException(409, "Population preparation is already running. Retry shortly.")
+        try:
+            bounds = None
+            if bbox is not None:
+                bounds = [float(v) for v in bbox.split(",")]
+                if (
+                    len(bounds) != 4
+                    or not all(isfinite(v) for v in bounds)
+                    or not -180 <= bounds[0] < bounds[2] <= 180
+                    or not -85 <= bounds[1] < bounds[3] <= 85
+                ):
+                    raise ValueError("Invalid population display bounds.")
+            return prepare_population_surface(path).display(bounds)
+        except PopulationResourceLimit as exc:
+            raise HTTPException(422, {"state": "resource_limit", "message": str(exc)}) from exc
+        except (ValueError, KeyError, OSError, TypeError, AttributeError) as exc:
+            raise HTTPException(422, "Cannot verify or prepare 250 m population classes.") from exc
+        finally:
+            population_cost_slot.release()
 
     @api.get("/api/datasets/{dataset_id}/experiment/layers/{layer}")
     def experiment_layer(dataset_id: str, layer: Literal["population", "zones"]):

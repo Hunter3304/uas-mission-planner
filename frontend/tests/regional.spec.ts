@@ -1,3 +1,4 @@
+import { populationCosts } from './fixtures/populationCosts'
 import { timedResult } from './fixtures/flightInterval'
 import { expect, test } from '@playwright/test'
 
@@ -65,7 +66,7 @@ test('eight catalog endpoints, independent layers, successful route export and p
       return route.fulfill({ json: timedResult(route.request().postDataJSON(), { status: 'success', geometry: { type: 'LineString', coordinates: [[9.76, 52.3], [9.7, 52.3]] }, length_m: 1000, risk_length_cost: 20, objective_cost: 118, cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5, runtime_ms: 25, research_assumptions: [], endpoint_diagnostics: {}, provenance: { model_signature: 'retained-source' }, mission: { speed_m_s: 30 } }) })
     }
     if (path.endsWith('/study/layers/constraints')) return route.fulfill({ json: { blocked: empty, unknown: empty, diagnostics: [{ reason: 'Fixture uncertainty' }], provenance: {}, interpretation: 'No permission inferred' } })
-    if (path.endsWith('/study/population')) return route.fulfill({ json: { layer: empty } })
+    if (path.endsWith('/study/population-costs')) return route.fulfill({ json: populationCosts() })
     if (path.endsWith('/study/layers/zones') || path.endsWith('/features')) return route.fulfill({ json: empty })
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds, locations: sites }, sources: {} } })
     return route.fulfill({ json: path === '/api/datasets' ? { datasets: [dataset] } : dataset })
@@ -82,7 +83,7 @@ test('eight catalog endpoints, independent layers, successful route export and p
   await expect(page.getByText('Layer coverage and applicability findings')).toBeVisible()
   await expect(page.getByLabel('Original DIPUL')).toHaveCount(0)
   await page.getByLabel('GHSL —').check()
-  await expect.poll(() => loaded.includes('/api/datasets/hannover/study/population')).toBe(true)
+  await expect.poll(() => loaded.includes('/api/datasets/hannover/study/population-costs')).toBe(true)
   await expect(page.getByLabel('GHSL —')).toBeChecked()
   await panel.getByRole('button', { name: 'Plan regional route', exact: true }).click()
   await expect(panel.getByRole('status')).toContainText('Length 1000.0 m')

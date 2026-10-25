@@ -22,6 +22,12 @@ export function objectTitle(properties: Record<string, unknown>, fallback = 'OSM
 }
 
 export function populationSummary(properties: Record<string, unknown>) {
+  if (properties.layer_kind === 'population_cost') {
+    const score = properties.risk_score
+    return typeof score === 'number' && Number.isInteger(score) && score >= 0 && score <= 4
+      ? { known: true, text: `Population risk: ${score} · ${costLabels[score]}`, note: '250 m aggregate · ordinal class, not a probability. Class 0 can contain people.' }
+      : { known: false, text: 'NoData · population risk unavailable', note: 'Incomplete population support is not zero population or class 0.' }
+  }
   const value = properties.people_per_cell
   if (properties.status === 'unknown' || typeof value !== 'number' || !Number.isFinite(value) || value < 0)
     return { known: false, text: 'NoData · population unavailable', note: 'Missing population data is not zero population.' }
@@ -44,7 +50,7 @@ export function selectionTitle(item: MapSelection) {
   const p = item.feature.properties ?? {}
   if (item.aggregate) return 'Aggregate overview cell'
   if (item.osm) return objectTitle(p)
-  if (item.source === 'GHSL') return `Population cell · ${item.id}`
+  if (item.source === 'GHSL') return `${p.layer_kind === 'population_cost' ? '250 m population risk' : 'Population cell'} · ${item.id}`
   return sourceText(p.name) ?? sourceText(p.type) ?? (p.category === 'building_obstacle' ? 'Assessed building footprint' : item.source === 'DIPUL' ? 'Assessed DIPUL zone' : 'Scenario area')
 }
 

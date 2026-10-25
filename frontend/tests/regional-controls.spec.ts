@@ -1,3 +1,4 @@
+import { populationCosts } from './fixtures/populationCosts'
 import { timedResult } from './fixtures/flightInterval'
 import { expect, test, type Page, type Route } from '@playwright/test'
 
@@ -28,7 +29,7 @@ async function setup(page: Page, respond?: (route: Route, count: number) => Prom
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds, locations: sites }, sources: {} } })
     if (path === '/api/terrain-datasets') return route.fulfill({ json: { datasets: [{ id: 'hannover-part2-terrain-v1', tiles: 120 }] } })
     if (path.endsWith('/study/restriction-profiles')) return route.fulfill({ json: { profiles: [], errors: [] } })
-    if (path.endsWith('/study/population')) return route.fulfill({ json: { layer: empty } })
+    if (path.endsWith('/study/population-costs')) return route.fulfill({ json: populationCosts() })
     if (path.endsWith('/study/osm/summary')) return route.fulfill({ json: { state: 'not_prepared', verified: false } })
     return route.fulfill({ json: path === '/api/datasets' ? { datasets: [dataset] } : path.endsWith('/features') ? empty : dataset })
   })
@@ -128,16 +129,16 @@ test('failed preparation offers retry and is never cached as an empty success', 
 test('GHSL cells remain cached across visibility and group folding without requiring a scenario', async ({ page }) => {
   const calls = await setup(page)
   const ghsl = group(page, 'GHSL population')
-  await ghsl.getByLabel('GHSL — population cells', { exact: true }).check()
-  await expect(ghsl).toContainText('Ready · 0 cells')
+  await ghsl.getByLabel('GHSL — population risk (250 m)', { exact: true }).check()
+  await expect(ghsl).toContainText('Ready · 1 cells')
   for (let i = 0; i < 3; i++) {
-    await ghsl.getByLabel('GHSL — population cells', { exact: true }).uncheck()
+    await ghsl.getByLabel('GHSL — population risk (250 m)', { exact: true }).uncheck()
     await ghsl.getByRole('button', { name: 'Collapse GHSL population' }).click()
     await ghsl.getByRole('button', { name: 'Expand GHSL population' }).click()
-    await ghsl.getByLabel('GHSL — population cells', { exact: true }).check()
-    await expect(ghsl).toContainText('Ready · 0 cells')
+    await ghsl.getByLabel('GHSL — population risk (250 m)', { exact: true }).check()
+    await expect(ghsl).toContainText('Ready · 1 cells')
   }
-  expect(calls.paths.filter(path => path.endsWith('/study/population'))).toHaveLength(1)
+  expect(calls.paths.filter(path => path.endsWith('/study/population-costs'))).toHaveLength(1)
   expect(calls.layers).toHaveLength(0)
   expect(calls.routes).toHaveLength(0)
 })
