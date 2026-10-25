@@ -4,9 +4,11 @@ Date: 2026-10-25 (Europe/Berlin).
 Status: Part 1 implementation authorized on 2026-10-25, including colored grid
 visualization brought forward from Part 3. The user additionally requested replacing
 the old green native-count overlay with this grid. Part 2 was authorized after
-Part 1 publication and is published with exact-head remote checks passed.
+Part 1 publication and is delivered through PR #126 at `0a174f8` after exact-head
+remote checks and explicit user merge authorization.
 Part 3 implementation was authorized on 2026-10-25 and is locally accepted,
-including browser and real Hannover UI verification; Part 4 remains planned.
+including browser and real Hannover UI verification. The user subsequently
+authorized Part 3 publication and merge into iteration/014; Part 4 remains planned.
 Part 1 is delivered to iteration/014 through PR #123 at `d3b0154`, following
 exact-head remote checks and the user's explicit integration approval;
 Issue #122 is closed. See [Part 1 outcome](../iteration/iteration-014/part1.md)

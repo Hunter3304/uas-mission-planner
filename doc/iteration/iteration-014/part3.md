@@ -16,8 +16,10 @@ Its accepted backend/frontend trees were unchanged. Ruff/format and 22 populatio
 routing tests passed (35.16 s). Published the existing Part 2 feature and opened
 [PR #126](https://github.com/Hunter3304/uas-mission-planner/pull/126), targeting
 iteration/014. Exact-head Checks run `40209689283` passed Windows Python, Linux
-Python and frontend, including all test steps. PR #126 and Issue #124 remain open;
-no Part 2 merge/deletion is claimed. Part 3 is stacked locally on that head.
+Python and frontend, including all test steps. With the user's subsequent explicit
+merge authorization, PR #126 merged at `0a174f84b507884fd5b442b07e5d55d3282b81a4`
+into iteration/014; Issue #124 is closed as completed. Part 3 incorporated this
+integration merge without file changes. Feature refs are retained.
 
 ## Implemented behavior
 
@@ -102,7 +104,10 @@ memory and performance acceptance remains Part 4.
 
 ## Delivery scope
 
-Part 3 is local only; no push, PR, remote CI, merge or feature cleanup is claimed.
-The second Part's explicit push authorization is recorded separately above.
+The user explicitly authorized pushing and merging the prepared Part 3 after local
+acceptance. Publication is prepared from the existing feature, with application
+trees identical to accepted `7684638`. Require exact final-head remote checks
+before merging to iteration/014. Remote publication/integration evidence will be
+recorded after completion. Feature refs are retained.
 Part 4 remains for broader integrated acceptance/performance/resource completion.
-Main and iteration/014 remain at their previously verified commits.
+Main remains unchanged; iteration/014 contains Part 2 at `0a174f8`.

@@ -1,6 +1,6 @@
 # Iteration 014 Part 2 - Optional population route objective
 
-Date: 2026-10-25 (Europe/Berlin). Status: published; exact-head remote checks passed.
+Date: 2026-10-25 (Europe/Berlin). Status: delivered to iteration/014.
 User authorized Part 2 after publishing Part 1.
 Implementation: `feature/124-population-routing`, assigned Issue #124 in
 [Milestone 13](https://github.com/Hunter3304/uas-mission-planner/milestone/13).
@@ -16,9 +16,12 @@ Published head `8dac2a6d608e04935c6d4750f60d507013e38e0c` on
 `origin/feature/124-population-routing` and opened
 [PR #126](https://github.com/Hunter3304/uas-mission-planner/pull/126), targeting
 iteration/014. Exact-head Checks run `40209689283` passed Windows Python, Linux
-Python and frontend, including all test steps. The PR and Issue #124 remain open;
-no Part 2 merge or branch deletion is claimed. Part 3 is implemented separately
-on a local feature stacked on this published head. Main remains unchanged.
+Python and frontend, including all test steps. The user subsequently explicitly
+authorized publication and merging. PR #126 merged into iteration/014 at
+`0a174f84b507884fd5b442b07e5d55d3282b81a4`; Issue #124 is closed as completed.
+The integration tree equals the exact checked Part 2 head. Part 3 incorporated
+this integration merge without file changes. Feature refs are retained;
+main remains unchanged.
 
 ## Part 1 publication
 

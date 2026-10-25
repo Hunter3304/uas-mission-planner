@@ -2,7 +2,17 @@
 
 ## Current status
 
-### Iteration 014 Part 2 published; Part 3 locally accepted (2026-10-25)
+### Iteration 014 Part 2 delivered; Part 3 publication authorized (2026-10-25)
+
+- User explicitly requested pushing and merging the prepared work. After verifying
+  exact head and green Checks run `40209689283`, PR #126 merged into iteration/014
+  at `0a174f84b507884fd5b442b07e5d55d3282b81a4`. Issue #124 is closed as completed.
+- Part 3 incorporated the verified integration merge with no file changes.
+  Backend/frontend Git trees still match accepted Part 3 `7684638`. Publish its
+  existing feature, require final-head remote CI, then merge into iteration/014.
+  Main and Part 4 remain outside this delivery. Feature refs are retained.
+
+### Earlier: Part 2 published; Part 3 locally accepted (2026-10-25)
 
 - User requested checking/pushing Part 2 and completing Part 3. Published Part 2
   `8dac2a6d608e04935c6d4750f60d507013e38e0c` on its existing feature and opened
