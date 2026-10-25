@@ -4,7 +4,11 @@ Iteration 014 Part 1 adds a fixed **250 m population risk grid** to the Hannover
 GHSL map group, replacing its former green native-count overlay. Five ordinal
 classes run green to red; gray means NoData. Click a cell for density, estimated
 population, support and study-wide thresholds. Part 2 adds optional population
-routing through regional API/CLI; the routing UI control remains Part 3.
+routing through regional API/CLI. Part 3 adds **Include population** beside the
+regional objective, with a weight input shown only when checked. Route results
+and exports separate building/population cost, physical length and the combined
+objective. The population map toggle is independent from route weighting.
+See the [operation guide](doc/experiments/iteration-014/README.md).
 See [population rules](doc/rules/population-costs.md) and the
 [plan](doc/plan/iteration-014.md). Native inspection APIs and original data remain available.
 

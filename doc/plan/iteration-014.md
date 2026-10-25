@@ -4,12 +4,19 @@ Date: 2026-10-25 (Europe/Berlin).
 Status: Part 1 implementation authorized on 2026-10-25, including colored grid
 visualization brought forward from Part 3. The user additionally requested replacing
 the old green native-count overlay with this grid. Part 2 was authorized after
-Part 1 publication and is implemented locally; Parts 3-4 remain planned.
+Part 1 publication and is delivered through PR #126 at `0a174f8` after exact-head
+remote checks and explicit user merge authorization.
+Part 3 implementation was authorized on 2026-10-25 and is locally accepted,
+including browser and real Hannover UI verification. The user subsequently
+authorized Part 3 publication and merge into iteration/014; Part 4 remains planned.
 Part 1 is delivered to iteration/014 through PR #123 at `d3b0154`, following
 exact-head remote checks and the user's explicit integration approval;
 Issue #122 is closed. See [Part 1 outcome](../iteration/iteration-014/part1.md)
 for numerical/browser/real-data results and delivery evidence. Part 2 is tracked by
-Issue #124 / Milestone 13; see [Part 2 outcome](../iteration/iteration-014/part2.md).
+Issue #124 / Milestone 13, published as PR #126 targeting iteration/014;
+see [Part 2 outcome](../iteration/iteration-014/part2.md). Part 3 is tracked by
+Issue #125 / `feature/125-population-routing-ui`, stacked on the published Part 2
+head; see [Part 3 outcome](../iteration/iteration-014/part3.md).
 Baseline inspected: local `iteration/013`, with the completed Iteration 013 Parts.
 This plan does not claim Iteration 013 delivery to main or create remote tracking.
 
@@ -260,7 +267,7 @@ class may contain people. NoData must remain visibly different from class 0.
 Preserve native GHSL inspection APIs/CLI and other pages, with their original units.
 
 Part 1 now includes the derived inspection API, colors and grid inspector;
-the route checkbox/weight remain Part 3. Preserve mobile layout, cached layer toggles, the left
+the route checkbox/weight are implemented in Part 3. Preserve mobile layout, cached layer toggles, the left
 inspector, exact endpoint selection and departure-only planning from Iteration 013.
 
 ## Performance and resource policy

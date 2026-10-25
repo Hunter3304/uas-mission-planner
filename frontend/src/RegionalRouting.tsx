@@ -24,6 +24,12 @@ interface RegionalResult {
   message?: string
   length_m: number | null
   risk_length_cost: number | null
+  population_length_cost?: number | null
+  population_active?: boolean
+  population_assessment?: string
+  population_model?: unknown
+  effective_objective?: string
+  effective_weights?: { building: number; distance: number; population: number }
   objective_cost: number | null
   cruise_time_s: number | null
   cruise_time_range_s: [number, number] | null
@@ -43,7 +49,7 @@ interface RegionalResult {
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const [controls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
     algorithm: 'astar', objective: 'risk', planning_mode: 'conservative', profile_id: '', cell_m: 250, background: '', time_budget_s: 3,
-    risk_weight: 0.9, distance_weight: 0.1, agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
+    risk_weight: 0.9, distance_weight: 0.1, include_population: false, population_weight: '1', agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
     mission_start: '', research_height_m: 30, corridor_margin_m: 1000,
     vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
   const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
@@ -108,7 +114,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const constraints: ConstraintLayers | null = layers.data
   const controller = useRef<AbortController | null>(null)
   useEffect(() => () => controller.current?.abort(), [])
-  function update(name: keyof typeof controls, value: string | number) {
+  function update(name: keyof typeof controls, value: string | number | boolean) {
     controller.current?.abort()
     setBusy(false)
     setResult(null)
@@ -123,6 +129,8 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setResult(null)
     setError('')
     try {
+      if (controls.include_population && (!controls.population_weight.trim() || !Number.isFinite(Number(controls.population_weight)) || Number(controls.population_weight) < 0))
+        throw new Error('Enter a finite, nonnegative population weight.')
       await layers.waitForIdle()
       if (active.signal.aborted) return
       const requestedScenario = scenario()
@@ -132,6 +140,8 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         profile_id: controls.profile_id || undefined,
         cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
         risk_weight: controls.risk_weight, distance_weight: controls.distance_weight,
+        include_population: controls.include_population,
+        ...(controls.include_population ? { population_weight: Number(controls.population_weight) } : {}),
         background_cost: controls.background === '' ? null : Number(controls.background), scenario: requestedScenario,
         ...(override.enabled ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
       }, active.signal)
@@ -154,7 +164,11 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     const { geometry, ...resultMetadata } = result
     const metadata = { ...resultMetadata, displayed_controls: controls, displayed_endpoint_selection: override, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
-      features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: { length_m: result.length_m } }] : [] }, null, 2)], { type: 'application/geo+json' })
+      features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: {
+        length_m: result.length_m, risk_length_cost: result.risk_length_cost,
+        population_length_cost: result.population_length_cost ?? null, objective_cost: result.objective_cost,
+        effective_objective: result.effective_objective, effective_weights: result.effective_weights,
+      } }] : [] }, null, 2)], { type: 'application/geo+json' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -208,11 +222,21 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           {terrains.map(t => <option key={t.id} value={t.id}>{t.id} ({t.tiles} tiles)</option>)}
         </select></label>
 <label>Departure time<input type="datetime-local" required step="1" value={controls.mission_start} onChange={event => update('mission_start', event.target.value)} /></label>
-        {(['algorithm', 'objective', 'planning_mode'] as const).map(name =>
-          <label key={name}>{name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'}
-            <select aria-label={name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'} value={controls[name]} onChange={event => update(name, event.target.value)}>
+        {(['algorithm', 'objective', 'planning_mode'] as const).map(name => {
+          const label = name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'
+          const select = <label key={name}>{label}
+            <select aria-label={label} value={controls[name]} onChange={event => update(name, event.target.value)}>
               {(name === 'algorithm' ? ['astar', 'dijkstra', 'abitstar'] : name === 'objective' ? ['risk', 'distance'] : ['conservative', 'strict', 'research']).map(value => <option key={value} value={value}>{value}</option>)}
-            </select></label>)}
+            </select></label>
+          return name === 'objective' ? <div key={name} className="route-objective-controls">
+            {select}
+            <label className="population-routing-toggle"><input type="checkbox" checked={controls.include_population} onChange={event => update('include_population', event.target.checked)} />Include population</label>
+            {controls.include_population && <>
+              <label>Population weight<input type="number" required min="0" step="any" value={controls.population_weight} onChange={event => update('population_weight', event.target.value)} aria-describedby="population-objective-help" /></label>
+              <small id="population-objective-help">{controls.objective === 'distance' ? 'Distance + population: length + weight × population cost.' : 'Building risk + population: building weight × building cost + distance weight × length + population weight × population cost.'} Population cost sums distance within each 250 m cell × its class (0–4). Weight 0 disables this contribution.</small>
+            </>}
+          </div> : select
+        })}
         {([{ name: 'agl_m', label: 'Altitude AGL (m)', min: 100, max: 120 }, { name: 'speed_m_s', label: 'Cruise speed (m/s)', min: 25, max: 35 },
           { name: 'cell_m', label: 'Grid spacing (m)', min: 1 }, { name: 'clearance_m', label: 'Horizontal clearance (m)', min: 0, max: 1000 },
           { name: 'vertical_clearance_m', label: 'Vertical clearance (m)', min: 0, max: 1000 }, { name: 'time_budget_s', label: 'Search budget (s)', min: 0, max: 60 },
@@ -223,7 +247,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
             { name: 'nhn_msl_uncertainty_m', label: 'NHN to MSL uncertainty (m)', min: 0, max: 1000 }] : []),
           ...(controls.objective === 'risk' ? [{ name: 'risk_weight', label: 'Risk weight', min: 0 }, { name: 'distance_weight', label: 'Distance weight', min: 0 }] : [])
         ] as { name: keyof typeof controls; label: string; min: number; max?: number }[]).map(field =>
-          <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={controls[field.name]} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
+          <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={String(controls[field.name])} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
         {controls.objective === 'risk' && <label>Background score assumption<input type="number" min="0" step="any" value={controls.background} placeholder="Unassessed" onChange={event => update('background', event.target.value)} /></label>}
       </div>
       <label><input type="checkbox" checked={controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption'} disabled={controls.planning_mode === 'strict'} onChange={event => update('vertical_reference_policy', event.target.checked ? 'nhn_as_msl_assumption' : 'source')} />Compare MSL zones using NHN + AGL (engineering assumption)</label>
@@ -246,11 +270,20 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       {result.restriction_report && <p>Zone decisions: {Object.entries(result.restriction_report.counts).map(([key, count]) => `${key}: ${count}`).join(' · ')}. Coverage: {result.restriction_report.coverage.status} — {result.restriction_report.coverage.reason}</p>}
       {result.status === 'unresolved_input' && <p>Review the findings below. Research mode requires explicit geometry and height assumptions; weighted routing also needs an assessed background score. Missing terrain cannot be bypassed.</p>}
       {result.status === 'invalid_endpoint' && <p>The selected point conflicts with a constraint. Review its source below and explicitly choose another launch/landing point if appropriate.</p>}
-      {result.length_m !== null && <p>Length {result.length_m.toFixed(1)} m · Risk {result.risk_length_cost?.toFixed(2) ?? '—'} · Objective {result.objective_cost?.toFixed(2)} · Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>}
-      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {controls.objective} ({controls.objective === 'risk' ? `${controls.risk_weight}/${controls.distance_weight}` : 'distance only'}) · {controls.planning_mode}</p>
+      {result.length_m !== null && <section aria-label="Route costs">
+        <p>Length {result.length_m.toFixed(1)} m</p>
+        {result.risk_length_cost != null && <p>Building cost {result.risk_length_cost.toFixed(2)} score-metres</p>}
+        {result.population_active && result.population_length_cost != null && <p>Population cost {result.population_length_cost.toFixed(2)} score-metres</p>}
+        <p>Objective cost {result.objective_cost?.toFixed(2)}</p>
+        <p>Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>
+      </section>}
+      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {result.effective_objective === 'distance+population' ? 'Distance + population' : result.effective_objective === 'risk+population' ? 'Building risk + population' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
+      {result.effective_weights && <p>Effective weights: building {result.effective_weights.building} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
+      {result.population_assessment && <p>Population assessment: {result.population_assessment === 'not_evaluated' ? 'Not evaluated (inactive)' : result.population_assessment}</p>}
       <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>
       <p>Time estimates cover constant cruise only; takeoff, landing, wind and dynamics are excluded.</p>
       <details open><summary>Constraint findings and assumptions</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: '22rem', overflow: 'auto' }}>{JSON.stringify({ endpoints: result.endpoint_diagnostics, assumptions: result.research_assumptions }, null, 2)}</pre></details>
+      {result.population_model != null && <details><summary>Population model and classification</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: '22rem', overflow: 'auto' }}>{JSON.stringify(result.population_model, null, 2)}</pre></details>}
       <button onClick={download}>Export displayed result</button>
     </div>}
   </CollapsiblePanel>

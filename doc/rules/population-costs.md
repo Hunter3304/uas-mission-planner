@@ -216,7 +216,23 @@ available request controls and population diagnostics.
 The inspection product retains `routing_cost: false` because displaying it does
 not enable optimization. Active route provenance separately records
 `ghsl_routing_cost: true`, the population identity and numerical/boundary policy.
-The UI routing checkbox/conditional weight field remain Part 3; API/CLI enable
-the new objective in Part 2. Map visibility alone changes no route objective.
+The regional UI's `Include population` checkbox defaults unchecked beside the
+base objective. It works with either `risk` or `distance`; `Population weight`
+appears only while checked, initially 1. Active weights must be finite and
+nonnegative; an empty input remains empty and blocks submission. Disabled requests
+send `include_population: false` and omit the retained hidden weight. Weight 0
+is submitted explicitly and remains inactive under the API contract above.
 
-See the [implementation plan](../plan/iteration-014.md) for later objective/UI work.
+Changing either population control cancels an obsolete solve and clears the
+displayed route, ETA and export, without automatically starting another solve.
+Map visibility alone changes no route objective and does not invalidate a route;
+route weighting does not fetch or require the population display GeoJSON.
+Results show physical metres, building/population score-metres when evaluated,
+the combined objective, returned effective weights and population assessment.
+Inactive population is labelled not evaluated, never displayed as measured zero.
+The displayed-result export retains full result/source metadata and separate
+costs/effective objective/weights in successful feature properties; failures have
+no route features. These UI controls are Part 3; API/CLI controls are Part 2.
+
+See the [operation guide](../experiments/iteration-014/README.md) and
+[implementation plan](../plan/iteration-014.md) for the remaining integrated acceptance.
