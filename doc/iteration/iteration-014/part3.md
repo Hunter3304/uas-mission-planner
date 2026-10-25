@@ -1,6 +1,6 @@
 # Iteration 014 Part 3 - Optional population routing UI
 
-Date: 2026-10-25 (Europe/Berlin). Status: implemented and locally accepted.
+Date: 2026-10-25 (Europe/Berlin). Status: delivered to iteration/014.
 Implementation authorized after Part 2 publication.
 Local feature: `feature/125-population-routing-ui`, assigned Issue #125 in
 [Milestone 13](https://github.com/Hunter3304/uas-mission-planner/milestone/13).
@@ -105,9 +105,17 @@ memory and performance acceptance remains Part 4.
 ## Delivery scope
 
 The user explicitly authorized pushing and merging the prepared Part 3 after local
-acceptance. Publication is prepared from the existing feature, with application
-trees identical to accepted `7684638`. Require exact final-head remote checks
-before merging to iteration/014. Remote publication/integration evidence will be
-recorded after completion. Feature refs are retained.
+acceptance. Published head `faf2f2dc71c78d500494129c521e77d3b5880e41` on the
+existing feature, with application trees identical to accepted `7684638`, and opened
+[PR #127](https://github.com/Hunter3304/uas-mission-planner/pull/127) to iteration/014.
+Exact-head Checks run `40211460838` passed Windows Python, Linux Python and
+frontend, including all test steps. Browser dependency installation took unusually
+long but completed without retries or application changes.
+
+PR #127 merged at `3bcb7130045bec63e86b66f8e0b0c3d274a4b3f6`; Issue #125 was
+explicitly closed as completed. Local iteration/014 fast-forwarded to that merge.
+Its entire Git tree equals the exact checked Part 3 head; backend/frontend trees
+match accepted local implementation `7684638`. This delivery closeout only updates
+documentation. Both feature refs are retained.
 Part 4 remains for broader integrated acceptance/performance/resource completion.
-Main remains unchanged; iteration/014 contains Part 2 at `0a174f8`.
+Main remains unchanged; iteration/014 contains Parts 1-3. Milestone 13 remains open.

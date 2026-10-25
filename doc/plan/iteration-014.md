@@ -6,17 +6,18 @@ visualization brought forward from Part 3. The user additionally requested repla
 the old green native-count overlay with this grid. Part 2 was authorized after
 Part 1 publication and is delivered through PR #126 at `0a174f8` after exact-head
 remote checks and explicit user merge authorization.
-Part 3 implementation was authorized on 2026-10-25 and is locally accepted,
-including browser and real Hannover UI verification. The user subsequently
-authorized Part 3 publication and merge into iteration/014; Part 4 remains planned.
+Part 3 implementation was authorized on 2026-10-25 and locally accepted,
+including browser and real Hannover UI verification. Following explicit user
+publication/merge authorization and exact-head remote checks, PR #127 delivered
+Part 3 to iteration/014 at `3bcb713`; Issue #125 is closed. Part 4 remains planned.
 Part 1 is delivered to iteration/014 through PR #123 at `d3b0154`, following
 exact-head remote checks and the user's explicit integration approval;
 Issue #122 is closed. See [Part 1 outcome](../iteration/iteration-014/part1.md)
 for numerical/browser/real-data results and delivery evidence. Part 2 is tracked by
 Issue #124 / Milestone 13, published as PR #126 targeting iteration/014;
 see [Part 2 outcome](../iteration/iteration-014/part2.md). Part 3 is tracked by
-Issue #125 / `feature/125-population-routing-ui`, stacked on the published Part 2
-head; see [Part 3 outcome](../iteration/iteration-014/part3.md).
+Issue #125 / `feature/125-population-routing-ui`, delivered through PR #127;
+see [Part 3 outcome](../iteration/iteration-014/part3.md).
 Baseline inspected: local `iteration/013`, with the completed Iteration 013 Parts.
 This plan does not claim Iteration 013 delivery to main or create remote tracking.
 

@@ -2,7 +2,26 @@
 
 ## Current status
 
-### Iteration 014 Part 2 delivered; Part 3 publication authorized (2026-10-25)
+### Iteration 014 Parts 2-3 delivered to iteration/014 (2026-10-25)
+
+- User explicitly requested pushing and merging the accepted work. Part 2 PR #126
+  merged at `0a174f84b507884fd5b442b07e5d55d3282b81a4`; exact-head Checks
+  `40209689283` and integration Checks `40211386802` passed all three jobs.
+  Issue #124 is closed as completed.
+- Part 3 published head `faf2f2dc71c78d500494129c521e77d3b5880e41` on the existing
+  feature; PR #127 targeted iteration/014. Exact-head Checks `40211460838` passed
+  Windows Python, Linux Python and frontend, including test steps. Browser
+  installation was slow but completed without a retry or application changes.
+  PR #127 merged at `3bcb7130045bec63e86b66f8e0b0c3d274a4b3f6`; Issue #125 is closed.
+- Local iteration/014 fast-forwarded to the verified Part 3 merge. Exact merged
+  tree equals the checked Part 3 head; backend/frontend trees equal the accepted
+  local Part 3 implementation `7684638`. This closeout changes documentation only.
+  Feature refs are retained. Main remains `4ed0023`; Milestone 13 remains open
+  for Part 4 broader integrated/resource acceptance. No main delivery is claimed.
+- See `doc/iteration/iteration-014/part3.md` for validation and delivery evidence,
+  and `doc/experiments/iteration-014/README.md` for the operation/verification guide.
+
+### Earlier: Part 2 delivered; Part 3 publication authorized (2026-10-25)
 
 - User explicitly requested pushing and merging the prepared work. After verifying
   exact head and green Checks run `40209689283`, PR #126 merged into iteration/014
