@@ -21,7 +21,7 @@ function PopulationDetails({ item }: { item: MapSelection }) {
       <Fact label="Cell identity">{item.id}</Fact>
       {sourceText(context.product) && <Fact label="Product">{sourceText(context.product)}</Fact>}
     </dl></SourceFacts>
-    <SourceFacts title="Coverage and interpretation"><p>Cell values describe the full native cell, not a clipped viewport total. Population is inspection only and does not change the route cost.</p>
+    <SourceFacts title="Coverage and interpretation"><p>Cell values describe the full native cell, not a clipped viewport total. Inspecting native counts does not enable population route weighting. Use Include population in regional route planning.</p>
       {typeof context.complete_support === 'boolean' && <p>{context.complete_support ? 'The requested inspection area has complete population support.' : 'The requested inspection area has incomplete population support; known cells do not establish complete regional coverage.'}</p>}
       {sourceText(context.interpretation) && <p>{sourceText(context.interpretation)}</p>}
     </SourceFacts>
@@ -47,7 +47,7 @@ function PopulationCostDetails({ item }: { item: MapSelection }) {
       <Fact label="Cell identity">{item.id}</Fact>
       <Fact label="Product">{sourceText(source.product) ?? 'Not supplied'}</Fact>
     </dl></SourceFacts>
-    <SourceFacts title="Classification and support"><p>Five classes relative to the complete saved study. Population does not change route costs.</p><dl>
+    <SourceFacts title="Classification and support"><p>Five classes relative to the complete saved study. Inspecting this cell does not enable population route weighting. Use Include population in route planning.</p><dl>
       <Fact label="Study maximum density">{measured(context.maximum_people_per_km2, 'people/km²')}</Fact>
       <Fact label="Density interval">{context.all_zero === true && summary.known ? 'Known zero study · class 0' : typeof bin.lower_people_per_km2 === 'number' && typeof bin.upper_people_per_km2 === 'number' ? `${numberText(bin.lower_people_per_km2)} ≤ density ${bin.upper_inclusive ? '≤' : '<'} ${numberText(bin.upper_people_per_km2)} people/km²` : 'Unavailable'}</Fact>
       {countBounds.length === 2 && <Fact label="Count interval for this cell">{measured(countBounds[0], '')} to {measured(countBounds[1], 'people')} · uses actual cell area</Fact>}

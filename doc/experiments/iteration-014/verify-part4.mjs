@@ -6,7 +6,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 const root = resolve(import.meta.dirname, '../../..')
-const output = resolve(root, process.argv[2] || '.cache/iteration014-part4-display-v1')
+const output = process.argv[2] ? resolve(process.argv[2]) : resolve(root, '.cache/iteration014-part4-display-v1')
 await mkdir(output, { recursive: true })
 const hashes = async () => Object.fromEntries(await Promise.all(['study.json', 'population.tif', 'osm/features.gpkg'].map(async name => [name, createHash('sha256').update(await readFile(resolve(root, 'data/hannover-part1-v4', name))).digest('hex')])))
 const before = await hashes(), services = [], errors = []

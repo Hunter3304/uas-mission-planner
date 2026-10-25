@@ -70,7 +70,7 @@ for (const [name, score, people] of [['zero', 0, 0], ['positive lowest class', 0
     await expect(panel).toContainText('2020')
     await expect(panel).toContainText('GHS-POP test')
     await expect(panel).toContainText('complete saved study')
-    await expect(panel).toContainText('does not change route costs')
+    await expect(panel).toContainText('does not enable population route weighting')
     if (score == null) await expect(panel).toContainText('not zero population or class 0')
     else await expect(panel).toContainText(`${people} people in this cell`)
     await expect(group.getByLabel('Population risk legend').locator('span')).toHaveCount(6)

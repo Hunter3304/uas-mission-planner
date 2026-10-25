@@ -72,3 +72,47 @@ It does not download or modify source data. This acceptance scenario is distinct
 from present-day operational permission. Actual results and limits are in
 [Part 2](../../iteration/iteration-014/part2.md) and
 [Part 3](../../iteration/iteration-014/part3.md).
+
+## Part 4 integrated/resource verification
+
+Use a new output directory for each core campaign, from the repository root:
+
+```powershell
+backend/.venv/Scripts/python.exe doc/experiments/iteration-014/verify-part4.py --output .cache/iteration014-part4-core-new
+backend/.venv/Scripts/python.exe doc/experiments/iteration-014/verify-part4.py --catalog-only --output .cache/iteration014-part4-catalog-new
+node doc/experiments/iteration-014/verify-part4.mjs .cache/iteration014-part4-display-new
+```
+
+Run the core campaign sequentially with other tests/CPU-heavy tasks finished. It
+hashes original study/population/OSM and all retained terrain TIFF/JSON/XML files
+before/after, starts isolated worker processes, and records every route outcome.
+It measures population cold construction, ten verified cache hits, spatial index,
+display/serialization, count conservation, and nine real requests when native OMPL
+is installed: A* risk off/on repeated twice each, Dijkstra risk off/on, ABIT* risk
+off/on and A* distance plus population. All share the frozen scenario, accepted
+exact endpoints, 250 m spacing and 20-second search budget. ABIT* remains continuous
+and stochastic; a single bounded run does not establish its optimum or distribution.
+
+The separate catalog-only campaign uses the actual saved address coordinates in
+conservative mode, with population off/on and no endpoint overrides. It records
+blocked/unresolved address outcomes with no accepted geometry/costs/ETA rather than
+moving a site or inventing launch clearance. This complements the accepted exact
+nearby endpoints used for successful research comparisons.
+
+Cold means an empty application cache in a fresh process, without flushing the
+operating system's filesystem cache. Only A* risk is repeated in-process for warm
+population reuse; full regional constraint/source preparation remains request-local.
+Windows memory counters report each worker's current/peak working set and private
+usage, including imported libraries and all sources. Peak is a process lifetime
+high-water mark, not the population layer's incremental allocation. Other platforms
+report those Windows measurements unavailable rather than fabricating values.
+
+The display campaign owns ports 8020/5190, refuses occupied ports and stops its
+own services. It records first full-study render, response bytes, ten cached
+visibility cycles, Chrome renderer JS heap after explicit garbage collection,
+DOM/listener counts and desktop/mobile screenshots. Renderer heap excludes native
+browser, canvas/GPU allocations; these measurements do not prove total memory or
+absence of every possible leak. Real routes are independently replayed against
+unbuffered classified footprints; graph A*/Dijkstra objectives must agree.
+See the [Part 4 report](../../iteration/iteration-014/part4.md) and
+[iteration outcome](../../iteration/iteration-014/outcome.md) for actual evidence.

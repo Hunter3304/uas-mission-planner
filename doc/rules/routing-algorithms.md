@@ -5,6 +5,10 @@ centreline evaluator in A*, Dijkstra and native ABIT*, including connectors and
 independent final costs. Default distance/building-only routing remains available
 without population support.
 
+The detailed graph/connector descriptions below concern the original small-area
+baseline. Regional planning retains its bounded corridor and exact-connector
+policy; optional population adds shared costs without changing that policy.
+
 Status: algorithm roles confirmed on 2026-09-29; Part 3 implementation authorized
 on 2026-09-30. Original baseline version: `distance-grid-v1`; Iteration 006
 Part 1 reports `distance-grid-v2` for configurable clearance and conservative

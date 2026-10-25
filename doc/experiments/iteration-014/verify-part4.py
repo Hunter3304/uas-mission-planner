@@ -62,6 +62,7 @@ OPTIONS = {
 }
 PROFILES = [f"{a}-risk-{p}" for a in ("astar", "dijkstra", "abitstar") for p in ("off", "on")]
 PROFILES.append("astar-distance-on")
+CATALOG_PROFILES = ["astar-catalog-off", "astar-catalog-on"]
 
 
 def memory():
@@ -190,8 +191,15 @@ def surface_worker(output):
 
 def route_worker(profile, output):
     algorithm, objective, enabled = profile.split("-")
+    catalog = objective == "catalog"
+    objective = "risk" if catalog else objective
     active = enabled == "on"
-    calls = 2 if algorithm == "astar" and objective == "risk" else 1
+    calls = 2 if algorithm == "astar" and objective == "risk" and not catalog else 1
+    options = dict(OPTIONS)
+    if catalog:
+        options.pop("start_coordinate")
+        options.pop("end_coordinate")
+        options["planning_mode"] = "conservative"
     records = []
     for iteration in range(calls):
         preparation = []
@@ -218,7 +226,7 @@ def route_worker(profile, output):
                 SCENARIO,
                 "rheuma-podbi",
                 "mhh",
-                **OPTIONS,
+                **options,
                 algorithm=algorithm,
                 objective=objective,
                 include_population=active,
@@ -231,8 +239,9 @@ def route_worker(profile, output):
         independent = None
         if result["status"] == "success":
             assert result["independent_validation"]
-            assert result["geometry"]["coordinates"][0] == OPTIONS["start_coordinate"]
-            assert result["geometry"]["coordinates"][-1] == OPTIONS["end_coordinate"]
+            if not catalog:
+                assert result["geometry"]["coordinates"][0] == OPTIONS["start_coordinate"]
+                assert result["geometry"]["coordinates"][-1] == OPTIONS["end_coordinate"]
             timing = result["timing"]
             assert timing["estimated_arrival"] == result["mission"]["mission_end"]
             assert datetime.fromisoformat(timing["estimated_arrival"]) <= datetime.fromisoformat(
@@ -310,7 +319,8 @@ def route_worker(profile, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--worker", choices=["surface", *PROFILES])
+    parser.add_argument("--worker", choices=["surface", *PROFILES, *CATALOG_PROFILES])
+    parser.add_argument("--catalog-only", action="store_true")
     args = parser.parse_args()
     args.output = args.output.resolve()
     if args.worker:
@@ -326,9 +336,13 @@ def main():
     sources.extend(p for p in TERRAIN.iterdir() if p.suffix in (".tif", ".json", ".xml"))
     before = {str(p.relative_to(ROOT)): checksum(p) for p in sources}
     save(args.output / "source-hashes-before.json", before)
-    profiles = [p for p in PROFILES if not p.startswith("abitstar") or find_spec("ompl")]
+    profiles = (
+        CATALOG_PROFILES
+        if args.catalog_only
+        else [p for p in PROFILES if not p.startswith("abitstar") or find_spec("ompl")]
+    )
     evidence = {}
-    for profile in ["surface", *profiles]:
+    for profile in [*([] if args.catalog_only else ["surface"]), *profiles]:
         with (args.output / f"{profile}.log").open("w", encoding="utf-8") as log:
             subprocess.run(
                 [
@@ -359,6 +373,18 @@ def main():
             flush=True,
         )
     assert before == {str(p.relative_to(ROOT)): checksum(p) for p in sources}
+    if args.catalog_only:
+        assert all(
+            r["status"] in ("success", "invalid_endpoint", "unresolved_input")
+            for profile in profiles
+            for r in evidence[profile]["runs"]
+        )
+        save(
+            args.output / "acceptance.json",
+            {"passed": True, "catalog_only": True, "source_hashes": before, "evidence": evidence},
+        )
+        print(json.dumps({"passed": True, "output": str(args.output)}), flush=True)
+        return
     for profile in (
         "astar-risk-off",
         "astar-risk-on",
@@ -371,6 +397,21 @@ def main():
         a = evidence[f"astar-risk-{flag}"]["runs"][0]
         b = evidence[f"dijkstra-risk-{flag}"]["runs"][0]
         assert isclose(a["objective_cost"], b["objective_cost"], abs_tol=1e-5)
+    for profile in profiles:
+        if profile.startswith("abitstar"):
+            assert all(
+                run["status"]
+                in (
+                    "success",
+                    "timeout",
+                    "resource_limit",
+                    "duration_resource_limit",
+                    "planner_unavailable",
+                    "cancelled",
+                    "unresolved_input",
+                )
+                for run in evidence[profile]["runs"]
+            ), profile
     identities = {
         r["population_identity"]
         for p in profiles

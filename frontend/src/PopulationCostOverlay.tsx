@@ -114,7 +114,7 @@ export default function PopulationCostOverlay({ map, datasetId, visible }: {
       {costColors.map((color, score) => <span key={score}><i style={{ background: color }} />{score} · {costLabels[score]}</span>)}
       <span><i style={{ background: unknownCostColor }} />NoData</span>
     </div>
-    <p className="layer-help">250 m population risk classes · green to red, 0–4. Gray means NoData. Class 0 can still contain people. Classes are relative to the complete saved study. Population is inspection only and does not affect route costs.</p>
+    <p className="layer-help">250 m population risk classes · green to red, 0–4. Gray means NoData. Class 0 can still contain people. Classes are relative to the complete saved study. Displaying this layer does not enable population route weighting. Use Include population in route planning.</p>
     {visible && <div data-testid="population-cost-state" aria-live="polite">
       {loading && <p role="status">Preparing 250 m population classes…</p>}
       {error && <p role="alert">{error} <button type="button" onClick={() => setAttempt(v => v + 1)}>Retry population classes</button></p>}
