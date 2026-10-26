@@ -231,11 +231,6 @@ function RegionalMapContent({
             <p className="layer-help">Scenario decisions: confirmed prohibitions and unresolved policy exclusions remain separate.</p>
             {constraints?.restriction_report && <details><summary>Restriction assessment summary</summary><p>{Object.entries(constraints.restriction_report.counts).map(([key, value]) => `${key}: ${value}`).join(' · ')}. Coverage: {constraints.restriction_report.coverage.status}.</p></details>}
           </CollapsiblePanel>
-          <CollapsiblePanel className="map-layer-group" title="Scenario coverage & diagnostics">
-            <p className="layer-help">Regional uncertainty, reviewed notices and findings without a DIPUL or building source.</p>
-            {scenarioControls('coverage', decisionKeys)}
-            {constraints && <details><summary>Layer coverage and applicability findings</summary><p>{constraints.interpretation}</p><pre>{JSON.stringify(constraints.diagnostics, null, 2)}</pre></details>}
-          </CollapsiblePanel>
         </div>
       </section>
       {readyMap && (Object.keys(grouped) as ScenarioLayerKey[]).map(key => <GeoOverlay key={key} owner={`scenario:${key}`} source={key.startsWith('dipul:') ? 'DIPUL' : key.startsWith('osm:') ? 'OSM' : 'Scenario'} context={scenarioContext} map={readyMap} collection={grouped[key]} visible={layerVisibility[key]} color={decisionColors[key.split(':')[1] as DecisionKey]} />)}

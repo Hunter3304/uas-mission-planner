@@ -19,9 +19,11 @@ The Origin and destination section is independent of other planning inputs:
   Original catalog IDs remain reference metadata when exact coordinates are used.
 
 Map layers is one area with independently collapsible Base map & references,
-OSM, GHSL population, DIPUL restrictions and Scenario coverage & diagnostics.
-Collapsing a group preserves its layer visibility and cached data. Mixed building,
-DIPUL and notice/coverage derivatives are grouped by provenance, not just color.
+OSM, GHSL population and DIPUL restrictions. The Scenario coverage & diagnostics
+panel was removed on 2026-10-26. Coverage assessments, reviewed notices and route
+constraint checks remain in the backend and planning results.
+Collapsing a group preserves its layer visibility and cached data. Building and
+DIPUL derivatives are grouped by provenance, not just color.
 There is no separate Original DIPUL switch/raw overlay or full-region OSM renderer.
 Fit study is in Base map & references; OSM source counts are in a disclosure.
 
