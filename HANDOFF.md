@@ -2,6 +2,17 @@
 
 ## Current status
 
+### UI follow-up: remove the scenario coverage panel (2026-10-26)
+
+- User requested removing only the Hannover Scenario coverage & diagnostics
+  panel, implementing it on `fix/remove-scenario-coverage-panel`, and publishing
+  to main after successful checks. Removed that panel's markup; DIPUL, OSM,
+  population controls and backend constraint/coverage assessments are unchanged.
+- Updated the affected existing browser cases and operation guide. Local lint
+  and production build pass; all 17 affected browser tests pass in Edge (14.9 s).
+  The first browser attempt could not launch because the default Playwright
+  Chromium was absent; rerunning with installed Edge required no application fix.
+
 ### Iterations 013 and 014 delivered to main (2026-10-25)
 
 - User explicitly requested publishing the accepted final work to main. Published

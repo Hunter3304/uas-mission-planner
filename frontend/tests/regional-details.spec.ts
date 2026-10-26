@@ -129,25 +129,6 @@ test('missing DIPUL limits never imply zero height, and color help explains disp
   expect(calls.routes).toBe(0)
 })
 
-test('scenario coverage remains an uncertainty finding with a supplied scope rather than a source-zone ban', async ({ page }) => {
-  await setup(page, async (route, path) => {
-    if (!path.endsWith('/study/layers/constraints')) return false
-    await route.fulfill({ json: { blocked: empty, excluded: empty, unknown: { type: 'FeatureCollection', features: [{ type: 'Feature', id: 'coverage/1', geometry, properties: { source: 'regional coverage', state: 'unresolved', reason: 'Temporary coverage remains unverified.', scope: 'region-wide applicability uncertainty', policy_exclusion: false } }] }, diagnostics: [], provenance: {}, interpretation: 'Coverage is not permission.' } })
-    return true
-  })
-  await osm(page).getByLabel('Show saved OSM').uncheck()
-  await page.getByLabel('Departure time', { exact: true }).fill('2026-10-07T10:00')
-  await page.getByRole('region', { name: 'Scenario coverage & diagnostics', exact: true }).getByLabel('Unknown areas').check()
-  await expect(page.getByTestId('coverage-layer-state')).toContainText('Ready')
-  await centerClick(page)
-  await expect(inspector(page)).toContainText('Selected · Scenario')
-  const assessment = inspector(page).getByRole('region', { name: 'Scenario assessment' })
-  await expect(assessment).toContainText('Unresolved assessment')
-  await expect(assessment).toContainText('not a confirmed prohibition')
-  await expect(assessment).toContainText('region-wide applicability uncertainty')
-  await expect(assessment).toContainText('Assessed time and flight-height scope not supplied')
-})
-
 test('derived building findings retain source identity, clearance and a validated original-object link', async ({ page }) => {
   await setup(page, async (route, path) => {
     if (!path.endsWith('/study/layers/constraints')) return false

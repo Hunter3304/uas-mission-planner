@@ -50,7 +50,7 @@ test('first enable loads shared data; ten visibility and fold cycles use the cac
   await expect(page.getByTestId('osm-layer-state')).toContainText('Ready · 2 features')
   const dipul = group(page, 'DIPUL restrictions')
   const osm = group(page, 'OSM')
-  const coverage = group(page, 'Scenario coverage & diagnostics')
+  await expect(group(page, 'Scenario coverage & diagnostics')).toHaveCount(0)
   for (let i = 0; i < 10; i++) {
     await dipul.getByLabel('Policy exclusions').uncheck()
     await dipul.getByLabel('Effective constraints').uncheck()
@@ -61,8 +61,6 @@ test('first enable loads shared data; ten visibility and fold cycles use the cac
     await osm.getByLabel('Building obstacles').check()
     await expect(page.getByTestId('dipul-layer-state')).toContainText('Ready · 1 features')
   }
-  await coverage.getByLabel('Unknown areas').check()
-  await expect(page.getByTestId('coverage-layer-state')).toContainText('Ready · 2 features')
   await dipul.getByLabel('Conditions satisfied').check()
   await page.waitForTimeout(450)
   expect(calls.layers).toHaveLength(1)

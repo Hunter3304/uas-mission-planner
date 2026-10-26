@@ -80,7 +80,7 @@ test('eight catalog endpoints, independent layers, successful route export and p
   await expect(panel).toContainText('same address')
   await panel.getByLabel('Destination', { exact: true }).selectOption('mhh')
   await panel.getByLabel('Departure time').fill('2026-10-07T10:00')
-  await expect(page.getByText('Layer coverage and applicability findings')).toBeVisible()
+  await expect(page.getByTestId('dipul-layer-state')).toContainText('Ready')
   await expect(page.getByLabel('Original DIPUL')).toHaveCount(0)
   await page.getByLabel('GHSL —').check()
   await expect.poll(() => loaded.includes('/api/datasets/hannover/study/population-costs')).toBe(true)
