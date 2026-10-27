@@ -113,11 +113,8 @@ test('DIPUL assessment separates policy, original limits, scoped height/time and
 
 test('missing DIPUL limits never imply zero height, and color help explains display changes and overview limits', async ({ page }) => {
   const { calls } = await setup(page)
-  await expect(osm(page).getByLabel('OSM color view')).toHaveValue('category')
+  await expect(osm(page).getByRole('combobox')).toHaveCount(0)
   await expect(osm(page)).toContainText('first enabled category')
-  await osm(page).getByLabel('OSM color view').selectOption({ label: 'Category cost' })
-  await expect(osm(page)).toContainText('not an overall risk surface')
-  await expect(osm(page)).toContainText('does not change the route objective')
   await expect(osm(page)).toContainText('overview cells have no cost score')
   await expect(osm(page)).toContainText('does not acquire new OSM originals')
   await expect(osm(page).getByLabel('OSM legend')).toContainText('Buildings')

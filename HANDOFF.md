@@ -2,6 +2,17 @@
 
 ## Current status
 
+### UI follow-up: Feature category only for Hannover OSM (2026-10-27)
+
+- User requested removing Category cost from the Hannover OSM color view while
+  keeping everything else unchanged. `fix/osm-feature-category-only` fixes the
+  map style to Feature category and removes cost-view controls, state and legend.
+  Layer toggles, refresh, original-object details/cost cards, population colors,
+  routing objectives and backend APIs remain unchanged.
+- Updated affected existing tests and current operation notes. Local frontend
+  lint/build and 27 browser tests pass in installed Edge (22.9 s), including OSM
+  categories, stale requests, shared selection, DIPUL details and population colors.
+
 ### UI follow-up: remove the scenario coverage panel (2026-10-26)
 
 - User requested removing only the Hannover Scenario coverage & diagnostics
