@@ -2,11 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import { getJson } from './api'
 import { snapshotKey, selectionFeatureId, useMapSelection } from './mapSelection'
-import { categoryColor, costColors, osmStyle, unknownCostColor } from './osmStyles'
-import { costLabels } from './sourcePresentation'
+import { categoryColor, osmStyle } from './osmStyles'
 import {
   layers,
-  type LayerKey,
   type Visibility,
   type OsmIdentity,
   type OsmSummary,
@@ -44,8 +42,6 @@ function checkCollection(data: OsmCollection, snapshot: string) {
 export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId: string }) {
   const [enabled, setEnabled] = useState(true)
   const [visibility, setVisibility] = useState<Visibility>(allCategories)
-  const [costMode, setCostMode] = useState(false)
-  const [costCategory, setCostCategory] = useState<LayerKey>('building')
   const [summary, setSummary] = useState<OsmSummary | null>(null)
   const [view, setView] = useState<View | null>(null)
   const { select, reconcile } = useMapSelection()
@@ -143,8 +139,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
         const overview = zoom < 15
         if (!overview) {
           params.set('zoom', String(zoom))
-          params.set('style', costMode ? 'cost' : 'category')
-          if (costMode) params.set('cost_category', costCategory)
+          params.set('style', 'category')
         }
         const url = `${base}/${overview ? 'overview' : 'features'}?${params}`
         const key = `${snapshot}:${url}`
@@ -186,7 +181,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           entry.data.display.outside_coverage
             ? 'Outside saved OSM coverage.'
             : entry.data.display.representation === 'aggregate_overview'
-              ? 'Aggregate OSM overview — zoom in for individual objects and costs.'
+              ? 'Aggregate OSM overview — zoom in for individual objects.'
               : entry.data.features.length
                 ? `${entry.data.features.length.toLocaleString()} individual OSM objects in the buffered viewport.`
                 : 'No matching OSM objects in this viewport.',
@@ -214,11 +209,6 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
         setStatus('All OSM categories are hidden.')
         return
       }
-      if (costMode && !visibility[costCategory]) {
-        setView(null)
-        setStatus('Enable the selected cost category to display its objects.')
-        return
-      }
       setStatus('Loading saved OSM…')
       const ticket = generation
       timer = setTimeout(() => {
@@ -235,7 +225,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       map.off('movestart zoomstart', moving)
       map.off('moveend zoomend', schedule)
     }
-  }, [map, base, enabled, categories, costMode, costCategory, visibility, retry, reconcile])
+  }, [map, base, enabled, categories, retry, reconcile])
 
   useEffect(() => {
     if (!view || !enabled) return
@@ -251,15 +241,14 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           return { color, fillColor: color, weight: 0.5, fillOpacity: 0.35 }
         }
         const item = feature as OsmCollection['features'][number]
-        return osmStyle(item.properties.categories, visibility, costMode, item.cost_analysis)
+        return osmStyle(item.properties.categories, visibility, false)
       },
       pointToLayer: (feature, latlng) =>
         L.circleMarker(latlng, {
           ...osmStyle(
             feature.properties.categories,
             visibility,
-            costMode,
-            (feature as OsmCollection['features'][number]).cost_analysis,
+            false,
           ),
           radius: 4,
         }),
@@ -278,7 +267,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
       group.clearLayers()
       group.remove()
     }
-  }, [map, view, enabled, visibility, costMode, select, selectObject])
+  }, [map, view, enabled, visibility, select, selectObject])
 
   return (
     <section className="regional-osm" aria-label="Regional OSM display">
@@ -307,37 +296,7 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           ))}
         </div>
         <div className="osm-selectors">
-          <label>
-            OSM color view{' '}
-            <select
-              aria-describedby="osm-color-help"
-              value={costMode ? 'cost' : 'category'}
-              onChange={(event) => setCostMode(event.target.value === 'cost')}
-            >
-              <option value="category">Feature category</option>
-              <option value="cost">Category cost</option>
-            </select>
-          </label>
-          {costMode && (
-            <label>
-              OSM cost category{' '}
-              <select
-                aria-describedby="osm-cost-category-help"
-                value={costCategory}
-                onChange={(event) => {
-                  const category = event.target.value as LayerKey
-                  setCostCategory(category)
-                  setVisibility((current) => ({ ...current, [category]: true }))
-                }}
-              >
-                {layers.map((layer) => (
-                  <option key={layer.key} value={layer.key}>
-                    {layer.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <span aria-describedby="osm-color-help">Feature category</span>
           <button
             type="button"
             onClick={() => {
@@ -349,34 +308,15 @@ export default function RegionalOsm({ map, datasetId }: { map: L.Map; datasetId:
           </button>
         </div>
         <div className="cost-legend" aria-label="OSM legend">
-          {costMode && view?.data.display.representation !== 'aggregate_overview' ? (
-            <>
-              {costColors.map((color, index) => (
-                <span key={color}>
-                  <i style={{ background: color }} />
-                  {index} · {costLabels[index]}
-                </span>
-              ))}
-              <span>
-                <i style={{ background: unknownCostColor }} />
-                Unknown / default / unscored (gray dashed)
-              </span>
-              <span>Dark outline: historical paper obstruction flag</span>
-            </>
-          ) : (
-            layers.map((layer) => (
-              <span key={layer.key}>
-                <i style={{ background: layer.color }} />
-                {layer.label}
-              </span>
-            ))
-          )}
+          {layers.map((layer) => (
+            <span key={layer.key}>
+              <i style={{ background: layer.color }} />
+              {layer.label}
+            </span>
+          ))}
         </div>
-        <p className="layer-help" id="osm-color-help">{costMode
-          ? 'Category cost: colors show the selected category’s independent ordinal score, from 0 (very low) to 4 (very high). Costs are never added together; this is not an overall risk surface.'
-          : 'Feature category: fixed colors identify buildings, roads & paths, land use and natural features. For overlapping memberships, the first enabled category in that order wins; hiding one can reveal another.'}</p>
-        {costMode && <p className="layer-help" id="osm-cost-category-help">Cost category chooses which category is displayed and enables it. It does not change the route objective. Unknown/default/no numeric costs are gray and dashed. Dark outlines mark historical paper obstruction flags, not current flight restrictions.</p>}
-        {view?.data.display.representation === 'aggregate_overview' && <p className="source-overview-help">Overview uses aggregate category colors, even in Category cost mode. Zoom in for individual objects and cost scores; overview cells have no cost score.</p>}
+        <p className="layer-help" id="osm-color-help">Feature category: fixed colors identify buildings, roads & paths, land use and natural features. For overlapping memberships, the first enabled category in that order wins; hiding one can reveal another.</p>
+        {view?.data.display.representation === 'aggregate_overview' && <p className="source-overview-help">Overview uses aggregate category colors. Zoom in for individual objects; overview cells have no cost score.</p>}
         <p className="layer-help">Blank areas are unassessed. Refresh OSM reloads prepared local display data; it does not acquire new OSM originals.</p>
         <p
           role="status"

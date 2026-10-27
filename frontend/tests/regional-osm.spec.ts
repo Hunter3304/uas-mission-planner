@@ -189,7 +189,7 @@ async function zoomDetail(page: Page) {
   await expect(osm(page).getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
 }
 
-test('overview, detail styles, original tags and independent route updates', async ({ page }) => {
+test('overview, category colors, original tags and independent route updates', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   const urls = await setup(page)
@@ -201,10 +201,10 @@ test('overview, detail styles, original tags and independent route updates', asy
   expect(urls.some((url) => url === '/api/datasets/regional-osm/features')).toBe(false)
   await page.getByLabel('Street basemap').uncheck()
   await zoomDetail(page)
-  await panel.getByLabel('OSM color view').selectOption('cost')
-  await expect.poll(() => urls.some((url) => /osm\/features\?.*style=cost/.test(url))).toBe(true)
+  await expect(panel.getByRole('combobox')).toHaveCount(0)
+  await expect.poll(() => urls.some((url) => /osm\/features\?.*style=category/.test(url))).toBe(true)
   await expect(panel.getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
-  await expect(panel.getByLabel('OSM legend')).toContainText('Unknown / default / unscored')
+  await expect(panel.getByLabel('OSM legend')).toContainText('Buildings')
   const map = page.getByRole('region', { name: 'Hannover regional map' })
   const box = await map.boundingBox()
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
@@ -225,12 +225,14 @@ test('overview, detail styles, original tags and independent route updates', asy
   await map.click({ position: { x: box!.width / 2, y: box!.height / 2 } })
   await expect(details).toContainText('Building cost: 4')
   await panel.getByLabel('Buildings', { exact: true }).uncheck()
-  await expect(panel.getByTestId('osm-status')).toContainText('Enable the selected cost category')
+  await expect.poll(() => urls.some(value => {
+    const url = new URL(value, 'http://localhost')
+    return url.pathname.endsWith('/osm/features') && url.searchParams.get('categories') === 'highway,landuse,natural' && url.searchParams.get('style') === 'category'
+  })).toBe(true)
   await expect(page.getByRole('region', { name: 'Selected OSM object' })).toHaveCount(0)
   await expect(routing.getByRole('button', { name: 'Export displayed result' })).toBeVisible()
-  await panel.getByLabel('OSM cost category').selectOption('natural')
   await expect(panel.getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
-  await expect.poll(() => urls.some((url) => /cost_category=natural/.test(url))).toBe(true)
+  expect(urls.some(url => /style=cost|cost_category=/.test(url))).toBe(false)
   await page.setViewportSize({ width: 390, height: 844 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   expect(errors).toEqual([])
@@ -338,10 +340,10 @@ test('obsolete requests, empty view, category changes and outside coverage', asy
       .getByRole('button', { name: 'Zoom in' })
       .click()
   await expect.poll(() => Boolean(pending)).toBe(true)
-  await osm(page).getByLabel('OSM color view').selectOption('cost')
+  await osm(page).getByLabel('Roads & paths', { exact: true }).uncheck()
   await expect(osm(page).getByTestId('osm-status')).toHaveAttribute('data-representation', 'detail')
   await pending!.fulfill({ json: collection(false) }).catch(() => {})
-  await expect(osm(page).getByLabel('OSM legend')).toContainText('4 · Very high')
+  await expect(osm(page).getByLabel('OSM legend')).toContainText('Buildings')
   empty = true
   await osm(page).getByRole('button', { name: 'Refresh OSM', exact: true }).click()
   await expect(osm(page).getByTestId('osm-status')).toContainText('No matching OSM objects')

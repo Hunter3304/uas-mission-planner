@@ -135,18 +135,15 @@ zero is very pale green; NoData is gray and never counted as zero. Small positiv
 values below 0.01 display as less than 0.01. Query coverage can be incomplete even
 when the selected cell is known. Original precision stays in expanded attributes.
 
-OSM color view has two choices:
+The Hannover OSM map uses Feature category colors only. The Category cost view
+and its category selector were removed on 2026-10-27; object-detail cost cards,
+population class colors and route risk calculations are unchanged.
 
 - Feature category uses fixed category colors. With multiple memberships, the
   first enabled category wins: buildings, roads/paths, land use, natural features.
   Hiding one can reveal another membership of the same object.
-- Category cost shows one selected category's independent 0-4 ordinal score:
-  very low, low, medium, high, very high. Costs are not added; this is not an
-  overall risk surface. Unknown/default/unscored objects are gray/dashed. Dark
-  paper-obstruction strokes are explained separately. Blank areas are unassessed.
-- OSM cost category enables/selects the category to inspect; it does not change
-  route objective. Overview always uses aggregate category colors, with no object
-  cost score. Zoom in to inspect individual costs.
+- Overview uses aggregate category colors, with no object cost score. Zoom in
+  and select an individual object to inspect its original tags and cost cards.
 - Refresh OSM reloads prepared local display data without acquiring originals.
   Fit study in Base map & references changes extent only.
 
