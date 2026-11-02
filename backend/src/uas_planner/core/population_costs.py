@@ -13,6 +13,9 @@ import numpy as np
 import rasterio
 from pyproj import Transformer
 from rasterio.windows import Window
+from shapely import area as geometry_area
+from shapely import box as geometry_boxes
+from shapely import intersection as geometry_intersection
 from shapely import segmentize
 from shapely.geometry import box, mapping, shape
 from shapely.ops import transform
@@ -53,7 +56,7 @@ def classify_density(density, maximum):
     return bisect_right([maximum * (i / 5) for i in range(1, 5)], density)
 
 
-def aggregate_native(src, polygon, *, deadline=float("inf"), cancel=None):
+def aggregate_native(src, polygon, *, deadline=float("inf"), cancel=None, vectorized=False):
     """Area-weight a polygon already in the native raster plane, without resampling."""
     check_deadline(deadline, cancel)
     if polygon.is_empty or not polygon.is_valid or polygon.area <= 0:
@@ -70,21 +73,37 @@ def aggregate_native(src, polygon, *, deadline=float("inf"), cancel=None):
     values = src.read(1, window=Window(c0, r0, width, height), masked=True)
     known_area, nodata_area, people = 0.0, 0.0, 0.0
     outside = polygon.difference(box(*src.bounds)).area
-    for row in range(r0, r1):
+    if vectorized and width and height:
+        # Identical source-plane intersections, bounded by MAX_WINDOW_PIXELS.
+        # Batch GEOS work avoids per-native-pixel Python geometry calls.
+        xs = src.transform.c + np.arange(c0, c1)[None, :] * 100
+        ys = src.transform.f - np.arange(r0, r1)[:, None] * 100
+        pixels = geometry_boxes(xs, ys - 100, xs + 100, ys)
+        areas = geometry_area(geometry_intersection(pixels, polygon))
+        raw, mask = np.ma.getdata(values), np.ma.getmaskarray(values)
+        observed = (areas > 0) & ~mask
+        if np.any(observed & (~np.isfinite(raw) | (raw < 0))):
+            raise ValueError("Invalid population outside declared NoData.")
+        known_area = float(np.sum(areas[observed]))
+        nodata_area = float(np.sum(areas[mask]))
+        people = float(np.sum(raw[observed] * areas[observed] / 10000))
         check_deadline(deadline, cancel)
-        for col in range(c0, c1):
-            x, y = src.transform @ (col, row)
-            overlap = polygon.intersection(box(x, y - 100, x + 100, y)).area
-            if overlap <= 0:
-                continue
-            raw = values[row - r0, col - c0]
-            if np.ma.is_masked(raw):
-                nodata_area += overlap
-            elif not isfinite(float(raw)) or float(raw) < 0:
-                raise ValueError("Invalid population outside declared NoData.")
-            else:
-                known_area += overlap
-                people += float(raw) * overlap / 10000
+    else:
+        for row in range(r0, r1):
+            check_deadline(deadline, cancel)
+            for col in range(c0, c1):
+                x, y = src.transform @ (col, row)
+                overlap = polygon.intersection(box(x, y - 100, x + 100, y)).area
+                if overlap <= 0:
+                    continue
+                raw = values[row - r0, col - c0]
+                if np.ma.is_masked(raw):
+                    nodata_area += overlap
+                elif not isfinite(float(raw)) or float(raw) < 0:
+                    raise ValueError("Invalid population outside declared NoData.")
+                else:
+                    known_area += overlap
+                    people += float(raw) * overlap / 10000
     complete = known_area > 0 and nodata_area + outside <= AREA_TOLERANCE_M2
     density = people / known_area * 1_000_000 if complete else None
     if not isfinite(people) or density is not None and not isfinite(density):
@@ -105,14 +124,19 @@ def aggregate_native(src, polygon, *, deadline=float("inf"), cancel=None):
 class PopulationSurface:
     """Prepared study-wide classes; subsets never change the reference or lattice."""
 
-    def __init__(self, boundary, source_path, source, epoch, *, deadline=None, cancel=None):
+    def __init__(
+        self, boundary, source_path, source, epoch, *, deadline=None, cancel=None, cell_m=CELL_M
+    ):
+        if isinstance(cell_m, bool) or cell_m not in (150, 250):
+            raise ValueError("Population cost spacing must be 150 or 250 m.")
+        cell_m = int(cell_m)
         deadline = perf_counter() + PREPARATION_SECONDS if deadline is None else deadline
         check_deadline(deadline, cancel)
         if boundary.is_empty or not boundary.is_valid or boundary.area <= 0:
             raise ValueError("Invalid metric population study boundary.")
         minx, miny, maxx, maxy = boundary.bounds
-        x0, y0 = floor(minx / CELL_M) * CELL_M, floor(miny / CELL_M) * CELL_M
-        nx, ny = ceil((maxx - x0) / CELL_M), ceil((maxy - y0) / CELL_M)
+        x0, y0 = floor(minx / cell_m) * cell_m, floor(miny / cell_m) * cell_m
+        nx, ny = ceil((maxx - x0) / cell_m), ceil((maxy - y0) / cell_m)
         if nx * ny > MAX_TARGET_CELLS:
             raise PopulationResourceLimit("Population target grid exceeds 100,000 cells.")
         native_forward = Transformer.from_crs(25832, "ESRI:54009", always_xy=True).transform
@@ -126,20 +150,22 @@ class PopulationSurface:
                     check_deadline(deadline, cancel)
                     polygon = boundary.intersection(
                         box(
-                            x0 + col * CELL_M,
-                            y0 + row * CELL_M,
-                            x0 + (col + 1) * CELL_M,
-                            y0 + (row + 1) * CELL_M,
+                            x0 + col * cell_m,
+                            y0 + row * cell_m,
+                            x0 + (col + 1) * cell_m,
+                            y0 + (row + 1) * cell_m,
                         )
                     )
                     if polygon.is_empty or polygon.area <= 0:
                         continue
                     # Densify curved CRS transformations, with shared lattice edges.
                     native = transform(native_forward, segmentize(polygon, 25))
-                    properties = aggregate_native(src, native, deadline=deadline, cancel=cancel)
+                    properties = aggregate_native(
+                        src, native, deadline=deadline, cancel=cancel, vectorized=cell_m == 150
+                    )
                     properties.update(
                         layer_kind="population_cost",
-                        cell_size_m=CELL_M,
+                        cell_size_m=cell_m,
                         native_support_m=100,
                         epoch=epoch,
                         row=row,
@@ -151,7 +177,7 @@ class PopulationSurface:
                             polygon,
                             {
                                 "type": "Feature",
-                                "id": f"population250:{row}:{col}",
+                                "id": f"population{cell_m}:{row}:{col}",
                                 "geometry": mapping(transform(reverse, polygon)),
                                 "properties": properties,
                             },
@@ -190,13 +216,13 @@ class PopulationSurface:
                     for key in ("lower_people_per_km2", "upper_people_per_km2")
                 ]
         self._metadata = {
-            "version": VERSION,
+            "version": VERSION if cell_m == CELL_M else "ramke-population-150m-v1",
             "state": "ready" if complete else "unresolved",
             "source": deepcopy(source),
             "epoch": epoch,
             "analysis_crs": "EPSG:25832",
             "native_crs": "ESRI:54009",
-            "cell_size_m": CELL_M,
+            "cell_size_m": cell_m,
             "native_support_m": 100,
             "origin_metric": [x0, y0],
             "study_boundary_metric": mapping(boundary),
@@ -222,6 +248,12 @@ class PopulationSurface:
             "interpretation": "Ordinal population classes, not probabilities. Score 0 can contain people. NoData is not zero. Route integration is deferred to Part 2.",
             "routing_cost": False,
         }
+        if cell_m == 150:
+            self._metadata["interpretation"] = (
+                "Ordinal residential population classes for the shared 150 m fused-risk grid. "
+                "Not probabilities; score 0 can contain people; NoData is not zero."
+            )
+            self._metadata["routing_cost"] = True
         self._metadata["identity"] = signature(self._metadata)
         self._display_tree = STRtree([shape(f["geometry"]) for _, f in self._cells])
         check_deadline(deadline, cancel)
@@ -290,14 +322,17 @@ def _prepared(directory, payload):
         manifest["epoch"],
         deadline=deadline,
         cancel=cancel,
+        cell_m=manifest.get("cell_m", CELL_M),
     )
 
 
-def prepare_population_surface(directory, *, deadline=None, cancel=None):
+def prepare_population_surface(directory, *, deadline=None, cancel=None, cell_m=CELL_M):
     """Verify population-specific source integrity on every call, including cache hits.
 
     This endpoint does not load or attest unrelated OSM/DIPUL/terrain sources.
     """
+    if isinstance(cell_m, bool) or cell_m not in (150, 250):
+        raise ValueError("Population cost spacing must be 150 or 250 m.")
     deadline = min(
         perf_counter() + PREPARATION_SECONDS, float("inf") if deadline is None else deadline
     )
@@ -323,7 +358,8 @@ def prepare_population_surface(directory, *, deadline=None, cancel=None):
             "source": source,
             "bounds": config["bounds"],
             "epoch": config["ghsl_epoch"],
-            "version": VERSION,
+            "version": VERSION if cell_m == CELL_M else "ramke-population-150m-v1",
+            **({"cell_m": int(cell_m)} if cell_m != CELL_M else {}),
         },
         sort_keys=True,
         allow_nan=False,

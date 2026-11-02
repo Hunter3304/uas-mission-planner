@@ -24,12 +24,16 @@ interface RegionalResult {
   message?: string
   length_m: number | null
   risk_length_cost: number | null
+  building_length_cost?: number | null
+  landuse_length_cost?: number | null
+  highway_length_cost?: number | null
+  fused_risk_length_cost?: number | null
   population_length_cost?: number | null
   population_active?: boolean
   population_assessment?: string
   population_model?: unknown
   effective_objective?: string
-  effective_weights?: { building: number; distance: number; population: number }
+  effective_weights?: { building: number; landuse?: number; highway?: number; distance: number; population: number }
   objective_cost: number | null
   cruise_time_s: number | null
   cruise_time_range_s: [number, number] | null
@@ -48,8 +52,8 @@ interface RegionalResult {
 
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const [controls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
-    algorithm: 'astar', objective: 'risk', planning_mode: 'conservative', profile_id: '', cell_m: 250, background: '', time_budget_s: 3,
-    risk_weight: 0.9, distance_weight: 0.1, include_population: false, population_weight: '1', agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
+    algorithm: 'abitstar', objective: 'risk', planning_mode: 'research', profile_id: '', cell_m: 250, background: '0', time_budget_s: 3,
+    include_population: false, population_weight: '1', agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
     mission_start: '', research_height_m: 30, corridor_margin_m: 1000,
     vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
   const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
@@ -129,8 +133,10 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setResult(null)
     setError('')
     try {
-      if (controls.include_population && (!controls.population_weight.trim() || !Number.isFinite(Number(controls.population_weight)) || Number(controls.population_weight) < 0))
+      if (controls.objective === 'distance' && controls.include_population && (!controls.population_weight.trim() || !Number.isFinite(Number(controls.population_weight)) || Number(controls.population_weight) < 0))
         throw new Error('Enter a finite, nonnegative population weight.')
+      if (controls.objective === 'risk' && (!controls.background.trim() || !Number.isFinite(Number(controls.background)) || Number(controls.background) < 0))
+        throw new Error('Enter a finite, nonnegative background score.')
       await layers.waitForIdle()
       if (active.signal.aborted) return
       const requestedScenario = scenario()
@@ -139,9 +145,8 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         algorithm: controls.algorithm, objective: controls.objective, planning_mode: controls.planning_mode,
         profile_id: controls.profile_id || undefined,
         cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
-        risk_weight: controls.risk_weight, distance_weight: controls.distance_weight,
-        include_population: controls.include_population,
-        ...(controls.include_population ? { population_weight: Number(controls.population_weight) } : {}),
+        ...(controls.objective === 'distance' ? { include_population: controls.include_population,
+          ...(controls.include_population ? { population_weight: Number(controls.population_weight) } : {}) } : {}),
         background_cost: controls.background === '' ? null : Number(controls.background), scenario: requestedScenario,
         ...(override.enabled ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
       }, active.signal)
@@ -166,6 +171,8 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
       features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: {
         length_m: result.length_m, risk_length_cost: result.risk_length_cost,
+        building_length_cost: result.building_length_cost, landuse_length_cost: result.landuse_length_cost,
+        highway_length_cost: result.highway_length_cost, fused_risk_length_cost: result.fused_risk_length_cost,
         population_length_cost: result.population_length_cost ?? null, objective_cost: result.objective_cost,
         effective_objective: result.effective_objective, effective_weights: result.effective_weights,
       } }] : [] }, null, 2)], { type: 'application/geo+json' })
@@ -230,10 +237,10 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
             </select></label>
           return name === 'objective' ? <div key={name} className="route-objective-controls">
             {select}
-            <label className="population-routing-toggle"><input type="checkbox" checked={controls.include_population} onChange={event => update('include_population', event.target.checked)} />Include population</label>
-            {controls.include_population && <>
+            {controls.objective === 'distance' && <label className="population-routing-toggle"><input type="checkbox" checked={controls.include_population} onChange={event => update('include_population', event.target.checked)} />Include population</label>}
+            {controls.objective === 'distance' && controls.include_population && <>
               <label>Population weight<input type="number" required min="0" step="any" value={controls.population_weight} onChange={event => update('population_weight', event.target.value)} aria-describedby="population-objective-help" /></label>
-              <small id="population-objective-help">{controls.objective === 'distance' ? 'Distance + population: length + weight × population cost.' : 'Building risk + population: building weight × building cost + distance weight × length + population weight × population cost.'} Population cost sums distance within each 250 m cell × its class (0–4). Weight 0 disables this contribution.</small>
+              <small id="population-objective-help">Distance + population: length + weight × population cost. Population cost sums distance within each 250 m cell × its class (0–4). Weight 0 disables this contribution.</small>
             </>}
           </div> : select
         })}
@@ -245,14 +252,15 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           ...(controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' ? [
             { name: 'nhn_msl_offset_m', label: 'NHN to MSL offset (m)', min: -1000, max: 1000 },
             { name: 'nhn_msl_uncertainty_m', label: 'NHN to MSL uncertainty (m)', min: 0, max: 1000 }] : []),
-          ...(controls.objective === 'risk' ? [{ name: 'risk_weight', label: 'Risk weight', min: 0 }, { name: 'distance_weight', label: 'Distance weight', min: 0 }] : [])
         ] as { name: keyof typeof controls; label: string; min: number; max?: number }[]).map(field =>
           <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={String(controls[field.name])} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
-        {controls.objective === 'risk' && <label>Background score assumption<input type="number" min="0" step="any" value={controls.background} placeholder="Unassessed" onChange={event => update('background', event.target.value)} /></label>}
+        {controls.objective === 'risk' && <label>Background score assumption<input type="number" required min="0" step="any" value={controls.background} onChange={event => update('background', event.target.value)} /></label>}
       </div>
+      {controls.objective === 'risk' && <p data-testid="risk-fusion-weights">Fixed weights: building 0.15 + land use 0.15 + roads 0.15 + population 0.45 + distance 0.10. OSM layers contribute equally; OSM and population each contribute half of fused risk. Total objective = 0.9 × fused risk + 0.1 × length. Cost grid: 150 m; population is always included. Background 0 is an explicit assumption for unscored OSM cells.</p>}
+      <p className="layer-help">Grid spacing applies to A*/Dijkstra search, independently of the 150 m risk cost grid and 250 m population display. ABIT* searches continuous space.</p>
       <label><input type="checkbox" checked={controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption'} disabled={controls.planning_mode === 'strict'} onChange={event => update('vertical_reference_policy', event.target.checked ? 'nhn_as_msl_assumption' : 'source')} />Compare MSL zones using NHN + AGL (engineering assumption)</label>
       {controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' && <p>Comparison height = NHN ground height + AGL + offset. Uncertainty expands both bounds; default offset/uncertainty 0 m is an explicit approximation. Original datums remain unchanged. Whole-motion terrain bounds are checked; overlap still requires zone conditions or permission. Strict mode requires verified reference compatibility.</p>}
-      {controls.planning_mode === 'research' && <p>Research route: derived polygon repairs; uncertain non-polygon extents excluded with a 20 m buffer; missing heights use the explicit estimate above. Zone applicability, NHN/MSL compatibility and temporary restrictions remain assumptions. Known obstacles and missing terrain remain excluded. For the weighted objective, enter an explicit background score assumption, such as 0.</p>}
+      {controls.planning_mode === 'research' && <p>Research route: derived polygon repairs; uncertain non-polygon extents excluded with a 20 m buffer; missing heights use the explicit estimate above. Zone applicability, NHN/MSL compatibility and temporary restrictions remain assumptions. Known obstacles and missing terrain remain excluded. The background score is an explicit assumption for unscored OSM cells.</p>}
       {controls.planning_mode === 'conservative' && <p>Conservative avoidance excludes unresolved zone footprints and confirmed prohibitions. Building geometry repairs and missing-height estimates remain explicit engineering assumptions. Temporary/NOTAM coverage is unverified; a successful candidate is not flight permission.</p>}
       {!override.enabled && controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
       <button disabled={busy || !study}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
@@ -272,13 +280,16 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       {result.status === 'invalid_endpoint' && <p>The selected point conflicts with a constraint. Review its source below and explicitly choose another launch/landing point if appropriate.</p>}
       {result.length_m !== null && <section aria-label="Route costs">
         <p>Length {result.length_m.toFixed(1)} m</p>
-        {result.risk_length_cost != null && <p>Building cost {result.risk_length_cost.toFixed(2)} score-metres</p>}
+        {result.building_length_cost != null && <p>Building cost {result.building_length_cost.toFixed(2)} score-metres</p>}
+        {result.landuse_length_cost != null && <p>Land use cost {result.landuse_length_cost.toFixed(2)} score-metres</p>}
+        {result.highway_length_cost != null && <p>Road cost {result.highway_length_cost.toFixed(2)} score-metres</p>}
+        {result.fused_risk_length_cost != null && <p>Fused risk cost {result.fused_risk_length_cost.toFixed(2)} score-metres</p>}
         {result.population_active && result.population_length_cost != null && <p>Population cost {result.population_length_cost.toFixed(2)} score-metres</p>}
         <p>Objective cost {result.objective_cost?.toFixed(2)}</p>
         <p>Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>
       </section>}
-      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {result.effective_objective === 'distance+population' ? 'Distance + population' : result.effective_objective === 'risk+population' ? 'Building risk + population' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
-      {result.effective_weights && <p>Effective weights: building {result.effective_weights.building} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
+      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {result.effective_objective === 'distance+population' ? 'Distance + population' : controls.objective === 'risk' ? 'Fused risk' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
+      {result.effective_weights && <p>Effective weights: building {result.effective_weights.building}{result.effective_weights.landuse != null && <> · land use {result.effective_weights.landuse} · roads {result.effective_weights.highway}</>} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
       {result.population_assessment && <p>Population assessment: {result.population_assessment === 'not_evaluated' ? 'Not evaluated (inactive)' : result.population_assessment}</p>}
       <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>
       <p>Time estimates cover constant cruise only; takeoff, landing, wind and dynamics are excluded.</p>

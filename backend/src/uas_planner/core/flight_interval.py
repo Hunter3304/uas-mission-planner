@@ -14,7 +14,7 @@ from uas_planner.core.regional import query_geometry, validate_scenario
 from uas_planner.core.risk import nonnegative, signature
 
 MAX_PASSES = 3
-REQUEST_SECONDS = 110  # Below the unchanged 120-second browser request timeout.
+REQUEST_SECONDS = 300  # Regional browser requests allow 10 s for response/transfer overhead.
 
 
 def timestamp_after(scenario, seconds):
@@ -85,6 +85,7 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
     planner._request_deadline = deadline
     passes, search_ms, preparation_ms = [], 0.0, source_ms
     validation_ms = interval_validation_ms = 0.0
+    population_ms = fusion_ms = 0.0
     result = None
     status, message = (
         "duration_resource_limit",
@@ -111,6 +112,8 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             search_ms += result["planner_ms"]
             validation_ms += result.get("final_validation_ms", 0.0)
             preparation_ms += result["preparation_ms"]
+            population_ms += result.get("population_preparation_ms", 0.0)
+            fusion_ms += result.get("fusion_preparation_ms", 0.0)
             passes.append(
                 {
                     "pass": number,
@@ -254,6 +257,14 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             solution_kind="none",
             independent_validation=False,
         )
+        for field in (
+            "building_length_cost",
+            "landuse_length_cost",
+            "highway_length_cost",
+            "fused_risk_length_cost",
+        ):
+            if field in result:
+                result[field] = None
         if result.get("population_active"):
             result["population_assessment"] = "unresolved"
         result["timing"] = {
@@ -274,5 +285,7 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
         planner_ms=search_ms,
         final_validation_ms=validation_ms,
         complete_interval_validation_ms=interval_validation_ms,
+        population_preparation_ms=population_ms,
+        fusion_preparation_ms=fusion_ms,
     )
     return result

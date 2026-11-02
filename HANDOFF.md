@@ -2,6 +2,55 @@
 
 ## Current status
 
+### Iteration 015 publication preparation (2026-11-02)
+
+- User authorized publishing the latest `iteration/015` feature work and merging
+  it into `main`. Fresh local checks pass: backend 391 passed / one existing skip
+  (168.86 s), Ruff/format, frontend lint/build and 67 mocked browser cases.
+  All 14 distinct smoke cases pass; one Chrome launch needed an isolated rerun.
+  Remote CI and integration are tracked separately by the publication PR/checks.
+- README now describes the implemented fixed 150 m fused-risk objective,
+  mandatory population in risk mode and ABIT*/Research/background-0 defaults.
+  Standard installation/start commands omit the optional Windows wheel, with a
+  separate Windows ABIT* path and explicit macOS A*/Dijkstra instructions.
+  A macOS OMPL build or successful macOS route run has not been verified.
+- Documented independent 30 s graph-preparation, selected search-budget and
+  300 s request / 310 s browser limits. This publication retains the 30 s cap;
+  it does not itself resolve the professor's expanded-graph timeout.
+- Source snapshots and `data.zip` remain outside publication. README preserves
+  the separately supplied dataset link workflow (Option A) and reacquisition
+  alternative (Option B). Historical October 27 checks are labelled separately
+  from the new release checks in the Iteration 015 outcome.
+
+### Iteration 015 local fused-risk implementation (2026-10-27)
+
+- User approved implementation after plan review, requiring direct replacement
+  of regional risk, fixed weight explanation, background 0 and research default.
+  Updated `doc/plan/iteration-015.md`; local branch `iteration/015` starts from
+  main `2b3efce`. Application changes remain local; no remote tracking, push,
+  PR, CI or merge is claimed.
+- Regional risk now uses a shared 150 m model with weights B/LU/H/P/L =
+  0.15/0.15/0.15/0.45/0.1. Natural fills unscored landuse cells. Population is
+  mandatory for risk; legacy coefficient arguments cannot double-count it.
+  The page keeps risk/distance and its layout, defaults to native ABIT*, and
+  removes old risk weight controls. Distance population remains optional;
+  the original 250 m population display remains independent.
+- User subsequently authorized a 300 s total limit. Regional backend requests
+  now use 300 s and browser requests 310 s with response grace; ABIT* search
+  budgets remain separate. 150 m native aggregation is batched without changing
+  the 250 m preparation path. All component costs, F/J and failure clearing are
+  shared by API/CLI, graph/native search, automatic arrival and export.
+- Full backend regression: 391 passes / one existing skip (179.81 s). The final
+  regional deadline adjustment passes 81 targeted tests; metadata correction
+  passes 17 fused-risk tests. Browser suite 67 passes; 14 real-backend smoke
+  passes; Ruff/format, frontend lint/build and desktop/mobile review pass.
+- Real Hannover A*/Dijkstra/ABIT* succeed with independently re-scored components;
+  graph J agrees at 4851.026076. Automatic interval/ETA succeeds; unchanged
+  conservative catalog endpoints remain invalid. Optimized fresh 3 s ABIT*
+  complete requests take 97.979 s and 119.675 s. Final worker peak 1332.03 MiB;
+  192 originals still match saved receipts. See rules, reproduction script and
+  `doc/iteration/iteration-015/outcome.md` for actual scope and limitations.
+
 ### UI follow-up: Feature category only for Hannover OSM (2026-10-27)
 
 - User requested removing Category cost from the Hannover OSM color view while

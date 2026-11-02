@@ -1,6 +1,6 @@
 """Bounded Hannover routing using existing graph/native planners and regional checks."""
 
-from copy import deepcopy
+from copy import copy, deepcopy
 from functools import lru_cache
 from math import ceil, hypot, isclose
 from time import perf_counter
@@ -9,7 +9,9 @@ from pyproj import Transformer
 from shapely.geometry import box, mapping, shape
 from shapely.ops import transform
 
+from uas_planner.core.flight_interval import REQUEST_SECONDS
 from uas_planner.core.grid import MAX_GRID_CELLS, validate_cell_size
+from uas_planner.core.paper_risk import FIELDS, WEIGHTS, prepare_paper_model
 from uas_planner.core.population_costs import PopulationResourceLimit, prepare_population_surface
 from uas_planner.core.population_routing import PopulationEvaluator, PopulationRiskModel
 from uas_planner.core.regional import RegionalConstraints
@@ -23,6 +25,8 @@ class RegionalPlanner:
     def __init__(self, directory, scenario, *, terrain_directory=None):
         self.directory = directory
         self._population = None
+        self._paper = None
+        self._paper_key = None
         self.constraints = RegionalConstraints(
             directory, scenario, terrain_directory=terrain_directory
         )
@@ -32,6 +36,11 @@ class RegionalPlanner:
     def ensure_deadline(self):
         if perf_counter() >= getattr(self, "_request_deadline", float("inf")):
             raise TimeoutError("Automatic flight interval deadline reached.")
+
+    def population_surface(self, cell_m=250):
+        return prepare_population_surface(
+            self.directory, deadline=self._request_deadline, cell_m=cell_m
+        )
 
     def check(self, coordinates, mode):
         self.ensure_deadline()
@@ -230,12 +239,17 @@ class RegionalPlanner:
         started = perf_counter()
         if not isinstance(include_population, bool):
             raise ValueError("include_population must be a boolean.")
+        if objective == "risk":
+            # Regional risk now uses the paper's fixed fusion, including population.
+            risk_weight, distance_weight = 0.9, 0.1
+            include_population, population_weight = True, 0.45
+            background_cost = 0 if background_cost is None else background_cost
         population_weight = (
             nonnegative(population_weight, "Population weight") if include_population else 0.0
         )
         population_active = include_population and population_weight > 0
-        if population_active and not hasattr(self, "_request_deadline"):
-            self._request_deadline = started + 110
+        if not hasattr(self, "_request_deadline"):
+            self._request_deadline = started + REQUEST_SECONDS
         cell_m = validate_cell_size(cell_m)
         if (
             algorithm not in ("astar", "dijkstra", "abitstar")
@@ -311,8 +325,16 @@ class RegionalPlanner:
             "population_length_cost": None,
             "population_model": None,
             "population_active": population_active,
-            "effective_objective": f"{objective}+population" if population_active else objective,
-            "effective_weights": {
+            "population_preparation_ms": 0.0,
+            "fusion_preparation_ms": 0.0,
+            "effective_objective": "risk"
+            if objective == "risk"
+            else f"{objective}+population"
+            if population_active
+            else objective,
+            "effective_weights": dict(WEIGHTS)
+            if objective == "risk"
+            else {
                 "building": risk_weight if objective == "risk" else 0,
                 "distance": distance_weight if objective == "risk" else 1,
                 "population": population_weight,
@@ -334,29 +356,58 @@ class RegionalPlanner:
             "mission": {**self.constraints.scenario, "start_id": start_id, "end_id": end_id},
         }
         self._last_result = result
+        if objective == "risk":
+            result.update({field: None for field in FIELDS + ("fused_risk_length_cost",)})
         reports.update({n: self.check([p], planning_mode) for n, p in endpoints.items()})
 
         def make_model(boundary):
             base = None
             if objective == "risk":
-                base = self.constraints.risk_model(
-                    background_cost=background_cost,
-                    mode=planning_mode,
-                    risk_weight=risk_weight,
-                    distance_weight=distance_weight,
-                    search_boundary=boundary,
-                    **(
-                        {"_allow_zero_weights": True}
-                        if risk_weight + distance_weight == 0 and population_active
-                        else {}
-                    ),
+                key = (planning_mode, background_cost)
+                if self._paper is None or self._paper_key != key:
+                    phase_started = perf_counter()
+                    try:
+                        surface = self.population_surface(150)
+                    finally:
+                        result["population_preparation_ms"] += (
+                            perf_counter() - phase_started
+                        ) * 1000
+                    if not shape(surface.metadata["study_boundary_metric"]).equals_exact(
+                        self.constraints.boundary, 1e-7
+                    ):
+                        raise ValueError("Population and constraint study boundaries differ.")
+                    phase_started = perf_counter()
+                    try:
+                        self._paper = prepare_paper_model(
+                            self.constraints,
+                            surface,
+                            mode=planning_mode,
+                            background=background_cost,
+                            deadline=self._request_deadline,
+                        )
+                    finally:
+                        result["fusion_preparation_ms"] += (perf_counter() - phase_started) * 1000
+                    self._population = self._paper.population
+                    self._paper_key = key
+                self._population = self._paper.population
+                result["population_model"] = deepcopy(self._population.metadata)
+                result["provenance"].update(
+                    ghsl_routing_cost=True,
+                    population_model_identity=self._population.metadata["identity"],
                 )
+                model = copy(self._paper)
+                model.boundary = boundary
+                model.deadline = self._request_deadline
+                model.provenance = deepcopy(self._paper.provenance)
+                model.provenance["source"] = deepcopy(self.constraints.provenance)
+                model.provenance["search_boundary_sha256"] = signature(mapping(boundary))
+                model.provenance.pop("model_signature", None)
+                model.provenance["model_signature"] = signature(model.provenance)
+                return model
             if not population_active:
                 return base
-            if self._population is None:
-                surface = prepare_population_surface(
-                    self.directory, deadline=self._request_deadline
-                )
+            if self._population is None or self._population.metadata.get("cell_size_m") != 250:
+                surface = self.population_surface()
                 candidate = PopulationEvaluator(surface)
                 if not shape(candidate.metadata["study_boundary_metric"]).equals_exact(
                     self.constraints.boundary, 1e-7
@@ -542,8 +593,10 @@ class RegionalPlanner:
                 assessed = all(a["assessment"] == "assessed" for a in assessments)
                 valid &= assessed
                 if assessed:
-                    for field in ("risk_length_cost", "objective_cost") + (
-                        ("population_length_cost",) if population_active else ()
+                    for field in (
+                        ("risk_length_cost", "objective_cost")
+                        + getattr(model, "component_fields", ())
+                        + (("population_length_cost",) if population_active else ())
                     ):
                         valid &= isclose(
                             sum(a[field] for a in assessments),
@@ -564,6 +617,7 @@ class RegionalPlanner:
                     objective_cost=None,
                     message="Independent route validation failed.",
                 )
+                result.update({field: None for field in getattr(model, "component_fields", ())})
         result["final_validation_ms"] = (perf_counter() - validation_started) * 1000
         if objective == "distance":
             result["risk_length_cost"] = None
@@ -693,11 +747,7 @@ def plan_regional_route(
     planner = RegionalPlanner(directory, scenario, terrain_directory=terrain_directory)
     source_ms = (perf_counter() - started) * 1000
     try:
-        if (
-            controls.get("include_population") is True
-            and nonnegative(controls.get("population_weight", 1), "Population weight") > 0
-        ):
-            planner._request_deadline = started + 110
+        planner._request_deadline = started + REQUEST_SECONDS
         try:
             result = planner.plan(start_id, end_id, **controls)
         except TimeoutError as error:
@@ -716,11 +766,12 @@ def plan_regional_route(
                 "solution_kind": "none",
                 "independent_validation": False,
                 "population_assessment": "unresolved"
-                if controls.get("include_population")
+                if controls.get("objective", "risk") == "risk" or controls.get("include_population")
                 else "not_evaluated",
                 "preparation_ms": max(0, (perf_counter() - started) * 1000 - source_ms),
                 "planner_ms": 0,
                 "runtime_ms": max(0, (perf_counter() - started) * 1000 - source_ms),
+                **{field: None for field in FIELDS + ("fused_risk_length_cost",)},
             }
     finally:
         planner.constraints.terrain.close()

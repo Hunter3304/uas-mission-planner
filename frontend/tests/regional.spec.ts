@@ -12,9 +12,9 @@ test('regional controls preserve weighted defaults, invalidate results and expor
       requests++
       const body = route.request().postDataJSON()
       expect(body.objective).toBe('risk')
-      expect(body.risk_weight).toBe(0.9)
+      expect(body).not.toHaveProperty('risk_weight')
       expect(body.scenario.agl_m).toBe(100)
-      expect(body.background_cost).toBeNull()
+      expect(body.background_cost).toBe(0)
       return route.fulfill({ json: { status: 'unresolved_input', message: 'Missing building heights', geometry: null, length_m: null, risk_length_cost: null, objective_cost: null, cruise_time_s: null, cruise_time_range_s: null, preparation_ms: 40000, planner_ms: 0, endpoint_diagnostics: {}, research_assumptions: [], provenance: { signature: 'fixture' } } })
     }
     if (path.endsWith('/study')) return route.fulfill({ json: { config: { bounds: dataset.query_bounds, locations: [{ id: 'mhh', name: 'MHH', longitude: 10.52, latitude: 52.27 }, { id: 'rheuma-podbi', name: 'Rheuma Podbi', longitude: 10.51, latitude: 52.26 }] }, sources: {} } })
@@ -43,7 +43,8 @@ test('regional controls preserve weighted defaults, invalidate results and expor
   await panel.getByLabel('Objective', { exact: true }).selectOption('distance')
   await expect(panel.getByLabel('Risk weight', { exact: true })).toHaveCount(0)
   await panel.getByLabel('Objective', { exact: true }).selectOption('risk')
-  await expect(panel.getByLabel('Risk weight', { exact: true })).toHaveValue('0.9')
+  await expect(panel.getByLabel('Risk weight', { exact: true })).toHaveCount(0)
+  await expect(panel.getByTestId('risk-fusion-weights')).toContainText('building 0.15')
   await page.setViewportSize({ width: 390, height: 844 })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await panel.screenshot({ path: '../.cache/part3-mobile.png' })

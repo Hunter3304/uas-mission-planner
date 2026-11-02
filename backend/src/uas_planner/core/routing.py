@@ -406,6 +406,12 @@ def plan_route(
                 )
         else:
             result["message"] = "Search resource limit reached; path existence remains unknown."
+    if result["status"] == "success" and getattr(risk_model, "component_fields", ()):
+        path = result["geometry"]["coordinates"]
+        evaluations = [risk_model.evaluate([a, b]) for a, b in zip(path, path[1:])]
+        result.update(
+            {field: sum(a[field] for a in evaluations) for field in risk_model.component_fields}
+        )
     result["runtime_ms"] = (perf_counter() - started) * 1000
     return result
 
@@ -423,6 +429,18 @@ def route_geojson(result):
                     "length_m": result["length_m"],
                     "risk_length_cost": result.get("risk_length_cost"),
                     "population_length_cost": result.get("population_length_cost"),
+                    **{
+                        name: result.get(name)
+                        for name in (
+                            "building_length_cost",
+                            "landuse_length_cost",
+                            "highway_length_cost",
+                            "fused_risk_length_cost",
+                            "effective_weights",
+                            "effective_objective",
+                        )
+                        if name in result
+                    },
                     "objective_cost": result.get("objective_cost"),
                     "rules_version": result["rules_version"],
                 },

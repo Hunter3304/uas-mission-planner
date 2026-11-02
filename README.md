@@ -1,620 +1,425 @@
 # UAS Mission Planner
 
-Iteration 014 Part 1 adds a fixed **250 m population risk grid** to the Hannover
-GHSL map group, replacing its former green native-count overlay. Five ordinal
-classes run green to red; gray means NoData. Click a cell for density, estimated
-population, support and study-wide thresholds. Part 2 adds optional population
-routing through regional API/CLI. Part 3 adds **Include population** beside the
-regional objective, with a weight input shown only when checked. Route results
-and exports separate building/population cost, physical length and the combined
-objective. The population map toggle is independent from route weighting.
-See the [operation guide](doc/experiments/iteration-014/README.md).
-Part 4 completes integrated/resource acceptance, preserves population endpoint
-diagnostics through automatic arrival, and corrects inspection help. See the
-[iteration outcome](doc/iteration/iteration-014/outcome.md) for actual timing,
-memory, validation and delivery limits. All four Parts are delivered to main;
-Part 4 [PR #129](https://github.com/Hunter3304/uas-mission-planner/pull/129) passed
-Linux/Windows/frontend CI. Full integration merged through
-[PR #130](https://github.com/Hunter3304/uas-mission-planner/pull/130) at `7c79b88`,
-after independent Linux/Windows/frontend CI. Milestones 12 and 13 are closed.
-See [population rules](doc/rules/population-costs.md) and the
-[plan](doc/plan/iteration-014.md). Native inspection APIs and original data remain available.
+A local geospatial research application for exploring Hannover/Lehrte map data
+and planning UAS routes between eight saved hospital, laboratory and practice
+locations. Python/FastAPI serves the data and planner; React/Vite provides the
+dataset explorer. OpenFlightMaps (OFM) has a separate page served by the backend.
 
-Iteration 013 **Part 1** is delivered to `iteration/013` through
-[PR #115](https://github.com/Hunter3304/uas-mission-planner/pull/115), after
-Linux Python, Windows Python and frontend CI passed. Issue #114 is closed.
-The completed iteration also entered main through PR #130. It adds source-grouped
-collapsible map controls, automatic cached scenario layers and a dedicated
-saved-site/exact-coordinate endpoint section. The old raw DIPUL overlay,
-coordinate override checkbox and manual layer-load button are removed from the
-regional UI. See the [operation guide](doc/experiments/iteration-013/README.md)
-and [Part 1 evidence/status](doc/iteration/iteration-013/part1.md).
-Part 2 is delivered through
-[PR #117](https://github.com/Hunter3304/uas-mission-planner/pull/117) to `iteration/013`
-at `370f1d7`, after final-head Linux/Windows/frontend CI passed. Issue #116 is
-closed and merged-feature cleanup is verified locally/remotely.
-OSM, DIPUL, GHSL and derived overlays share one left inspector, actual-geometry
-black outlines and short map summaries. Mobile uses one collapsible detail sheet.
-See [Part 2 acceptance/status](doc/iteration/iteration-013/part2.md).
-Part 3 is delivered through
-[PR #119](https://github.com/Hunter3304/uas-mission-planner/pull/119) at `db0d40b`,
-after final-head Linux/Windows/frontend CI. Issue #118 is closed; merged-feature
-cleanup is verified locally/remotely. It adds
-readable source cards, nested expandable attributes, explicit uncertainty/units,
-and Feature category / Category cost explanations. See
-[Part 3 acceptance/status](doc/iteration/iteration-013/part3.md).
-Part 4 is delivered to `iteration/013` through
-[PR #121](https://github.com/Hunter3304/uas-mission-planner/pull/121) at `81ec028`,
-after final-head Linux/Windows/frontend CI passed. Issue #120 is closed and
-merged-feature cleanup is verified locally/remotely. It adds
-departure-only input, actual-route cruise arrival and complete-interval constraint
-reassessment. Explicit historical API/CLI intervals remain supported. See
-[Part 4 acceptance/status](doc/iteration/iteration-013/part4.md) and
-[iteration outcome](doc/iteration/iteration-013/outcome.md).
-Local regression and integrated Hannover acceptance pass. The user's explicit
-publication approval superseded the earlier automatic block. All four Parts are
-on iteration/013 and entered main as the completed ancestor of Iteration 014
-through PR #130, after the independent full-integration CI gate passed.
+This guide sets up those **two pages**. Run commands from the repository root.
+The standard setup supports **A*/Dijkstra on macOS, Linux and Windows**. Optional
+native ABIT* is provided only for Windows x64. Shell-specific commands are marked;
+other commands can be run in PowerShell or a macOS/Linux terminal.
 
-Iteration 012 is delivered to `main` through
-[PR #112](https://github.com/Hunter3304/uas-mission-planner/pull/112), after
-independent Linux/Windows/frontend CI. All four Parts, including real-data
-performance/resource acceptance, are complete. See
-[actual measurements and remaining limits](doc/iteration/iteration-012/outcome.md).
+## 1. Install the application
 
-Iteration 012 **Part 1**, delivered to `iteration/012` through
-[PR #105](https://github.com/Hunter3304/uas-mission-planner/pull/105),
-adds explicit OSM display preparation, bounded regional
-viewport/overview APIs and a guard against the full Hannover response. Run
-`uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4`.
-Part 2, delivered to `iteration/012` through
-[PR #107](https://github.com/Hunter3304/uas-mission-planner/pull/107),
-adds precomputed independent category-cost styles, on-demand original-object
-details and shared demo style helpers. Re-run the prepare command for the new
-schema-2 cache. See [Part 2 acceptance](doc/iteration/iteration-012/part2.md).
-Part 3 delivers the regional colored-map UI to `iteration/012` through
-[PR #109](https://github.com/Hunter3304/uas-mission-planner/pull/109)
-(Issue #108): the initial view shows a labelled
-aggregate overview, while zoom 15+ requests bounded individual objects.
-Use **Show saved OSM**, the four category switches, **OSM color view** and
-**OSM cost category**. Click an object for original tags and independent costs;
-**Focus origin/destination** opens a local detail view. Route results and map
-position survive OSM changes. Linux/Windows/frontend CI passed before integration;
-Part 4 completes local real-data/resource acceptance and removes full source
-inspection from map-label loading. Warm TCP p95 is 0.165 s, browser-view p95
-0.980 s; 50 cycles retain bounded map/cache state. Three route runs per OSM state
-have identical outputs and -0.26% observed median overhead. Initial fit still
-takes about 11 s and routes about 52 s, dominated by source preparation.
-Part 4 [PR #111](https://github.com/Hunter3304/uas-mission-planner/pull/111)
-is merged into `iteration/012` after Linux/Windows/frontend CI passed; the complete
-iteration then passed its independent main gate and merged through PR #112. See
-[Part 4 measurements and limits](doc/iteration/iteration-012/outcome.md),
-[Part 3 acceptance](doc/iteration/iteration-012/part3.md), the
-[Part 1 operation guide](doc/experiments/iteration-012/README.md) and
-[real-data acceptance](doc/iteration/iteration-012/part1.md).
+Install Git, [uv](https://docs.astral.sh/uv/) and Node.js 24 with npm 11.
+The backend requires Python 3.13; uv can install the pinned Python version.
+Runtime pins are in [.python-version](.python-version) and
+[.node-version](.node-version); dependencies are locked in
+[backend/uv.lock](backend/uv.lock) and
+[frontend/package-lock.json](frontend/package-lock.json).
 
-Iteration 011, delivered through [PR #102](https://github.com/Hunter3304/uas-mission-planner/pull/102),
-adds **independent OpenFlightMaps layers and visualization** for the
-default Hannover/Lehrte eight-site study. Acquire a pinned OFMX revision, inspect
-airspaces/aerodromes and original height references, and open the backend's
-standalone [OFM preview](http://127.0.0.1:8000/ofm). Export a self-contained HTML
-preview for offline use. See the [operation/API guide](doc/experiments/iteration-011.md)
-and [acceptance/limitations](doc/iteration/iteration-011/outcome.md). OFM remains
-separate from the main explorer map and route/permission decisions.
-
-```powershell
-uv run --project backend --locked uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
-New-Item -ItemType Directory -Force .cache | Out-Null
-uv run --project backend --locked uas-planner ofm-preview data/.ofm/hannover-2610-new --output .cache/ofm-preview-new.html
-```
-
-Use new outputs and the intended AIRAC cycle; `2610` is the inspected example,
-not an automatic current-cycle selection. Existing acquired originals remain local.
-
-Iteration 008 Part 5 is delivered to main through [PR #96](https://github.com/Hunter3304/uas-mission-planner/pull/96)
-and verified against the current engine on **2026-10-15**:
-600 offline records across three real Hannover pairs and synthetic fixtures,
-weighted/distance objectives, A*/Dijkstra/native ABIT*, altitude/grid/speed and
-boundary comparisons. Real default-input preflights remain unresolved; 170
-synthetic successes pass independent checks. See [current Part 5 results and
-reproduction](doc/iteration/iteration-008/part5.md); the original 2026-10-08 evidence
-is retained separately. The default matrix does not enable Iteration 009's
-additional research assumptions or invent permission profiles.
-
-Iteration 010 adds **default conservative regional avoidance**: unresolved DIPUL
-footprints are excluded separately from confirmed prohibitions. Saved evidence
-profiles, phase/time/height scope, reviewed temporary notices and coverage reports
-are shared by A*, Dijkstra and native ABIT*. See the
-[operation guide and real endpoint conflicts](doc/iteration/iteration-010/outcome.md)
-and [decision rules](doc/rules/restriction-decisions.md). The historical research
-examples below require explicitly selecting `research`; no real permission profiles
-are supplied. Strict mode still retains unverified coverage gates.
-
-Iteration 010 closeout includes a [complete DIPUL source/endpoint audit](doc/data-sources/iteration-010-dipul-audit.md)
-and reproducible real three-mode acceptance. Independently active reviewed
-prohibitions take precedence over generic or stale allowances; permission-profile
-expiry/source changes restore conservative exclusions.
-
-The user-authorized [NHN + AGL height comparison](doc/rules/vertical-references.md)
-adds explicit offset/uncertainty and endpoint MSL comparison diagnostics. It is an
-engineering assumption in conservative/research mode; strict datum checks remain.
-
-Iteration 009 enables **real Hannover research routes** with explicit derived
-geometry and missing-height assumptions, bounded corridor search, checked exact
-endpoint connectors and Berlin date/time selectors. See
-[operation and independently checked real results](doc/iteration/iteration-009/outcome.md).
-Select `hannover-part1-v4`, terrain `hannover-part2-terrain-v1`, planning mode
-`research`, background score assumption `0`, missing-height estimate `30` m and
-A*. Use grid `250` m for rheuma-podbi → mhh; `500` m for amedes-georg/limbach-lehrte
-→ mhh. Enter the intended scenario times in the date selectors. Strict mode retains
-its unresolved-source checks; research routes do not establish flight permission.
-
-The regional map includes an optional online OpenStreetMap street basemap with
-explicit tile-failure feedback. Retained source data remain local. Iteration 012
-Part 3 replaces the old full-region OSM overlay request with bounded viewport
-queries and aggregate overview fallback; saved objects work without street tiles.
-Part 4's [resource and OSM off/on route comparison](doc/iteration/iteration-012/outcome.md)
-passes its adopted warm gates; measured startup, planner and full Braunschweig
-analysis memory costs remain explicit limitations.
-Mission duration is not checked
-against the entered scenario end time. See the operation guide's supplemental
-closeout section for diagnosed limitations and deferred work.
-
-A local Python geospatial research prototype for an internship and subsequent bachelor's thesis. Acquire a small area, save and verify its data, explore layers and statistics, and download results.
-
-**Stage version: [v0.3.0](https://github.com/Hunter3304/uas-mission-planner/releases/tag/v0.3.0).** See [CHANGELOG](CHANGELOG.md), [Iteration 003 plan](doc/plan/iteration-003.md), and [feedback](doc/iteration/iteration-003/feedback.md). Read [HANDOFF](HANDOFF.md) before work and update it afterward.
-
-Main includes the completed [Iteration 004](doc/plan/iteration-004.md) independent tag costs; these additions are not part of the fixed v0.3.0 release. See [iteration feedback](doc/iteration/iteration-004/feedback.md).
-
-Iteration 005 Part 1 adds independent **GHSL population, DIPUL zones and terrain
-height inspection**. Use the [experiment guide](doc/experiments/part1.md) to acquire
-or reload a checksummed snapshot and inspect 60 m AGL plus ground/aircraft height.
-The saved local demonstration is `braunschweig-part1-v2` (9.23 km²). Select it in
-the explorer after restarting the backend and refreshing the page.
-
-Iteration 005 [Part 2](doc/iteration/iteration-005/part2.md) was delivered to main
-on 2026-09-30 through [PR #48](https://github.com/Hunter3304/uas-mission-planner/pull/48).
-It adds a configurable
-EPSG:25832 preparation grid (default 50 m, maximum 10,000 cells). Enable
-**Constraint grid**, change **Grid cell (m)**, and click a cell to inspect
-population estimates, unknown support, altitude diagnostics and adjacent
-candidate connections. Endpoint connectors preserve the exact mission points.
-The read-only endpoint is `/api/datasets/{id}/experiment/grid?cell_m=50`.
-Temporary restriction coverage and legal applicability remain unresolved;
-`block_unresolved` excludes every candidate from traversal. Part 3 preserves
-this policy and reports `unresolved_input` for the real snapshot. This
-preparation graph does not establish flight permission.
-Validated locally with 96 Python passes (one Windows permission skip), 9 mocked
-and 5 real-stack browser passes, lint/format/build, and real Braunschweig grid
-inspection. Windows/Linux Python and frontend CI passed before and after merge.
-The real 50 m grid has 3,809 cells and 14,867 candidate edges; initial preparation
-took about 35 seconds locally, so allow it to finish before inspecting cells.
-
-## Iteration 008 Part 1: Hannover regional sources
-
-The new [regional source workflow](doc/experiments/iteration-008/README.md)
-uses all eight supplied Hannover/Lehrte hospital and laboratory/practice addresses,
-with a configurable detour margin. The saved configuration covers about 411.74 km²
-and uses a dated Geofabrik OSM extract with offline regional selection;
-an alternative Overpass configuration uses 32 bounded requests. `study-fetch`,
-`study-inspect`, `study-rebuild` and `study-configure` provide explicit acquisition,
-offline integrity checks, rebuilding from original responses and region changes.
-OSM, all advertised DIPUL layers and native GHSL population are separate sources.
-See [Part 1 evidence](doc/iteration/iteration-008/part1.md).
-
-This source snapshot is separate from the small-area flight experiment schema.
-Regional constraints, planner/UI integration and offline experiments are delivered
-in Parts 2-5; the building-risk/distance objective retains weights 0.9/0.1.
-Mission defaults are 100 m AGL and 30 m/s (ranges 100–120 m and 25–35 m/s).
-A complete source snapshot does not establish flight permission or route readiness.
-
-Iteration 008 Part 2 adds offline **fixed-altitude regional constraint preparation**
-and independent native GHSL region/corridor inspection. `study-prepare` records
-exact endpoint conflicts, building-height policies, DIPUL altitude/applicability,
-full-motion terrain support and source/rule identity. `study-check` applies the
-same point, motion and connector checks. Native LGLN terrain uses separate bounded,
-checksummed snapshots through `terrain-fetch`; NHN is not silently equated with MSL.
-`study-population` produces native-cell statistics/GeoJSON and an optional SVG
-preview. Read-only `/api/datasets/{id}/study/population` exposes the same inspection
-core. This native inspection does not change the default building-only 0.9/0.1
-objective; Iteration 014 separately adds optional 250 m population routing.
-See the [Part 2 operating guide](doc/experiments/iteration-008/README.md#part-2-regional-constraints-and-native-population-inspection)
-and [traceable rules](doc/rules/regional-constraints.md). Unknown height, geometry,
-time, vertical reference and coverage remain explicit; regional route/selector/UI
-integration is delivered in Parts 3/4, with current-engine experiments in Part 5.
-
-## Iteration 007: real-area research routing
-
-The default **Planning mode: Strict constraints** now reports unresolved source
-coverage before native search, including with an ABIT* zero-second budget.
-**ABIT* search budget (s)** excludes grid and building-model preparation. Results
-report preparation, planner and total durations; cooperative setup/validation can
-add overhead. The existing 10,000-cell cap and browser request timeout remain.
-
-To calculate on `braunschweig-part1-v2`, select **Research assumptions** explicitly.
-This assumes unresolved DIPUL applicability does not exclude travel and integrates
-polygon building footprints only; non-polygon building diagnostics are retained.
-Known obstacles, missing terrain, boundaries, clearance and unscored polygon risk
-remain excluded. This is a research route with incomplete constraint verification.
-Strict grid colours and original source layers remain available for inspection.
-Saved mission dates are historical (2026-10-01), not a newly verified flight window.
-
-For a verified weighted A*/Dijkstra example, use grid 50 m, background 0, weights
-0.9/0.1, safety distance 0, start `(10.504709863937636, 52.2537613755198)` and
-end `(10.539918336772804, 52.25510557964907)`. Both returned approximately 2,997 m
-with objective 316.333. Original points `(10.505, 52.254)` to `(10.54, 52.255)`
-produced a verified ABIT* research route with a 3 s search budget, but their
-start-to-grid connector intersects unscored building `way/49170599`; graph
-planners explain that local blocker rather than assuming a score. ABIT* stochastic
-paths and success within a fixed budget can vary between runs.
-
-CLI: add `--planning-mode research` to `experiment-route` or `route-compare`.
-API: add `planning_mode=research` to `/experiment/route` or `/experiment/compare`.
-UI exports the displayed result with mode, assumptions, crossed uncertain zones,
-source provenance and timings. Parameter/mode changes invalidate old results.
-See [approved plan](doc/plan/iteration-007.md) and
-[delivery evidence](doc/iteration/iteration-007/outcome.md).
-
-## Part 3: constrained shortest route
-
-Part 3 was delivered to main on 2026-09-30 through
-[PR #53](https://github.com/Hunter3304/uas-mission-planner/pull/53), after
-Windows/Linux Python and frontend CI passed. It adds deterministic distance-only
-A*, verified against Dijkstra, exact
-endpoint selection, full segment checks, explicit failures and route GeoJSON
-with mission/source/rule metadata. See [Part 3 outcome](doc/iteration/iteration-005/part3.md).
-Local verification: 110 Python passes (one Windows permission skip), 9 mocked
-and 6 real-stack browser passes, Ruff, ESLint and production build.
-Real Braunschweig inputs remain unresolved; use this synthetic obstacle model
-for a successful offline demonstration:
-
-```powershell
-uv run --project backend --locked uas-planner route-demo --output data/synthetic-route-demo
-uv run --project backend --locked uas-planner experiment-route data/synthetic-route-demo --output .cache/demo-route.geojson
-```
-
-Output paths must be new. Restart the backend, refresh the explorer and select
-`synthetic-route-demo`. Choose **Select start/end on map** or edit longitude and
-latitude, then **Generate shortest route**. The green route displays horizontal
-length and runtime. **Export route GeoJSON** includes provenance and assumptions;
-failures export empty features with their explicit outcome. The optional dashed
-**Straight-line reference** has no constraint validation. Changing endpoints,
-dataset or cell size clears the old route. Grid colors: green permitted, red
-blocked, amber unresolved. This historical synthetic distance demo does not use
-population or OSM soft scores; regional population routing is available in Iteration 014.
-
-The API is `/api/datasets/{id}/experiment/route?cell_m=50` with optional
-`start_lon`, `start_lat`, `end_lon`, `end_lat`; add `export=true` for GeoJSON.
-Results distinguish `success`, `invalid_endpoint`, `unresolved_input`,
-`no_path_on_grid`, `resource_limit` and `computational_failure`. Malformed
-coordinates or unsupported preparation sizes return HTTP 422. CLI exit codes
-are 0 success, 2 explicit route failure, 1 invalid input/storage failure.
-The shortest-distance guarantee applies to the constructed graph only; no
-flight permission, continuous-space optimality, 3D clearance or SORA claim.
-
-## Quick start: offline demonstration
-
-Iteration 006 Part 1 adds **building-risk weighted A*/Dijkstra in the Python
-core**, with metric centreline length times score, overlap maximum, explicit
-background assumptions and risk/length weights 0.9/0.1. See the
-[calculation rules and offline example](doc/rules/risk-weighted-routing.md) and
-[Part 1 feedback](doc/iteration/iteration-006/part1.md). Native OMPL and weighted
-CLI/API/UI controls were subsequently delivered in Parts 2/3.
-Real unresolved constraints retain their existing behavior.
-Feature [PR #57](https://github.com/Hunter3304/uas-mission-planner/pull/57) passed
-Windows/Linux Python and frontend CI and merged into `iteration/006`;
-[PR #58](https://github.com/Hunter3304/uas-mission-planner/pull/58) is the main
-integration record. Local verification: 139 Python passes, one Windows permission
-skip, six real-stack browser passes, Ruff, ESLint and production build.
-
-Prerequisites: Git, Python 3.13, uv, and Node.js 24/npm 11. Validated baseline: Python 3.13.13, uv 0.11.6, Node 24.14.1, npm 11.11.0. Open the repository folder in VS Code. Run these PowerShell commands from its root:
-
-```powershell
-# New checkout only; skip if the repository already exists locally.
+```sh
 git clone https://github.com/Hunter3304/uas-mission-planner.git
 cd uas-mission-planner
-
-# First installation (requires internet).
+uv python install
 uv sync --project backend --locked
 npm ci --prefix frontend
-
-# Generate a tiny sample; no map-service access is needed.
-uv run --project backend --locked uas-planner sample --output data/offline-sample
-uv run --project backend --locked uas-planner inspect data/offline-sample
 ```
 
-The sample contains **3 synthetic objects: 1 point, 1 line, 1 polygon**. Each semantic layer has one object; the building also has a land-use tag, so layer counts total four but unique objects total three. It is illustrative data, not surveyed OSM data. Feature content is fixed; timestamps and GeoPackage checksums can differ between saves. If `data/offline-sample` already exists, inspect it or choose another output name. Never overwrite a dataset silently.
+For an existing clone, first run `git switch main` and `git pull --ff-only` from
+a clean working tree, then repeat dependency installation after pulling updates.
 
-Open **two terminals** at the repository root and keep both running:
+**On macOS/Linux, select `astar` or `dijkstra` before planning.** The interface
+initially selects `abitstar`; leaving that selected without OMPL produces
+`planner_unavailable: No module named 'ompl'`. Do not add `--extra ompl-windows`
+on a Mac. A macOS OMPL package/build and successful macOS ABIT* run have not been
+provided or verified by this repository. A*/Dijkstra do not require OMPL; this
+does not guarantee that a particular route completes within the resource limits.
 
-```powershell
-# Terminal 1: backend
-uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
-```
-
-```powershell
-# Terminal 2: frontend
-npm --prefix frontend run dev
-```
-
-Open **http://127.0.0.1:5173**. Select `offline-sample`; switch off **Basemap** for offline use. Toggle layers, select a feature in the map/table, and download GeoJSON, GeoPackage, or metadata. Downloads always contain the complete dataset, including hidden layers. Click **Refresh** after saving another dataset. Stop each service with **Ctrl+C** in its terminal.
-
-| Address | Purpose |
-| --- | --- |
-| http://127.0.0.1:5173 | User interface |
-| http://127.0.0.1:8000/docs | API documentation |
-| http://127.0.0.1:8000/api/health | Backend health; returns `{"status":"ok"}` |
-| http://127.0.0.1:8000/ | No page is registered; `Not Found` is expected |
-
-## Optional OMPL / ABIT* on native Windows
-
-Iteration 006 Part 2's dependency probe passed on Windows x64 / Python 3.13.13.
-The route uses the official OMPL 2.0.1 C++ ABIT* algorithm with local Python
-binding and packaging fixes. Part 2 adds an offline Python adapter; the
-normal quick start above does not require OMPL. No Linux/WSL setup is needed
-for this verified Windows route.
-
-| Dependency | Verified version / purpose |
-| --- | --- |
-| Visual Studio 2022 Build Tools | 17.14.37710.0; MSVC x64/x86 14.44.35207, native source builds |
-| Windows SDK | 10.0.26100.0, native source builds |
-| CMake / Ninja | 4.4.3 / 1.13.2 |
-| vcpkg | Pinned checkout; Boost 1.92.0 serialization, program-options, math, graph and odeint; Eigen 5.0.1 |
-| scikit-build-core | 1.1.0, Python wheel packaging |
-| Nanobind | Pinned OMPL source submodule, Python bindings |
-| OMPL wheel | Patched `2.0.1+uas.1`, included under `backend/vendor`, Python 3.13 x64 only |
-
-The compiler/SDK are build prerequisites. The wheel includes its Boost runtime
-DLL; a plain PyPI `ompl` installation is not the verified Windows package.
-The wheel was tested on the build host, not a separate clean Windows machine.
-See the [source pins, patches, build commands and runtime evidence](doc/iteration/iteration-006/part2-windows-verification.md).
-Install the optional planner and run its tests from the repository root:
+For **Windows x64 native ABIT***, additionally run:
 
 ```powershell
 uv sync --project backend --locked --extra ompl-windows
-uv run --project backend --locked --extra ompl-windows pytest tests/test_abitstar.py -q
 ```
 
-The lock pins the repository wheel's SHA-256. Compiler tools are unnecessary for
-installing it on a compatible Windows x64 Python 3.13 environment; the Windows
-MSVC runtime must be available. Use `--extra ompl-windows` on subsequent `uv run`
-or `uv sync` commands to retain the optional planner. Other platforms retain
-graph routing and receive `planner_unavailable` for ABIT* unless a compatible
-patched native build is separately installed. Linux ABIT* is not runtime-verified.
+This extra installs the repository's patched CPython 3.13 Windows wheel without
+a compiler. The Microsoft Visual C++ runtime must be available. See
+[native planner requirements](backend/vendor/README.md). To retain this optional
+dependency, insert `--extra ompl-windows` after `--locked` in **every subsequent
+`uv sync` and `uv run` command** below, including backend startup. All commands
+without that extra are the standard macOS/Linux/Windows A*/Dijkstra setup.
 
-The Python entry point is `plan_risk_route(..., algorithm="abitstar",
-background_cost=0, time_budget_s=3, cancel=event.is_set)`. Background 0 is an
-explicit research assumption. Results distinguish exact success, approximate
-candidate, timeout, cancellation, invalid endpoint, unresolved input, unavailable
-planner and computation failure. Returned exact paths are rechecked against the
-full vector constraints and their costs are recomputed. Budget/cancellation are
-cooperative; preparation and final validation can add overhead. CLI/API/UI controls and independently scored comparisons are available in Part 3. See [Part 2 usage and limits](doc/iteration/iteration-006/part2.md)
-and [binary source/build provenance](backend/vendor/README.md).
+**Cloning source does not download map datasets.** Download the data archive
+from the separate link provided by the project author, then follow Option A below.
+Option B is an alternative for acquiring new source data yourself.
 
-## Iteration 006 Part 3: controls and comparison
+## 2. Prepare the required datasets
 
-CLI/API/UI now select A*, Dijkstra or ABIT*, distance or weighted building risk,
-weights, an explicit background score, safety distance and ABIT* time budget.
-Existing requests default to distance-only A*. Blank background remains
-unassessed; background 0 is an explicit research assumption. These small-area
-controls remain separate from Iteration 014 regional population routing.
+Prepare **three complete snapshot directories plus one generated display cache**:
 
-Create a **new** synthetic low-risk-detour dataset and compare offline:
+| Directory under `data/` | Contents and purpose | Required for |
+| --- | --- | --- |
+| `hannover-part1-v4/` | Regional OSM buildings, roads, land use and natural features; GHSL population; DIPUL zones; study bounds and eight saved sites | Hannover explorer and regional planning |
+| `hannover-part2-terrain-v1/` | Full-region LGLN DGM1 terrain: 120 native 2 km tiles and `terrain.json` | Scenario constraint preparation and route height checks |
+| `.ofm/hannover-2610-v2/` | One independent OFM snapshot: airspaces, aerodromes, original source, details and manifest | OFM page only |
+| `.osm-display/` | Indexed OSM display cache generated by `study-osm-prepare` | Saved OSM viewing in the Hannover map |
+
+OSM, GHSL and DIPUL are bundled in **one regional study directory**, not three
+separately selectable datasets. The OFM folder name above is an existing local
+example; one verified OFM snapshot is sufficient.
+
+The current local copies occupy approximately 643 MiB (study), 1,254 MiB
+(terrain), 8 MiB (one OFM snapshot) and 222 MiB (existing display caches).
+Allow additional space for download caches, environments and temporary files.
+
+You can omit `braunschweig-part1-v2`, `offline-sample`, `synthetic-risk-demo`,
+`synthetic-route-demo`, `hannover-part2-terrain-mhh` and duplicate OFM revisions
+for this setup. The MHH terrain probe covers only a small area and cannot replace
+full-region terrain. Keep existing copies if you use other demos.
+
+### Option A: use the supplied download link (recommended)
+
+Download the data archive from the link supplied by the project author and extract
+it at the **repository root**. The result must be `uas-mission-planner/data/...`,
+not `uas-mission-planner/data/data/...`. If several archives were provided, extract
+all of them into that same root and merge their `data/` directories.
+
+You can also copy the three complete snapshot directories from an existing
+installation into `data/`. Retain their contents, relative paths and hidden `.ofm`
+directory. Keep `.osm-display` if included; otherwise generate it below. Expected layout:
+
+```text
+data/
+  hannover-part1-v4/
+    study.json
+    population.tif
+    osm/
+      features.gpkg
+      metadata.json
+    raw/                         original OSM, GHSL and DIPUL responses
+  hannover-part2-terrain-v1/
+    terrain.json
+    dgm1-*.tif                   all tiles referenced by terrain.json
+    ...                          retained receipts/progress files
+  .ofm/
+    hannover-2610-v2/
+      ofm.json
+      source.zip
+      publication.xml
+      region.json
+      airspaces.geojson
+      aerodromes.geojson
+      details.json
+      diagnostics.json
+  .osm-display/                  generated in the next step
+```
+
+Copying only a GeoPackage, population raster or manifest is insufficient:
+verification also requires the referenced original files. Datasets are distributed
+separately through the author's download link and remain excluded from Git. The explorer's
+GeoJSON/GeoPackage/metadata buttons export **OSM only**, so those downloads cannot
+transfer a complete regional study.
+
+Verify the copied study and OFM snapshot, then generate the OSM display cache:
+
+```sh
+uv run --project backend --locked uas-planner study-inspect data/hannover-part1-v4
+uv run --project backend --locked uas-planner ofm-inspect data/.ofm/hannover-2610-v2
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
+```
+
+Terrain appears in its own selector; its payloads are verified when preparing a
+scenario or route. A catalog entry alone does not prove complete terrain support.
+The display cache can be rebuilt locally; it is not another external download.
+After source/rule changes, repeat `study-osm-prepare` with `--refresh`.
+
+### Option B: acquire the data on a new machine
+
+Internet access to the source services is required. The committed
+[Hannover configuration](doc/experiments/iteration-008/hannover-study.json)
+defines the eight sites, study bounds and source parameters. No API key is
+configured for this workflow.
+
+First acquire the regional OSM + GHSL + DIPUL study:
+
+```sh
+uv run --project backend --locked uas-planner study-fetch --config doc/experiments/iteration-008/hannover-study.json --output data/hannover-part1-v4 --cache .cache/source-downloads
+uv run --project backend --locked uas-planner study-inspect data/hannover-part1-v4
+```
+
+This uses a dated Niedersachsen Geofabrik OSM extract, GHSL GHS-POP R2023A
+(2020, native 100 m, tile R3_C19) and DIPUL WFS layers. The original PBF alone is
+about 483 MiB. Services must still offer the configured products; newly acquired
+responses may differ from the existing snapshot. For exact historical
+reproduction, use Option A.
+
+If the dated PBF is unavailable, the committed
+[Overpass configuration](doc/experiments/iteration-008/hannover-overpass.json)
+can be supplied to `--config` with a **new** output directory. This fetches a new
+OSM snapshot and does not reproduce the dated extract. See the
+[source acquisition guide](doc/experiments/iteration-008/README.md).
+
+Next acquire terrain for exactly the same study bounds and prepare OSM display.
+In **PowerShell**:
 
 ```powershell
-uv run --project backend --locked uas-planner route-demo --low-risk --output data/synthetic-risk-demo
-uv run --project backend --locked --extra ompl-windows uas-planner experiment-route data/synthetic-risk-demo --algorithm abitstar --objective risk --background-cost 0 --cell-m 25 --time-budget-s 3 --output risk-route.geojson
-uv run --project backend --locked --extra ompl-windows uas-planner route-compare data/synthetic-risk-demo --background-cost 0 --cell-m 25 --repetitions 3 --time-budget-s 2 --output risk-comparison.json
+$studyConfig = Get-Content doc/experiments/iteration-008/hannover-study.json -Raw | ConvertFrom-Json
+uv run --project backend --locked uas-planner terrain-fetch --bounds $studyConfig.bounds.west $studyConfig.bounds.south $studyConfig.bounds.east $studyConfig.bounds.north --output data/hannover-part2-terrain-v1 --workers 3
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
 ```
 
-Use new output names if they already exist. In the map, choose the synthetic
-dataset, set grid 25 m and background 0, and generate or **Compare algorithms**.
-The UI exports the displayed result without another solve. Status, costs,
-assumptions and provenance are retained; approximate/failed results do not export
-a successful route feature. Parameter changes invalidate displayed results.
+In **macOS/Linux bash or zsh**, use the same bounds from the configuration:
 
-`/api/datasets/{id}/experiment/route` accepts algorithm/objective/weights,
-background/clearance/budget and optional endpoints; `/experiment/compare` runs
-the fixed four-planner lineup with bounded repetitions and independent cost checks.
-Per-task native seeds are unsupported and recorded as such. Grid and continuous
-optimality claims remain separate. Real-data unresolved results stay explicit.
-See [operation, budgets, measurements and verification](doc/iteration/iteration-006/part3.md).
+```sh
+study_bounds=($(node -e 'const b=require("./doc/experiments/iteration-008/hannover-study.json").bounds; console.log([b.west,b.south,b.east,b.north].join(" "))'))
+uv run --project backend --locked uas-planner terrain-fetch --bounds "${study_bounds[@]}" --output data/hannover-part2-terrain-v1 --workers 3
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
+```
 
-## Acquire real map data
+Finally acquire one independent OFM snapshot:
 
-With dependencies installed, run from the repository root:
+```sh
+uv run --project backend --locked uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
+uv run --project backend --locked uas-planner ofm-inspect data/.ofm/hannover-2610-new
+```
+
+`2610` is the historical example, valid from **2026-10-01 to 2026-10-29**;
+it is not an automatically current cycle. Choose an explicitly available cycle
+and matching folder name for another period. Re-fetching the same cycle can
+return a different revision. The default OFM region is packaged with the backend,
+so OFM alone does not require study or terrain downloads. See the
+[OFM acquisition and offline import guide](doc/experiments/iteration-011.md).
+
+Acquisition commands require **new output directories**. For interrupted
+`study-fetch` or `terrain-fetch`, repeat the identical command with `--resume`.
+Completed snapshots cannot be resumed or overwritten; inspect them or choose
+new output names. Resolve missing or failed downloads before use.
+
+## 3. Start the two pages
+
+Keep two terminals open at the repository root.
+
+**Terminal 1 — backend, including OFM:**
+
+```sh
+uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+```
+
+For the optional **Windows native ABIT*** installation, use this backend command
+instead (macOS/Linux use the command above):
 
 ```powershell
-uv run --project backend --locked uas-planner fetch --west 10.519 --south 52.269 --east 10.521 --north 52.271 --output data/braunschweig-demo --cache .cache/osmnx
-uv run --project backend --locked uas-planner inspect data/braunschweig-demo
+uv run --project backend --locked --extra ompl-windows uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-`fetch` needs internet and retrieves building, highway, landuse, and natural features through OSMnx/Overpass. It saves `features.gpkg` and `metadata.json`, then reloads and verifies them. `inspect` reads only local data. The output directory must be new. A previous live demonstration contained 91 features; current OSM results may change.
+**Terminal 2 — Hannover dataset explorer:**
 
-Coordinates use EPSG:4326 longitude/latitude. Queries are limited to 25 km², a maximum one-degree span per axis, and no polar or dateline-crossing area. Features retain complete geometries and can extend beyond the query rectangle. Layers match by union. Empty results are valid; source-invalid geometries are retained and counted.
+```sh
+npm --prefix frontend run dev
+```
 
-OSMnx enables caching and service backoff. Individual HTTP requests time out after 60 seconds; retries/backoff are not bounded by an overall deadline. Use Ctrl+C to cancel. Acquisition times are operation times, not source edit times or proof of a fresh download. A failed save may leave an incomplete folder for diagnosis; it will not pass verification. Preserve it for investigation and retry with a new output name.
-
-## Troubleshooting
-
-| Symptom | Action |
+| Address | Purpose |
 | --- | --- |
-| `WinError 10048` / address already in use | A service already owns backend port 8000. Check `/api/health`; reuse it if it is this project, or stop the original terminal with Ctrl+C before restarting. |
-| `Port 5173 is already in use` | Check the existing frontend URL. Stop the original frontend terminal before starting another instance. |
-| Backend root shows `Not Found` | Open port **5173** for the UI, or `/docs` on port 8000 for API docs. |
-| Cannot reach data service / error 500 or 502 | Start the backend and check its terminal. Restart Vite after changing branches or proxy configuration. |
-| Invalid response / unexpected download type | Check both addresses above. An HTML page may be served instead of the API; restart the services with the correct configuration. |
-| No saved datasets | Run the sample/fetch command, then Refresh. Check the data root and folder name. |
-| Dataset cannot be verified | Inspect it with the CLI for details. Check that both files are present; do not edit checksums to bypass corruption. |
-| Basemap unavailable | Disable Basemap. Saved vector layers, statistics, and downloads still work locally. |
-| uv hardlink warning | Installation falls back to copying; this is not failure. Optionally set `$env:UV_LINK_MODE='copy'` in that terminal. |
-| Sample output already exists | Use `inspect`, or choose a new directory such as `data/offline-sample-02`. |
+| [127.0.0.1:5173](http://127.0.0.1:5173) | Dataset explorer: select `hannover-part1-v4` |
+| [127.0.0.1:8000/ofm](http://127.0.0.1:8000/ofm) | Independent OFM page: select the acquired snapshot |
+| [127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health) | Backend check; expected `{"status":"ok"}` |
+| [127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | API documentation |
 
-Identify the owner of a busy port in PowerShell:
+OFM needs only Terminal 1. It is not a route on port 5173 and is not included in
+the main map or route optimization. Stop each server with Ctrl+C in its terminal.
+No database server or separate GIS application is required.
 
-```powershell
-Get-NetTCPConnection -LocalPort 8000,5173 -State Listen |
-    Select-Object LocalAddress, LocalPort, OwningProcess
-# Replace 12345 with an actual PID from the output:
-Get-Process -Id 12345
+### Check the Hannover page
+
+1. Select `hannover-part1-v4` under **Saved dataset**. With several datasets
+   present, the application initially selects the first catalog entry rather
+   than automatically preferring Hannover.
+2. Confirm the boundary, eight saved sites and saved OSM appear. The initial
+   regional view uses an aggregate overview; zoom to level 15+ for individual
+   OSM objects. Click an object for its original attributes and category costs.
+3. Select terrain `hannover-part2-terrain-v1`. Enter a **Departure time** in
+   Europe/Berlin. Scenario constraint layers prepare automatically once required
+   inputs are valid; no manual preload button is needed.
+4. Enable **GHSL — population risk (250 m)** to display population classes.
+   This affects display only. The `risk` objective always includes population,
+   even when the population layer is hidden. **Include population** is available
+   only for the `distance` objective.
+5. For the retained research example, choose `rheuma-podbi` → `mhh`, select
+   **research**, `risk`, 100 m AGL, 30 m/s, background score **0**, estimated
+   missing building height 30 m. The page defaults to **ABIT***, **Research**,
+   background **0**, grid spacing **250 m** and search budget **3 s**. On macOS
+   or a machine without OMPL, explicitly choose **`astar` or `dijkstra`**.
+   For a first graph attempt, try **500 m** spacing and **60 s** search budget;
+   these reduce graph work/allow more search but do not guarantee success.
+   Finer spacing gives a more detailed graph and costs more preparation time.
+   Click **Plan regional route**. Keep the NHN/MSL comparison assumption and
+   its 0 m offset and uncertainty explicit.
+
+With retained historical sources, `2026-10-07 10:00` is a documented research
+departure example, not a current verified flight window. ABIT* is stochastic:
+a finite budget can produce a different route or no solution. Source preparation
+and final checks can make a request much longer than its search budget; graph
+cost preparation also consumes the A*/Dijkstra search deadline. See the separate
+limits below. Cold full-study preparation was about 98–120 s on the development
+Windows host; this is a historical observation, not a macOS timing guarantee.
+
+The regional `risk` objective uses a **fixed 150 m fused cost grid**:
+
+```text
+J = 0.15 × building + 0.15 × land use + 0.15 × roads
+    + 0.45 × population + 0.10 × route length
 ```
 
-Stop a process only after confirming it belongs to your project. Prefer Ctrl+C in its original terminal. If that terminal is unavailable, `Stop-Process -Id 12345` stops the confirmed process. Do not copy an old PID from another session.
+Each risk component is integrated as score × travelled metres. The three OSM
+categories contribute equally to OSM risk; OSM and population each supply half
+of fused risk, then the objective combines 0.9 × fused risk + 0.1 × length.
+Population is mandatory and weights are fixed in `risk`. Background 0 is an
+explicit assumption for unscored OSM cells, not observed absence of risk.
 
-## Configuration and data
+`distance` retains its optional, separately weighted 250 m population term.
+The **150 m fusion grid**, **250 m population display** and configurable
+**A*/Dijkstra search spacing** serve different purposes. Increasing search
+spacing does not change the fusion resolution. ABIT* searches continuous space
+and does not use graph spacing. See the [fused-risk rules](doc/rules/paper-risk-routing.md)
+and [population rules](doc/rules/population-costs.md).
 
-The API reads direct subdirectories of `data/`, containing `features.gpkg` and `metadata.json`. Names must start with an ASCII letter/digit, use only letters, digits, underscores or hyphens, and be at most 100 characters. To use another data root, set `$env:UAS_DATA_DIR='D:/path/to/datasets'` in the **backend terminal before startup**.
+### Planning time and resource limits
 
-Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend port, start uvicorn with that port and set `$env:UAS_API_URL='http://127.0.0.1:8001'` in the **frontend terminal before startup**. Servers bind to loopback for local development.
+| Stage | Limit / behavior |
+| --- | --- |
+| Build an A*/Dijkstra graph, including an expanded corridor | At most **30 s per graph preparation**, also subject to the remaining request time and candidate-cell limit |
+| Graph cost/connector preparation and A*/Dijkstra search | Share the selected **Search budget**, default 3 s and maximum 60 s; expansion does not reset this deadline |
+| Native ABIT* solve | Selected search budget, also bounded by the remaining request time |
+| Entire regional backend request | **300 s**, including source/cost preparation and flight-interval checks |
+| Browser wait for a regional route response | **310 s**; other API calls retain 120 s |
 
-Generated datasets and caches are excluded from Git. Metadata records the source, query, versions, geometry policy, count, and GeoPackage SHA-256. Verification checks storage consistency, not geographic accuracy. Synthetic samples are explicitly marked in metadata and UI. Dataset schema remains version 1, compatible with valid earlier datasets.
+These limits are independent. Setting Search budget to 60 s does **not** extend
+the 30 s graph-preparation cap. `Expanded preparation refused (preparation
+exceeded 30 seconds)` means a wider retry graph could not be prepared in time;
+it does not establish that no route exists. Increase **Grid spacing** explicitly
+(for example, 250 → 500 m) and retry. If 500 m still exceeds the cap, preparation
+needs investigation on that machine; increasing only Search budget or the total
+request limit cannot remove that cap. Coarser grids can miss narrow passages.
+The fixed fusion surface and population preparation also have bounded work;
+300 s is an outer ceiling, not a promise that every stage receives 300 s.
 
-## Verify the delivery
+### What loads automatically?
 
-From the repository root:
+Source acquisition is done beforehand by CLI or by copying complete snapshots.
+Opening a page does not download missing source datasets.
+
+| Trigger | Data loaded or prepared |
+| --- | --- |
+| Open explorer / select Hannover | Dataset metadata, terrain catalog, lightweight study bounds and eight-site catalog |
+| Regional map opens, pans or zooms with saved OSM enabled | OSM cache summary and bounded overview/object requests; the full regional OSM collection is not sent to the browser |
+| Street basemap enabled (default) | Online OpenStreetMap tiles; independent of the saved OSM snapshot |
+| Valid departure, endpoints, terrain and scenario inputs, with a scenario layer enabled | Automatically prepared OSM/DIPUL constraint layers and height checks using study + terrain; before routing, the interval is provisional |
+| Enable GHSL population display | Derived 250 m population class layer from the study's local GHSL raster |
+| Click Plan regional route | Verified source/terrain preparation, cost model, search and flight-interval reassessment; no route is computed on initial page load |
+| Open `/ofm` / select a snapshot | OFM catalog, selected snapshot metadata, airspaces, aerodromes and diagnostics; object details load on selection |
+
+After installation and acquisition, disable **Street basemap** for offline use.
+Saved vectors, terrain, planning and OFM work from local files. OFM uses no online
+street tiles. Its **Download offline preview** exports a standalone HTML view
+that also works without running the backend.
+
+## 4. Configuration and troubleshooting
+
+The backend reads `data/` by default. To use another location, set this in the
+**backend terminal before startup**; place the study, terrain, `.ofm` and
+`.osm-display` under that same root:
+
+**PowerShell:**
 
 ```powershell
-uv run --project backend --locked uas-planner --version
+$env:UAS_DATA_DIR = 'D:/uas-datasets'
+```
+
+**macOS/Linux:**
+
+```sh
+export UAS_DATA_DIR="$HOME/uas-datasets"
+```
+
+When preparing OSM there, pass the actual study path, for example
+`uas-planner study-osm-prepare D:/uas-datasets/hannover-part1-v4` with the same
+`uv run` prefix as above. The default cache location is the study's sibling
+`.osm-display` directory. Dataset names use at most 100 ASCII letters/digits,
+underscores or hyphens and must start with a letter/digit. Refresh the explorer
+after adding a dataset.
+
+Vite proxies `/api` to port 8000. For another backend port, change uvicorn's
+`--port` and set this in the **frontend terminal before starting Vite**:
+
+```powershell
+$env:UAS_API_URL = 'http://127.0.0.1:8001'
+```
+
+On macOS/Linux, use `export UAS_API_URL='http://127.0.0.1:8001'` instead.
+
+Open OFM on that backend port too. These variables are read from the process
+environment; this setup does not require an `.env` file.
+
+| Symptom | Check / action |
+| --- | --- |
+| No saved datasets / Hannover absent | Data is not included in Git. Complete section 2, check `UAS_DATA_DIR`, then Refresh. |
+| Saved OSM reports `not_prepared` or `stale` | Run `study-osm-prepare` for the selected study; use `--refresh` after source/rule changes. |
+| Terrain selector missing or awaiting catalog | Check root and `terrain.json`; retain every referenced tile. The MHH probe is not a full-region replacement. |
+| Scenario layers waiting | Enter departure, choose available terrain and valid endpoints, and leave at least one scenario layer enabled. |
+| No local OFM snapshots | Check `{data_root}/.ofm/{snapshot_id}/ofm.json`; copy the whole snapshot or run `ofm-fetch`. |
+| `planner_unavailable` / `No module named 'ompl'` for ABIT* | On macOS/Linux select `astar` / `dijkstra`; a compatible native OMPL installation is not provided or verified. On supported Windows x64 Python 3.13 install/retain `--extra ompl-windows`, then restart the backend. |
+| `Graph cost preparation exceeded the search deadline` | Increase Search budget from the 3 s default toward 60 s and/or increase graph spacing; graph cost work shares this deadline with search. |
+| `Expanded preparation refused (preparation exceeded 30 seconds)` | Increase Grid spacing; 60 s search and 300 s total limits do not override the separate 30 s graph cap. See planning limits above. |
+| Cannot reach data service | Check backend terminal and `/api/health`; verify Vite's proxy target. |
+| Backend `/` says Not Found | Open port 5173 for the explorer or backend `/ofm` for OFM. |
+| Basemap unavailable | Disable Street basemap; local saved data remains usable. |
+| Snapshot fails verification | Inspect it with the matching CLI command; restore missing/corrupt originals. Do not edit checksums to bypass verification. |
+| Port 8000 / 5173 occupied | Check for an existing project server; reuse it or stop it with Ctrl+C in its terminal. |
+
+## Development and further documentation
+
+The independent Python core is shared by CLI and API; it does not depend on React
+or FastAPI. Source is in `backend/src/uas_planner/` and `frontend/src/`.
+Run these checks after code changes:
+
+```sh
 uv run --project backend --locked pytest backend/tests -q
 uv run --project backend --locked ruff check backend/src backend/tests
 uv run --project backend --locked ruff format --check backend/src backend/tests
 npm --prefix frontend run lint
 npm --prefix frontend run build
+```
 
-# One-time browser installation requires internet.
-cd frontend
+For browser tests, install Chromium once, then run the suites:
+
+```powershell
+Push-Location frontend
 npx playwright install chromium
 npm run test:e2e
 npm run test:smoke
-cd ..
+Pop-Location
 ```
 
-Alternatively, with Chrome installed on Windows, set `$env:PLAYWRIGHT_CHANNEL='chrome'` before the browser tests and skip installing Chromium. The mocked UI suite uses port 5174. The **real-stack smoke test** creates a temporary sample, launches the actual API on 8011 and Vite on 5175, checks map/statistics/tags and all downloads, verifies the GeoPackage checksum, and stops its servers. Keep these test ports free. Basemap requests are blocked in tests; map-service access is unnecessary after dependencies and browser installation.
+On macOS/Linux, use `cd frontend` and `cd ..` in place of `Push-Location` and
+`Pop-Location`. The browser suites use ports 5174 and 8011/5175. Add the Windows
+OMPL extra to the Python check commands when verifying native ABIT* there.
 
-CI runs Python checks on Windows/Linux and frontend lint, build, mocked browser tests and real-stack smoke on Linux. Windows may skip the symlink-containment test when symlink permission is unavailable; Linux runs it. A dependency currently emits a Starlette/httpx deprecation warning; it does not fail the checks.
+- [Regional acquisition and CLI guide](doc/experiments/iteration-008/README.md)
+- [OFM acquisition, API and offline preview](doc/experiments/iteration-011.md)
+- [Map controls and source inspection](doc/experiments/iteration-013/README.md)
+- [Population display and routing](doc/experiments/iteration-014/README.md)
+- [Regional fused-risk objective](doc/rules/paper-risk-routing.md)
+- [Building-risk routing model](doc/rules/risk-weighted-routing.md)
+- [Planning modes and assumptions](doc/rules/planning-modes.md)
+- [Source attribution, access and methodology](doc/data-sources/README.md)
+- [Release history](CHANGELOG.md), [development handoff](HANDOFF.md) and
+  [iteration records](doc/iteration/)
 
-## Architecture and stack
-
-### Independent tag cost analysis
-
-Saved datasets are analyzed using versioned rules from Ramke (2020). Choose
-**Cost category**: Buildings, Roads & paths, Land use, or Natural features.
-Enable the corresponding **cost map** checkbox to color that category by its
-tag cost (0-4). Roads, land use and natural features are analyzed independently,
-including objects with no building tag. Select a feature to inspect each tag, its cost or unscored status,
-the matched rule, source and any historical paper obstruction flag. Search
-supports tag keys/values as well as names and OSM identities.
-Read [Cost rules](doc/rules/README.md) and the
-[independent-layer guide](doc/rules/independent-costs.md). The executable rules
-live in [cost_rules.json](backend/src/uas_planner/core/cost_rules.json).
-Unknown classifications use provisional cost 2 with a distinct gray
-style; blank areas are unassessed. Other tag costs are shown independently,
-not added to the selected category's cost. Statistics cover all saved objects in
-that category, including hidden ones. Switching categories updates the map,
-table and statistics and clears the prior selection. Active layer switches still
-use union visibility for objects carrying multiple tags.
-Paper obstruction flags do not establish current flight restrictions.
-
-Restart the backend after updating rules/code, then Refresh the dataset.
-Original datasets and downloads are unchanged; analysis is calculated on read.
-Independent tag analysis remains separate from building-risk route optimization;
-general cross-layer tag-cost fusion remains deferred. Iteration 014 separately
-supports a building/distance objective with an optional population term.
-
-One public monorepo, separately running frontend/backend. React communicates through HTTP. **The Python core must never depend on React or FastAPI**; CLI, API and future experiments reuse the core. Code, UI and project documentation default to English.
-
-| Area | Stack |
-| --- | --- |
-| Core/API | Python 3.13, FastAPI, uvicorn |
-| Frontend | React 19.3.0, TypeScript 6.0.3, Vite 8.3.1, Leaflet |
-| Geospatial | OSMnx/Overpass, GeoPandas, Shapely, pyproj, pyogrio |
-| Storage/export | GeoPackage, GeoJSON, JSON metadata |
-| Environments | uv + backend/uv.lock; npm + frontend/package-lock.json |
-| Quality | pytest, Ruff, ESLint, TypeScript, Playwright, GitHub Actions |
-| Development | Local VS Code; Python 3.13 and Node.js 24 runtime lines |
-
-Use locked installs. Upgrade dependencies deliberately through a tested issue/PR, not as part of ordinary startup.
-
-```text
-backend/src/uas_planner/   Independent core, acquisition, storage, CLI and API adapters
-backend/tests/            Unit/API tests and isolated smoke-test server
-frontend/src/             React interface and map
-frontend/tests/           Mocked browser regression tests
-frontend/smoke/           Real API/browser sample test
-data/                     Local generated datasets (ignored)
-doc/plan/                 Agreed sprint plans
-doc/iteration/            Results and retrospectives
-doc/decisions/            Architecture decisions
-doc/research/             Literature and methodology
-.github/                  Issues and CI
-HANDOFF.md                Current state, workflow and pending work
-CHANGELOG.md              Stage release history
-```
-
-## Workflow and stage versions
-
-Read HANDOFF, discuss each sprint, and record its plan before creating the Milestone. Create Issues in that Milestone **before** feature branches. Branch from `iteration/NNN`, validate and merge PRs back into it, close Issues, and immediately delete merged branches **locally and remotely**, pruning and verifying both. Merge the tested iteration into main; retain iteration branches as history. Update README, feedback and HANDOFF, including post-merge facts.
-
-The v0.3.0 stage release is a tagged prototype baseline. Backend, frontend, CLI and API versions agree; a regression test checks this. Only tag a main commit with successful CI. Release notes record capabilities, validation and limits. Do not move a published tag; fixes get a new version. GitHub source archives plus committed lockfiles and the sample command reproduce the release environment without publishing local map datasets.
-
-## Current limits
-
-The [external data and methodology assessment](doc/data-sources/README.md)
-reviews Droniq/TraX, OpenFlightMaps, GHSL, DIPUL, SORA 2.5 and EGRED 2 as of
-2026-09-29, with access evidence, limitations and proposed routing uses.
-GHSL, selected DIPUL WFS layers and LGLN DGM1 are integrated for independent
-inspection. Iteration 011 adds an independent OFM snapshot/display workflow.
-Droniq and the assessed methodology-only sources retain their documented scope.
-
-The local prototype supports small-area and Hannover regional mission research
-and loads source data into memory for verification. Building tag costs are ordinal
-research classifications. Regional OSM display uses the bounded indexed queries
-from Iteration 012 and population routing is optional in Iteration 014.
-Browser-triggered acquisition, background jobs, general cross-layer tag fusion
-and public deployment remain future work. Full flight phases, real
-permission evidence and complete NOTAM coverage remain unresolved. No next sprint
-is approved automatically by a stage release.
-
-## Explorer panel controls
-
-Iteration 008 Part 3 adds `study-route` and regional planning controls using the
-same offline constraints in A*, Dijkstra and native ABIT*. Weighted building risk
-defaults to 0.9/0.1; distance-only remains a baseline. Strict Hannover source
-checks remain unresolved; Iterations 009/010 add explicit research routes and
-conservative avoidance, as described above. See the
-[Part 3 delivery](doc/iteration/iteration-008/part3.md) and
-[operating guide](doc/experiments/iteration-008/README.md).
-
-Use **Collapse / Expand** on the cost analysis, independent source layers, route
-planning, location/source inspection, feature browser and feature details panels.
-The map stays visible and folding preserves planner inputs and results. Feature
-browser/details start collapsed, can be opened manually, and both open when any
-feature is selected. Clearing selection collapses both.
-
-**Distance** hides Risk weight, Distance weight and Background score assumption;
-**Weighted building risk** shows them and restores their values. Safety distance
-and ABIT* budget remain available. Distance objective cost is horizontal route
-length in metres. Weighted objective cost is `risk_weight * integrated_building_score_length
-+ distance_weight * horizontal_length`; background must be explicitly assessed.
-See [UI validation](doc/iteration/iteration-006/ui-panels.md).
-
-
-Iteration 006 Part 2/3 and explorer panel controls were accepted on 2026-10-03.
-Delivered to main through [PR #64](https://github.com/Hunter3304/uas-mission-planner/pull/64)
-after successful Windows/Linux Python and frontend CI. See HANDOFF for integration records.
-
-
-### Hannover regional interface (Iteration 008 Part 4)
-
-Select `hannover-part1-v4` in the dataset explorer. Choose origin/destination from
-all eight verified catalog addresses, enter explicit offset-aware scenario times
-and use `hannover-part2-terrain-v1` for retained full-region terrain. **Load scenario
-layers** prepares altitude/time/clearance-dependent constraint and unknown overlays;
-**Plan regional route** uses the shared weighted or distance planner. Independent
-map switches show boundary, sites, OSM, original DIPUL, effective constraints,
-unknown areas, native GHSL and successful route geometry. Large overlays load on
-demand. Results report mission parameters, costs and separate calculation/cruise
-times; **Export displayed result** preserves the current result and provenance
-without solving again. Changed inputs invalidate results; scenario changes also
-invalidate constraint layers. Retained source uncertainties are shown explicitly.
-See [Part 4 operation and validation](doc/iteration/iteration-008/part4.md).
+This is a research prototype. Saved snapshots and integrity checks do not prove
+current flight permission, complete temporary-restriction coverage or geographic
+accuracy. Research uses explicit geometry, height and vertical-reference
+assumptions; missing terrain and known obstacles remain constraints. OFM is an
+independent inspection source and does not authorize or alter planned routes.
+Preserve attribution and check recorded licenses before redistributing local
+datasets or exported previews.

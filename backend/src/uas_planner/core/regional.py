@@ -21,7 +21,7 @@ from shapely.ops import transform, unary_union
 from shapely.strtree import STRtree
 
 from uas_planner.acquisition.study import finite_number, inspect_study
-from uas_planner.core.costs import RULES, analyze_feature
+from uas_planner.core.costs import RULES, classify_layer
 from uas_planner.core.experiment import checksum, read_json, safe_file
 from uas_planner.core.restrictions import (
     RULES_VERSION,
@@ -501,6 +501,7 @@ class RegionalConstraints:
         )
         self.terrain = TerrainSupport(terrain_directory)
         self.records, self.diagnostics, self.risk_records = [], [], []
+        self.paper_records = []
         self.derived_risk_records, self.derived_obstacles, self.geometry_assumptions = [], [], []
         frame, metadata = load_dataset(self.root / "osm", compact=True)
         projected_geometries = frame.to_crs(25832).geometry
@@ -512,7 +513,8 @@ class RegionalConstraints:
         ):
             geometry = row.geometry
             ident = f"{row.element_type}/{row.osm_id}"
-            if analyze_feature(tags, "building") is not None and (
+            self.paper_records.append((projected, tags, ident))
+            if classify_layer(tags, "building") is not None and (
                 not geometry.is_valid
                 or geometry.geom_type not in ("Polygon", "MultiPolygon")
                 or projected.is_empty
@@ -591,7 +593,7 @@ class RegionalConstraints:
                 )
                 # Do not repair shapes or infer the extent of invalid/collection geometries.
                 continue
-            if analyze_feature(tags, "building") is None:
+            if classify_layer(tags, "building") is None:
                 continue
             if projected.is_empty or not projected.is_valid:
                 self.diagnostics.append(
@@ -900,6 +902,34 @@ class RegionalConstraints:
             "model_signature": self.provenance["model_signature"],
             "restriction_coverage": self.restriction_coverage,
         }
+
+    def paper_features(self, mode):
+        """Metric OSM inputs; reuse only the scenario's declared building repairs."""
+        derived = (
+            mode in {"research", "conservative"}
+            and self.scenario.get("research_geometry") == "derived"
+        )
+        replacements = {
+            f"{element}/{ident}": (metric_geometry(g), tags, f"{element}/{ident}")
+            for g, tags, element, ident in self.derived_risk_records
+        }
+        records = []
+        for geometry, tags, ident in self.paper_records:
+            if (
+                derived
+                and classify_layer(tags, "building") is not None
+                and (not geometry.is_valid or geometry.geom_type not in ("Polygon", "MultiPolygon"))
+            ):
+                if ident in replacements:
+                    records.append(replacements[ident])
+                else:
+                    # Uncertain extents remain excluded by the shared hard checker.
+                    records.append(
+                        (geometry, {k: v for k, v in tags.items() if k != "building"}, ident)
+                    )
+            else:
+                records.append((geometry, tags, ident))
+        return records
 
     def risk_model(
         self,

@@ -218,7 +218,15 @@ def test_regional_distance_population_is_separate_and_changes_route(planner):
 
 
 @pytest.mark.parametrize("weights", [(0.9, 0.1), (0.2, 0.7), (0, 0)])
-def test_combined_building_population_objective_and_population_only(planner, weights):
+def test_regional_risk_has_fixed_weights_and_cannot_double_count_population(
+    planner, weights, monkeypatch
+):
+    def prepare(*args, **kwargs):
+        s = squares()
+        s.metadata["cell_size_m"] = 150
+        return s
+
+    monkeypatch.setattr(routing, "prepare_population_surface", prepare)
     risk, distance = weights
     result = planner.plan(
         "a",
@@ -232,9 +240,10 @@ def test_combined_building_population_objective_and_population_only(planner, wei
     )
     assert result["status"] == "success" and result["independent_validation"]
     assert result["objective_cost"] == pytest.approx(
-        risk * result["risk_length_cost"]
-        + distance * result["length_m"]
-        + 0.3 * result["population_length_cost"]
+        0.9 * result["fused_risk_length_cost"] + 0.1 * result["length_m"]
+    )
+    assert result["effective_weights"] == dict(
+        building=0.15, landuse=0.15, highway=0.15, population=0.45, distance=0.1
     )
 
 
@@ -253,7 +262,9 @@ def test_inactive_population_skips_preparation_and_hidden_invalid_weight(planner
     json.dumps(a, allow_nan=False)
     for bad in (-1, float("nan"), float("inf"), True):
         with pytest.raises(ValueError):
-            planner.plan("a", "b", include_population=True, population_weight=bad)
+            planner.plan(
+                "a", "b", objective="distance", include_population=True, population_weight=bad
+            )
     with pytest.raises(ValueError):
         planner.plan("a", "b", include_population="true")
 

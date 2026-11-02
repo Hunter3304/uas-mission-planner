@@ -2,13 +2,14 @@
 
 from collections import Counter, defaultdict
 from copy import copy, deepcopy
-from math import isclose
+from math import ceil, floor, isclose
 from statistics import mean
 from time import perf_counter
+from types import SimpleNamespace
 
 from pyproj import Transformer
 from shapely.geometry import LineString, Point, box, mapping
-from shapely.ops import transform
+from shapely.ops import transform, unary_union
 
 from uas_planner.core.costs import classify_tag
 from uas_planner.core.regional import validate_scenario
@@ -68,7 +69,35 @@ class SyntheticConstraints:
             "model_signature": signature(self.definition),
             "scenario": self.scenario,
             "definition": self.definition,
+            "osm_sha256": signature(self.definition),
         }
+
+    def paper_features(self, mode):
+        return [(self.risk_polygon, {"building": "hospital"}, "synthetic/hospital")]
+
+    def population_surface(self, cell_m=250):
+        x0, y0, x1, y1 = self.boundary.bounds
+        x0, y0 = floor(x0 / cell_m) * cell_m, floor(y0 / cell_m) * cell_m
+        cells = []
+        for row in range(ceil((y1 - y0) / cell_m)):
+            for col in range(ceil((x1 - x0) / cell_m)):
+                cell = box(
+                    x0 + col * cell_m,
+                    y0 + row * cell_m,
+                    x0 + (col + 1) * cell_m,
+                    y0 + (row + 1) * cell_m,
+                ).intersection(self.boundary)
+                if cell.area:
+                    cells.append((cell, f"synthetic:{row}:{col}", 0))
+        return SimpleNamespace(
+            metadata={
+                "identity": signature({"boundary": mapping(self.boundary), "spacing": cell_m}),
+                "study_boundary_metric": mapping(self.boundary),
+                "cell_size_m": cell_m,
+                "source": "explicit synthetic known-zero population",
+            },
+            metric_cells=cells,
+        )
 
     def check(self, coordinates, mode="strict"):
         points = [self.forward(*p) for p in coordinates]
@@ -114,6 +143,8 @@ def synthetic_planner(fixture, scenario, *, expanded=False):
     planner.constraints = SyntheticConstraints(fixture, scenario, expanded)
     planner.forward = planner.constraints.forward
     planner.reverse = planner.constraints.reverse
+    planner._population, planner._paper, planner._paper_key = None, None, None
+    planner.population_surface = planner.constraints.population_surface
     return planner
 
 
@@ -138,13 +169,19 @@ def independent_synthetic_check(planner, result):
     source = planner.constraints
     path = result["geometry"]["coordinates"]
     line = LineString([planner.forward(*p) for p in path])
-    risk = sum(
-        LineString([planner.forward(*a), planner.forward(*b)])
-        .intersection(source.risk_polygon)
-        .length
+    scored = unary_union(
+        [
+            cell
+            for cell, _, _ in source.population_surface(150).metric_cells
+            if cell.intersection(source.risk_polygon).area > 0
+        ]
+    )
+    building = sum(
+        LineString([planner.forward(*a), planner.forward(*b)]).intersection(scored).length
         * source.score
         for a, b in zip(path, path[1:])
     )
+    risk = building / 6
     objective = 0.9 * risk + 0.1 * line.length if result["objective"] == "risk" else line.length
     valid = (
         path[0] == result["start"]
@@ -168,9 +205,9 @@ def independent_synthetic_check(planner, result):
     return {
         "state": "passed" if valid else "failed",
         "length_m": line.length,
-        "building_risk_cost": risk,
+        "building_risk_cost": building,
         "weighted_objective": 0.9 * risk + 0.1 * line.length,
-        "method": "Direct metric segment/polygon intersections and endpoint/boundary/obstacle checks",
+        "method": "Independent 150 m synthetic rasterization, metric intersections and endpoint/boundary/obstacle checks",
     }
 
 
