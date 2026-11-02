@@ -1,5 +1,10 @@
 # Regional planning modes
 
+Iteration 015 update: the regional UI/CLI now default to `research` at the user's
+request. Core/API still default to `strict` for unspecified policies. The three
+constraint policies below retain their semantics; references below to the former
+conservative UI/CLI default describe Iteration 010 behavior.
+
 Recorded 2026-10-11 for Iteration 010. Applies to Hannover regional planning with
 A*, Dijkstra and native ABIT*. A mode is a constraint-handling policy; it does not
 select an algorithm or constitute flight permission.

@@ -232,8 +232,11 @@ class AbitPlanner:
             assessments.append(cost)
         totals = {
             name: sum(a[name] for a in assessments)
-            for name in ("length_m", "risk_length_cost", "objective_cost")
-            + (("population_length_cost",) if hasattr(self.model, "population_weight") else ())
+            for name in dict.fromkeys(
+                ("length_m", "risk_length_cost", "objective_cost")
+                + (("population_length_cost",) if hasattr(self.model, "population_weight") else ())
+                + getattr(self.model, "component_fields", ())
+            )
         }
         if not all(isfinite(v) for v in totals.values()) or not isclose(
             totals["objective_cost"], path.cost(self.objective).value(), rel_tol=1e-7, abs_tol=1e-5

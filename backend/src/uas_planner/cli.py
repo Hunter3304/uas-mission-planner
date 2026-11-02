@@ -58,11 +58,21 @@ def parser():
     )
     regional_route.add_argument("--objective", choices=("risk", "distance"), default="risk")
     regional_route.add_argument(
-        "--planning-mode", choices=("strict", "conservative", "research"), default="conservative"
+        "--planning-mode", choices=("strict", "conservative", "research"), default="research"
     )
-    regional_route.add_argument("--background-cost", type=float)
-    regional_route.add_argument("--risk-weight", type=float, default=0.9)
-    regional_route.add_argument("--distance-weight", type=float, default=0.1)
+    regional_route.add_argument("--background-cost", type=float, default=0)
+    regional_route.add_argument(
+        "--risk-weight",
+        type=float,
+        default=0.9,
+        help="Deprecated for regional risk; fixed fusion weights are used.",
+    )
+    regional_route.add_argument(
+        "--distance-weight",
+        type=float,
+        default=0.1,
+        help="Deprecated for regional risk; fixed fusion weights are used.",
+    )
     regional_route.add_argument("--include-population", action="store_true")
     regional_route.add_argument("--population-weight", type=float, default=1.0)
     regional_route.add_argument("--time-budget-s", type=float, default=3)

@@ -37,6 +37,7 @@ def planner(monkeypatch):
                 "synthetic": True,
                 "model_signature": "synthetic-regional-test",
                 "scenario": self.scenario,
+                "osm_sha256": "synthetic-regional-test",
             }
             self.queries = []
             self.forced = None
@@ -78,8 +79,44 @@ def planner(monkeypatch):
                 **kwargs,
             )
 
+        def paper_features(self, mode):
+            return [(box(500100, 5800100, 500300, 5800300), {"building": "hospital"}, "building/1")]
+
     monkeypatch.setattr(routing, "RegionalConstraints", FixtureConstraints)
-    return routing.RegionalPlanner("unused", {"agl_m": 100, "speed_m_s": 30, "clearance_m": 0})
+    result = routing.RegionalPlanner("unused", {"agl_m": 100, "speed_m_s": 30, "clearance_m": 0})
+
+    def population(*args, **kwargs):
+        from math import ceil, floor
+
+        from uas_planner.core.risk import signature
+
+        boundary = result.constraints.boundary
+        x0, y0, x1, y1 = boundary.bounds
+        spacing = kwargs.get("cell_m", 250)
+        x0, y0 = floor(x0 / spacing) * spacing, floor(y0 / spacing) * spacing
+        cells = []
+        for row in range(ceil((y1 - y0) / spacing)):
+            for col in range(ceil((x1 - x0) / spacing)):
+                g = box(
+                    x0 + col * spacing,
+                    y0 + row * spacing,
+                    x0 + (col + 1) * spacing,
+                    y0 + (row + 1) * spacing,
+                ).intersection(boundary)
+                if g.area:
+                    cells.append((g, f"population{spacing}:{row}:{col}", 0))
+        return SimpleNamespace(
+            metadata={
+                "identity": signature(mapping(boundary)),
+                "study_boundary_metric": mapping(boundary),
+                "cell_size_m": spacing,
+                "normalization_scope": "complete_saved_study",
+            },
+            metric_cells=cells,
+        )
+
+    monkeypatch.setattr(routing, "prepare_population_surface", population)
+    return result
 
 
 def test_weighted_graph_agreement_and_distance_baseline(planner):
@@ -93,7 +130,7 @@ def test_weighted_graph_agreement_and_distance_baseline(planner):
     assert a["objective_cost"] == pytest.approx(0.9 * a["risk_length_cost"] + 0.1 * a["length_m"])
     risk = planner.constraints.risk_model(background_cost=0)
     path = baseline["geometry"]["coordinates"]
-    assert a["risk_length_cost"] < sum(
+    assert a["building_length_cost"] < sum(
         risk.evaluate([u, v])["risk_length_cost"] for u, v in zip(path, path[1:])
     )
     assert a["length_m"] > baseline["length_m"]

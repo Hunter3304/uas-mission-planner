@@ -6,9 +6,9 @@ locations. Python/FastAPI serves the data and planner; React/Vite provides the
 dataset explorer. OpenFlightMaps (OFM) has a separate page served by the backend.
 
 This guide sets up those **two pages**. Run commands from the repository root.
-Examples use **Windows x64 and PowerShell**, including the optional native ABIT*
-planner available in the regional interface. This guide describes published
-main; experimental branches and older tags may have different defaults and controls.
+The standard setup supports **A*/Dijkstra on macOS, Linux and Windows**. Optional
+native ABIT* is provided only for Windows x64. Shell-specific commands are marked;
+other commands can be run in PowerShell or a macOS/Linux terminal.
 
 ## 1. Install the application
 
@@ -19,24 +19,36 @@ Runtime pins are in [.python-version](.python-version) and
 [backend/uv.lock](backend/uv.lock) and
 [frontend/package-lock.json](frontend/package-lock.json).
 
-```powershell
+```sh
 git clone https://github.com/Hunter3304/uas-mission-planner.git
 cd uas-mission-planner
 uv python install
-uv sync --project backend --locked --extra ompl-windows
+uv sync --project backend --locked
 npm ci --prefix frontend
 ```
 
-The Windows extra installs the repository's patched OMPL wheel for CPython 3.13
-x64; installing it does not require a compiler. The Microsoft Visual C++ runtime
-must be available. See [native planner requirements](backend/vendor/README.md).
-Keep `--extra ompl-windows` on subsequent `uv sync` and `uv run` commands so uv
-retains this optional dependency.
+For an existing clone, first run `git switch main` and `git pull --ff-only` from
+a clean working tree, then repeat dependency installation after pulling updates.
 
-For A*/Dijkstra or viewing only, omit `--extra ompl-windows` from the commands in
-this guide and select `astar` or `dijkstra` before planning. This also applies
-to Linux/macOS: the included Windows wheel cannot run there, and native ABIT*
-needs a separately compatible build.
+**On macOS/Linux, select `astar` or `dijkstra` before planning.** The interface
+initially selects `abitstar`; leaving that selected without OMPL produces
+`planner_unavailable: No module named 'ompl'`. Do not add `--extra ompl-windows`
+on a Mac. A macOS OMPL package/build and successful macOS ABIT* run have not been
+provided or verified by this repository. A*/Dijkstra do not require OMPL; this
+does not guarantee that a particular route completes within the resource limits.
+
+For **Windows x64 native ABIT***, additionally run:
+
+```powershell
+uv sync --project backend --locked --extra ompl-windows
+```
+
+This extra installs the repository's patched CPython 3.13 Windows wheel without
+a compiler. The Microsoft Visual C++ runtime must be available. See
+[native planner requirements](backend/vendor/README.md). To retain this optional
+dependency, insert `--extra ompl-windows` after `--locked` in **every subsequent
+`uv sync` and `uv run` command** below, including backend startup. All commands
+without that extra are the standard macOS/Linux/Windows A*/Dijkstra setup.
 
 **Cloning source does not download map datasets.** Download the data archive
 from the separate link provided by the project author, then follow Option A below.
@@ -111,10 +123,10 @@ transfer a complete regional study.
 
 Verify the copied study and OFM snapshot, then generate the OSM display cache:
 
-```powershell
-uv run --project backend --locked --extra ompl-windows uas-planner study-inspect data/hannover-part1-v4
-uv run --project backend --locked --extra ompl-windows uas-planner ofm-inspect data/.ofm/hannover-2610-v2
-uv run --project backend --locked --extra ompl-windows uas-planner study-osm-prepare data/hannover-part1-v4
+```sh
+uv run --project backend --locked uas-planner study-inspect data/hannover-part1-v4
+uv run --project backend --locked uas-planner ofm-inspect data/.ofm/hannover-2610-v2
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
 ```
 
 Terrain appears in its own selector; its payloads are verified when preparing a
@@ -131,9 +143,9 @@ configured for this workflow.
 
 First acquire the regional OSM + GHSL + DIPUL study:
 
-```powershell
-uv run --project backend --locked --extra ompl-windows uas-planner study-fetch --config doc/experiments/iteration-008/hannover-study.json --output data/hannover-part1-v4 --cache .cache/source-downloads
-uv run --project backend --locked --extra ompl-windows uas-planner study-inspect data/hannover-part1-v4
+```sh
+uv run --project backend --locked uas-planner study-fetch --config doc/experiments/iteration-008/hannover-study.json --output data/hannover-part1-v4 --cache .cache/source-downloads
+uv run --project backend --locked uas-planner study-inspect data/hannover-part1-v4
 ```
 
 This uses a dated Niedersachsen Geofabrik OSM extract, GHSL GHS-POP R2023A
@@ -148,19 +160,28 @@ can be supplied to `--config` with a **new** output directory. This fetches a ne
 OSM snapshot and does not reproduce the dated extract. See the
 [source acquisition guide](doc/experiments/iteration-008/README.md).
 
-Next acquire terrain for exactly the same study bounds and prepare OSM display:
+Next acquire terrain for exactly the same study bounds and prepare OSM display.
+In **PowerShell**:
 
 ```powershell
 $studyConfig = Get-Content doc/experiments/iteration-008/hannover-study.json -Raw | ConvertFrom-Json
-uv run --project backend --locked --extra ompl-windows uas-planner terrain-fetch --bounds $studyConfig.bounds.west $studyConfig.bounds.south $studyConfig.bounds.east $studyConfig.bounds.north --output data/hannover-part2-terrain-v1 --workers 3
-uv run --project backend --locked --extra ompl-windows uas-planner study-osm-prepare data/hannover-part1-v4
+uv run --project backend --locked uas-planner terrain-fetch --bounds $studyConfig.bounds.west $studyConfig.bounds.south $studyConfig.bounds.east $studyConfig.bounds.north --output data/hannover-part2-terrain-v1 --workers 3
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
+```
+
+In **macOS/Linux bash or zsh**, use the same bounds from the configuration:
+
+```sh
+study_bounds=($(node -e 'const b=require("./doc/experiments/iteration-008/hannover-study.json").bounds; console.log([b.west,b.south,b.east,b.north].join(" "))'))
+uv run --project backend --locked uas-planner terrain-fetch --bounds "${study_bounds[@]}" --output data/hannover-part2-terrain-v1 --workers 3
+uv run --project backend --locked uas-planner study-osm-prepare data/hannover-part1-v4
 ```
 
 Finally acquire one independent OFM snapshot:
 
-```powershell
-uv run --project backend --locked --extra ompl-windows uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
-uv run --project backend --locked --extra ompl-windows uas-planner ofm-inspect data/.ofm/hannover-2610-new
+```sh
+uv run --project backend --locked uas-planner ofm-fetch --cycle 2610 --output data/.ofm/hannover-2610-new
+uv run --project backend --locked uas-planner ofm-inspect data/.ofm/hannover-2610-new
 ```
 
 `2610` is the historical example, valid from **2026-10-01 to 2026-10-29**;
@@ -181,13 +202,20 @@ Keep two terminals open at the repository root.
 
 **Terminal 1 — backend, including OFM:**
 
+```sh
+uv run --project backend --locked uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
+```
+
+For the optional **Windows native ABIT*** installation, use this backend command
+instead (macOS/Linux use the command above):
+
 ```powershell
 uv run --project backend --locked --extra ompl-windows uvicorn uas_planner.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 **Terminal 2 — Hannover dataset explorer:**
 
-```powershell
+```sh
 npm --prefix frontend run dev
 ```
 
@@ -214,28 +242,67 @@ No database server or separate GIS application is required.
    Europe/Berlin. Scenario constraint layers prepare automatically once required
    inputs are valid; no manual preload button is needed.
 4. Enable **GHSL — population risk (250 m)** to display population classes.
-   The display switch is independent of **Include population**, which controls
-   the optional population term in routing.
+   This affects display only. The `risk` objective always includes population,
+   even when the population layer is hidden. **Include population** is available
+   only for the `distance` objective.
 5. For the retained research example, choose `rheuma-podbi` → `mhh`, select
    **research**, `risk`, 100 m AGL, 30 m/s, background score **0**, estimated
-   missing building height 30 m and grid spacing 250 m. Use A*, Dijkstra or the
-   installed native ABIT*, then click **Plan regional route**. The published
-   page defaults to A* and conservative mode; select Research and background 0
-   explicitly. Keep the NHN/MSL comparison assumption and its 0 m offset and
-   uncertainty explicit.
+   missing building height 30 m. The page defaults to **ABIT***, **Research**,
+   background **0**, grid spacing **250 m** and search budget **3 s**. On macOS
+   or a machine without OMPL, explicitly choose **`astar` or `dijkstra`**.
+   For a first graph attempt, try **500 m** spacing and **60 s** search budget;
+   these reduce graph work/allow more search but do not guarantee success.
+   Finer spacing gives a more detailed graph and costs more preparation time.
+   Click **Plan regional route**. Keep the NHN/MSL comparison assumption and
+   its 0 m offset and uncertainty explicit.
 
 With retained historical sources, `2026-10-07 10:00` is a documented research
 departure example, not a current verified flight window. ABIT* is stochastic:
-a finite budget can produce a different route or no solution. The search budget
-excludes source preparation and final checks, so total request time can be much
-longer; allow preparation to finish.
+a finite budget can produce a different route or no solution. Source preparation
+and final checks can make a request much longer than its search budget; graph
+cost preparation also consumes the A*/Dijkstra search deadline. See the separate
+limits below. Cold full-study preparation was about 98–120 s on the development
+Windows host; this is a historical observation, not a macOS timing guarantee.
 
-The published `risk` objective combines integrated building risk and distance,
-with default weights 0.9/0.1. **Include population** optionally adds population
-cost with its entered weight. The population display uses 250 m cells and stays
-independent from route weighting and A*/Dijkstra search spacing. See
-[building-risk routing rules](doc/rules/risk-weighted-routing.md) and
-[population routing rules](doc/rules/population-costs.md).
+The regional `risk` objective uses a **fixed 150 m fused cost grid**:
+
+```text
+J = 0.15 × building + 0.15 × land use + 0.15 × roads
+    + 0.45 × population + 0.10 × route length
+```
+
+Each risk component is integrated as score × travelled metres. The three OSM
+categories contribute equally to OSM risk; OSM and population each supply half
+of fused risk, then the objective combines 0.9 × fused risk + 0.1 × length.
+Population is mandatory and weights are fixed in `risk`. Background 0 is an
+explicit assumption for unscored OSM cells, not observed absence of risk.
+
+`distance` retains its optional, separately weighted 250 m population term.
+The **150 m fusion grid**, **250 m population display** and configurable
+**A*/Dijkstra search spacing** serve different purposes. Increasing search
+spacing does not change the fusion resolution. ABIT* searches continuous space
+and does not use graph spacing. See the [fused-risk rules](doc/rules/paper-risk-routing.md)
+and [population rules](doc/rules/population-costs.md).
+
+### Planning time and resource limits
+
+| Stage | Limit / behavior |
+| --- | --- |
+| Build an A*/Dijkstra graph, including an expanded corridor | At most **30 s per graph preparation**, also subject to the remaining request time and candidate-cell limit |
+| Graph cost/connector preparation and A*/Dijkstra search | Share the selected **Search budget**, default 3 s and maximum 60 s; expansion does not reset this deadline |
+| Native ABIT* solve | Selected search budget, also bounded by the remaining request time |
+| Entire regional backend request | **300 s**, including source/cost preparation and flight-interval checks |
+| Browser wait for a regional route response | **310 s**; other API calls retain 120 s |
+
+These limits are independent. Setting Search budget to 60 s does **not** extend
+the 30 s graph-preparation cap. `Expanded preparation refused (preparation
+exceeded 30 seconds)` means a wider retry graph could not be prepared in time;
+it does not establish that no route exists. Increase **Grid spacing** explicitly
+(for example, 250 → 500 m) and retry. If 500 m still exceeds the cap, preparation
+needs investigation on that machine; increasing only Search budget or the total
+request limit cannot remove that cap. Coarser grids can miss narrow passages.
+The fixed fusion surface and population preparation also have bounded work;
+300 s is an outer ceiling, not a promise that every stage receives 300 s.
 
 ### What loads automatically?
 
@@ -263,8 +330,16 @@ The backend reads `data/` by default. To use another location, set this in the
 **backend terminal before startup**; place the study, terrain, `.ofm` and
 `.osm-display` under that same root:
 
+**PowerShell:**
+
 ```powershell
 $env:UAS_DATA_DIR = 'D:/uas-datasets'
+```
+
+**macOS/Linux:**
+
+```sh
+export UAS_DATA_DIR="$HOME/uas-datasets"
 ```
 
 When preparing OSM there, pass the actual study path, for example
@@ -281,6 +356,8 @@ Vite proxies `/api` to port 8000. For another backend port, change uvicorn's
 $env:UAS_API_URL = 'http://127.0.0.1:8001'
 ```
 
+On macOS/Linux, use `export UAS_API_URL='http://127.0.0.1:8001'` instead.
+
 Open OFM on that backend port too. These variables are read from the process
 environment; this setup does not require an `.env` file.
 
@@ -291,7 +368,9 @@ environment; this setup does not require an `.env` file.
 | Terrain selector missing or awaiting catalog | Check root and `terrain.json`; retain every referenced tile. The MHH probe is not a full-region replacement. |
 | Scenario layers waiting | Enter departure, choose available terrain and valid endpoints, and leave at least one scenario layer enabled. |
 | No local OFM snapshots | Check `{data_root}/.ofm/{snapshot_id}/ofm.json`; copy the whole snapshot or run `ofm-fetch`. |
-| `planner_unavailable` for ABIT* | Install/retain `--extra ompl-windows` on supported Windows x64 Python 3.13, or select `astar` / `dijkstra`. |
+| `planner_unavailable` / `No module named 'ompl'` for ABIT* | On macOS/Linux select `astar` / `dijkstra`; a compatible native OMPL installation is not provided or verified. On supported Windows x64 Python 3.13 install/retain `--extra ompl-windows`, then restart the backend. |
+| `Graph cost preparation exceeded the search deadline` | Increase Search budget from the 3 s default toward 60 s and/or increase graph spacing; graph cost work shares this deadline with search. |
+| `Expanded preparation refused (preparation exceeded 30 seconds)` | Increase Grid spacing; 60 s search and 300 s total limits do not override the separate 30 s graph cap. See planning limits above. |
 | Cannot reach data service | Check backend terminal and `/api/health`; verify Vite's proxy target. |
 | Backend `/` says Not Found | Open port 5173 for the explorer or backend `/ofm` for OFM. |
 | Basemap unavailable | Disable Street basemap; local saved data remains usable. |
@@ -304,10 +383,10 @@ The independent Python core is shared by CLI and API; it does not depend on Reac
 or FastAPI. Source is in `backend/src/uas_planner/` and `frontend/src/`.
 Run these checks after code changes:
 
-```powershell
-uv run --project backend --locked --extra ompl-windows pytest backend/tests -q
-uv run --project backend --locked --extra ompl-windows ruff check backend/src backend/tests
-uv run --project backend --locked --extra ompl-windows ruff format --check backend/src backend/tests
+```sh
+uv run --project backend --locked pytest backend/tests -q
+uv run --project backend --locked ruff check backend/src backend/tests
+uv run --project backend --locked ruff format --check backend/src backend/tests
 npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
@@ -322,12 +401,15 @@ npm run test:smoke
 Pop-Location
 ```
 
-The browser suites use ports 5174 and 8011/5175.
+On macOS/Linux, use `cd frontend` and `cd ..` in place of `Push-Location` and
+`Pop-Location`. The browser suites use ports 5174 and 8011/5175. Add the Windows
+OMPL extra to the Python check commands when verifying native ABIT* there.
 
 - [Regional acquisition and CLI guide](doc/experiments/iteration-008/README.md)
 - [OFM acquisition, API and offline preview](doc/experiments/iteration-011.md)
 - [Map controls and source inspection](doc/experiments/iteration-013/README.md)
 - [Population display and routing](doc/experiments/iteration-014/README.md)
+- [Regional fused-risk objective](doc/rules/paper-risk-routing.md)
 - [Building-risk routing model](doc/rules/risk-weighted-routing.md)
 - [Planning modes and assumptions](doc/rules/planning-modes.md)
 - [Source attribution, access and methodology](doc/data-sources/README.md)

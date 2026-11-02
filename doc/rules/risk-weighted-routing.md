@@ -1,5 +1,9 @@
 # Metric building-risk routing — Iteration 006 Part 1
 
+This remains the small-area building-risk contract. Iteration 015 replaces the
+regional `risk` objective with [fixed multi-layer fusion](paper-risk-routing.md);
+regional `risk_length_cost` now denotes fused risk, with building separately reported.
+
 Implemented core policy: `building-length-risk-v1`. Classification remains
 `ramke-building-tags-v1`; its canonical JSON SHA-256 is recorded with results.
 These are ordinal research costs, not accident probabilities.

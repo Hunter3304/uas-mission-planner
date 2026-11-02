@@ -3,22 +3,24 @@ import { setup } from './fixtures/regionalSelection'
 import { timedResult } from './fixtures/flightInterval'
 
 interface Request {
-  objective: string; include_population: boolean; population_weight?: number
-  risk_weight: number; distance_weight: number
+  objective: string; include_population?: boolean; population_weight?: number
+  risk_weight?: number; distance_weight?: number
   scenario: { mission_start: string; speed_m_s: number }
 }
 const panel = (page: Page) => page.getByRole('region', { name: 'Regional route planning', exact: true })
 const estimate = (page: Page) => page.getByRole('region', { name: 'Flight time estimate', exact: true })
 const submit = (page: Page) => panel(page).getByRole('button', { name: 'Plan regional route', exact: true }).click()
 function response(body: Request) {
-  const active = body.include_population && (body.population_weight ?? 0) > 0
   const building = body.objective === 'risk'
+  const active = building || body.include_population && (body.population_weight ?? 0) > 0
   return timedResult(body, {
     status: 'success', geometry: { type: 'LineString', coordinates: [[9.8, 52.388], [9.805, 52.388]] },
-    length_m: 1000, risk_length_cost: building ? 20 : null, population_length_cost: active ? 350 : null,
-    objective_cost: (building ? body.risk_weight * 20 + body.distance_weight * 1000 : 1000) + (active ? body.population_weight! * 350 : 0),
-    effective_objective: body.objective + (active ? '+population' : ''),
-    effective_weights: { building: building ? body.risk_weight : 0, distance: building ? body.distance_weight : 1, population: active ? body.population_weight : 0 },
+    length_m: 1000, risk_length_cost: building ? 190 : null, population_length_cost: active ? 350 : null,
+    building_length_cost: building ? 20 : null, landuse_length_cost: building ? 30 : null,
+    highway_length_cost: building ? 40 : null, fused_risk_length_cost: building ? 190 : null,
+    objective_cost: building ? 271 : 1000 + (active ? body.population_weight! * 350 : 0),
+    effective_objective: building ? 'risk' : body.objective + (active ? '+population' : ''),
+    effective_weights: { building: building ? 0.15 : 0, landuse: building ? 0.15 : undefined, highway: building ? 0.15 : undefined, distance: building ? 0.1 : 1, population: building ? 0.45 : active ? body.population_weight : 0 },
     population_active: active, population_assessment: active ? 'assessed' : 'not_evaluated',
     population_model: active ? { identity: 'fixed-study-population', version: 'ramke-population-250m-v1' } : null,
     cruise_time_s: 1000 / 30, cruise_time_range_s: [1000 / 35, 40], preparation_ms: 20, planner_ms: 5,
@@ -27,7 +29,7 @@ function response(body: Request) {
     controls: { include_population: body.include_population, population_weight: body.include_population ? body.population_weight : null },
   })
 }
-async function fixture(page: Page, respond?: (route: Route, body: Request) => Promise<void>) {
+async function fixture(page: Page, respond?: (route: Route, body: Request) => Promise<void>, distance = true) {
   const requests: Request[] = []
   const state = await setup(page, async (route, path) => {
     if (!path.endsWith('/study/route')) return false
@@ -38,6 +40,7 @@ async function fixture(page: Page, respond?: (route: Route, body: Request) => Pr
     return true
   })
   await panel(page).getByLabel('Departure time').fill('2026-10-07T10:00')
+  if (distance) await panel(page).getByLabel('Objective', { exact: true }).selectOption('distance')
   return { ...state, requests }
 }
 async function exported(page: Page) {
@@ -56,7 +59,8 @@ test('population defaults off; enabling clears route/ETA without solving or load
   await expect(panel(page).getByLabel('Population weight', { exact: true })).toHaveCount(0)
   await submit(page)
   await expect(estimate(page)).not.toContainText('Awaiting route')
-  expect(requests[0]).toMatchObject({ objective: 'risk', include_population: false, risk_weight: 0.9, distance_weight: 0.1 })
+  expect(requests[0]).toMatchObject({ objective: 'distance', include_population: false })
+  expect(requests[0]).not.toHaveProperty('risk_weight')
   expect(requests[0]).not.toHaveProperty('population_weight')
   await expect(panel(page)).toContainText('Population assessment: Not evaluated (inactive)')
   await toggle.check()
@@ -69,7 +73,7 @@ test('population defaults off; enabling clears route/ETA without solving or load
   expect(errors).toEqual([])
 })
 
-for (const objective of ['risk', 'distance']) {
+for (const objective of ['distance']) {
   test(`${objective} plus population displays separate effective costs and exports the displayed result`, async ({ page }) => {
     const { requests, calls } = await fixture(page)
     await panel(page).getByLabel('Objective', { exact: true }).selectOption(objective)
@@ -127,6 +131,42 @@ test('empty/negative weights block active submission, hidden values are ignored,
   await expect(panel(page).getByRole('region', { name: 'Route costs' })).not.toContainText('Population cost')
   expect(requests[1]).toMatchObject({ include_population: true, population_weight: 0 })
   expect((await exported(page)).metadata.population_length_cost).toBeNull()
+})
+
+test('risk directly uses fixed fusion with research and zero background defaults', async ({ page }) => {
+  await page.addInitScript(() => {
+    const delays: number[] = []
+    Object.defineProperty(window, 'requestTimeouts', { value: delays })
+    const original = AbortSignal.timeout.bind(AbortSignal)
+    AbortSignal.timeout = (ms: number) => { delays.push(ms); return original(ms) }
+  })
+  const { requests } = await fixture(page, undefined, false)
+  await expect(panel(page).getByLabel('Objective', { exact: true })).toHaveValue('risk')
+  await expect(panel(page).getByLabel('Objective', { exact: true }).locator('option')).toHaveCount(2)
+  await expect(panel(page).getByLabel('Planning mode', { exact: true })).toHaveValue('research')
+  await expect(panel(page).getByLabel('Algorithm', { exact: true })).toHaveValue('abitstar')
+  await expect(panel(page).getByLabel('Background score assumption')).toHaveValue('0')
+  await expect(panel(page).getByLabel('Risk weight', { exact: true })).toHaveCount(0)
+  await expect(panel(page).getByLabel('Distance weight', { exact: true })).toHaveCount(0)
+  await expect(panel(page).getByLabel('Include population', { exact: true })).toHaveCount(0)
+  await expect(page.getByTestId('risk-fusion-weights')).toContainText('population 0.45')
+  await submit(page)
+  await expect(panel(page).getByRole('region', { name: 'Route costs' })).toContainText('Fused risk cost 190.00')
+  expect(requests[0]).toMatchObject({ objective: 'risk', planning_mode: 'research', background_cost: 0 })
+  for (const key of ['risk_weight', 'distance_weight', 'population_weight', 'include_population']) expect(requests[0]).not.toHaveProperty(key)
+  const data = await exported(page)
+  expect(data.features[0].properties).toMatchObject({ building_length_cost: 20, landuse_length_cost: 30, highway_length_cost: 40, population_length_cost: 350, fused_risk_length_cost: 190, objective_cost: 271 })
+  const timeouts = await page.evaluate(() => (window as unknown as { requestTimeouts: number[] }).requestTimeouts)
+  expect(timeouts).toContain(310_000)
+  expect(timeouts).toContain(120_000)
+  await panel(page).screenshot({ path: '../.cache/iteration015-risk-desktop.png' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await panel(page).screenshot({ path: '../.cache/iteration015-risk-mobile.png' })
+  await panel(page).getByLabel('Objective', { exact: true }).selectOption('distance')
+  await expect(panel(page).getByLabel('Include population', { exact: true })).not.toBeChecked()
+  await expect(estimate(page)).toContainText('Awaiting route')
+  await expect(panel(page).getByRole('button', { name: 'Export displayed result' })).toHaveCount(0)
 })
 
 for (const edit of ['checkbox', 'weight']) {

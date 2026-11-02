@@ -1,7 +1,8 @@
 async function request(url: string, signal?: AbortSignal, init?: RequestInit): Promise<Response> {
   // Part 1's 31k-feature analysis response is about 85 MB and can take
   // longer than 30 seconds to generate and transfer on a local Windows setup.
-  const timeout = AbortSignal.timeout(120_000)
+  // Regional planning has a 300 s backend deadline, plus response/transfer grace.
+  const timeout = AbortSignal.timeout(/\/study\/route(?:\?|$)/.test(url) ? 310_000 : 120_000)
   try {
     return await fetch(url, {
       ...init,

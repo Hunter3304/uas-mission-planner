@@ -1,5 +1,11 @@
 # Population classes on a 250 m grid
 
+Iteration 015 update: this remains the display and distance-plus-population
+contract. Regional `risk` now always uses population in [fixed multi-layer
+fusion](paper-risk-routing.md) on a separately identified 150 m cost lattice.
+The optional additive risk formula documented below records the earlier
+Iteration 014 contract and is replaced for regional risk requests.
+
 Part 1 implements aggregation, classification, inspection API and colored map
 cells. Part 2 adds optional population routing through the regional core/API/CLI.
 Rule version: `ramke-population-250m-v1`.

@@ -1,7 +1,7 @@
 import { previewResult } from './fixtures/flightInterval'
 import { expect, test } from '@playwright/test'
 
-test('default conservative policy, saved evidence revision, scoped request and invalidation', async ({ page }) => {
+test('default research policy, saved evidence revision, scoped request and invalidation', async ({ page }) => {
   const bounds = { west: 9.6, south: 52.2, east: 10.1, north: 52.5 }
   const dataset = { id: 'restrictions', has_study: true, verified: true, feature_count: 0, geometry_counts: {}, layer_counts: {}, crs: 'EPSG:4326', query_bounds: bounds, feature_bounds: null }
   const empty = { type: 'FeatureCollection', features: [] }
@@ -25,7 +25,7 @@ test('default conservative policy, saved evidence revision, scoped request and i
     if (path.endsWith('/study/route')) {
       routeRequests++
       const body = route.request().postDataJSON()
-      expect(body.planning_mode).toBe('conservative')
+      expect(body.planning_mode).toBe('research')
       expect(body.scenario.vertical_reference_policy).toBe('nhn_as_msl_assumption')
       expect(body.scenario.nhn_msl_offset_m).toBe(routeRequests === 1 ? 0 : 5)
       expect(body.profile_id).toBe('a'.repeat(32))
@@ -37,7 +37,7 @@ test('default conservative policy, saved evidence revision, scoped request and i
   })
   await page.goto('/')
   const panel = page.getByRole('region', { name: 'Regional route planning' })
-  await expect(panel.getByLabel('Planning mode', { exact: true })).toHaveValue('conservative')
+  await expect(panel.getByLabel('Planning mode', { exact: true })).toHaveValue('research')
   await panel.getByLabel('Departure time').fill('2026-10-07T10:00')
   await expect(panel.getByLabel('Assessed zone', { exact: true }).locator('option')).toHaveCount(2)
   await panel.getByText('Restriction assessments and reviewed notices', { exact: true }).click()

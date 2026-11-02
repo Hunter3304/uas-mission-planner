@@ -2,6 +2,12 @@
 
 This directory documents implemented cost classification and routing rules.
 
+[Regional fused risk](paper-risk-routing.md) is the current regional `risk`
+contract: fixed OSM/population fusion on a common 150 m cost grid, replacing
+building-only risk. The existing 250 m population display and optional population
+term for regional distance remain separate. Small-area building-risk rules below
+continue to apply to that experiment interface.
+
 [Population classes](population-costs.md) specifies Iteration 014 Part 1's fixed
 250 m aggregation, complete-study 0-4 classes, colored grid and inspection API.
 Part 2 adds optional shared population weighting through regional core/API/CLI;
