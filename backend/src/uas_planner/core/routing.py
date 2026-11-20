@@ -436,6 +436,7 @@ def route_geojson(result):
                             "landuse_length_cost",
                             "highway_length_cost",
                             "fused_risk_length_cost",
+                            "pedestrian_exposure_m",
                             "effective_weights",
                             "effective_objective",
                         )

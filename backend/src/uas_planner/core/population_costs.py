@@ -267,6 +267,14 @@ class PopulationSurface:
         """Immutable metric footprints/IDs/classes for independent route evaluation."""
         return tuple((g, f["id"], f["properties"]["risk_score"]) for g, f in self._cells)
 
+    @property
+    def metric_population_cells(self):
+        """Metric footprints, stable IDs and count estimates on the shared lattice."""
+        return tuple(
+            (polygon, feature["id"], feature["properties"]["estimated_people"])
+            for polygon, feature in self._cells
+        )
+
     def display(self, bbox=None):
         """Bounded geographic subset, preserving full-study classification metadata."""
         metadata = self.metadata

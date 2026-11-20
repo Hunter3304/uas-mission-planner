@@ -146,19 +146,18 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             if checked["state"] == "permitted":
                 planner.ensure_deadline()
                 current = planner.constraints.scenario
-                population_reports = {
-                    name: deepcopy(report["population"])
+                cost_reports = {
+                    name: {
+                        k: deepcopy(report[k])
+                        for k in ("population", "pedestrian_exposure")
+                        if k in report
+                    }
                     for name, report in result.get("endpoint_diagnostics", {}).items()
-                    if "population" in report
                 }
                 result["endpoint_diagnostics"] = {
                     name: {
                         **planner.check([result[name]], controls.get("planning_mode", "strict")),
-                        **(
-                            {"population": population_reports[name]}
-                            if name in population_reports
-                            else {}
-                        ),
+                        **cost_reports.get(name, {}),
                     }
                     for name in ("start", "end")
                 }
@@ -183,6 +182,10 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
                         ghsl_routing_cost=True,
                         population_model_identity=result["population_model"]["identity"],
                     )
+                if result.get("pedestrian_exposure", {}).get("assessment") == "assessed":
+                    result["provenance"]["pedestrian_layer_identity"] = result[
+                        "pedestrian_exposure"
+                    ]["layer_identity"]
                 if isinstance(result.get("assumptions"), dict):
                     result["assumptions"] = deepcopy(current)
                 if "risk_model" in result:
@@ -262,11 +265,17 @@ def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=
             "landuse_length_cost",
             "highway_length_cost",
             "fused_risk_length_cost",
+            "pedestrian_exposure_m",
         ):
             if field in result:
                 result[field] = None
         if result.get("population_active"):
             result["population_assessment"] = "unresolved"
+        exposure = result.get("pedestrian_exposure")
+        if exposure and exposure["assessment"] == "assessed":
+            exposure["assessment"] = "unresolved"
+            for field in ("arrival_window", "crosses_window", "time_policy"):
+                exposure.pop(field, None)
         result["timing"] = {
             "mode": "automatic",
             "estimated_arrival": None,

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
 import 'leaflet/dist/leaflet.css'
+import PedestrianExposureOverlay from './PedestrianExposureOverlay'
 import PopulationCostOverlay from './PopulationCostOverlay'
 import type { RestrictionReport } from './RestrictionProfiles'
 import RegionalOsm from './RegionalOsm'
@@ -10,6 +11,7 @@ import { decisionKeys, groupScenarioLayers, type DecisionKey, type LayerSource, 
 import { MapSelectionProvider, SelectionOverlay } from './RegionalSelection'
 import { selectionFeatureId, useMapSelection, type MapSelection } from './mapSelection'
 import { asRecord } from './sourcePresentation'
+import type { PedestrianWindowId } from './pedestrianTime'
 
 export interface Site {
   id: string
@@ -19,6 +21,7 @@ export interface Site {
   address?: string
 }
 export interface Study {
+  region_id?: string | null
   config: {
     locations: Site[]
     bounds: { west: number; south: number; east: number; north: number }
@@ -67,8 +70,12 @@ function RegionalMapContent({
   layerVisibility,
   onLayerVisibility,
   layerState,
+  pedestrianWindow,
+  routeLayerIdentity,
 }: {
   datasetId: string
+  pedestrianWindow?: PedestrianWindowId | null
+  routeLayerIdentity?: string
   study: Study | null
   startId: string
   endId: string
@@ -222,6 +229,9 @@ function RegionalMapContent({
             <label className="map-layer-choice"><input type="checkbox" checked={visible.population} onChange={event => setVisible(current => ({ ...current, population: event.target.checked }))} />GHSL — population risk (250 m)</label>
             {readyMap && <PopulationCostOverlay key={`${datasetId}:population-cost`} map={readyMap} datasetId={datasetId} visible={visible.population} />}
           </CollapsiblePanel>
+          {study?.region_id === 'hannover-lehrte-5km' && <CollapsiblePanel className="map-layer-group" title="Outdoor pedestrians">
+            {readyMap && <PedestrianExposureOverlay key={datasetId} map={readyMap} datasetId={datasetId} departureWindow={pedestrianWindow} routeLayerIdentity={routeLayerIdentity} />}
+          </CollapsiblePanel>}
           <CollapsiblePanel className="map-layer-group map-layer-group-osm" title="OSM">
             {readyMap && <RegionalOsm key={datasetId} map={readyMap} datasetId={datasetId} />}
             {scenarioControls('osm', ['blocked', 'unknown'])}

@@ -2,6 +2,70 @@
 
 ## Current status
 
+### Iteration 016 release approved (2026-11-20)
+
+- The user authorized publishing the verified public-data pedestrian exposure
+  and routing work and merging it into `main`. Release tracking is in
+  [Issue #134](https://github.com/Hunter3304/uas-mission-planner/issues/134)
+  and [Milestone 14](https://github.com/Hunter3304/uas-mission-planner/milestone/14).
+- The release contains the implementation, tests, preparation guide and
+  iteration evidence. The public inputs and prepared grids are acquired locally
+  through the documented study-data workflow.
+
+### Iteration 016 local route error diagnosed (2026-11-19)
+
+- Replayed the reported Rheumapraxis Hannover–Podbielskistraße to MHH route
+  at `2026-11-18T14:07:23+01:00`, 100 m AGL and 30 m/s. The default backend
+  on port 8000 returned HTTP 500. It started before the Phase 2 source changes
+  and was launched without automatic reload.
+- The current Phase 2 planner produced a 2,999.75 m route on the 13:00–16:00
+  exposure window and passed independent scoring and full-interval checks.
+  The updated preview is on 5187 with backend 8017. Restart the 8000 backend
+  before reusing the default 5173 frontend with the Phase 2 code.
+
+### Iteration 016 Phase 2 implemented locally (2026-11-19)
+
+- The approved pedestrian-routing mode is on `feature/134-public-pedestrian-map`
+  with the Phase 1 changes. The regional API and shared map use the same saved
+  exposure snapshot and the Berlin departure window. The default **Existing
+  planning** workflow and route objectives remain available.
+- The new mode uses A* on a 500 m search lattice and scores the 150 m exposure
+  cells. It integrates `E` with a fixed reference of 100 people/km² and
+  `J = L + E`. Missing exposure support excludes an edge, and independent
+  scoring and complete-flight-interval checks gate successful results.
+- The real MHH to MVZ Labor Limbach Lehrte case passed at 08:00 and 12:55 Berlin
+  time on 7 October 2026. Both selected the same 15,281.83 m route. The exposure
+  terms were 3,343.98 m and 4,341.76 m respectively. The later route arrived at
+  13:03:29 and retained its departure window for exposure scoring.
+- Backend 402 passed with one existing skip. Frontend lint/build and 69
+  browser regression tests passed. Separate segment-by-segment recomputation
+  matched all route components. The live browser reproduced the 12:55 route,
+  matching map window, arrival notice and GeoJSON exposure score. See the
+  [Phase 2 outcome](doc/iteration/iteration-016/phase-2.md).
+  Remote publication remains separate from this local implementation.
+
+### Iteration 016 Phase 1 implemented and validated locally (2026-11-18)
+
+- Implemented the approved public-data [plan](doc/plan/iteration-016.md) on
+  `feature/134-public-pedestrian-map` from `iteration/016` at `bb2baa6`.
+  Existing Issue #134 remains open under Milestone 14. The original feature
+  branch and rollback archive are retained. No remote changes were made.
+- The local `data/.pedestrian-exposure/hannover-part1-v4.json` is from the
+  verified public MiD workbook and Niedersachsen time and grouped-duration
+  tables, BKG boundaries and the saved GHSL and OSM sources. There are seven
+  windows across 18,574 cells. Municipal and GHSL coverage is complete, and
+  17,431 cells across 93.87% of the map area have estimates. The map and API
+  label the other 1,143 cells as unavailable. The person-minute ledger
+  reconciles and a repeat offline build produced an identical snapshot.
+- Backend regression suite 394 passed with one existing skip. Ruff checks,
+  frontend lint/build, 68 mocked browser tests, and the live seven-window
+  API/browser check passed. See the [Phase 1 outcome](doc/iteration/iteration-016/outcome.md),
+  [preparation guide](doc/experiments/iteration-016.md) and
+  [source inventory](doc/data-sources/07-mid-2023.md).
+- Phase 2 covers the route objective and new planning mode. The seven windows
+  pool all survey days and use a fixed spatial walking pattern. The archived
+  microdata-dependent approach is historical.
+
 ### Iteration 015 publication preparation (2026-11-02)
 
 - User authorized publishing the latest `iteration/015` feature work and merging
