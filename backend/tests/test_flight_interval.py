@@ -61,7 +61,7 @@ def automatic(model, monkeypatch):
             "a",
             overrides.pop("end_id", "b"),
             duration_mode="automatic",
-            objective="distance",
+            objective=overrides.pop("objective", "distance"),
             planning_mode=overrides.pop("planning_mode", "conservative"),
             cell_m=50,
             **overrides,
@@ -192,7 +192,16 @@ def test_automatic_native_and_graph_compatibility(automatic, algorithm):
     assert result["timing"]["cruise_time_s"] == pytest.approx(result["length_m"] / 30)
 
 
-def test_bounded_nonconvergence_and_one_shared_search_budget(automatic, monkeypatch):
+@pytest.mark.parametrize(
+    ("algorithm", "objective", "budget"),
+    [
+        ("astar", "distance", 1),
+        ("abitstar", "pedestrian_exposure", 120),
+    ],
+)
+def test_bounded_nonconvergence_and_one_shared_search_budget(
+    automatic, monkeypatch, algorithm, objective, budget
+):
     model, _, run = automatic
     budgets = []
 
@@ -208,10 +217,18 @@ def test_bounded_nonconvergence_and_one_shared_search_budget(automatic, monkeypa
 
     monkeypatch.setattr(routing.RegionalPlanner, "plan", candidate)
     monkeypatch.setattr(routing.RegionalPlanner, "check", lambda *a, **kw: {"state": "blocked"})
-    result = run(time_budget_s=1)
+    result = run(algorithm=algorithm, objective=objective, time_budget_s=budget)
     assert result["status"] == "duration_unstable" and len(budgets) == 3
-    assert budgets == pytest.approx([1, 0.8, 0.6])
+    assert budgets == pytest.approx([budget, budget - 0.2, budget - 0.4])
     assert result["geometry"] is result["timing"]["estimated_arrival"] is None
+
+
+def test_search_budget_limits_for_automatic_requests(automatic):
+    _, _, run = automatic
+    with pytest.raises(ValueError, match="120 seconds"):
+        run(algorithm="abitstar", objective="pedestrian_exposure", time_budget_s=121)
+    with pytest.raises(ValueError, match="60 seconds"):
+        run(algorithm="dijkstra", objective="pedestrian_exposure", time_budget_s=120)
 
 
 def test_shared_request_deadline_releases_terrain(automatic, monkeypatch):

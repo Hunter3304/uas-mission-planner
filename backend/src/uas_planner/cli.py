@@ -81,7 +81,13 @@ def parser():
         "--distance-weight",
         type=float,
         default=0.1,
-        help="Deprecated for regional risk; fixed fusion weights are used.",
+        help="Distance weight for pedestrian exposure routing (default: 0.1).",
+    )
+    regional_route.add_argument(
+        "--exposure-weight",
+        type=float,
+        default=0.9,
+        help="Exposure weight for pedestrian exposure routing (default: 0.9).",
     )
     regional_route.add_argument("--include-population", action="store_true")
     regional_route.add_argument("--population-weight", type=float, default=1.0)
@@ -286,6 +292,7 @@ def main(argv=None):
                         "background_cost",
                         "risk_weight",
                         "distance_weight",
+                        "exposure_weight",
                         "include_population",
                         "population_weight",
                         "time_budget_s",

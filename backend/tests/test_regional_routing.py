@@ -11,6 +11,7 @@ from pyproj import Transformer
 from shapely.geometry import LineString, Point, box, mapping
 from shapely.ops import transform
 
+from uas_planner.core import pedestrian_routing
 from uas_planner.core import regional_routing as routing
 from uas_planner.core.risk import RiskModel
 from uas_planner.core.routing import route_geojson
@@ -154,6 +155,85 @@ def test_native_shared_checker_and_validation(planner):
     assert result["independent_validation"]
     assert result["geometry"]["coordinates"][0] == result["start"]
     assert result["randomness"]["seed_supported"] is False
+
+
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        "astar",
+        "dijkstra",
+        pytest.param(
+            "abitstar",
+            marks=pytest.mark.skipif(
+                find_spec("ompl") is None, reason="Optional native OMPL absent"
+            ),
+        ),
+    ],
+)
+@pytest.mark.parametrize(("distance_weight", "exposure_weight"), [(0.25, 1.75), (0, 2), (2, 0)])
+def test_pedestrian_routes_keep_exact_coordinates_and_weights(
+    planner, monkeypatch, algorithm, distance_weight, exposure_weight
+):
+    boundary = planner.constraints.boundary
+    product = {
+        "version": "fixture",
+        "study_sha256": "fixture-study",
+        "cells": [
+            {
+                "id": "covered",
+                "area_m2": boundary.area,
+                "geometry": mapping(transform(planner.reverse, boundary)),
+            }
+        ],
+        "windows": {"08-10": {"mean_people": [boundary.area / 10000]}},
+    }
+    monkeypatch.setattr(
+        pedestrian_routing, "read_pedestrian_product", lambda _: (product, "fixture")
+    )
+    planner.constraints.scenario["mission_start"] = "2026-10-07T08:00:00+02:00"
+    start = list(planner.reverse(500043, 5800227))
+    end = list(planner.reverse(500346, 5800251))
+    result = planner.plan(
+        "a",
+        "b",
+        algorithm=algorithm,
+        objective="pedestrian_exposure",
+        start_coordinate=start,
+        end_coordinate=end,
+        distance_weight=distance_weight,
+        exposure_weight=exposure_weight,
+        cell_m=100,
+        time_budget_s=1,
+    )
+    assert result["status"] == "success", result.get("message")
+    coordinates = result["geometry"]["coordinates"]
+    assert coordinates[0] == start and coordinates[-1] == end
+    assert result["independent_validation"]
+    assert result["effective_weights"] == {
+        "distance": distance_weight,
+        "pedestrian_exposure": exposure_weight,
+    }
+    assert result["pedestrian_exposure_m"] == pytest.approx(result["length_m"])
+    assert result["objective_cost"] == pytest.approx(2 * result["length_m"])
+    assert (
+        route_geojson(result)["features"][0]["properties"]["effective_weights"]
+        == result["effective_weights"]
+    )
+
+
+@pytest.mark.parametrize(
+    ("distance_weight", "exposure_weight", "message"),
+    [(0, 0, "positive"), (-1, 1, "Distance weight"), (1, None, "Exposure weight")],
+)
+def test_invalid_pedestrian_weights(planner, distance_weight, exposure_weight, message):
+    with pytest.raises(ValueError, match=message):
+        planner.plan(
+            "a",
+            "b",
+            objective="pedestrian_exposure",
+            distance_weight=distance_weight,
+            exposure_weight=exposure_weight,
+        )
 
 
 def test_grid_limit_and_inputs(planner):

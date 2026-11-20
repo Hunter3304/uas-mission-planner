@@ -9,10 +9,12 @@ import RestrictionProfiles, { type RestrictionReport } from './RestrictionProfil
 import useScenarioLayers from './useScenarioLayers'
 import { initialScenarioVisibility } from './regionalLayers'
 import { pedestrianWindow, type PedestrianWindow, type PedestrianWindowId } from './pedestrianTime'
+import { hannoverDatasetId } from './types'
 
 const coordinateText = (value: number) => new Intl.NumberFormat('en', { maximumFractionDigits: 6, useGrouping: false }).format(value)
+const algorithmOptions = [['astar', 'A*'], ['dijkstra', 'Dijkstra'], ['abitstar', 'ABIT*']] as const
 const pedestrianDefaults = {
-  objective: 'pedestrian_exposure', algorithm: 'astar', planning_mode: 'research', cell_m: 500,
+  objective: 'pedestrian_exposure', planning_mode: 'research', cell_m: 500,
   time_budget_s: 30, corridor_margin_m: 1000, research_height_m: 30,
   vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0,
 }
@@ -38,13 +40,13 @@ interface RegionalResult {
   pedestrian_exposure_m?: number | null
   pedestrian_exposure?: {
     assessment: string; window: PedestrianWindow; model_version?: string; layer_identity?: string
-    reference_density_people_per_km2?: number; lambda?: number; crosses_window?: boolean; arrival_window?: PedestrianWindow
+    reference_density_people_per_km2?: number; crosses_window?: boolean; arrival_window?: PedestrianWindow
   }
   population_active?: boolean
   population_assessment?: string
   population_model?: unknown
   effective_objective?: string
-  effective_weights?: { building: number; landuse?: number; highway?: number; distance: number; population: number }
+  effective_weights?: { building?: number; landuse?: number; highway?: number; distance: number; population?: number; pedestrian_exposure?: number }
   objective_cost: number | null
   cruise_time_s: number | null
   cruise_time_range_s: [number, number] | null
@@ -62,18 +64,25 @@ interface RegionalResult {
 }
 
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
-  const [routeMode, setRouteMode] = useState<'existing' | 'pedestrian'>('existing')
+  const [routeMode, setRouteMode] = useState<'existing' | 'pedestrian'>(datasetId === hannoverDatasetId ? 'pedestrian' : 'existing')
   const pedestrian = routeMode === 'pedestrian'
+  const [exposureControls, setExposureControls] = useState({
+    algorithm: 'abitstar', searchBudget: String(pedestrianDefaults.time_budget_s), distanceWeight: '0.1', exposureWeight: '0.9',
+  })
   const [savedControls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
     algorithm: 'abitstar', objective: 'risk', planning_mode: 'research', profile_id: '', cell_m: 250, background: '0', time_budget_s: 3,
     include_population: false, population_weight: '1', agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
     mission_start: '', research_height_m: 30, corridor_margin_m: 1000,
     vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
-  const controls = pedestrian ? { ...savedControls, ...pedestrianDefaults } : savedControls
+  const controls = pedestrian ? {
+    ...savedControls, ...pedestrianDefaults, algorithm: exposureControls.algorithm,
+    time_budget_s: exposureControls.algorithm === 'abitstar' ? Number(exposureControls.searchBudget) : pedestrianDefaults.time_budget_s,
+  } : savedControls
+  const exposureWeights = { distance_weight: Number(exposureControls.distanceWeight), exposure_weight: Number(exposureControls.exposureWeight) }
   const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
   const [terrainError, setTerrainError] = useState('')
   const [override, setOverride] = useState({ enabled: false, start_lon: '', start_lat: '', end_lon: '', end_lat: '' })
-  const exact = !pedestrian && override.enabled
+  const exact = override.enabled
   const [result, setResult] = useState<RegionalResult | null>(null)
   const [study, setStudy] = useState<Study | null>(null)
   const [studyError, setStudyError] = useState('')
@@ -145,6 +154,10 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     clearResult()
     setControls(current => ({ ...current, [name]: value }))
   }
+  function updateExposure(name: keyof typeof exposureControls, value: string) {
+    clearResult()
+    setExposureControls(current => ({ ...current, [name]: value }))
+  }
   async function solve() {
     controller.current?.abort()
     const active = new AbortController()
@@ -153,6 +166,10 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     setResult(null)
     setError('')
     try {
+      if (pedestrian && (!exposureControls.distanceWeight.trim() || !exposureControls.exposureWeight.trim() ||
+        Object.values(exposureWeights).some(weight => !Number.isFinite(weight) || weight < 0) ||
+        (exposureWeights.distance_weight === 0 && exposureWeights.exposure_weight === 0)))
+        throw new Error('Enter finite, nonnegative weights. At least one weight must be positive.')
       if (controls.objective === 'distance' && controls.include_population && (!controls.population_weight.trim() || !Number.isFinite(Number(controls.population_weight)) || Number(controls.population_weight) < 0))
         throw new Error('Enter a finite, nonnegative population weight.')
       if (controls.objective === 'risk' && (!controls.background.trim() || !Number.isFinite(Number(controls.background)) || Number(controls.background) < 0))
@@ -165,6 +182,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         algorithm: controls.algorithm, objective: controls.objective, planning_mode: controls.planning_mode,
         profile_id: controls.profile_id || undefined,
         cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
+        ...(pedestrian ? exposureWeights : {}),
         ...(controls.objective === 'distance' ? { include_population: controls.include_population,
           ...(controls.include_population ? { population_weight: Number(controls.population_weight) } : {}) } : {}),
         ...(!pedestrian ? { background_cost: controls.background === '' ? null : Number(controls.background) } : {}), scenario: requestedScenario,
@@ -192,7 +210,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   function download() {
     if (!result) return
     const { geometry, ...resultMetadata } = result
-    const metadata = { ...resultMetadata, displayed_controls: controls, displayed_endpoint_selection: { ...override, enabled: exact }, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
+    const metadata = { ...resultMetadata, displayed_controls: { ...controls, ...(pedestrian ? exposureWeights : {}) }, displayed_endpoint_selection: { ...override, enabled: exact }, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
       features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: {
         length_m: result.length_m, risk_length_cost: result.risk_length_cost,
@@ -227,15 +245,15 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       <fieldset className="endpoint-section">
         <legend>Origin and destination</legend>
         <div className={`endpoint-row ${exact ? 'endpoint-row-exact' : ''}`}>
-          {!pedestrian && <label>Selection method
+          <label>Selection method
             <select value={override.enabled ? 'coordinates' : 'sites'} onChange={event => {
-              update('start_id', controls.start_id)
+              clearResult()
               setOverride(current => ({ ...current, enabled: event.target.value === 'coordinates' }))
             }}>
               <option value="sites">Choose from saved sites</option>
               <option value="coordinates">Enter exact coordinates</option>
             </select>
-          </label>}
+          </label>
           {!exact && (['start_id', 'end_id'] as const).map(name => <label key={name}>{name === 'start_id' ? 'Origin' : 'Destination'}<select aria-label={name === 'start_id' ? 'Origin' : 'Destination'} required value={controls[name]} disabled={!study} onChange={event => update(name, event.target.value)}>{study?.config.locations.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>)}
           {exact && (['start_lon', 'start_lat', 'end_lon', 'end_lat'] as const).map(name => {
             const b = study?.config.bounds
@@ -246,7 +264,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
             const label = { start_lon: 'Start longitude', start_lat: 'Start latitude', end_lon: 'End longitude', end_lat: 'End latitude' }[name]
             return <label key={name}>{label} (decimal degrees)
               <input required type="number" step="any" min={min} max={max} disabled={!b} value={value} aria-invalid={invalid} aria-describedby={invalid ? `${name}-error` : 'endpoint-bounds'} onChange={event => {
-                update('start_id', controls.start_id)
+                clearResult()
                 setOverride(current => ({ ...current, [name]: event.target.value }))
               }} />
               {invalid && <small id={`${name}-error`} className="field-error">{label} must be between {min == null ? '—' : coordinateText(min)} and {max == null ? '—' : coordinateText(max)}°.</small>}
@@ -262,11 +280,22 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           {terrains.map(t => <option key={t.id} value={t.id}>{t.id} ({t.tiles} tiles)</option>)}
         </select></label>
 <label>Departure time<input type="datetime-local" required step="1" value={controls.mission_start} onChange={event => update('mission_start', event.target.value)} /></label>
-        {!pedestrian && (['algorithm', 'objective', 'planning_mode'] as const).map(name => {
-          const label = name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'
+        <label>Algorithm<select aria-label="Algorithm" value={controls.algorithm} onChange={event => {
+          if (pedestrian) updateExposure('algorithm', event.target.value)
+          else update('algorithm', event.target.value)
+        }}>
+          {algorithmOptions.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+        </select></label>
+        {pedestrian && <>
+          <label>Distance weight<input type="number" required min="0" step="any" value={exposureControls.distanceWeight} onChange={event => updateExposure('distanceWeight', event.target.value)} /></label>
+          <label>Exposure weight<input type="number" required min="0" step="any" value={exposureControls.exposureWeight} onChange={event => updateExposure('exposureWeight', event.target.value)} /></label>
+          {controls.algorithm === 'abitstar' && <label>Search budget (s)<input type="number" required min="0" max="120" step="any" value={exposureControls.searchBudget} onChange={event => updateExposure('searchBudget', event.target.value)} /></label>}
+        </>}
+        {!pedestrian && (['objective', 'planning_mode'] as const).map(name => {
+          const label = name === 'planning_mode' ? 'Planning mode' : 'Objective'
           const select = <label key={name}>{label}
             <select aria-label={label} value={controls[name]} onChange={event => update(name, event.target.value)}>
-              {(name === 'algorithm' ? ['astar', 'dijkstra', 'abitstar'] : name === 'objective' ? ['risk', 'distance'] : ['conservative', 'strict', 'research']).map(value => <option key={value} value={value}>{value}</option>)}
+              {(name === 'objective' ? ['risk', 'distance'] : ['conservative', 'strict', 'research']).map(value => <option key={value} value={value}>{value}</option>)}
             </select></label>
           return name === 'objective' ? <div key={name} className="route-objective-controls">
             {select}
@@ -292,7 +321,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         {controls.objective === 'risk' && <label>Background score assumption<input type="number" required min="0" step="any" value={controls.background} onChange={event => update('background', event.target.value)} /></label>}
       </div>
       {controls.objective === 'risk' && <p data-testid="risk-fusion-weights">Fixed weights: building 0.15 + land use 0.15 + roads 0.15 + population 0.45 + distance 0.10. OSM layers contribute equally; OSM and population each contribute half of fused risk. Total objective = 0.9 × fused risk + 0.1 × length. Cost grid: 150 m; population is always included. Background 0 is an explicit assumption for unscored OSM cells.</p>}
-      {pedestrian ? <p className="layer-help">A* research planning uses the departure window throughout the route. Research assumptions use a 30 m estimate for missing building heights and NHN + AGL for MSL comparison.</p> : <>
+      {pedestrian ? <p className="layer-help">Route cost = distance weight × length + exposure weight × pedestrian exposure. Research planning uses the departure window throughout the route, a 30 m estimate for missing building heights and NHN + AGL for MSL comparison.</p> : <>
       <p className="layer-help">Grid spacing applies to A*/Dijkstra search, independently of the 150 m risk cost grid and 250 m population display. ABIT* searches continuous space.</p>
       <label><input type="checkbox" checked={controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption'} disabled={controls.planning_mode === 'strict'} onChange={event => update('vertical_reference_policy', event.target.checked ? 'nhn_as_msl_assumption' : 'source')} />Compare MSL zones using NHN + AGL (engineering assumption)</label>
       {controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' && <p>Comparison height = NHN ground height + AGL + offset. Uncertainty expands both bounds; default offset/uncertainty 0 m is an explicit approximation. Original datums remain unchanged. Whole-motion terrain bounds are checked; overlap still requires zone conditions or permission. Strict mode requires verified reference compatibility.</p>}
@@ -308,6 +337,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     {error && <p role="alert">{error}</p>}
     {result && <div role="status">
       <p>{result.status}: {result.message}</p>
+      {result.status === 'planner_unavailable' && <p>ABIT* requires native OMPL. Select A* or Dijkstra to plan on this setup.</p>}
       {Object.entries(result.endpoint_diagnostics ?? {}).flatMap(([endpoint, diagnostics]) => (diagnostics.vertical_comparisons ?? []).map((comparison, index) =>
         <p key={`${endpoint}-${comparison.source}-${index}`} style={{ overflowWrap: 'anywhere' }}>
           {endpoint} · {comparison.source}: aircraft {comparison.aircraft_comparison_bounds_m.map(v => v.toFixed(3)).join('–')} m MSL comparison · zone {comparison.zone_msl_bounds_m.lower?.toFixed(3) ?? 'unbounded'}–{comparison.zone_msl_bounds_m.upper?.toFixed(3) ?? 'unbounded'} m MSL · {comparison.vertical_relation} {comparison.vertical_reference_assumption ? '(NHN + AGL engineering assumption)' : '(source reference)'}.
@@ -329,9 +359,10 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
       {result.pedestrian_exposure && <>
         <p>Exposure window {result.pedestrian_exposure.window.label} · {result.pedestrian_exposure.window.timezone} · {result.pedestrian_exposure.assessment}</p>
         {result.pedestrian_exposure.crosses_window && <p>Arrival falls in {result.pedestrian_exposure.arrival_window?.label}. Exposure uses the departure window along the whole route.</p>}
-        {result.pedestrian_exposure.model_version && <p>{result.pedestrian_exposure.model_version} · reference density {result.pedestrian_exposure.reference_density_people_per_km2} people/km² · exposure weight {result.pedestrian_exposure.lambda}</p>}
+        {result.pedestrian_exposure.model_version && <p>{result.pedestrian_exposure.model_version} · reference density {result.pedestrian_exposure.reference_density_people_per_km2} people/km²</p>}
       </>}
-      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {pedestrian ? 'Outdoor pedestrian exposure' : result.effective_objective === 'distance+population' ? 'Distance + population' : controls.objective === 'risk' ? 'Fused risk' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
+      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {algorithmOptions.find(([value]) => value === controls.algorithm)?.[1]} · {pedestrian ? 'Outdoor pedestrian exposure' : result.effective_objective === 'distance+population' ? 'Distance + population' : controls.objective === 'risk' ? 'Fused risk' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
+      {pedestrian && result.effective_weights && <p>Effective weights: distance {result.effective_weights.distance} · exposure {result.effective_weights.pedestrian_exposure}</p>}
       {!pedestrian && result.effective_weights && <p>Effective weights: building {result.effective_weights.building}{result.effective_weights.landuse != null && <> · land use {result.effective_weights.landuse} · roads {result.effective_weights.highway}</>} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
       {!pedestrian && result.population_assessment && <p>Population assessment: {result.population_assessment === 'not_evaluated' ? 'Not evaluated (inactive)' : result.population_assessment}</p>}
       <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>

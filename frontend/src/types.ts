@@ -1,5 +1,7 @@
 import type { Feature, FeatureCollection, Geometry } from 'geojson'
 
+export const hannoverDatasetId = 'hannover-part1-v4'
+
 export const layers = [
   { key: 'building', label: 'Buildings', color: '#bc784a' },
   { key: 'highway', label: 'Roads & paths', color: '#657ac0' },

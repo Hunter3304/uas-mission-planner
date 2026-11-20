@@ -360,6 +360,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             "background_cost",
             "risk_weight",
             "distance_weight",
+            "exposure_weight",
             "include_population",
             "population_weight",
             "time_budget_s",
