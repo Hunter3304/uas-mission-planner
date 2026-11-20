@@ -44,6 +44,14 @@ def parser():
             command.add_argument("directory", type=Path)
         if name != "ofm-inspect":
             command.add_argument("--output", type=Path, required=True)
+    exposure = commands.add_parser(
+        "study-pedestrian-prepare",
+        help="Prepare pedestrian estimates from saved sources and public MiD",
+    )
+    exposure.add_argument("directory", type=Path)
+    exposure.add_argument("--mid-workbook", type=Path, required=True)
+    exposure.add_argument("--boundaries", type=Path, required=True)
+    exposure.add_argument("--boundary-release", required=True)
     regional_route = commands.add_parser(
         "study-route", help="Plan a weighted regional route offline"
     )
@@ -56,7 +64,9 @@ def parser():
     regional_route.add_argument(
         "--algorithm", choices=("astar", "dijkstra", "abitstar"), default="astar"
     )
-    regional_route.add_argument("--objective", choices=("risk", "distance"), default="risk")
+    regional_route.add_argument(
+        "--objective", choices=("risk", "distance", "pedestrian_exposure"), default="risk"
+    )
     regional_route.add_argument(
         "--planning-mode", choices=("strict", "conservative", "research"), default="research"
     )
@@ -215,6 +225,18 @@ def main(argv=None):
                 progress=lambda state: print(json.dumps(state), file=sys.stderr),
             )
             print(json.dumps(result, indent=2))
+            return 0
+        if args.command == "study-pedestrian-prepare":
+            from uas_planner.acquisition.pedestrian import prepare_product
+
+            result = prepare_product(
+                args.directory,
+                args.mid_workbook,
+                args.boundaries,
+                boundary_release=args.boundary_release,
+                progress=lambda message: print(message, file=sys.stderr, flush=True),
+            )
+            print(json.dumps(result, indent=2, allow_nan=False))
             return 0
         if args.command.startswith("ofm-"):
             from uas_planner.acquisition.ofm import acquire_ofm, rebuild_ofm

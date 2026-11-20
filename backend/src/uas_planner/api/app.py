@@ -183,6 +183,7 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             # Map labels need saved metadata, not materialized OSM/GHSL/DIPUL sources.
             # Full inspection and every planner/source-layer verification stay unchanged.
             return {
+                "region_id": config.get("region_id"),
                 "config": {"bounds": config["bounds"], "locations": config["locations"]},
                 "sources": {
                     name: {"attribution": str(sources.get(name, {}).get("attribution", ""))[:4096]}
@@ -450,6 +451,18 @@ def create_app(data_dir: Path | None = None) -> FastAPI:
             raise HTTPException(422, "Cannot verify or prepare 250 m population classes.") from exc
         finally:
             population_cost_slot.release()
+
+    @api.get("/api/datasets/{dataset_id}/study/pedestrian-exposure")
+    def regional_pedestrian_exposure(dataset_id: str, scenario: str):
+        from uas_planner.acquisition.pedestrian import display_product
+        from uas_planner.core.mid_profiles import WINDOWS
+
+        if scenario not in WINDOWS:
+            raise HTTPException(422, "Unknown pedestrian time window.")
+        try:
+            return display_product(dataset_path(dataset_id), scenario)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            raise HTTPException(422, "Cannot read the prepared pedestrian layer.") from exc
 
     @api.get("/api/datasets/{dataset_id}/experiment/layers/{layer}")
     def experiment_layer(dataset_id: str, layer: Literal["population", "zones"]):

@@ -43,6 +43,7 @@ def test_catalog_is_bounded_unverified_metadata_and_full_inspection_stays_defaul
         data = response.json()
         assert data["verified"] is False
         assert data["verification_scope"] == "validated_catalog_metadata_only"
+        assert data["region_id"] == config["region_id"]
         assert data["config"] == {"bounds": config["bounds"], "locations": config["locations"]}
         assert data["sources"]["osm"] == {"attribution": "Saved OSM"}
         assert "files" not in data

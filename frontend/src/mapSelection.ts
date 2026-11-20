@@ -6,7 +6,7 @@ export interface MapSelection {
   owner: string
   id: string
   version: unknown
-  source: 'OSM' | 'DIPUL' | 'GHSL' | 'Scenario'
+  source: 'OSM' | 'DIPUL' | 'GHSL' | 'Scenario' | 'Pedestrian'
   feature: InspectableFeature
   context?: Record<string, unknown>
   anchor?: [number, number]

@@ -9,9 +9,20 @@ from pyproj import Transformer
 from shapely.geometry import box, mapping, shape
 from shapely.ops import transform
 
-from uas_planner.core.flight_interval import REQUEST_SECONDS
+from uas_planner.core.flight_interval import REQUEST_SECONDS, timestamp_after
 from uas_planner.core.grid import MAX_GRID_CELLS, validate_cell_size
+from uas_planner.core.mid_profiles import departure_window, window_metadata
 from uas_planner.core.paper_risk import FIELDS, WEIGHTS, prepare_paper_model
+from uas_planner.core.pedestrian_routing import (
+    DEFAULT_GRID_M,
+    DEFAULT_SEARCH_SECONDS,
+    EXPOSURE_FIELD,
+    EXPOSURE_WEIGHT,
+    PedestrianRouteCost,
+)
+from uas_planner.core.pedestrian_routing import (
+    OBJECTIVE as PEDESTRIAN_OBJECTIVE,
+)
 from uas_planner.core.population_costs import PopulationResourceLimit, prepare_population_surface
 from uas_planner.core.population_routing import PopulationEvaluator, PopulationRiskModel
 from uas_planner.core.regional import RegionalConstraints
@@ -27,6 +38,7 @@ class RegionalPlanner:
         self._population = None
         self._paper = None
         self._paper_key = None
+        self._pedestrian = None
         self.constraints = RegionalConstraints(
             directory, scenario, terrain_directory=terrain_directory
         )
@@ -239,6 +251,9 @@ class RegionalPlanner:
         started = perf_counter()
         if not isinstance(include_population, bool):
             raise ValueError("include_population must be a boolean.")
+        pedestrian = objective == PEDESTRIAN_OBJECTIVE
+        if pedestrian and (algorithm != "astar" or include_population):
+            raise ValueError("Outdoor pedestrian exposure requires A* and its own exposure layer.")
         if objective == "risk":
             # Regional risk now uses the paper's fixed fusion, including population.
             risk_weight, distance_weight = 0.9, 0.1
@@ -253,7 +268,7 @@ class RegionalPlanner:
         cell_m = validate_cell_size(cell_m)
         if (
             algorithm not in ("astar", "dijkstra", "abitstar")
-            or objective not in ("risk", "distance")
+            or objective not in ("risk", "distance", PEDESTRIAN_OBJECTIVE)
             or planning_mode not in ("strict", "research", "conservative")
         ):
             raise ValueError("Unknown regional planner controls.")
@@ -356,12 +371,31 @@ class RegionalPlanner:
             "mission": {**self.constraints.scenario, "start_id": start_id, "end_id": end_id},
         }
         self._last_result = result
+        if pedestrian:
+            selected_window = departure_window(self.constraints.scenario["mission_start"])
+            result["pedestrian_exposure"] = {
+                "assessment": "not_evaluated",
+                "window": window_metadata(selected_window),
+            }
+            result[EXPOSURE_FIELD] = None
+            result["effective_weights"] = {"distance": 1, "pedestrian_exposure": EXPOSURE_WEIGHT}
         if objective == "risk":
             result.update({field: None for field in FIELDS + ("fused_risk_length_cost",)})
         reports.update({n: self.check([p], planning_mode) for n, p in endpoints.items()})
 
         def make_model(boundary):
             base = None
+            if pedestrian:
+                if self._pedestrian is None:
+                    self._pedestrian = PedestrianRouteCost(
+                        self.directory,
+                        selected_window,
+                        self.constraints.scenario.get("clearance_m", 0),
+                    )
+                result["pedestrian_exposure"].update(
+                    self._pedestrian.provenance, assessment="unresolved"
+                )
+                return self._pedestrian
             if objective == "risk":
                 key = (planning_mode, background_cost)
                 if self._paper is None or self._paper_key != key:
@@ -452,16 +486,32 @@ class RegionalPlanner:
                 model = make_model(corridors[0])
             except PopulationResourceLimit as error:
                 result.update(status="resource_limit", message=str(error))
-            except ValueError as error:
+            except (ValueError, KeyError, OSError, TypeError) as error:
+                if not pedestrian and not isinstance(error, ValueError):
+                    raise
                 result["message"] = str(error)
+                if pedestrian:
+                    result["pedestrian_exposure"].update(
+                        assessment="unavailable", reason=str(error)
+                    )
             else:
                 if population_active:
                     for name, point in endpoints.items():
                         reports[name]["population"] = self._population.evaluate([point])
+                if pedestrian:
+                    for name, point in endpoints.items():
+                        assessment = model.evaluate([point])
+                        reports[name]["pedestrian_exposure"] = {
+                            key: assessment[key] for key in ("assessment", "unavailable_cell_ids")
+                        }
                 if model and any(
                     model.evaluate([p])["assessment"] != "assessed" for p in endpoints.values()
                 ):
-                    result["message"] = "Endpoint cost support (building/population) is unassessed."
+                    result["message"] = (
+                        "Pedestrian exposure coverage is unavailable at an exact endpoint."
+                        if pedestrian
+                        else "Endpoint cost support (building/population) is unassessed."
+                    )
                 else:
                     grid = self.base_grid(check)
                     grid["validation"]["boundary"] = mapping(transform(self.reverse, corridors[0]))
@@ -588,7 +638,13 @@ class RegionalPlanner:
                 )
             )
             valid &= isclose(length, result["length_m"], rel_tol=1e-7, abs_tol=1e-6)
-            if model:
+            if pedestrian:
+                checked = model.independently_score(path)
+                valid &= checked is not None and all(
+                    isclose(value, result[field], rel_tol=1e-7, abs_tol=1e-6)
+                    for field, value in checked.items()
+                )
+            elif model:
                 assessments = [model.evaluate([a, b]) for a, b in zip(path, path[1:])]
                 assessed = all(a["assessment"] == "assessed" for a in assessments)
                 valid &= assessed
@@ -619,7 +675,7 @@ class RegionalPlanner:
                 )
                 result.update({field: None for field in getattr(model, "component_fields", ())})
         result["final_validation_ms"] = (perf_counter() - validation_started) * 1000
-        if objective == "distance":
+        if objective == "distance" or pedestrian:
             result["risk_length_cost"] = None
         result["objective"] = objective
         result["population_assessment"] = (
@@ -702,6 +758,25 @@ class RegionalPlanner:
         )
         length = result["length_m"]
         result["cruise_time_s"] = length / scenario["speed_m_s"] if length is not None else None
+        if pedestrian and length is not None:
+            arrival = departure_window(timestamp_after(scenario, result["cruise_time_s"]))
+            result["pedestrian_exposure"].update(
+                assessment="assessed",
+                arrival_window=window_metadata(arrival),
+                crosses_window=arrival != selected_window,
+                time_policy="Departure window applied along the whole route",
+            )
+        if pedestrian and self._pedestrian is not None:
+            result["rules_version"] = self._pedestrian.provenance["rules_version"]
+            result["provenance"]["pedestrian_layer_identity"] = self._pedestrian.provenance[
+                "layer_identity"
+            ]
+            result["prepared_identity"] = signature(
+                {
+                    "base_identity": result["prepared_identity"],
+                    "pedestrian_exposure": self._pedestrian.provenance,
+                }
+            )
         result["cruise_time_range_s"] = [length / 35, length / 25] if length is not None else None
         result["time_estimate_scope"] = (
             "Constant cruise only; excludes takeoff, landing, wind and dynamics."
@@ -735,6 +810,9 @@ def plan_regional_route(
     duration_mode="explicit",
     **controls,
 ):
+    if controls.get("objective") == PEDESTRIAN_OBJECTIVE:
+        controls.setdefault("cell_m", DEFAULT_GRID_M)
+        controls.setdefault("time_budget_s", DEFAULT_SEARCH_SECONDS)
     if duration_mode == "automatic":
         from uas_planner.core.flight_interval import automatic_route
 
@@ -759,6 +837,11 @@ def plan_regional_route(
                 "length_m": None,
                 "risk_length_cost": None,
                 "population_length_cost": None,
+                **(
+                    {EXPOSURE_FIELD: None}
+                    if controls.get("objective") == PEDESTRIAN_OBJECTIVE
+                    else {}
+                ),
                 "objective_cost": None,
                 "exact": False,
                 "cruise_time_s": None,
