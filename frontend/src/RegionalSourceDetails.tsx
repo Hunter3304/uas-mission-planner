@@ -1,6 +1,6 @@
 import type { MapSelection } from './mapSelection'
 import { AttributeList, Fact, OriginalAttributes, SourceFacts } from './SourceFacts'
-import { asRecord, categoryNames, decisionSummary, numberText, populationSummary, sourceText } from './sourcePresentation'
+import { asRecord, categoryNames, decisionSummary, numberText, pedestrianSummary, populationSummary, sourceText } from './sourcePresentation'
 
 function HeightLimit({ properties, prefix }: { properties: Record<string, unknown>; prefix: 'lower' | 'upper' }) {
   const value = sourceText(properties[`${prefix}_limit_altitude`])
@@ -61,6 +61,29 @@ function PopulationCostDetails({ item }: { item: MapSelection }) {
   </>
 }
 
+const pedestrianCoverageReasons: Record<string, string> = {
+  ghsl_coverage: 'Incomplete population grid coverage',
+  no_mapped_connection: 'No nearby mapped walking connection',
+  no_reachable_destination: 'No reachable mapped destination within the model distance',
+  uncertain_path_shelter: 'Uncertain shelter classification on a mapped path',
+}
+
+function PedestrianDetails({ item }: { item: MapSelection }) {
+  const p = item.feature.properties ?? {}, context = item.context ?? {}
+  const reason = sourceText(p.coverage_reason)
+  return <SourceFacts title="Average outdoor pedestrians">
+    <p className="source-main-value">{pedestrianSummary(p.mean_people)}</p>
+    <dl>
+      <Fact label="Time window">{sourceText(context.window)} · {sourceText(context.timezone)}</Fact>
+      <Fact label="Survey profile">Niedersachsen · all survey days pooled</Fact>
+      <Fact label="Coverage">{p.state === 'known' ? 'Modelled' : reason && pedestrianCoverageReasons[reason] || 'Estimate unavailable'}</Fact>
+      <Fact label="People per square kilometre">{typeof p.people_per_km2 === 'number' ? numberText(p.people_per_km2) : 'Unavailable'}</Fact>
+      <Fact label="Mapped cell area">{typeof p.area_m2 === 'number' ? numberText(p.area_m2) + ' m²' : 'Unavailable'}</Fact>
+      <Fact label="Model version">{sourceText(context.model_version)}</Fact>
+    </dl>
+  </SourceFacts>
+}
+
 export default function RegionalSourceDetails({ item }: { item: MapSelection }) {
   const p = item.feature.properties ?? {}, context = item.context ?? {}
   if (item.aggregate) return <>
@@ -68,6 +91,7 @@ export default function RegionalSourceDetails({ item }: { item: MapSelection }) 
       {Object.entries(asRecord(p.category_counts)).map(([key, value]) => <Fact key={key} label={categoryNames([key])}>{sourceText(value) ?? 'Not supplied'}</Fact>)}
     </dl><p>Whole cells intersecting the view are counted using one representative point per object. Counts are not exact viewport totals; category memberships overlap.</p><button type="button" onClick={item.zoom}>Zoom for objects</button></SourceFacts>
   </>
+  if (item.source === 'Pedestrian') return <PedestrianDetails item={item} />
   if (item.source === 'GHSL') return p.layer_kind === 'population_cost' ? <PopulationCostDetails item={item} /> : <PopulationDetails item={item} />
   const decision = decisionSummary(p), scenario = asRecord(context.scenario)
   const msl = asRecord(p.zone_msl_bounds_m)

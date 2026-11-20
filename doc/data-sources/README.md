@@ -21,6 +21,9 @@ context, not a current statement that the project lacks routing or source adapte
 | [SORA 2.5](05-sora-2.5.md) | JARUS PDFs; EASA online rules, PDF and machine-readable XML | Document revisions | Not a spatial dataset | Selected rules can be encoded; substantial mission inputs and review remain |
 | [EGRED 2](06-egred-2.md) | BBK guidance publication, PDF | Revisions; no fixed interval confirmed | Not a spatial dataset | Selected checks can be encoded after defining the BOS scenario |
 
+Iteration 016 adds [public MiD 2023 walking inputs and BKG municipal boundaries](07-mid-2023.md)
+for the Hannover–Lehrte pedestrian layer.
+
 Official evidence links and qualifications are in each source note. “Feasible”
 means a reasoned engineering assessment, not a successful end-to-end test.
 See [integration recommendation](integration-recommendation.md) for priorities,

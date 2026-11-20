@@ -245,6 +245,11 @@ No database server or separate GIS application is required.
    This affects display only. The `risk` objective always includes population,
    even when the population layer is hidden. **Include population** is available
    only for the `distance` objective.
+   For the public MiD resident-walking layer, follow the
+   [pedestrian exposure preparation guide](doc/experiments/iteration-016.md)
+   and enable **Outdoor pedestrians** on the map. In the route panel, choose
+   **Outdoor pedestrian exposure** under **Routing mode** to use the same
+   prepared layer for route scoring. [Route example and acceptance](doc/iteration/iteration-016/phase-2.md)
 5. For the retained research example, choose `rheuma-podbi` → `mhh`, select
    **research**, `risk`, 100 m AGL, 30 m/s, background score **0**, estimated
    missing building height 30 m. The page defaults to **ABIT***, **Research**,

@@ -363,12 +363,30 @@ def osm_frame(paths, area):
     return frame, {"source_base_timestamps": timestamps, "conflicting_tagged_versions": conflicts}
 
 
+_PBF_TAG_PATTERN = re.compile(r'"((?:\\.|[^"\\])*)"=>"((?:\\.|[^"\\])*)"')
+
+
+def pbf_tags(feature):
+    """Decode the GDAL OSM driver's common columns and original other_tags."""
+    tags = {}
+    other = feature.get("other_tags")
+    if isinstance(other, str):
+        for match in _PBF_TAG_PATTERN.finditer(other):
+            key, value = (json.loads('"' + part + '"', strict=False) for part in match.groups())
+            tags[key] = value
+    for key, value in feature.items():
+        if key not in ("geometry", "osm_id", "osm_way_id", "other_tags", "z_order") and isinstance(
+            value, str
+        ):
+            tags[key] = value
+    return tags
+
+
 def pbf_frame(path, area):
     """Read complete intersecting OSM geometries using the installed GDAL OSM driver."""
     if "OSM" not in pyogrio.list_drivers():
         raise ValueError("The installed GDAL runtime has no OSM/PBF driver.")
     frames = []
-    pattern = re.compile(r'"((?:\\.|[^"\\])*)"=>"((?:\\.|[^"\\])*)"')
     for layer, element_type in (
         ("points", "node"),
         ("lines", "way"),
@@ -380,21 +398,7 @@ def pbf_frame(path, area):
         source = pyogrio.read_dataframe(path, layer=layer, bbox=area.as_tuple())
         rows = []
         for _, feature in source.iterrows():
-            tags = {}
-            other = feature.get("other_tags")
-            if isinstance(other, str):
-                for match in pattern.finditer(other):
-                    key, value = (
-                        json.loads('"' + part + '"', strict=False) for part in match.groups()
-                    )
-                    tags[key] = value
-            # GDAL extracts common tags as columns; computed fields are not OSM tags.
-            for key in source.columns:
-                if key in ("geometry", "osm_id", "osm_way_id", "other_tags", "z_order"):
-                    continue
-                value = feature[key]
-                if isinstance(value, str):
-                    tags[key] = value
+            tags = pbf_tags(feature)
             if not any(tag in tags for tag in TAGS):
                 continue
             identity = feature.get("osm_id")

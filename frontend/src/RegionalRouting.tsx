@@ -8,8 +8,14 @@ import { berlinTimestamp, berlinDisplay, checkFlightTiming, type FlightTiming } 
 import RestrictionProfiles, { type RestrictionReport } from './RestrictionProfiles'
 import useScenarioLayers from './useScenarioLayers'
 import { initialScenarioVisibility } from './regionalLayers'
+import { pedestrianWindow, type PedestrianWindow, type PedestrianWindowId } from './pedestrianTime'
 
 const coordinateText = (value: number) => new Intl.NumberFormat('en', { maximumFractionDigits: 6, useGrouping: false }).format(value)
+const pedestrianDefaults = {
+  objective: 'pedestrian_exposure', algorithm: 'astar', planning_mode: 'research', cell_m: 500,
+  time_budget_s: 30, corridor_margin_m: 1000, research_height_m: 30,
+  vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0,
+}
 
 interface VerticalComparison {
   source: string
@@ -29,6 +35,11 @@ interface RegionalResult {
   highway_length_cost?: number | null
   fused_risk_length_cost?: number | null
   population_length_cost?: number | null
+  pedestrian_exposure_m?: number | null
+  pedestrian_exposure?: {
+    assessment: string; window: PedestrianWindow; model_version?: string; layer_identity?: string
+    reference_density_people_per_km2?: number; lambda?: number; crosses_window?: boolean; arrival_window?: PedestrianWindow
+  }
   population_active?: boolean
   population_assessment?: string
   population_model?: unknown
@@ -51,14 +62,18 @@ interface RegionalResult {
 }
 
 export default function RegionalRouting({ datasetId }: { datasetId: string }) {
-  const [controls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
+  const [routeMode, setRouteMode] = useState<'existing' | 'pedestrian'>('existing')
+  const pedestrian = routeMode === 'pedestrian'
+  const [savedControls, setControls] = useState({ start_id: 'rheuma-podbi', end_id: 'mhh', terrain_id: 'hannover-part2-terrain-v1',
     algorithm: 'abitstar', objective: 'risk', planning_mode: 'research', profile_id: '', cell_m: 250, background: '0', time_budget_s: 3,
     include_population: false, population_weight: '1', agl_m: 100, speed_m_s: 30, clearance_m: 0, vertical_clearance_m: 0,
     mission_start: '', research_height_m: 30, corridor_margin_m: 1000,
     vertical_reference_policy: 'nhn_as_msl_assumption', nhn_msl_offset_m: 0, nhn_msl_uncertainty_m: 0 })
+  const controls = pedestrian ? { ...savedControls, ...pedestrianDefaults } : savedControls
   const [terrains, setTerrains] = useState<{ id: string; tiles: number }[]>([])
   const [terrainError, setTerrainError] = useState('')
   const [override, setOverride] = useState({ enabled: false, start_lon: '', start_lat: '', end_lon: '', end_lat: '' })
+  const exact = !pedestrian && override.enabled
   const [result, setResult] = useState<RegionalResult | null>(null)
   const [study, setStudy] = useState<Study | null>(null)
   const [studyError, setStudyError] = useState('')
@@ -99,9 +114,11 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   let layerKey = ''
   let activeStart: [number, number] | undefined
   let activeEnd: [number, number] | undefined
+  let departureWindow: PedestrianWindowId | null | undefined = pedestrian ? null : undefined
   try {
+    if (pedestrian && controls.mission_start) departureWindow = pedestrianWindow(berlinTimestamp(controls.mission_start))
     if (!study) throw new Error('Waiting for the study bounds and saved sites.')
-    if (override.enabled) { activeStart = coordinate('start'); activeEnd = coordinate('end') }
+    if (exact) { activeStart = coordinate('start'); activeEnd = coordinate('end') }
     else {
       const start = study.config.locations.find(site => site.id === controls.start_id)
       const end = study.config.locations.find(site => site.id === controls.end_id)
@@ -112,17 +129,20 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
     if (!terrains.some(terrain => terrain.id === controls.terrain_id)) throw new Error('Choose an available terrain dataset in the planning panel.')
     if (![controls.agl_m, controls.speed_m_s, controls.clearance_m, controls.vertical_clearance_m, controls.research_height_m, controls.nhn_msl_offset_m, controls.nhn_msl_uncertainty_m].every(Number.isFinite)) throw new Error('Complete the scenario height, speed and clearance inputs.')
     if (controls.agl_m < 100 || controls.agl_m > 120 || controls.speed_m_s < 25 || controls.speed_m_s > 35 || controls.clearance_m < 0 || controls.vertical_clearance_m < 0) throw new Error('Check the scenario altitude, speed and clearance ranges.')
-    layerKey = JSON.stringify({ duration_mode: result?.status === 'success' ? 'explicit' : 'automatic', start_id: controls.start_id, end_id: controls.end_id, ...(override.enabled ? { start_coordinate: activeStart, end_coordinate: activeEnd } : {}), scenario: { ...scenario(), ...(result?.status === 'success' ? result.timing?.assessed_interval : {}) }, terrain_id: controls.terrain_id, profile_id: controls.profile_id || undefined, planning_mode: controls.planning_mode })
+    layerKey = JSON.stringify({ duration_mode: result?.status === 'success' ? 'explicit' : 'automatic', start_id: controls.start_id, end_id: controls.end_id, ...(exact ? { start_coordinate: activeStart, end_coordinate: activeEnd } : {}), scenario: { ...scenario(), ...(result?.status === 'success' ? result.timing?.assessed_interval : {}) }, terrain_id: controls.terrain_id, profile_id: controls.profile_id || undefined, planning_mode: controls.planning_mode })
   } catch (failure) { pendingReason = failure instanceof Error ? failure.message : 'Complete the scenario inputs.' }
   const layers = useScenarioLayers(datasetId, layerKey, Object.values(layerVisibility).some(Boolean) && !busy)
   const constraints: ConstraintLayers | null = layers.data
   const controller = useRef<AbortController | null>(null)
   useEffect(() => () => controller.current?.abort(), [])
-  function update(name: keyof typeof controls, value: string | number | boolean) {
+  function clearResult() {
     controller.current?.abort()
     setBusy(false)
     setResult(null)
     setError('')
+  }
+  function update(name: keyof typeof controls, value: string | number | boolean) {
+    clearResult()
     setControls(current => ({ ...current, [name]: value }))
   }
   async function solve() {
@@ -147,14 +167,19 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         cell_m: controls.cell_m, time_budget_s: controls.time_budget_s, corridor_margin_m: controls.corridor_margin_m,
         ...(controls.objective === 'distance' ? { include_population: controls.include_population,
           ...(controls.include_population ? { population_weight: Number(controls.population_weight) } : {}) } : {}),
-        background_cost: controls.background === '' ? null : Number(controls.background), scenario: requestedScenario,
-        ...(override.enabled ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
+        ...(!pedestrian ? { background_cost: controls.background === '' ? null : Number(controls.background) } : {}), scenario: requestedScenario,
+        ...(exact ? { start_coordinate: coordinate('start'), end_coordinate: coordinate('end') } : {}),
       }, active.signal)
       if (!active.signal.aborted) {
         if (response.status === 'success') {
           checkFlightTiming(response.timing, requestedScenario.mission_start, response.length_m, controls.speed_m_s)
           if (response.mission?.mission_start !== requestedScenario.mission_start || response.mission?.mission_end !== response.timing?.estimated_arrival)
             throw new Error('The returned mission interval does not match its flight estimate. Plan again.')
+          if (pedestrian && (response.pedestrian_exposure?.assessment !== 'assessed' ||
+              response.pedestrian_exposure.window.id !== pedestrianWindow(requestedScenario.mission_start) ||
+              !response.pedestrian_exposure.layer_identity || response.pedestrian_exposure_m == null ||
+              !Number.isFinite(response.pedestrian_exposure_m) || response.pedestrian_exposure_m < 0))
+            throw new Error('The returned route has no valid exposure score for this departure window. Plan again.')
         }
         setResult(response)
       }
@@ -167,13 +192,14 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   function download() {
     if (!result) return
     const { geometry, ...resultMetadata } = result
-    const metadata = { ...resultMetadata, displayed_controls: controls, displayed_endpoint_selection: override, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
+    const metadata = { ...resultMetadata, displayed_controls: controls, displayed_endpoint_selection: { ...override, enabled: exact }, catalog_endpoints: study?.config.locations.filter(site => site.id === controls.start_id || site.id === controls.end_id) }
     const blob = new Blob([JSON.stringify({ type: 'FeatureCollection', metadata,
       features: result.status === 'success' ? [{ type: 'Feature', geometry, properties: {
         length_m: result.length_m, risk_length_cost: result.risk_length_cost,
         building_length_cost: result.building_length_cost, landuse_length_cost: result.landuse_length_cost,
         highway_length_cost: result.highway_length_cost, fused_risk_length_cost: result.fused_risk_length_cost,
         population_length_cost: result.population_length_cost ?? null, objective_cost: result.objective_cost,
+        pedestrian_exposure_m: result.pedestrian_exposure_m,
         effective_objective: result.effective_objective, effective_weights: result.effective_weights,
       } }] : [] }, null, 2)], { type: 'application/geo+json' })
     const url = URL.createObjectURL(blob)
@@ -186,15 +212,22 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
   const mapTarget = document.getElementById('regional-map')
   const assessedInterval = result?.status === 'success' ? result.timing?.assessed_interval : constraints?.flight_interval?.assessed_interval
   return <CollapsiblePanel title="Regional route planning">
-    {mapTarget && createPortal(<RegionalMap datasetId={datasetId} study={study} startId={controls.start_id} endId={controls.end_id} startCoordinate={activeStart} endCoordinate={activeEnd} exactCoordinates={override.enabled} geometry={result?.status === 'success' ? result.geometry : null} constraints={constraints} layerVisibility={layerVisibility} onLayerVisibility={setLayerVisibility} layerState={{ pendingReason, loading: layers.loading, error: layers.error, retry: layers.retry }} />, mapTarget)}
+    {mapTarget && createPortal(<RegionalMap datasetId={datasetId} study={study} startId={controls.start_id} endId={controls.end_id} startCoordinate={activeStart} endCoordinate={activeEnd} exactCoordinates={exact} geometry={result?.status === 'success' ? result.geometry : null} constraints={constraints} layerVisibility={layerVisibility} onLayerVisibility={setLayerVisibility} layerState={{ pendingReason, loading: layers.loading, error: layers.error, retry: layers.retry }} pedestrianWindow={departureWindow} routeLayerIdentity={result?.status === 'success' ? result.pedestrian_exposure?.layer_identity : undefined} />, mapTarget)}
     {studyError && <p role="alert">Location catalog: {studyError}</p>}
     <p>Select endpoints and departure in Europe/Berlin. Estimated arrival uses the successful route length divided by cruise speed, with no takeoff/landing allowance. Addresses are not verified launch or landing sites.</p>
     {terrainError && <p role="alert">Terrain catalog: {terrainError}</p>}
     <form onSubmit={event => { event.preventDefault(); void solve() }}>
+      <label>Routing mode<select value={routeMode} onChange={event => {
+        clearResult()
+        setRouteMode(event.target.value === 'pedestrian' ? 'pedestrian' : 'existing')
+      }}>
+        <option value="existing">Existing planning</option>
+        <option value="pedestrian" disabled={study?.region_id !== 'hannover-lehrte-5km'}>Outdoor pedestrian exposure</option>
+      </select></label>
       <fieldset className="endpoint-section">
         <legend>Origin and destination</legend>
-        <div className={`endpoint-row ${override.enabled ? 'endpoint-row-exact' : ''}`}>
-          <label>Selection method
+        <div className={`endpoint-row ${exact ? 'endpoint-row-exact' : ''}`}>
+          {!pedestrian && <label>Selection method
             <select value={override.enabled ? 'coordinates' : 'sites'} onChange={event => {
               update('start_id', controls.start_id)
               setOverride(current => ({ ...current, enabled: event.target.value === 'coordinates' }))
@@ -202,9 +235,9 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
               <option value="sites">Choose from saved sites</option>
               <option value="coordinates">Enter exact coordinates</option>
             </select>
-          </label>
-          {!override.enabled && (['start_id', 'end_id'] as const).map(name => <label key={name}>{name === 'start_id' ? 'Origin' : 'Destination'}<select aria-label={name === 'start_id' ? 'Origin' : 'Destination'} required value={controls[name]} disabled={!study} onChange={event => update(name, event.target.value)}>{study?.config.locations.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>)}
-          {override.enabled && (['start_lon', 'start_lat', 'end_lon', 'end_lat'] as const).map(name => {
+          </label>}
+          {!exact && (['start_id', 'end_id'] as const).map(name => <label key={name}>{name === 'start_id' ? 'Origin' : 'Destination'}<select aria-label={name === 'start_id' ? 'Origin' : 'Destination'} required value={controls[name]} disabled={!study} onChange={event => update(name, event.target.value)}>{study?.config.locations.map(site => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>)}
+          {exact && (['start_lon', 'start_lat', 'end_lon', 'end_lat'] as const).map(name => {
             const b = study?.config.bounds
             const min = name.endsWith('lon') ? b?.west : b?.south
             const max = name.endsWith('lon') ? b?.east : b?.north
@@ -220,7 +253,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
             </label>
           })}
         </div>
-        {override.enabled && <p id="endpoint-bounds" className="endpoint-bounds">{study ? `Study bounds (WGS84 decimal degrees, approximate): longitude ${coordinateText(study.config.bounds.west)} to ${coordinateText(study.config.bounds.east)}°; latitude ${coordinateText(study.config.bounds.south)} to ${coordinateText(study.config.bounds.north)}°. Inputs retain full precision; points still require endpoint constraint checks.` : 'Waiting for the study coordinate bounds…'}</p>}
+        {exact && <p id="endpoint-bounds" className="endpoint-bounds">{study ? `Study bounds (WGS84 decimal degrees, approximate): longitude ${coordinateText(study.config.bounds.west)} to ${coordinateText(study.config.bounds.east)}°; latitude ${coordinateText(study.config.bounds.south)} to ${coordinateText(study.config.bounds.north)}°. Inputs retain full precision; points still require endpoint constraint checks.` : 'Waiting for the study coordinate bounds…'}</p>}
       </fieldset>
       <h4 className="planning-parameters-heading">Flight and planning parameters</h4>
       <div className="regional-controls">
@@ -229,7 +262,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           {terrains.map(t => <option key={t.id} value={t.id}>{t.id} ({t.tiles} tiles)</option>)}
         </select></label>
 <label>Departure time<input type="datetime-local" required step="1" value={controls.mission_start} onChange={event => update('mission_start', event.target.value)} /></label>
-        {(['algorithm', 'objective', 'planning_mode'] as const).map(name => {
+        {!pedestrian && (['algorithm', 'objective', 'planning_mode'] as const).map(name => {
           const label = name === 'planning_mode' ? 'Planning mode' : name === 'algorithm' ? 'Algorithm' : 'Objective'
           const select = <label key={name}>{label}
             <select aria-label={label} value={controls[name]} onChange={event => update(name, event.target.value)}>
@@ -252,17 +285,21 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           ...(controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' ? [
             { name: 'nhn_msl_offset_m', label: 'NHN to MSL offset (m)', min: -1000, max: 1000 },
             { name: 'nhn_msl_uncertainty_m', label: 'NHN to MSL uncertainty (m)', min: 0, max: 1000 }] : []),
-        ] as { name: keyof typeof controls; label: string; min: number; max?: number }[]).map(field =>
+        ] as { name: keyof typeof controls; label: string; min: number; max?: number }[]).filter(field =>
+          !pedestrian || ['agl_m', 'speed_m_s', 'clearance_m', 'vertical_clearance_m'].includes(field.name),
+        ).map(field =>
           <label key={field.name}>{field.label}<input type="number" required step="any" min={field.min} max={field.max} value={String(controls[field.name])} onChange={event => update(field.name, Number(event.target.value))} /></label>)}
         {controls.objective === 'risk' && <label>Background score assumption<input type="number" required min="0" step="any" value={controls.background} onChange={event => update('background', event.target.value)} /></label>}
       </div>
       {controls.objective === 'risk' && <p data-testid="risk-fusion-weights">Fixed weights: building 0.15 + land use 0.15 + roads 0.15 + population 0.45 + distance 0.10. OSM layers contribute equally; OSM and population each contribute half of fused risk. Total objective = 0.9 × fused risk + 0.1 × length. Cost grid: 150 m; population is always included. Background 0 is an explicit assumption for unscored OSM cells.</p>}
+      {pedestrian ? <p className="layer-help">A* research planning uses the departure window throughout the route. Research assumptions use a 30 m estimate for missing building heights and NHN + AGL for MSL comparison.</p> : <>
       <p className="layer-help">Grid spacing applies to A*/Dijkstra search, independently of the 150 m risk cost grid and 250 m population display. ABIT* searches continuous space.</p>
       <label><input type="checkbox" checked={controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption'} disabled={controls.planning_mode === 'strict'} onChange={event => update('vertical_reference_policy', event.target.checked ? 'nhn_as_msl_assumption' : 'source')} />Compare MSL zones using NHN + AGL (engineering assumption)</label>
       {controls.planning_mode !== 'strict' && controls.vertical_reference_policy === 'nhn_as_msl_assumption' && <p>Comparison height = NHN ground height + AGL + offset. Uncertainty expands both bounds; default offset/uncertainty 0 m is an explicit approximation. Original datums remain unchanged. Whole-motion terrain bounds are checked; overlap still requires zone conditions or permission. Strict mode requires verified reference compatibility.</p>}
       {controls.planning_mode === 'research' && <p>Research route: derived polygon repairs; uncertain non-polygon extents excluded with a 20 m buffer; missing heights use the explicit estimate above. Zone applicability, NHN/MSL compatibility and temporary restrictions remain assumptions. Known obstacles and missing terrain remain excluded. The background score is an explicit assumption for unscored OSM cells.</p>}
       {controls.planning_mode === 'conservative' && <p>Conservative avoidance excludes unresolved zone footprints and confirmed prohibitions. Building geometry repairs and missing-height estimates remain explicit engineering assumptions. Temporary/NOTAM coverage is unverified; a successful candidate is not flight permission.</p>}
-      {!override.enabled && controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
+      </>}
+      {!exact && controls.start_id === controls.end_id && <p>Origin and destination are the same address. A zero-length route still requires endpoint constraint validation.</p>}
       <button disabled={busy || !study}>{busy ? 'Preparing and planning…' : 'Plan regional route'}</button>
     </form>
     <section className="flight-estimate source-card" aria-label="Flight time estimate"><h4>Estimated arrival</h4>{result?.status === 'success' && result.timing?.estimated_arrival ? <><p className="source-main-value">{berlinDisplay(result.timing.estimated_arrival)}</p><p>{result.length_m?.toFixed(1)} m ÷ {controls.speed_m_s} m/s = {result.timing.cruise_time_s?.toFixed(3)} s of cruise. Cruise only; planning computation time is separate.</p><p>Assessed interval: {berlinDisplay(result.timing.assessed_interval.mission_start)} — {berlinDisplay(result.timing.assessed_interval.mission_end)}</p></> : <p>Awaiting route</p>}</section>
@@ -276,7 +313,7 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
           {endpoint} · {comparison.source}: aircraft {comparison.aircraft_comparison_bounds_m.map(v => v.toFixed(3)).join('–')} m MSL comparison · zone {comparison.zone_msl_bounds_m.lower?.toFixed(3) ?? 'unbounded'}–{comparison.zone_msl_bounds_m.upper?.toFixed(3) ?? 'unbounded'} m MSL · {comparison.vertical_relation} {comparison.vertical_reference_assumption ? '(NHN + AGL engineering assumption)' : '(source reference)'}.
         </p>))}
       {result.restriction_report && <p>Zone decisions: {Object.entries(result.restriction_report.counts).map(([key, count]) => `${key}: ${count}`).join(' · ')}. Coverage: {result.restriction_report.coverage.status} — {result.restriction_report.coverage.reason}</p>}
-      {result.status === 'unresolved_input' && <p>Review the findings below. Research mode requires explicit geometry and height assumptions; weighted routing also needs an assessed background score. Missing terrain cannot be bypassed.</p>}
+      {result.status === 'unresolved_input' && !pedestrian && <p>Review the findings below. Research mode requires explicit geometry and height assumptions; weighted routing also needs an assessed background score. Missing terrain cannot be bypassed.</p>}
       {result.status === 'invalid_endpoint' && <p>The selected point conflicts with a constraint. Review its source below and explicitly choose another launch/landing point if appropriate.</p>}
       {result.length_m !== null && <section aria-label="Route costs">
         <p>Length {result.length_m.toFixed(1)} m</p>
@@ -285,12 +322,18 @@ export default function RegionalRouting({ datasetId }: { datasetId: string }) {
         {result.highway_length_cost != null && <p>Road cost {result.highway_length_cost.toFixed(2)} score-metres</p>}
         {result.fused_risk_length_cost != null && <p>Fused risk cost {result.fused_risk_length_cost.toFixed(2)} score-metres</p>}
         {result.population_active && result.population_length_cost != null && <p>Population cost {result.population_length_cost.toFixed(2)} score-metres</p>}
+        {result.pedestrian_exposure_m != null && <p>Pedestrian exposure E {result.pedestrian_exposure_m.toFixed(2)} m</p>}
         <p>Objective cost {result.objective_cost?.toFixed(2)}</p>
         <p>Cruise {result.cruise_time_s?.toFixed(1)} s (25–35 m/s: {result.cruise_time_range_s?.map(t => t.toFixed(1)).join('–')} s)</p>
       </section>}
-      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {result.effective_objective === 'distance+population' ? 'Distance + population' : controls.objective === 'risk' ? 'Fused risk' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
-      {result.effective_weights && <p>Effective weights: building {result.effective_weights.building}{result.effective_weights.landuse != null && <> · land use {result.effective_weights.landuse} · roads {result.effective_weights.highway}</>} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
-      {result.population_assessment && <p>Population assessment: {result.population_assessment === 'not_evaluated' ? 'Not evaluated (inactive)' : result.population_assessment}</p>}
+      {result.pedestrian_exposure && <>
+        <p>Exposure window {result.pedestrian_exposure.window.label} · {result.pedestrian_exposure.window.timezone} · {result.pedestrian_exposure.assessment}</p>
+        {result.pedestrian_exposure.crosses_window && <p>Arrival falls in {result.pedestrian_exposure.arrival_window?.label}. Exposure uses the departure window along the whole route.</p>}
+        {result.pedestrian_exposure.model_version && <p>{result.pedestrian_exposure.model_version} · reference density {result.pedestrian_exposure.reference_density_people_per_km2} people/km² · exposure weight {result.pedestrian_exposure.lambda}</p>}
+      </>}
+      <p>Altitude {controls.agl_m} m AGL · Speed {controls.speed_m_s} m/s · {controls.algorithm} · {pedestrian ? 'Outdoor pedestrian exposure' : result.effective_objective === 'distance+population' ? 'Distance + population' : controls.objective === 'risk' ? 'Fused risk' : result.effective_objective ?? controls.objective} · {controls.planning_mode}</p>
+      {!pedestrian && result.effective_weights && <p>Effective weights: building {result.effective_weights.building}{result.effective_weights.landuse != null && <> · land use {result.effective_weights.landuse} · roads {result.effective_weights.highway}</>} · distance {result.effective_weights.distance} · population {result.effective_weights.population}</p>}
+      {!pedestrian && result.population_assessment && <p>Population assessment: {result.population_assessment === 'not_evaluated' ? 'Not evaluated (inactive)' : result.population_assessment}</p>}
       <p>Preparation {(result.preparation_ms / 1000).toFixed(2)} s · Search {(result.planner_ms / 1000).toFixed(2)} s · Total {result.runtime_ms == null ? '—' : (result.runtime_ms / 1000).toFixed(2)} s · Source preparation {result.source_preparation_ms == null ? '—' : (result.source_preparation_ms / 1000).toFixed(2)} s</p>
       <p>Time estimates cover constant cruise only; takeoff, landing, wind and dynamics are excluded.</p>
       <details open><summary>Constraint findings and assumptions</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: '22rem', overflow: 'auto' }}>{JSON.stringify({ endpoints: result.endpoint_diagnostics, assumptions: result.research_assumptions }, null, 2)}</pre></details>

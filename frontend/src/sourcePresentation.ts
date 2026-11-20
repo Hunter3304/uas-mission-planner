@@ -46,10 +46,17 @@ export function decisionSummary(properties: Record<string, unknown>) {
   return { label: state ? fieldLabel(state) : 'Assessment not supplied', tone: 'neutral', note: 'No further permission or prohibition is inferred from this record.' }
 }
 
+export function pedestrianSummary(value: unknown) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return 'Pedestrian estimate unavailable'
+  const count = value > 0 && value < 0.01 ? 'Less than 0.01' : numberText(value)
+  return count + ' average pedestrians'
+}
+
 export function selectionTitle(item: MapSelection) {
   const p = item.feature.properties ?? {}
   if (item.aggregate) return 'Aggregate overview cell'
   if (item.osm) return objectTitle(p)
+  if (item.source === 'Pedestrian') return 'Outdoor pedestrian cell · ' + item.id
   if (item.source === 'GHSL') return `${p.layer_kind === 'population_cost' ? '250 m population risk' : 'Population cell'} · ${item.id}`
   return sourceText(p.name) ?? sourceText(p.type) ?? (p.category === 'building_obstacle' ? 'Assessed building footprint' : item.source === 'DIPUL' ? 'Assessed DIPUL zone' : 'Scenario area')
 }
@@ -58,6 +65,7 @@ export function selectionSummary(item: MapSelection) {
   const p = item.feature.properties ?? {}
   if (item.aggregate) return `${p.objects ?? 'Unknown'} assigned objects. ${Object.entries(asRecord(p.category_counts)).map(([key, value]) => `${categoryNames([key])}: ${value}`).join(' · ')}. Zoom for individual objects; no cost score.`
   if (item.source === 'GHSL') return populationSummary(p).text
+  if (item.source === 'Pedestrian') return pedestrianSummary(p.mean_people)
   if (item.osm) return 'Original source tags and independent category costs in the left inspector.'
   return decisionSummary(p).label
 }
