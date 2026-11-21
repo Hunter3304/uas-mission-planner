@@ -14,10 +14,11 @@ from uas_planner.core.grid import MAX_GRID_CELLS, validate_cell_size
 from uas_planner.core.mid_profiles import departure_window, window_metadata
 from uas_planner.core.paper_risk import FIELDS, WEIGHTS, prepare_paper_model
 from uas_planner.core.pedestrian_routing import (
+    DEFAULT_DISTANCE_WEIGHT,
+    DEFAULT_EXPOSURE_WEIGHT,
     DEFAULT_GRID_M,
     DEFAULT_SEARCH_SECONDS,
     EXPOSURE_FIELD,
-    EXPOSURE_WEIGHT,
     PedestrianRouteCost,
 )
 from uas_planner.core.pedestrian_routing import (
@@ -28,6 +29,14 @@ from uas_planner.core.population_routing import PopulationEvaluator, PopulationR
 from uas_planner.core.regional import RegionalConstraints
 from uas_planner.core.risk import RiskModel, nonnegative, signature
 from uas_planner.core.routing import connect_endpoints, plan_route
+
+
+def validate_search_budget(seconds, algorithm, objective):
+    limit = 120 if algorithm == "abitstar" and objective == PEDESTRIAN_OBJECTIVE else 60
+    budget = nonnegative(seconds, "Planning time budget")
+    if budget > limit:
+        raise ValueError(f"Planning time budget must be at most {limit} seconds.")
+    return budget
 
 
 class RegionalPlanner:
@@ -240,7 +249,8 @@ class RegionalPlanner:
         planning_mode="strict",
         background_cost=None,
         risk_weight=0.9,
-        distance_weight=0.1,
+        distance_weight=DEFAULT_DISTANCE_WEIGHT,
+        exposure_weight=DEFAULT_EXPOSURE_WEIGHT,
         include_population=False,
         population_weight=1.0,
         time_budget_s=3,
@@ -252,8 +262,10 @@ class RegionalPlanner:
         if not isinstance(include_population, bool):
             raise ValueError("include_population must be a boolean.")
         pedestrian = objective == PEDESTRIAN_OBJECTIVE
-        if pedestrian and (algorithm != "astar" or include_population):
-            raise ValueError("Outdoor pedestrian exposure requires A* and its own exposure layer.")
+        if pedestrian:
+            if include_population:
+                raise ValueError("Outdoor pedestrian exposure uses its own exposure layer.")
+            exposure_weight = nonnegative(exposure_weight, "Exposure weight")
         if objective == "risk":
             # Regional risk now uses the paper's fixed fusion, including population.
             risk_weight, distance_weight = 0.9, 0.1
@@ -272,18 +284,11 @@ class RegionalPlanner:
             or planning_mode not in ("strict", "research", "conservative")
         ):
             raise ValueError("Unknown regional planner controls.")
-        for value, label in (
-            (risk_weight, "Risk weight"),
-            (distance_weight, "Distance weight"),
-            (time_budget_s, "Time budget"),
-        ):
-            nonnegative(value, label)
-        if (
-            time_budget_s > 60
-            or objective == "risk"
-            and risk_weight + distance_weight + population_weight == 0
-        ):
-            raise ValueError("Invalid budget or zero objective weights.")
+        nonnegative(risk_weight, "Risk weight")
+        distance_weight = nonnegative(distance_weight, "Distance weight")
+        if pedestrian and distance_weight == exposure_weight == 0:
+            raise ValueError("At least one pedestrian routing weight must be positive.")
+        time_budget_s = validate_search_budget(time_budget_s, algorithm, objective)
         if background_cost is not None:
             nonnegative(background_cost, "Background cost")
         nonnegative(corridor_margin_m, "Corridor margin")
@@ -362,6 +367,7 @@ class RegionalPlanner:
                 "background_cost": background_cost,
                 "risk_weight": risk_weight,
                 "distance_weight": distance_weight,
+                **({"exposure_weight": exposure_weight} if pedestrian else {}),
                 "include_population": include_population,
                 "population_weight": population_weight if include_population else None,
                 "time_budget_s": time_budget_s,
@@ -378,7 +384,10 @@ class RegionalPlanner:
                 "window": window_metadata(selected_window),
             }
             result[EXPOSURE_FIELD] = None
-            result["effective_weights"] = {"distance": 1, "pedestrian_exposure": EXPOSURE_WEIGHT}
+            result["effective_weights"] = {
+                "distance": distance_weight,
+                "pedestrian_exposure": exposure_weight,
+            }
         if objective == "risk":
             result.update({field: None for field in FIELDS + ("fused_risk_length_cost",)})
         reports.update({n: self.check([p], planning_mode) for n, p in endpoints.items()})
@@ -386,11 +395,16 @@ class RegionalPlanner:
         def make_model(boundary):
             base = None
             if pedestrian:
-                if self._pedestrian is None:
+                if self._pedestrian is None or (
+                    self._pedestrian.distance_weight,
+                    self._pedestrian.exposure_weight,
+                ) != (distance_weight, exposure_weight):
                     self._pedestrian = PedestrianRouteCost(
                         self.directory,
                         selected_window,
                         self.constraints.scenario.get("clearance_m", 0),
+                        distance_weight=distance_weight,
+                        exposure_weight=exposure_weight,
                     )
                 result["pedestrian_exposure"].update(
                     self._pedestrian.provenance, assessment="unresolved"
@@ -546,6 +560,9 @@ class RegionalPlanner:
                                 distance_weight=1,
                                 safety_distance_m=self.constraints.scenario.get("clearance_m", 0),
                             )
+                            if pedestrian:
+                                native_model = copy(model)
+                                native_model.boundary = corridors[0]
                             result.update(
                                 plan_abitstar(
                                     grid,
@@ -563,7 +580,6 @@ class RegionalPlanner:
                                 "variability": "Independent finite-budget stochastic runs; global optimality not established.",
                             }
                             if objective == "distance" and not population_active:
-                                result.update(objective="distance", risk_length_cost=None)
                                 result.pop("risk_model", None)
                         else:
                             grid = self.attach(grid, endpoints, check, model)
@@ -699,6 +715,7 @@ class RegionalPlanner:
                 "background_cost": background_cost,
                 "risk_weight": risk_weight,
                 "distance_weight": distance_weight,
+                **({"exposure_weight": exposure_weight} if pedestrian else {}),
                 "include_population": include_population,
                 "population_weight": population_weight if include_population else None,
                 "time_budget_s": time_budget_s,
