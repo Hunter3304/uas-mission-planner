@@ -229,13 +229,13 @@ function RegionalMapContent({
             <label className="map-layer-choice"><input type="checkbox" checked={visible.population} onChange={event => setVisible(current => ({ ...current, population: event.target.checked }))} />GHSL — population risk (250 m)</label>
             {readyMap && <PopulationCostOverlay key={`${datasetId}:population-cost`} map={readyMap} datasetId={datasetId} visible={visible.population} />}
           </CollapsiblePanel>
-          {study?.region_id === 'hannover-lehrte-5km' && <CollapsiblePanel className="map-layer-group" title="Outdoor pedestrians">
-            {readyMap && <PedestrianExposureOverlay key={datasetId} map={readyMap} datasetId={datasetId} departureWindow={pedestrianWindow} routeLayerIdentity={routeLayerIdentity} />}
-          </CollapsiblePanel>}
           <CollapsiblePanel className="map-layer-group map-layer-group-osm" title="OSM">
             {readyMap && <RegionalOsm key={datasetId} map={readyMap} datasetId={datasetId} />}
             {scenarioControls('osm', ['blocked', 'unknown'])}
           </CollapsiblePanel>
+          {study?.region_id === 'hannover-lehrte-5km' && <CollapsiblePanel className="map-layer-group" title="Outdoor pedestrians">
+            {readyMap && <PedestrianExposureOverlay key={datasetId} map={readyMap} datasetId={datasetId} departureWindow={pedestrianWindow} routeLayerIdentity={routeLayerIdentity} />}
+          </CollapsiblePanel>}
           <CollapsiblePanel className="map-layer-group" title="DIPUL restrictions">
             {scenarioControls('dipul', decisionKeys)}
             <p className="layer-help">Scenario decisions: confirmed prohibitions and unresolved policy exclusions remain separate.</p>

@@ -27,7 +27,18 @@ def test_half_open_berlin_departure_windows(timestamp, expected):
     assert departure_window(timestamp) == expected
 
 
-def test_astar_trade_off_and_independent_coverage(tmp_path):
+@pytest.mark.parametrize("algorithm", ["astar", "dijkstra"])
+@pytest.mark.parametrize(
+    ("distance_weight", "exposure_weight", "expected"),
+    [
+        (0.1, 0.9, ("direct", "detour", "detour")),
+        (2, 0, ("direct", "direct", "detour")),
+        (0, 2, ("detour", "detour", "detour")),
+    ],
+)
+def test_trade_off_and_independent_coverage(
+    tmp_path, algorithm, distance_weight, exposure_weight, expected
+):
     directory = tmp_path / "study"
     directory.mkdir()
     study = directory / "study.json"
@@ -59,23 +70,31 @@ def test_astar_trade_off_and_independent_coverage(tmp_path):
     geographic = {key: to_geo(*point) for key, point in positions.items()}
     paths = []
     for window in ("08-10", "13-16", "22-05"):
-        model = PedestrianRouteCost(directory, window, 0)
+        model = PedestrianRouteCost(
+            directory, window, 0, distance_weight=distance_weight, exposure_weight=exposure_weight
+        )
         edges = []
         for a, b in (("start", "end"), ("start", "detour"), ("detour", "end")):
             score = model.evaluate([geographic[a], geographic[b]])
             if score["assessment"] == "assessed":
                 edges.append((a, b, score["length_m"], score["objective_cost"]))
         selected = search_graph(
-            positions, edges, "start", "end", objective="risk", distance_weight=1
+            positions,
+            edges,
+            "start",
+            "end",
+            algorithm=algorithm,
+            objective="risk",
+            distance_weight=distance_weight,
         )
         assert selected["status"] == "success"
-        paths.append(selected["nodes"])
+        paths.append("detour" if "detour" in selected["nodes"] else "direct")
         checked = model.independently_score([geographic[n] for n in selected["nodes"]])
         assert checked["objective_cost"] == pytest.approx(selected["objective_cost"])
-        assert checked[EXPOSURE_FIELD] == pytest.approx(
-            selected["objective_cost"] - selected["length_m"]
+        assert checked["objective_cost"] == pytest.approx(
+            distance_weight * selected["length_m"] + exposure_weight * checked[EXPOSURE_FIELD]
         )
-    assert paths == [["start", "end"], ["start", "detour", "end"], ["start", "detour", "end"]]
+    assert tuple(paths) == expected
     assert model.evaluate([to_geo(x + 150, y)])["unavailable_cell_ids"] == ["0"]
     assert model.independently_score([geographic["start"], geographic["end"]]) is None
     assert model.evaluate([geographic["start"], to_geo(x - 120, y)])["objective_cost"] is None

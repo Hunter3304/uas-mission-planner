@@ -11,7 +11,7 @@ from pyproj import Transformer
 from uas_planner.acquisition.study import validate_study
 from uas_planner.core.osm_display import contained, read_object
 from uas_planner.core.regional import query_geometry, validate_scenario
-from uas_planner.core.risk import nonnegative, signature
+from uas_planner.core.risk import signature
 
 MAX_PASSES = 3
 REQUEST_SECONDS = 300  # Regional browser requests allow 10 s for response/transfer overhead.
@@ -70,14 +70,14 @@ def interval_of(scenario):
 
 
 def automatic_route(directory, scenario, start_id, end_id, *, terrain_directory=None, **controls):
-    from uas_planner.core.regional_routing import RegionalPlanner
+    from uas_planner.core.regional_routing import RegionalPlanner, validate_search_budget
 
     started = perf_counter()
     deadline = started + REQUEST_SECONDS
     original = deepcopy(scenario)
-    budget = nonnegative(controls.get("time_budget_s", 3), "Planning time budget")
-    if budget > 60:
-        raise ValueError("Planning time budget must be at most 60 seconds.")
+    budget = validate_search_budget(
+        controls.get("time_budget_s", 3), controls.get("algorithm"), controls.get("objective")
+    )
     endpoints = {k: controls[k] for k in ("start_coordinate", "end_coordinate") if k in controls}
     prepared = provisional_scenario(directory, original, start_id, end_id, **endpoints)
     planner = RegionalPlanner(directory, prepared, terrain_directory=terrain_directory)

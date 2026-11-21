@@ -7,6 +7,7 @@ import { CostDetails, CostOverview, costText } from './BuildingCosts'
 import {
   featureKey,
   featureLayers,
+  hannoverDatasetId,
   isVisible,
   layers,
   type Dataset,
@@ -71,10 +72,11 @@ export default function App() {
     getJson<{ datasets: Dataset[] }>('/api/datasets', controller.signal)
       .then((result) => {
         setCatalog(result.datasets)
+        const preferred = result.datasets.find(item => item.id === hannoverDatasetId)
         setId((current) =>
           result.datasets.some((item) => item.id === current)
             ? current
-            : (result.datasets[0]?.id ?? ''),
+            : (preferred?.id ?? result.datasets[0]?.id ?? ''),
         )
       })
       .catch((err) => {

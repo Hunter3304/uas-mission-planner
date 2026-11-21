@@ -13,7 +13,8 @@ from uas_planner.core.mid_profiles import window_metadata
 
 OBJECTIVE = "pedestrian_exposure"
 REFERENCE_DENSITY = 100.0  # people/km², fixed comparison scale across model windows
-EXPOSURE_WEIGHT = 1.0  # a metre at reference density adds one metre to the objective
+DEFAULT_DISTANCE_WEIGHT = 0.1
+DEFAULT_EXPOSURE_WEIGHT = 0.9
 EXPOSURE_FIELD = "pedestrian_exposure_m"
 DEFAULT_GRID_M = 500
 DEFAULT_SEARCH_SECONDS = 30
@@ -21,15 +22,24 @@ CONTACT_M = 1e-6
 
 
 class PedestrianRouteCost:
-    """Cost adapter for the existing graph search, with explicit missing support."""
+    """Cost adapter for graph and continuous search, with explicit missing support."""
 
     crs = CRS.from_epsg(25832)
-    distance_weight = 1.0
     component_fields = (EXPOSURE_FIELD,)
 
-    def __init__(self, directory, window, clearance):
+    def __init__(
+        self,
+        directory,
+        window,
+        clearance,
+        *,
+        distance_weight=DEFAULT_DISTANCE_WEIGHT,
+        exposure_weight=DEFAULT_EXPOSURE_WEIGHT,
+    ):
         product, identity = read_pedestrian_product(directory)
         self.safety_distance_m = clearance
+        self.distance_weight = distance_weight
+        self.exposure_weight = exposure_weight
         self.forward = Transformer.from_crs(4326, self.crs, always_xy=True).transform
         self.polygons = []
         self.densities = []
@@ -50,17 +60,24 @@ class PedestrianRouteCost:
             self.ids.append(cell["id"])
         self.tree = STRtree(self.polygons)
         self.provenance = {
-            "rules_version": "pedestrian-distance-v1",
+            "rules_version": "pedestrian-distance-v2",
             "window": window_metadata(window),
             "layer_identity": f"{identity}:{window}",
             "model_version": product["version"],
             "study_sha256": product["study_sha256"],
             "reference_density_people_per_km2": REFERENCE_DENSITY,
-            "lambda": EXPOSURE_WEIGHT,
         }
 
-    def evaluate(self, coordinates):
-        points = [self.forward(*point) for point in coordinates]
+    def evaluate(self, coordinates, *, input_crs="EPSG:4326"):
+        if input_crs == "EPSG:25832":
+            points = coordinates
+        else:
+            project = (
+                self.forward
+                if input_crs == "EPSG:4326"
+                else Transformer.from_crs(input_crs, self.crs, always_xy=True).transform
+            )
+            points = [project(*point) for point in coordinates]
         geometry = Point(points[0]) if len(set(points)) == 1 else LineString(points)
         length = geometry.length
         candidates = self.tree.query(
@@ -99,7 +116,9 @@ class PedestrianRouteCost:
             "assessment": "assessed" if assessed else "unresolved",
             "length_m": length,
             EXPOSURE_FIELD: exposure if assessed else None,
-            "objective_cost": length + EXPOSURE_WEIGHT * exposure if assessed else None,
+            "objective_cost": self.distance_weight * length + self.exposure_weight * exposure
+            if assessed
+            else None,
             "risk_length_cost": 0.0,
             "has_default": False,
             "background_assumed": False,
@@ -134,5 +153,5 @@ class PedestrianRouteCost:
         return {
             "length_m": route_length,
             EXPOSURE_FIELD: exposure,
-            "objective_cost": route_length + EXPOSURE_WEIGHT * exposure,
+            "objective_cost": self.distance_weight * route_length + self.exposure_weight * exposure,
         }

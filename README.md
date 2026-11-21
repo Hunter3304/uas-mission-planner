@@ -1,8 +1,8 @@
 # UAS Mission Planner
 
 A local geospatial research application for exploring Hannover/Lehrte map data
-and planning UAS routes between eight saved hospital, laboratory and practice
-locations. Python/FastAPI serves the data and planner; React/Vite provides the
+and planning UAS routes between eight saved locations or exact coordinates.
+Python/FastAPI serves the data and planner; React/Vite provides the
 dataset explorer. OpenFlightMaps (OFM) has a separate page served by the backend.
 
 This guide sets up those **two pages**. Run commands from the repository root.
@@ -232,34 +232,33 @@ No database server or separate GIS application is required.
 
 ### Check the Hannover page
 
-1. Select `hannover-part1-v4` under **Saved dataset**. With several datasets
-   present, the application initially selects the first catalog entry rather
-   than automatically preferring Hannover.
+1. Open the website. When `hannover-part1-v4` is in the saved catalog, the
+   website opens it in **Outdoor pedestrian exposure** mode with **ABIT\***
+   selected. The **Saved dataset** menu lists the other local datasets.
 2. Confirm the boundary, eight saved sites and saved OSM appear. The initial
    regional view uses an aggregate overview; zoom to level 15+ for individual
    OSM objects. Click an object for its original attributes and category costs.
 3. Select terrain `hannover-part2-terrain-v1`. Enter a **Departure time** in
    Europe/Berlin. Scenario constraint layers prepare automatically once required
    inputs are valid; no manual preload button is needed.
-4. Enable **GHSL — population risk (250 m)** to display population classes.
-   This affects display only. The `risk` objective always includes population,
-   even when the population layer is hidden. **Include population** is available
-   only for the `distance` objective.
-   For the public MiD resident-walking layer, follow the
-   [pedestrian exposure preparation guide](doc/experiments/iteration-016.md)
-   and enable **Outdoor pedestrians** on the map. In the route panel, choose
-   **Outdoor pedestrian exposure** under **Routing mode** to use the same
-   prepared layer for route scoring. [Route example and acceptance](doc/iteration/iteration-016/phase-2.md)
-5. For the retained research example, choose `rheuma-podbi` → `mhh`, select
-   **research**, `risk`, 100 m AGL, 30 m/s, background score **0**, estimated
-   missing building height 30 m. The page defaults to **ABIT***, **Research**,
-   background **0**, grid spacing **250 m** and search budget **3 s**. On macOS
-   or a machine without OMPL, explicitly choose **`astar` or `dijkstra`**.
-   For a first graph attempt, try **500 m** spacing and **60 s** search budget;
-   these reduce graph work/allow more search but do not guarantee success.
-   Finer spacing gives a more detailed graph and costs more preparation time.
-   Click **Plan regional route**. Keep the NHN/MSL comparison assumption and
-   its 0 m offset and uncertainty explicit.
+4. Prepare the public MiD resident-walking layer using the
+   [pedestrian exposure preparation guide](doc/experiments/iteration-016.md).
+   Enable **Outdoor pedestrians** on the map to view the route's departure
+   window. This panel sits next to **DIPUL restrictions** on wide screens.
+5. Choose origin and destination from the eight saved sites or select
+   **Enter exact coordinates** and enter two WGS84 longitude/latitude pairs.
+   The defaults are distance weight **0.1** and exposure weight **0.9**.
+   Change either field to adjust the route objective. When using ABIT*, the
+   **Search budget (s)** field starts at **30** and accepts up to **120**.
+   Choose **A\*** or **Dijkstra** if native OMPL is unavailable. Click
+   **Plan regional route** to compute a route and see the applied weights.
+
+Pedestrian mode uses the Berlin departure window along the route. It
+integrates exposure `E` in proportion to the distance travelled in each
+150 m cell and the cell's pedestrian density divided by 100 people/km².
+The default objective combines `0.1 × route length + 0.9 × E`. Route results
+and GeoJSON exports record both effective weights, the window and the model
+identity. [Iteration 017 plan](doc/plan/iteration-017.md)
 
 With retained historical sources, `2026-10-07 10:00` is a documented research
 departure example, not a current verified flight window. ABIT* is stochastic:
@@ -269,7 +268,12 @@ cost preparation also consumes the A*/Dijkstra search deadline. See the separate
 limits below. Cold full-study preparation was about 98–120 s on the development
 Windows host; this is a historical observation, not a macOS timing guarantee.
 
-The regional `risk` objective uses a **fixed 150 m fused cost grid**:
+Switch **Routing mode** to **Existing planning** for the regional `risk` and
+`distance` objectives. In this mode, enable **GHSL — population risk (250 m)**
+to display population classes. Use **Include population** to add a separately
+weighted population term to the `distance` objective.
+
+The regional `risk` objective uses a **fixed 150 m fused cost grid**.
 
 ```text
 J = 0.15 × building + 0.15 × land use + 0.15 × roads
@@ -294,8 +298,8 @@ and [population rules](doc/rules/population-costs.md).
 | Stage | Limit / behavior |
 | --- | --- |
 | Build an A*/Dijkstra graph, including an expanded corridor | At most **30 s per graph preparation**, also subject to the remaining request time and candidate-cell limit |
-| Graph cost/connector preparation and A*/Dijkstra search | Share the selected **Search budget**, default 3 s and maximum 60 s; expansion does not reset this deadline |
-| Native ABIT* solve | Selected search budget, also bounded by the remaining request time |
+| Graph cost/connector preparation and A*/Dijkstra search | Share one deadline. Pedestrian mode uses 30 s in the website. Existing planning defaults to 3 s with a 60 s maximum |
+| Native ABIT* solve | Pedestrian mode defaults to 30 s and allows up to 120 s. Existing planning defaults to 3 s and allows up to 60 s. The remaining request time also bounds native search |
 | Entire regional backend request | **300 s**, including source/cost preparation and flight-interval checks |
 | Browser wait for a regional route response | **310 s**; other API calls retain 120 s |
 
